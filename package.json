@@ -1,0 +1,12 @@
+{
+  "name": "pieces-dashboard",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "fetch": "bash scripts/fetch-cloud.sh && node scripts/fetch-pr-states.mjs",
+    "fetch:prs": "node scripts/fetch-pr-states.mjs",
+    "test": "node --test",
+    "build": "node output-schema/build.mjs && node ai-actions/build.mjs && node site/build.mjs"
+  }
+}
