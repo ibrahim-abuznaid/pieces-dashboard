@@ -12,6 +12,7 @@ const readIf = (p) => (existsSync(join(ROOT, p)) ? JSON.parse(readFileSync(join(
 const nums = new Set();
 for (const p of readIf('ai-actions/pieces.json')?.pieces ?? []) if (p.pr) nums.add(p.pr);
 for (const ov of Object.values(readIf('output-schema/overrides.json')?.pieces ?? {})) if (ov.pr) nums.add(ov.pr);
+for (const ov of Object.values(readIf('ai-actions/overrides.json')?.pieces ?? {})) if (ov.pr) nums.add(ov.pr);
 
 const prs = {};
 for (const n of [...nums].sort((a, b) => a - b)) {

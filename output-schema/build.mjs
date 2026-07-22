@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Joins cloud catalog + cloud coverage + repo schema files + manual overrides
 // into data/pieces.json, then renders TRACKING.md and index.html.
-// Refresh the inputs first with ./refresh.sh (or run this alone to re-render).
+// Refresh the inputs first with scripts/fetch-cloud.sh + scripts/fetch-pr-states.mjs (or npm run fetch) (or run this alone to re-render).
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -149,7 +149,7 @@ const chip = { live: '🟢 live', 'merged-not-live': '🟡 merged, not live', 'i
 const md = [];
 md.push(`# Output Schema Rollout — Tracking`);
 md.push(``);
-md.push(`> Generated ${GENERATED} by \`build.mjs\`. **Do not hand-edit** — computed from the cloud catalog, cloud piece metadata, the upstream repo tree, and \`status-overrides.json\` (manual state goes THERE). Dashboard: \`index.html\`. Full data: \`data/pieces.json\`. How-to: \`reference/SKILL.md\` (upstream \`piece-output-schema\` skill, PR #14346).`);
+md.push(`> Generated ${GENERATED} by \`build.mjs\`. **Do not hand-edit** — computed from the cloud catalog, cloud piece metadata, the upstream repo tree, and \`output-schema/overrides.json\` (manual state goes THERE). Dashboard: \`index.html\`. Full data: \`data/pieces.json\`. How-to: the upstream \`piece-output-schema\` skill (PR #14346).`);
 md.push(``);
 md.push(`## Where we are`);
 md.push(``);
@@ -180,7 +180,7 @@ const q1 = queue.filter((p) => p.tier === 'P1');
 const q2 = queue.filter((p) => p.tier === 'P2');
 md.push(`## Priority queue — next up`);
 md.push(``);
-md.push(`Ranked by cloud \`projectUsage\`. Effort from step count (XS ≤3 · S ≤8 · M ≤15 · L ≤30 · XL >30). The **Linear** column stays empty until tickets are opened (then set it in \`status-overrides.json\`).`);
+md.push(`Ranked by cloud \`projectUsage\`. Effort from step count (XS ≤3 · S ≤8 · M ≤15 · L ≤30 · XL >30). The **Linear** column stays empty until tickets are opened (then set it in \`output-schema/overrides.json\`).`);
 md.push(``);
 md.push(`### P1 — usage ≥ 20 (${q1.length} pieces)`);
 md.push(``);
@@ -206,13 +206,13 @@ for (const p of review) md.push(`| ${p.displayName} (\`${p.folder}\`) | ${p.usag
 md.push(``);
 md.push(`## Related workstream — AI-agent atomics (separate track, same skill)`);
 md.push(``);
-md.push(`[PIE-364](https://linear.app/activepieces/issue/PIE-364), [PIE-365](https://linear.app/activepieces/issue/PIE-365), [PIE-366](https://linear.app/activepieces/issue/PIE-366) (all Backlog): add \`outputSchema\` to ~716 \`audience:'ai'\` actions across 16 **open** AI-actions PRs. Those schemas live on the PR branches, not the catalog — but the pieces overlap (see the AI-atomics column above), so whoever takes a piece here should coordinate with the wave ticket to share captured outputs and field-sets.`);
+md.push(`PIE-364 · PIE-365 · PIE-366: add \`outputSchema\` to ~716 \`audience:'ai'\` actions across the 16 AI-actions wave PRs. Those schemas live on the PR branches, not the catalog — but the pieces overlap (see the AI-atomics column above), so whoever takes a piece here should coordinate with the wave ticket to share captured outputs and field-sets.`);
 md.push(``);
 md.push(`## Refresh`);
 md.push(``);
 md.push('```bash');
-md.push(`cd pieces-team/output-schema && ./refresh.sh   # refetch cloud + repo, then rebuild`);
-md.push(`node build.mjs                                  # re-render only (after editing status-overrides.json)`);
+md.push(`npm run fetch                        # refetch cloud + repo + PR states (from repo root)`);
+md.push(`npm run build                        # re-render all dashboards (after editing output-schema/overrides.json)`);
 md.push('```');
 md.push(``);
 writeFileSync(join(DIST, 'TRACKING.md'), md.join('\n'));
@@ -235,4 +235,4 @@ writeFileSync(join(DIST, 'summary.json'), JSON.stringify(summary, null, 2) + '\n
 
 console.log(`Built ${GENERATED}: ${pieces.length} pieces — live ${summary.status.live}, merged-not-live ${summary.status['merged-not-live']}, todo ${summary.status.todo}, review ${summary.status.review + summary.status.skip}`);
 console.log(`Steps wired live: ${summary.stepsWiredLive}/${summary.totals.steps} · usage-weighted live ${summary.usageWeighted.liveShare}% (eligible ${summary.usageWeighted.eligibleLiveShare}%)`);
-console.log(`Wrote data/pieces.json, TRACKING.md, index.html`);
+console.log(`Wrote dist/output-schema/{pieces.json, TRACKING.md, summary.json, index.html}`);

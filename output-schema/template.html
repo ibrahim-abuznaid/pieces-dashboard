@@ -21,7 +21,7 @@
 
   <section class="card">
     <h2>Work in flight</h2>
-    <p class="hint">Claimed pieces. Stage is derived — assignee only → assigned · open PR → PR open · merged PR → merged (flips to live once cloud serves it).</p>
+    <p class="hint">Stage is derived — assignee only → assigned · open PR → PR open · merged → merged. Merged-but-not-yet-live pieces appear here automatically; rows drop off once live on cloud.</p>
     <table id="flightTable"></table>
   </section>
 
@@ -58,7 +58,7 @@
 
   <footer>
     Related workstream: PIE-364 · PIE-365 · PIE-366 — outputSchema for ~716 <code>audience:'ai'</code> actions on 16 open AI-actions PRs (separate track; overlapping pieces flagged in the table).<br>
-    Sources: cloud catalog + per-piece metadata (<code>cloud.activepieces.com/api/v1/pieces</code>), upstream git tree, PR #13757 diff, <code>status-overrides.json</code>. Refresh: <code>./refresh.sh</code> · re-render: <code>node build.mjs</code>.
+    Sources: cloud catalog + per-piece metadata (<code>cloud.activepieces.com/api/v1/pieces</code>), upstream git tree, PR #13757 diff, <code>overrides.json</code>. Refresh: <code>npm run fetch</code> · re-render: <code>npm run build</code>.
   </footer>
 </div>
 <div id="tip" role="tooltip"></div>

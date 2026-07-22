@@ -169,6 +169,7 @@ function renderBlockers() {
   document.getElementById('blkcount').textContent = `${rows.length} blockers`;
   document.getElementById('blkProgress').style.width = `${(S.blockersDone / (S.blockersDone + S.blockersOpen) * 100).toFixed(0)}%`;
   document.getElementById('blkProgressLabel').textContent = `${S.blockersDone} of ${S.blockersDone + S.blockersOpen} resolved`;
+  // b.why / b.fix are curated trusted HTML (inline <code>) — intentionally NOT escaped. Everything else must go through esc().
   document.getElementById('blockerList').innerHTML = rows.map((b) => `
     <div class="blocker${b.done ? ' done' : ''}">
       <div class="meta"><span class="sevtag ${b.sev}">${b.sev}</span>

@@ -58,7 +58,7 @@ function funnel(elId, legendId, segs) {
     if (!s.n) continue;
     const d = document.createElement('div');
     d.className = 'seg'; d.style.background = s.color; d.style.flex = `${s.n} 0 0`; d.style.borderRadius = '4px';
-    d.innerHTML = `<span class="seglabel">${s.n}</span>`;
+    d.innerHTML = `<span class="seglabel"${s.dark ? ' style="color:#0b0b0b"' : ''}>${s.n}</span>`;
     el.appendChild(d);
   }
   document.getElementById(legendId).innerHTML = segs.map((s) => `<span><span class="swatch" style="background:${s.color}"></span>${s.label} · ${s.n}</span>`).join('');
@@ -72,8 +72,8 @@ document.getElementById('osTiles').innerHTML = [
 funnel('osFunnel', 'osLegend', [
   { label: 'Assigned', n: os.stages.assigned, color: 'var(--st-assigned)' },
   { label: 'PR open', n: os.stages.prOpen, color: 'var(--s-progress)' },
-  { label: 'Merged, not live', n: os.stages.merged, color: 'var(--s-merged)' },
-  { label: 'Live', n: os.stages.live, color: 'var(--s-live)' },
+  { label: 'Merged, not live', n: os.stages.merged, color: 'var(--s-merged)', dark: true },
+  { label: 'Live', n: os.stages.live, color: 'var(--s-live)', dark: true },
 ]);
 
 document.getElementById('aiTiles').innerHTML = [
@@ -85,7 +85,7 @@ funnel('aiFunnel', 'aiLegend', [
   { label: 'Held', n: ai.stages.held, color: 'var(--s-review)' },
   { label: 'Assigned', n: ai.stages.assigned, color: 'var(--st-assigned)' },
   { label: 'PR open', n: ai.stages.prOpen, color: 'var(--s-progress)' },
-  { label: 'Merged', n: ai.stages.merged, color: 'var(--s-live)' },
+  { label: 'Merged', n: ai.stages.merged, color: 'var(--s-live)', dark: true },
 ]);
 
 document.getElementById('stamps').innerHTML =

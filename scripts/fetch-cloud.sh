@@ -20,6 +20,11 @@ jq -r '.[].name' data/cloud-catalog.json | xargs -P10 -I{} sh -c '
   fi' > data/.coverage.jsonl
 jq -s '.' data/.coverage.jsonl > data/cloud-coverage.json && rm data/.coverage.jsonl
 echo "  $(jq length data/cloud-coverage.json) fetched, $(jq '[.[]|select(.error)]|length' data/cloud-coverage.json) errors"
+ERRS=$(jq '[.[]|select(.error)]|length' data/cloud-coverage.json)
+if [ "$ERRS" -gt 0 ]; then
+  echo "✗ $ERRS piece metadata fetches failed — aborting (fail-loud: partial coverage would silently demote live pieces)" >&2
+  exit 1
+fi
 
 echo "3/3 upstream repo tree (pieces + output-schemas.ts files)…"
 gh api "repos/activepieces/activepieces/git/trees/main?recursive=1" --paginate \

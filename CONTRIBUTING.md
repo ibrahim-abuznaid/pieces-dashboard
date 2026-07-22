@@ -1,7 +1,7 @@
 # Updating the dashboards
 
 Everything on the site is either **computed** (cloud API, upstream repo, GitHub PR states — hands off)
-or **manual state in one of three JSON files**. You edit JSON, push to `main`, and Actions rebuilds
+or **manual state in one of four JSON files**. You edit JSON, push to `main`, and Actions rebuilds
 the site in ~2–3 minutes. Never edit `dist/` or any generated file.
 
 ## Claim a piece (stage → *assigned*)
