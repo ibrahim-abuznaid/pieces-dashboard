@@ -1,0 +1,18 @@
+{
+  "_comment": "Manual state layered over the computed data. `pieces` keys are repo folder names (npm name minus @activepieces/piece-). Allowed status overrides: in-progress | review | skip. Set `linear` when a ticket is opened. Claim a piece: add `assignee` (GitHub handle). Record work: add `pr` (upstream PR number). Stage is derived automatically — never write it. Everything else is computed by build.mjs — don't duplicate it here.",
+  "pieces": {
+    "webhook": { "status": "review", "note": "Payload is caller-defined — per skill table generic passthrough gets no schema. Decide: skip." },
+    "http": { "status": "review", "note": "Generic passthrough (custom_api_call-like). Likely skip per skill table." },
+    "manual-trigger": { "status": "review", "note": "Output is user-defined sample data. Likely skip." },
+    "forms": { "status": "review", "note": "Fields are flow-author-defined — dynamicKey schema might work; needs a decision." },
+    "store": { "status": "review", "note": "Values are arbitrary; envelope is stable. Partial schema possible." },
+    "tables": { "status": "review", "note": "Record fields are user-defined — dynamicKey candidate." },
+    "subflows": { "status": "review", "note": "Returns callback output from the sub-flow — arbitrary shape." },
+    "ai": { "status": "review", "note": "Outputs vary by provider/mode; check per-action stability before scheming." }
+  },
+  "aiAtomicsWaves": {
+    "PIE-364": ["google-docs", "google-calendar", "gmail", "google-drive", "google-tasks", "google-sheets", "google-forms", "notion", "telegram-bot"],
+    "PIE-365": ["slack", "todoist", "clickup", "firecrawl", "apify", "trello", "discord"],
+    "PIE-366": ["stripe", "airtable", "serp-api", "github", "cody", "pubrio", "quizell", "senja", "reoon-verifier", "prompthub"]
+  }
+}

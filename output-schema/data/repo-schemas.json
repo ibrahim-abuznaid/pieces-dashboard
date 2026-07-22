@@ -1,0 +1,21 @@
+{
+  "fetchedAt": "2026-07-22",
+  "source": "upstream git tree main (output-schemas.ts files) + PR #13757 diff (wiredRepo = added `outputSchema:` lines outside output-schemas.ts; clickup undercounts because it wires via shared maps — trust cloud when live)",
+  "pieces": {
+    "claude": { "repoVersion": "0.4.9", "wiredRepo": 2 },
+    "clickup": { "repoVersion": "0.7.8", "wiredRepo": 28 },
+    "gmail": { "repoVersion": "0.12.8", "wiredRepo": 10 },
+    "google-calendar": { "repoVersion": "0.9.5", "wiredRepo": 14 },
+    "google-docs": { "repoVersion": "0.4.5", "wiredRepo": 6 },
+    "google-drive": { "repoVersion": "0.7.10", "wiredRepo": 16 },
+    "google-gemini": { "repoVersion": "0.1.12", "wiredRepo": 5 },
+    "google-sheets": { "repoVersion": "0.16.3", "wiredRepo": 30 },
+    "groq": { "repoVersion": "0.2.6", "wiredRepo": 3 },
+    "linkedin": { "repoVersion": "0.2.7", "wiredRepo": 2 },
+    "notion": { "repoVersion": "0.6.6", "wiredRepo": 16 },
+    "open-router": { "repoVersion": "0.1.6", "wiredRepo": 1 },
+    "rss": { "repoVersion": "0.5.7", "wiredRepo": 2 },
+    "supabase": { "repoVersion": "0.1.9", "wiredRepo": 9 },
+    "telegram-bot": { "repoVersion": "0.6.5", "wiredRepo": 18 }
+  }
+}
