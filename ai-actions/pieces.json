@@ -1,0 +1,258 @@
+{
+  "_comment": "Curated per-piece facts. No status field — stage derives from pr + data/pr-states.json. held = authored-but-not-in-a-PR reason. Claims for pieces without a PR go in overrides.json.",
+  "pieces": [
+    {
+      "slug": "google-docs",
+      "atomics": 37,
+      "v": "0.4.5",
+      "pr": 13926,
+      "t2v": 35,
+      "t2t": 37,
+      "note": "2 Tier-1-only (replace_image, unmerge_table_cells). Greptile addressed."
+    },
+    {
+      "slug": "google-calendar",
+      "atomics": 16,
+      "v": "0.9.5",
+      "pr": 13929,
+      "t2v": 16,
+      "t2t": 16,
+      "note": "15 scope-gated calendar/ACL tools deferred (need Google app verification)."
+    },
+    {
+      "slug": "gmail",
+      "atomics": 19,
+      "v": "0.12.7",
+      "pr": 13930,
+      "t2v": 18,
+      "t2t": 19,
+      "note": "Tier A only. get_attachment Tier-1-only. Tier B (11) deferred — scope re-consent."
+    },
+    {
+      "slug": "google-drive",
+      "atomics": 36,
+      "v": "0.7.9",
+      "pr": 13937,
+      "t2v": 40,
+      "t2t": 45,
+      "note": "Tier-2 combined with google-tasks in #13937 (40/45 across both). 5 need a Workspace / are destructive."
+    },
+    {
+      "slug": "google-tasks",
+      "atomics": 9,
+      "v": "0.4.6",
+      "pr": 13937,
+      "t2shared": "google-drive",
+      "note": "Shipped in #13937 with google-drive; Tier-2 counted there (40/45 combined)."
+    },
+    {
+      "slug": "google-sheets",
+      "atomics": 34,
+      "v": "0.16.2",
+      "pr": 13941,
+      "t2v": 34,
+      "t2t": 34,
+      "note": "All shipped atomics live-verified."
+    },
+    {
+      "slug": "google-forms",
+      "atomics": 3,
+      "v": "0.5.4",
+      "pr": 13941,
+      "t2v": 3,
+      "t2t": 3,
+      "note": "Read-only. 9 create/edit atomics deferred — forms.body scope blocked on the unverified OAuth app."
+    },
+    {
+      "slug": "notion",
+      "atomics": 22,
+      "v": "0.6.5",
+      "pr": 13941,
+      "t2v": 22,
+      "t2t": 22,
+      "note": "Preserved upstream's 2 new actions; merged on top."
+    },
+    {
+      "slug": "telegram-bot",
+      "atomics": 21,
+      "v": "0.6.4",
+      "pr": 13941,
+      "t2v": 21,
+      "t2t": 21,
+      "note": "~8 adjacent atomics env-limited (file uploads, invite-link, callback) — twins of in-prod actions."
+    },
+    {
+      "slug": "slack",
+      "atomics": 44,
+      "v": "0.17.3",
+      "pr": 13946,
+      "t2v": 44,
+      "t2t": 44,
+      "note": "Part of 145/145 combined. 12 atomics deferred (paid plan / scopes / harness)."
+    },
+    {
+      "slug": "todoist",
+      "atomics": 42,
+      "v": "0.4.8",
+      "pr": 13946,
+      "t2v": 42,
+      "t2t": 42,
+      "note": "Zero deferrals — all 42 shipped & verified."
+    },
+    {
+      "slug": "clickup",
+      "atomics": 59,
+      "v": "0.7.6",
+      "pr": 13947,
+      "t2v": 59,
+      "t2t": 59,
+      "note": "Core surface. Long-tail (goals/docs/chat/views) deferred; 6 atomics blocked (paid/Enterprise/UI-only)."
+    },
+    {
+      "slug": "firecrawl",
+      "atomics": 15,
+      "v": "0.3.8",
+      "pr": 13952,
+      "t2v": 15,
+      "t2t": 15,
+      "note": "get_extract_results deferred (no standalone extract id)."
+    },
+    {
+      "slug": "apify",
+      "atomics": 32,
+      "v": "0.2.5",
+      "pr": 13952,
+      "t2v": 32,
+      "t2t": 32,
+      "note": "delete_dataset Tier-1-only (destructive)."
+    },
+    {
+      "slug": "trello",
+      "atomics": 46,
+      "v": "0.4.10",
+      "pr": 13953,
+      "t2v": 46,
+      "t2t": 46,
+      "note": "3 attachment atomics deferred (form-data limit). remove_board_member is Tier-B."
+    },
+    {
+      "slug": "discord",
+      "atomics": 45,
+      "v": "0.5.4",
+      "pr": 13954,
+      "t2v": 45,
+      "t2t": 45,
+      "note": "send_message rewritten (form-data → JSON). list_thread_members deferred (GUILD_MEMBERS intent)."
+    },
+    {
+      "slug": "resend",
+      "atomics": 36,
+      "v": "0.4.3",
+      "pr": null,
+      "t2v": 2,
+      "t2t": 36,
+      "note": "Held on disk, not in a PR. Send-only restricted key blocks 34 read/mgmt atomics. Needs a full-access key.",
+      "held": "Held on disk, not in a PR. Send-only restricted key blocks 34 read/mgmt atomics. Needs a full-access key."
+    },
+    {
+      "slug": "stripe",
+      "atomics": 75,
+      "v": "0.6.10",
+      "pr": 13969,
+      "t2v": 75,
+      "t2t": 75,
+      "note": "Wave 1 (2026-06-29), PR pending review. Test-mode key → money/email atomics verified safely. 8 Tier-2 bugs found+fixed. 4 more deferred (disputes/payouts + close_dispute) — see blockers."
+    },
+    {
+      "slug": "airtable",
+      "atomics": 18,
+      "v": "0.6.10",
+      "pr": 13970,
+      "t2v": 18,
+      "t2t": 18,
+      "note": "Wave 1, PR pending review. PAT carries full scopes → all 'Tier-B' writes passed live. 1 more deferred (create_base_ai) — see blockers."
+    },
+    {
+      "slug": "serp-api",
+      "atomics": 17,
+      "v": "0.1.5",
+      "pr": 13971,
+      "t2v": 17,
+      "t2t": 17,
+      "note": "Wave 1, PR pending review. All 17 engine searches verified; 13 new engines added to the SerpApiEngine validator enum."
+    },
+    {
+      "slug": "github",
+      "atomics": 72,
+      "v": "0.8.4",
+      "pr": 13972,
+      "t2v": 72,
+      "t2t": 72,
+      "note": "Wave 2 (core subset), PR pending review. 0 code bugs. Long-tail (Actions/Projects/Checks/...) + 2 env-gated deferred — see blockers."
+    },
+    {
+      "slug": "cody",
+      "atomics": 18,
+      "v": "0.1.6",
+      "pr": 13973,
+      "t2v": 18,
+      "t2t": 18,
+      "note": "Wave 3, PR pending review. Account had 2 bots → full conversation/document chain verified. 1 more deferred (upload_file_to_kb) — see blockers."
+    },
+    {
+      "slug": "sendinblue",
+      "atomics": 20,
+      "v": "0.2.6",
+      "pr": null,
+      "t2v": 0,
+      "t2t": 20,
+      "note": "Wave 3 (Brevo). BLOCKED — seeded Brevo key returns 401 'Key not found'. 20 authored + Tier-1 green, 0 verifiable until a valid key is re-seeded.",
+      "held": "Wave 3 (Brevo). BLOCKED — seeded Brevo key returns 401 'Key not found'. 20 authored + Tier-1 green, 0 verifiable until a valid key is re-seeded."
+    },
+    {
+      "slug": "pubrio",
+      "atomics": 14,
+      "v": "0.0.4",
+      "pr": 13979,
+      "t2v": 14,
+      "t2t": 14,
+      "note": "Wave 8 (2026-06-29/30), PR pending review. Seeded via seed_connections.py. 1 more deferred (delete_monitor — vendor 404 on both documented endpoints, unfixable) — see blockers."
+    },
+    {
+      "slug": "senja",
+      "atomics": 5,
+      "v": "0.1.4",
+      "pr": 13979,
+      "t2v": 5,
+      "t2t": 5,
+      "note": "Wave 8, PR pending review. All 5 ai twins live-verified; zero deferrals."
+    },
+    {
+      "slug": "quizell",
+      "atomics": 4,
+      "v": "0.0.4",
+      "pr": 13979,
+      "t2v": 4,
+      "t2t": 4,
+      "note": "Wave 8, PR pending review. 3 more deferred (get_customer_by_id + create/update_customer — quiz_id has no in-piece resolver) — see blockers."
+    },
+    {
+      "slug": "reoon-verifier",
+      "atomics": 3,
+      "v": "0.1.5",
+      "pr": 13979,
+      "t2v": 3,
+      "t2t": 3,
+      "note": "Wave 8, PR pending review. All 3 ai twins live-verified; zero deferrals."
+    },
+    {
+      "slug": "prompthub",
+      "atomics": 1,
+      "v": "0.1.6",
+      "pr": 13979,
+      "t2v": 1,
+      "t2t": 1,
+      "note": "Wave 8, PR pending review. 1 net-new (get_current_account). 3 pre-existing 'both' actions had a zod v3-vs-4 validateZod bug — fixed 2026-06-30 (940192c), now working for agents too."
+    }
+  ]
+}

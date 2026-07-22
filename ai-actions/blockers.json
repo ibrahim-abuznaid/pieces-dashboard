@@ -1,0 +1,448 @@
+{
+  "categories": [
+    {
+      "id": "framework",
+      "label": "Framework"
+    },
+    {
+      "id": "plan",
+      "label": "Paid / Enterprise plan"
+    },
+    {
+      "id": "scope",
+      "label": "OAuth scope · connection · key"
+    },
+    {
+      "id": "vendorui",
+      "label": "Vendor UI-only resource"
+    },
+    {
+      "id": "harness",
+      "label": "Test-harness · safety limit"
+    },
+    {
+      "id": "arch",
+      "label": "Architecture & audit · open decisions"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "fw-formdata",
+      "cat": "framework",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "slack",
+        "trello",
+        "discord"
+      ],
+      "affected": "several",
+      "title": "node form-data bodies aren't transmitted by the dev FetchHttpClient",
+      "why": "Multipart / form-data request bodies arrive empty (dataSize:0) over fetch-http-client.ts — native fetch + a node form-data stream, no Content-Length. Confirmed framework-wide (the human discord_send_message fails identically; the diff vs upstream/main is comment-only). Blocks any atomic that posts a file via form-data.",
+      "fix": "Fix the framework HTTP client to transmit node form-data (set Content-Length / use a compatible body), or verify affected atomics in a real flow where a prior step produces the file. discord_send_message already works around it (JSON for text, payload_json for files)."
+    },
+    {
+      "id": "slack-usergroups",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "slack"
+      ],
+      "affected": 7,
+      "title": "Slack user groups (subteams) — 7 atomics",
+      "why": "Slack returns paid_teams_only — user groups are a paid Slack plan feature. The sandbox workspace is free and has zero existing groups, so the dependent atomics have no target.",
+      "fix": "Seed a connection to a paid Slack workspace (Pro/Business+), create one test group, then run all 7: create → update / enable / disable / list-members / set-members / find-by-handle."
+    },
+    {
+      "id": "clickup-multilist",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "clickup"
+      ],
+      "affected": 1,
+      "title": "clickup add_task_to_list",
+      "why": "403 TIML_001 — multi-homing a task into more than one list is a paid ClickUp ClickApp (blocked on free). Confirmed twice; not a code bug.",
+      "fix": "Test on a paid workspace with the 'Tasks in Multiple Lists' ClickApp enabled. Endpoint <code>POST /api/v2/list/{list_id}/task/{task_id}</code>."
+    },
+    {
+      "id": "clickup-tis",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "clickup"
+      ],
+      "affected": 1,
+      "title": "clickup get_task_time_in_status",
+      "why": "403 TIS_027 — Time in Status is a ClickUp Business+ feature.",
+      "fix": "Test on a Business-plan workspace. Endpoint <code>GET /api/v2/task/{id}/time_in_status</code>."
+    },
+    {
+      "id": "clickup-guests",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "clickup"
+      ],
+      "affected": 2,
+      "title": "clickup add_guest_to_task / remove_guest_from_task",
+      "why": "Guests are an Enterprise ClickUp feature; the sandbox plan has no guest accounts, so there's no real guest_id to add or remove.",
+      "fix": "On an Enterprise workspace, invite a guest, capture the guest id, then add → remove against a throwaway task."
+    },
+    {
+      "id": "resend-key",
+      "cat": "scope",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "resend"
+      ],
+      "affected": 34,
+      "title": "resend — entire piece held (34 of 36 atomics)",
+      "why": "The seeded Resend connection uses a send-only restricted API key → every read/management atomic returns 401 'restricted to only send emails'. Only send_email + send_batch_emails verified (2/36). Code is sound (Tier-1 green).",
+      "fix": "Create a full-access Resend API key, reconnect the connection, then re-run the resend Tier-2 leg (scratchpad/wf-tier2-waveA.js). Audiences/Contacts/Segments/Templates/Broadcasts also need a paid plan."
+    },
+    {
+      "id": "gmail-tierb",
+      "cat": "scope",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "gmail"
+      ],
+      "affected": 11,
+      "title": "gmail Tier B — label / trash / modify-labels / batch (11 atomics)",
+      "why": "All 11 fail invalid_request — the seeded connection predates the gmail.modify / gmail.labels scopes → re-consent wall. Code is correct + Tier-1 green. Authored on local/ai-actions-dev-page, not in the PR.",
+      "fix": "Confirm the scope expansion, reconnect the gmail dev connection (re-consent), then Tier-2 the 11. The settings cluster + People-API contacts need broader / second-API scopes."
+    },
+    {
+      "id": "forms-body",
+      "cat": "scope",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "google-forms"
+      ],
+      "affected": 9,
+      "title": "google-forms create / edit — 9 atomics",
+      "why": "These need the restricted forms.body scope, which Google blocks on the unverified dev/managed OAuth app (hard block, no override). Dropped from the PR; forms ships read-only.",
+      "fix": "Gated on Google verifying the forms.body scope for AP's OAuth app; then author / ship the 9 create+edit atomics."
+    },
+    {
+      "id": "slack-teamread",
+      "cat": "scope",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "slack"
+      ],
+      "affected": 1,
+      "title": "slack get_team_info",
+      "why": "team.info needs the team:read OAuth scope, absent from slack auth.ts; the seeded token predates it → missing_scope.",
+      "fix": "Add team:read to the bot scope[] in slack/src/lib/auth.ts and reconnect. Belongs in a small dedicated scope-expansion PR."
+    },
+    {
+      "id": "slack-filespublic",
+      "cat": "scope",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "slack"
+      ],
+      "affected": 2,
+      "title": "slack make_file_public / revoke_file_public_url",
+      "why": "files.sharedPublicURL / revokePublicURL are user-token-only (bot → not_allowed_token_type); the user token then lacks files:write → missing_scope. Token type already fixed; scope remains.",
+      "fix": "Add files:write to the user scope[] in auth.ts and reconnect. Bundle with team:read in one scope-expansion PR. Recover files from commit 0f227ba / ccd7ea3."
+    },
+    {
+      "id": "discord-intent",
+      "cat": "scope",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "discord"
+      ],
+      "affected": 1,
+      "title": "discord list_thread_members",
+      "why": "GET /channels/{id}/thread-members returns 403 Missing Access without the privileged GUILD_MEMBERS gateway intent — permission/intent gate, not a code defect.",
+      "fix": "Enable the GUILD_MEMBERS privileged intent on the bot, then test on a thread the bot has joined."
+    },
+    {
+      "id": "clickup-customfield",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "clickup"
+      ],
+      "affected": 2,
+      "title": "clickup set_custom_field_value / remove_custom_field_value",
+      "why": "No custom field exists in the sandbox, and ClickUp has no public API to create one (UI-only) → there's no field_id to target.",
+      "fix": "In the ClickUp UI add a custom field, run get_accessible_custom_fields for its id, then set → remove on a throwaway task. Endpoints <code>POST/DELETE /api/v2/task/{id}/field/{field_id}</code>."
+    },
+    {
+      "id": "clickup-listtemplate",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "clickup"
+      ],
+      "affected": 1,
+      "title": "clickup create_list_from_template",
+      "why": "No list template exists in the workspace (templates are created in the UI).",
+      "fix": "Save any list as a template in the ClickUp UI, then test with that template_id against a folder/space; delete the created list after."
+    },
+    {
+      "id": "slack-uploadfile",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "slack"
+      ],
+      "affected": 1,
+      "title": "slack upload_file",
+      "why": "Its file input is a Property.File; the Tier-2 test-step harness can't synthesize / inject a file object. It's a twin of the production-shipped uploadFile action.",
+      "fix": "Verify inside a real flow where a prior step produces the file, or via the UI flow builder with a manual upload."
+    },
+    {
+      "id": "slack-unfurl",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "slack"
+      ],
+      "affected": 1,
+      "title": "slack unfurl_url",
+      "why": "chat.unfurl requires a pending link_shared event (the app must own the link's domain); it can't be synthesized by a test-step → cannot_unfurl_url.",
+      "fix": "Register the app for a domain, post a link that triggers link_shared, then call with that event's channel + ts. Niche — consider leaving deferred."
+    },
+    {
+      "id": "trello-attach",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "trello"
+      ],
+      "affected": 3,
+      "title": "trello card attachments — add / get / delete",
+      "why": "add_card_attachment is file-only (Property.File, required) → needs multipart, which the dev httpClient can't transmit and the harness can't inject (same form-data limit). The byte-identical human action fails the same. get/delete are code-correct but have no attachment id to chain.",
+      "fix": "Verify in a real flow where a prior step produces the file, or on an env whose httpClient sends node form-data. For get/delete, attach a link via the Trello UI/API first to obtain an attachment_id."
+    },
+    {
+      "id": "apify-delete",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "apify"
+      ],
+      "affected": 1,
+      "title": "apify delete_dataset",
+      "why": "Destructive; not run live to avoid deleting real data. Code path verified Tier-1.",
+      "fix": "Test on a throwaway dataset (create via a hello-world run → delete)."
+    },
+    {
+      "id": "firecrawl-extract",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "firecrawl"
+      ],
+      "affected": 1,
+      "title": "firecrawl get_extract_results",
+      "why": "No way to obtain a standalone extract job id (extract_data polls inline + strips the id; no list-extracts endpoint), and Firecrawl reports /v2/extract/{id} as deprecated. The endpoint path is correct.",
+      "fix": "Call with a real extract id captured out-of-band, or migrate to the /v2/scrape json-format replacement on next re-author."
+    },
+    {
+      "id": "slack-unarchive",
+      "cat": "scope",
+      "sev": "low",
+      "done": true,
+      "pieces": [
+        "slack"
+      ],
+      "affected": 1,
+      "title": "slack unarchive_channel",
+      "why": "Was not_in_channel on the bot token (Slack only lets a member/admin user token unarchive).",
+      "fix": "Swapped getBotToken → requireUserToken (same pattern as delete-message / search-messages). Verified live: create → archive → unarchive → ok:true. Now shipping (slack 43 → 44)."
+    },
+    {
+      "id": "discord-sendmsg",
+      "cat": "framework",
+      "sev": "high",
+      "done": true,
+      "pieces": [
+        "discord"
+      ],
+      "affected": 1,
+      "title": "discord send_message — form-data transport",
+      "why": "The twin (and the human action) always sent form-data multipart even for text → broken transport (empty body).",
+      "fix": "Rewrote the twin to send a JSON body for text and payload_json multipart only when files are attached. Text path live-verified 6/6."
+    },
+    {
+      "id": "brevo-key",
+      "cat": "scope",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "sendinblue"
+      ],
+      "affected": 20,
+      "title": "Brevo (sendinblue) — entire piece held (20 atomics)",
+      "why": "The seeded Brevo connection's API key returns 401 'Key not found' (revoked / invalid / expired) on every call → 0/20 verifiable. Auth wiring is correct (api-key header transmitted, confirmed in the request body that reached Brevo) and the code is Tier-1 green; the actions surface a clean 'Brevo authentication failed' message. Same class as the resend key blocker.",
+      "fix": "Create / re-seed a valid Brevo project API key, reconnect the connection, then re-run the sendinblue Tier-2 leg (<code>scratchpad/wf-tier2-w3.js</code>). 6 of the 20 (SMS + CRM-companies) also need those Brevo add-ons enabled."
+    },
+    {
+      "id": "stripe-disputes-payouts",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "stripe"
+      ],
+      "affected": 4,
+      "title": "stripe disputes & payouts — 4 atomics",
+      "why": "get_payout / get_dispute / update_dispute have no live resource on a fresh test account (no payouts, no chargebacks — neither can be created on demand); close_dispute is irreversible (concedes + forfeits funds) so it was never live-fired. All returned clean API round-trips / correct 404s — code is sound.",
+      "fix": "On an account with a real payout cycle + a test dispute, run get_payout / get_dispute / update_dispute; live-fire close_dispute only against a throwaway disputed charge you are willing to concede."
+    },
+    {
+      "id": "airtable-workspace",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "airtable"
+      ],
+      "affected": 1,
+      "title": "airtable create_base_ai",
+      "why": "Airtable exposes no list-workspaces API, so there is no obtainable workspace_id to create a base under. The schema.bases:write scope IS present (the sibling schema-write atomics passed live).",
+      "fix": "Capture a workspace_id from the Airtable UI URL (wsp...), then run create_base_ai with it. Endpoint <code>POST /v0/meta/bases</code>."
+    },
+    {
+      "id": "github-env",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "github"
+      ],
+      "affected": 2,
+      "title": "github request_pull_request_reviewers / create_organization_repository",
+      "why": "request_reviewers → 422 'cannot request review on your own PR' (no second collaborator on the account); create_organization_repository → 403 (the OAuth account has no org with write access). Both mapped the vendor error cleanly — not code defects.",
+      "fix": "Add a second collaborator to the test repo to request a review; create the org repo against an org where the connected account has write access."
+    },
+    {
+      "id": "cody-uploadfile",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "cody"
+      ],
+      "affected": 1,
+      "title": "cody upload_file_to_kb",
+      "why": "Composite (mint signed URL → raw S3 PUT → register) needing a Property.File input; the Tier-2 test-step harness can't synthesize / inject a file object. Tier-1 green. Same class as slack upload_file / trello attachments.",
+      "fix": "Verify inside a real flow where a prior step produces the file, or via the UI flow builder with a manual upload."
+    },
+    {
+      "id": "pubrio-deletemonitor",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "pubrio"
+      ],
+      "affected": 1,
+      "title": "pubrio delete_monitor",
+      "why": "Both the pre-existing endpoint (POST /monitors/delete) and pubrio's own documented replacement (DELETE /monitors/{id}) 404 in production — a vendor-side docs-vs-prod drift, not a code defect. Kept audience:'human'; agents can already deactivate a monitor via update_monitor_ai.",
+      "fix": "Retest once pubrio fixes either delete route; there is no code-side workaround."
+    },
+    {
+      "id": "quizell-customer",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "quizell"
+      ],
+      "affected": 3,
+      "title": "quizell get_customer_by_id / create_customer_lead / update_customer_record",
+      "why": "create/update need a quiz_id with no in-piece resolver (no list-quizzes-by-customer style endpoint), and the sandbox test account has no existing customer to fetch by id — none are verifiable as authored. Demoted to audience:'human' (2026-06-30 Greptile pass).",
+      "fix": "Capture a real quiz_id from the Quizell UI/API and a seeded customer record, then Tier-2 all 3 before considering an 'ai' twin."
+    },
+    {
+      "id": "arch-mcp",
+      "cat": "arch",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "Phase-1 MCP"
+      ],
+      "affected": "§2",
+      "title": "MCP redesign spike",
+      "why": "The MCP server exposes ~40 generic ap_* tools (the action is a parameter to ap_run_action), not one tool per action — nothing reads audience/aiMetadata and there's no per-action slot. The premise behind Phase-1 tasks #4–#6 (collapse 446 custom_api_call tools / per-action tools/list) doesn't hold.",
+      "fix": "Run the spike: decide how audience/aiMetadata surface through the discovery tools (ap_research_pieces, ap_get_piece_props) + ap_run_action. Blocks tasks #4–#6 (#3 aiReady is independent)."
+    },
+    {
+      "id": "arch-enginefilter",
+      "cat": "arch",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "Phase-1 MCP"
+      ],
+      "affected": "§5",
+      "title": "Engine-required action filter",
+      "why": "127 engine-required actions (97 AI-relevant across ~58 pieces) are advertised to the agent surface even though they hard-fail at runtime.",
+      "fix": "Pull a minimal read-only filter (or a static deny-set seeded from engine_required_actions.csv) into the Phase-1 MCP work."
+    },
+    {
+      "id": "arch-output",
+      "cat": "arch",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "Phase 3/4"
+      ],
+      "affected": "§5",
+      "title": "Output-contract feature — owner / ETA",
+      "why": "Phase-3/4 + the MCP outputSchema slot depend on a separate output-contract feature with no PR# / owner / ETA. outputSchema was correctly removed from aiMetadata to avoid two sources of truth.",
+      "fix": "Get a PR# / owner / ETA for the output-contract feature before Phase 3 depends on it, or restore a minimal interim outputSchema."
+    },
+    {
+      "id": "arch-pathd",
+      "cat": "arch",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "Decision record"
+      ],
+      "affected": "§3",
+      "title": "Path D drop rationale (owed)",
+      "why": "Pure Path A was adopted, but the written rationale for dropping the prior A+D+B recommendation is still owed; CLAUDE.md conflates Path C and Path D.",
+      "fix": "Add an explicit written decision record (accept the measured efficiency loss for maintenance / IP / single-source reasons); fix the CLAUDE.md C-vs-D line."
+    },
+    {
+      "id": "arch-deptable",
+      "cat": "arch",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "PROGRESS"
+      ],
+      "affected": "§5",
+      "title": "Deferred-dependency table in PROGRESS",
+      "why": "The deferral chain (output-shape, engineCoupling, error-envelope, Phase 4) is load-bearing and external, with no consolidated table.",
+      "fix": "Add a dependency table to PROGRESS with PR# / owner / ETA; gate the consuming phases."
+    }
+  ]
+}

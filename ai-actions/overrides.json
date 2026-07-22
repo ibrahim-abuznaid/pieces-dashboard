@@ -1,0 +1,4 @@
+{
+  "_comment": "Manual claims only — for pieces with no PR yet (GitHub PR assignees are picked up automatically once a pr exists). Claim: \"<slug>\": { \"assignee\": \"<github-handle>\" }. You may also set pr here if it isn't in pieces.json yet. Stage is derived — never write it.",
+  "pieces": {}
+}
