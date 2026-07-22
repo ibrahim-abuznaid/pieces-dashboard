@@ -15,7 +15,14 @@ for (const ov of Object.values(readIf('output-schema/overrides.json')?.pieces ??
 
 const prs = {};
 for (const n of [...nums].sort((a, b) => a - b)) {
-  const pr = JSON.parse(execFileSync('gh', ['api', `repos/activepieces/activepieces/pulls/${n}`], { encoding: 'utf8' }));
+  // Fail-loud by design: partial PR data would silently mis-stage pieces; a failed
+  // run fails CI and Pages keeps serving the last good deploy.
+  let pr;
+  try {
+    pr = JSON.parse(execFileSync('gh', ['api', `repos/activepieces/activepieces/pulls/${n}`], { encoding: 'utf8' }));
+  } catch (e) {
+    throw new Error(`PR #${n} fetch failed (check the number in overrides/pieces.json, gh auth, rate limits): ${e.message}`);
+  }
   prs[n] = {
     state: pr.merged_at ? 'MERGED' : pr.state.toUpperCase(), // OPEN | CLOSED | MERGED
     mergedAt: pr.merged_at,
