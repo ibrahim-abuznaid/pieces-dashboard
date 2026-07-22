@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pieces Team — Dashboards</title>
+<style>
+/*__THEME__*/
+.board { display: block; color: inherit; text-decoration: none; }
+.board:hover { text-decoration: none; border-color: var(--s-progress); }
+.board h2 a { font-size: inherit; }
+.open-link { font-size: 12px; color: var(--s-progress); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Pieces Team</h1>
+    <span class="sub">rollout dashboards · auto-refreshed daily</span>
+    <span class="spacer"></span>
+    <button id="themeToggle" aria-label="Toggle color theme">◐ theme</button>
+  </header>
+  <div class="sub">Work model on both boards: <b>assigned → PR open → PR merged</b> — stages derive from GitHub; claims are one JSON edit (see the repo's CONTRIBUTING.md).</div>
+
+  <a class="board card" id="osCard" href="./output-schema/">
+    <h2>Output-schema rollout <span class="open-link">open →</span></h2>
+    <p class="hint">Curated <code>outputSchema</code> across the published piece catalog.</p>
+    <div class="tiles" id="osTiles"></div>
+    <div class="funnel" id="osFunnel"></div>
+    <div class="legend" id="osLegend"></div>
+  </a>
+
+  <a class="board card" id="aiCard" href="./ai-actions/">
+    <h2>AI actions (agent atomics) <span class="open-link">open →</span></h2>
+    <p class="hint">Phase-3 <code>audience:'ai'</code> atomics coverage + blockers.</p>
+    <div class="tiles" id="aiTiles"></div>
+    <div class="funnel" id="aiFunnel"></div>
+    <div class="legend" id="aiLegend"></div>
+  </a>
+
+  <footer id="stamps"></footer>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+const { os, ai } = DATA;
+
+const root = document.documentElement;
+document.getElementById('themeToggle').addEventListener('click', (e) => {
+  e.preventDefault();
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+});
+
+const tile = (t) => `<div class="tile"><div class="label">${t.label}</div><div class="value">${t.value}</div><div class="foot">${t.foot}</div></div>`;
+function funnel(elId, legendId, segs) {
+  const el = document.getElementById(elId);
+  for (const s of segs) {
+    if (!s.n) continue;
+    const d = document.createElement('div');
+    d.className = 'seg'; d.style.background = s.color; d.style.flex = `${s.n} 0 0`; d.style.borderRadius = '4px';
+    d.innerHTML = `<span class="seglabel">${s.n}</span>`;
+    el.appendChild(d);
+  }
+  document.getElementById(legendId).innerHTML = segs.map((s) => `<span><span class="swatch" style="background:${s.color}"></span>${s.label} · ${s.n}</span>`).join('');
+}
+
+document.getElementById('osTiles').innerHTML = [
+  { label: 'Pieces live on cloud', value: `${os.status.live} <small>/ ${os.totals.pieces}</small>`, foot: `+${os.status['merged-not-live']} merged awaiting publish` },
+  { label: 'Usage-weighted coverage', value: `${os.usageWeighted.liveShare}<small>%</small>`, foot: `→ ${os.usageWeighted.repoShare}% once merged pieces go live` },
+  { label: 'Work in flight', value: `${os.stages.assigned + os.stages.prOpen}`, foot: `${os.stages.assigned} assigned · ${os.stages.prOpen} PR open` },
+].map(tile).join('');
+funnel('osFunnel', 'osLegend', [
+  { label: 'Assigned', n: os.stages.assigned, color: 'var(--st-assigned)' },
+  { label: 'PR open', n: os.stages.prOpen, color: 'var(--s-progress)' },
+  { label: 'Merged, not live', n: os.stages.merged, color: 'var(--s-merged)' },
+  { label: 'Live', n: os.stages.live, color: 'var(--s-live)' },
+]);
+
+document.getElementById('aiTiles').innerHTML = [
+  { label: 'AI atomics shipped', value: `${ai.atomics}`, foot: `across ${ai.pieces} pieces` },
+  { label: 'PRs', value: `${ai.prsOpen} <small>open</small> · ${ai.prsMerged} <small>merged</small>`, foot: 'upstream activepieces PRs' },
+  { label: 'Open blockers', value: `${ai.blockersOpen}`, foot: `${ai.blockersDone} resolved` },
+].map(tile).join('');
+funnel('aiFunnel', 'aiLegend', [
+  { label: 'Held', n: ai.stages.held, color: 'var(--s-review)' },
+  { label: 'Assigned', n: ai.stages.assigned, color: 'var(--st-assigned)' },
+  { label: 'PR open', n: ai.stages.prOpen, color: 'var(--s-progress)' },
+  { label: 'Merged', n: ai.stages.merged, color: 'var(--s-live)' },
+]);
+
+document.getElementById('stamps').innerHTML =
+  `Output-schema data generated ${os.generated} · AI-actions PR states fetched ${ai.prFetched} · refreshed daily 06:00 UTC + on every push.`;
+</script>
+</body>
+</html>
