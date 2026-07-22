@@ -25,6 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: actions/configure-pages@v4   # auto-enables Pages on first run
       - run: npm run fetch     # cloud catalog + coverage + repo tree + PR states (~3 min)
       - run: npm test
       - run: npm run build
