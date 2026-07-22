@@ -33,3 +33,16 @@ test('throws when a marker is missing', () => {
   const dir = setup('<style></style>');
   assert.throws(() => renderPage({ templatePath: join(dir, 't.html'), themePath: join(dir, 'theme.css'), data: {}, outPath: join(dir, 'o.html') }), /missing/);
 });
+
+test('data with replacement patterns like $& survives literally', () => {
+  const dir = setup(TPL);
+  const out = join(dir, 'out.html');
+  renderPage({ templatePath: join(dir, 't.html'), themePath: join(dir, 'theme.css'), data: { s: '$&' }, outPath: out });
+  const html = readFileSync(out, 'utf8');
+  assert.ok(html.includes('{"s":"$&"}'));
+});
+
+test('throws when data marker is missing even if theme marker present', () => {
+  const dir = setup('<style>/*__THEME__*/</style>');
+  assert.throws(() => renderPage({ templatePath: join(dir, 't.html'), themePath: join(dir, 'theme.css'), data: {}, outPath: join(dir, 'o.html') }), /missing/);
+});
