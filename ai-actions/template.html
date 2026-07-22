@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Actions — Pieces Team</title>
+<style>
+/*__THEME__*/
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="crumbs"><a href="../">Pieces Team</a> · <a href="../output-schema/">Output schema</a> · <b>AI actions</b></nav>
+  <header>
+    <h1>AI Actions (agent atomics)</h1>
+    <span class="sub">Pieces Team · PR states fetched <span id="gen"></span></span>
+    <span class="spacer"></span>
+    <button id="themeToggle" aria-label="Toggle color theme">◐ theme</button>
+  </header>
+  <div class="sub">Phase-3 coverage: <code>audience:'ai'</code> atomics per piece. PR stages are live from GitHub; narrative status of record remains <code>PROGRESS.md</code> in the workspace.</div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <section class="card">
+    <h2>Stage funnel</h2>
+    <p class="hint">held (authored, no PR — blocked or parked) → assigned → PR open → merged. Derived from GitHub + overrides.json; nobody edits stages by hand.</p>
+    <div class="funnel" id="funnel"></div>
+    <div class="legend" id="funnelLegend"></div>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button class="tabbtn" role="tab" aria-selected="true" data-tab="pieces">Pieces</button>
+    <button class="tabbtn" role="tab" aria-selected="false" data-tab="blockers">Blockers <span id="blockerCount" class="muted"></span></button>
+  </div>
+
+  <section class="card" id="tab-pieces">
+    <div class="filters">
+      <div class="fgroup" id="stageFilter"></div>
+      <input id="search" type="search" placeholder="Filter pieces…" aria-label="Filter pieces">
+      <span class="rowcount" id="rowcount"></span>
+    </div>
+    <table id="piecesTable"></table>
+  </section>
+
+  <section class="card" id="tab-blockers" hidden>
+    <div class="filters"><div class="fgroup" id="catFilter"></div><span class="rowcount" id="blkcount"></span></div>
+    <div class="progress"><div id="blkProgress"></div></div>
+    <p class="hint" id="blkProgressLabel"></p>
+    <div id="blockerList"></div>
+  </section>
+
+  <footer>
+    Sources: curated <code>ai-actions/pieces.json</code> + <code>blockers.json</code>, PR states via GitHub API (auto-refreshed daily). Claim work per <code>CONTRIBUTING.md</code>. Related Linear: PIE-364 · PIE-365 · PIE-366 (outputSchema on these atomics — separate track).
+  </footer>
+</div>
+<div id="tip" role="tooltip"></div>
+<script>
+const DATA = /*__DATA__*/null;
+const S = DATA.summary, P = DATA.pieces, B = DATA.blockers, CATS = DATA.categories;
+
+const STAGES = [
+  { k: 'held',     label: 'Held (no PR)', color: 'var(--s-review)' },
+  { k: 'assigned', label: 'Assigned',     color: 'var(--st-assigned)' },
+  { k: 'pr-open',  label: 'PR open',      color: 'var(--s-progress)' },
+  { k: 'merged',   label: 'Merged',       color: 'var(--s-live)' },
+];
+const stageOf = (k) => STAGES.find((s) => s.k === k);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const stageChip = (k) => { const s = stageOf(k); return `<span class="chip"><span class="swatch" style="background:${s.color}"></span>${s.label}</span>`; };
+const prLink = (pr) => pr ? `<a href="https://github.com/activepieces/activepieces/pull/${pr}">#${pr}</a>` : '<span class="muted">—</span>';
+
+document.getElementById('gen').textContent = S.prFetched;
+
+// ------- theme toggle (same as output-schema page)
+const root = document.documentElement;
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+});
+
+// ------- tooltip
+const tip = document.getElementById('tip');
+function bindTip(el, htmlFn) {
+  el.addEventListener('mousemove', (e) => {
+    tip.innerHTML = htmlFn(); tip.style.display = 'block';
+    const r = tip.getBoundingClientRect();
+    tip.style.left = Math.min(e.clientX + 14, innerWidth - r.width - 8) + 'px';
+    tip.style.top = Math.min(e.clientY + 14, innerHeight - r.height - 8) + 'px';
+  });
+  el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+}
+
+// ------- KPI tiles
+const t2pct = S.t2t ? (S.t2v / S.t2t * 100).toFixed(0) : '0';
+document.getElementById('tiles').innerHTML = [
+  { label: 'Pieces covered', value: `${S.pieces}`, foot: `${S.stages.held} held outside PRs` },
+  { label: 'AI atomics shipped', value: `${S.atomics}`, foot: 'audience:\'ai\' actions authored' },
+  { label: 'PRs', value: `${S.prsOpen} <small>open</small> · ${S.prsMerged} <small>merged</small>`, foot: 'upstream activepieces PRs' },
+  { label: 'Tier-2 live-verified', value: `${S.t2v} <small>/ ${S.t2t}</small>`, foot: `${t2pct}% verified against live vendors` },
+  { label: 'Open blockers', value: `${S.blockersOpen}`, foot: `${S.blockersDone} resolved` },
+].map((t) => `<div class="tile"><div class="label">${t.label}</div><div class="value">${t.value}</div><div class="foot">${t.foot}</div></div>`).join('');
+
+// ------- stage funnel (piece counts per stage)
+const fn = document.getElementById('funnel');
+for (const s of STAGES) {
+  const n = S.stages[{ held: 'held', assigned: 'assigned', 'pr-open': 'prOpen', merged: 'merged' }[s.k]];
+  if (!n) continue;
+  const seg = document.createElement('div');
+  seg.className = 'seg'; seg.style.background = s.color; seg.style.flex = `${n} 0 0`; seg.style.borderRadius = '4px';
+  seg.innerHTML = `<span class="seglabel"${s.k === 'merged' ? ' style="color:#0b0b0b"' : ''}>${n}</span>`;
+  bindTip(seg, () => `<div class="t-title">${s.label}</div><div class="t-sub">${n} of ${S.pieces} pieces</div>`);
+  fn.appendChild(seg);
+}
+document.getElementById('funnelLegend').innerHTML = STAGES.map((s) => {
+  const n = S.stages[{ held: 'held', assigned: 'assigned', 'pr-open': 'prOpen', merged: 'merged' }[s.k]];
+  return `<span><span class="swatch" style="background:${s.color}"></span>${s.label} · ${n}</span>`;
+}).join('');
+
+// ------- tabs
+for (const btn of document.querySelectorAll('.tabbtn')) {
+  btn.addEventListener('click', () => {
+    for (const b of document.querySelectorAll('.tabbtn')) b.setAttribute('aria-selected', b === btn);
+    document.getElementById('tab-pieces').hidden = btn.dataset.tab !== 'pieces';
+    document.getElementById('tab-blockers').hidden = btn.dataset.tab !== 'blockers';
+  });
+}
+document.getElementById('blockerCount').textContent = `(${S.blockersOpen})`;
+
+// ------- pieces tab
+const state = { stage: 'all', q: '' };
+function fbtn(label, pressed, onClick) {
+  const b = document.createElement('button');
+  b.className = 'fbtn'; b.textContent = label; b.setAttribute('aria-pressed', pressed);
+  b.addEventListener('click', onClick);
+  return b;
+}
+function renderStageFilter() {
+  const sf = document.getElementById('stageFilter'); sf.innerHTML = '';
+  for (const [k, label] of [['all', 'all'], ...STAGES.map((s) => [s.k, s.label])])
+    sf.appendChild(fbtn(label, String(state.stage === k), () => { state.stage = k; renderStageFilter(); renderPieces(); }));
+}
+document.getElementById('search').addEventListener('input', (e) => { state.q = e.target.value.toLowerCase(); renderPieces(); });
+
+function renderPieces() {
+  let rows = P.slice().sort((a, b) => b.atomics - a.atomics);
+  if (state.stage !== 'all') rows = rows.filter((p) => p.stage === state.stage);
+  if (state.q) rows = rows.filter((p) => (p.slug + ' ' + (p.note ?? '')).toLowerCase().includes(state.q));
+  document.getElementById('rowcount').textContent = `${rows.length} pieces`;
+  document.getElementById('piecesTable').innerHTML =
+    '<thead><tr><th>Piece</th><th class="num">Atomics</th><th>Ver</th><th>PR</th><th>Stage</th><th>Assignees</th><th class="num">Tier-2</th><th>Note</th></tr></thead><tbody>' +
+    rows.map((p) => `<tr>
+      <td>${esc(p.slug)}</td><td class="num">${p.atomics}</td><td class="mono">${esc(p.v ?? '')}</td>
+      <td>${prLink(p.pr)}</td><td>${stageChip(p.stage)}</td>
+      <td>${p.assignees?.length ? p.assignees.map(esc).join(', ') : '<span class="muted">—</span>'}</td>
+      <td class="num">${p.t2shared ? `<span class="muted">w/ ${esc(p.t2shared)}</span>` : `${p.t2v}/${p.t2t}`}</td>
+      <td class="muted">${esc(p.held ?? p.note ?? '')}</td></tr>`).join('') + '</tbody>';
+}
+
+// ------- blockers tab
+const blkState = { cat: 'all' };
+function renderCatFilter() {
+  const cf = document.getElementById('catFilter'); cf.innerHTML = '';
+  for (const [k, label] of [['all', 'all'], ...CATS.map((c) => [c.id, c.label])])
+    cf.appendChild(fbtn(label, String(blkState.cat === k), () => { blkState.cat = k; renderCatFilter(); renderBlockers(); }));
+}
+function renderBlockers() {
+  const rows = B.filter((b) => blkState.cat === 'all' || b.cat === blkState.cat)
+    .sort((a, b) => (a.done - b.done) || ({ high: 0, med: 1, low: 2 }[a.sev] - { high: 0, med: 1, low: 2 }[b.sev]));
+  document.getElementById('blkcount').textContent = `${rows.length} blockers`;
+  document.getElementById('blkProgress').style.width = `${(S.blockersDone / (S.blockersDone + S.blockersOpen) * 100).toFixed(0)}%`;
+  document.getElementById('blkProgressLabel').textContent = `${S.blockersDone} of ${S.blockersDone + S.blockersOpen} resolved`;
+  document.getElementById('blockerList').innerHTML = rows.map((b) => `
+    <div class="blocker${b.done ? ' done' : ''}">
+      <div class="meta"><span class="sevtag ${b.sev}">${b.sev}</span>
+        <span>${esc(CATS.find((c) => c.id === b.cat)?.label ?? b.cat)}</span>
+        <span>· ${b.pieces.map(esc).join(', ')}</span>
+        <span>· affects ${esc(String(b.affected ?? '?'))}</span>${b.done ? '<span>· ✓ resolved</span>' : ''}</div>
+      <h3>${esc(b.title)}</h3>
+      <p><b>Why:</b> ${b.why}</p>
+      <p><b>Fix:</b> ${b.fix}</p>
+    </div>`).join('');
+}
+
+renderStageFilter(); renderPieces(); renderCatFilter(); renderBlockers();
+</script>
+</body>
+</html>
