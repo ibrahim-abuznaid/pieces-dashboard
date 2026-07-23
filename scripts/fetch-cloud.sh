@@ -9,15 +9,19 @@ curl -sf "https://cloud.activepieces.com/api/v1/pieces" > data/cloud-catalog.jso
 echo "  $(jq length data/cloud-catalog.json) pieces"
 
 echo "2/3 per-piece cloud metadata (outputSchema coverage)…"
-jq -r '.[].name' data/cloud-catalog.json | xargs -P10 -I{} sh -c '
-  m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/{}" || echo "")
-  if [ -z "$m" ]; then m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/{}" || echo ""); fi
-  if [ -z "$m" ]; then echo "{\"name\":\"{}\",\"error\":true}"; else
-    echo "$m" | jq -c "{name:.name, version:.version,
+# Piece name is passed as a positional param ($1) — NOT xargs -I{}, which would
+# also substitute the name into every {} inside the jq program below.
+jq -r '.[].name' data/cloud-catalog.json | xargs -P10 -n1 sh -c '
+  n="$1"
+  m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/$n" || echo "")
+  if [ -z "$m" ]; then m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/$n" || echo ""); fi
+  if [ -z "$m" ]; then printf "{\"name\":\"%s\",\"error\":true}\n" "$n"; else
+    # printf, not echo: dash echo mangles the \n escapes inside JSON strings
+    printf "%s" "$m" | jq -c "{name:.name, version:.version,
       totalActions: ((.actions // {})|length), totalTriggers: ((.triggers // {})|length),
       actionsWithSchema: ([(.actions // {})|to_entries[]|select(.value.outputSchema != null)]|length),
       triggersWithSchema: ([(.triggers // {})|to_entries[]|select(.value.outputSchema != null)]|length)}"
-  fi' > data/.coverage.jsonl
+  fi' _ > data/.coverage.jsonl
 jq -s '.' data/.coverage.jsonl > data/cloud-coverage.json && rm data/.coverage.jsonl
 echo "  $(jq length data/cloud-coverage.json) fetched, $(jq '[.[]|select(.error)]|length' data/cloud-coverage.json) errors"
 ERRS=$(jq '[.[]|select(.error)]|length' data/cloud-coverage.json)
