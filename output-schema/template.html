@@ -77,6 +77,7 @@ const STATUSES = [
 const STAGES = { assigned: ['Assigned', 'var(--st-assigned)'], 'pr-open': ['PR open', 'var(--s-progress)'], merged: ['Merged', 'var(--s-merged)'] };
 const stageChip = (st) => st ? `<span class="chip"><span class="swatch" style="background:${STAGES[st][1]}"></span>${STAGES[st][0]}</span>` : '<span class="muted">—</span>';
 const prLink = (pr) => pr ? `<a href="https://github.com/activepieces/activepieces/pull/${pr}">#${pr}</a>` : '<span class="muted">—</span>';
+const claimUrl = (piece) => `https://github.com/ibrahim-abuznaid/pieces-dashboard/issues/new?template=claim.yml&title=${encodeURIComponent('claim: ' + piece)}&workstream=output-schema&piece=${encodeURIComponent(piece)}`;
 const statusOf = (p) => (p.s === 'skip' ? 'review' : p.s);
 const chipHtml = (p) => {
   const st = STATUSES.find((s) => s.k === statusOf(p));
@@ -225,7 +226,7 @@ function renderTable() {
       <td>${esc(p.d)} <span class="muted">(${esc(p.f)})</span></td>
       <td class="num">${p.u}</td><td class="num">${p.a}</td><td class="num">${p.t}</td>
       <td>${p.e}</td><td>${p.r}</td><td>${chipHtml(p)}</td>
-      <td>${stageChip(p.st)}</td><td class="muted">${p.ass?.length ? p.ass.map(esc).join(', ') : '—'}</td>
+      <td>${stageChip(p.st)}</td><td class="muted">${p.ass?.length ? p.ass.map(esc).join(', ') : (statusOf(p) === 'todo' && !p.st ? `<a href="${claimUrl(p.f)}" title="Claim ${esc(p.d)} — pre-filled issue, a bot applies it">claim</a>` : '—')}</td>
       <td class="muted">${p.ai ?? '—'}</td><td>${p.li ? esc(p.li) : '<span class="muted">—</span>'}</td>
       <td class="muted">${esc(p.n ?? p.g ?? '')}</td></tr>`).join('') +
     (rows.length > CAP ? `<tr><td colspan="13" class="muted">…${rows.length - CAP} more — narrow the filter or see data/pieces.json</td></tr>` : '') +

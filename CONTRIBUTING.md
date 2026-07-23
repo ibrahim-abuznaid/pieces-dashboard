@@ -4,7 +4,19 @@ Everything on the site is either **computed** (cloud API, upstream repo, GitHub 
 or **manual state in one of four JSON files**. You edit JSON, push to `main`, and Actions rebuilds
 the site in ~2–3 minutes. Never edit `dist/` or any generated file.
 
-## Claim a piece (stage → *assigned*)
+## The easy way: claim from the dashboard (no JSON, no clone)
+
+Every unclaimed piece on the site has a **claim** link in its Assignees column. Click it →
+a pre-filled ["Claim a piece" issue](https://github.com/ibrahim-abuznaid/pieces-dashboard/issues/new?template=claim.yml)
+opens → Submit. The **claim bot** edits the overrides JSON for you, commits, closes the issue,
+and redeploys — the dashboard shows you as *assigned* in ~5 minutes. When your upstream PR
+exists, file the same form once more with the PR number filled in (or just set yourself as
+assignee on the GitHub PR — that's picked up automatically too).
+
+If the bot rejects a claim (typo'd piece name etc.) it comments why — edit the issue and it
+retries automatically. Everything below is the manual path; same result.
+
+## Claim a piece manually (stage → *assigned*)
 
 **Output-schema work** — add your entry in `output-schema/overrides.json` under `pieces`:
 

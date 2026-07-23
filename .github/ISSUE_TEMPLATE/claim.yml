@@ -1,0 +1,39 @@
+name: Claim a piece
+description: Assign a piece to yourself (or a teammate) — a bot applies it and the dashboard updates in ~5 min.
+title: "claim: "
+labels: [claim]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submit and you're done — the claim bot edits the overrides JSON, commits, and redeploys the dashboard.
+        No JSON editing needed. (Tip: the **claim** links on the dashboard pre-fill this form.)
+  - type: dropdown
+    id: workstream
+    attributes:
+      label: Workstream
+      options:
+        - output-schema
+        - ai-actions
+    validations:
+      required: true
+  - type: input
+    id: piece
+    attributes:
+      label: Piece
+      description: The piece folder/slug exactly as shown on the dashboard (e.g. airtable)
+      placeholder: airtable
+    validations:
+      required: true
+  - type: input
+    id: assignee
+    attributes:
+      label: Assignee
+      description: GitHub handle — leave empty to assign yourself
+      placeholder: kishanprmr
+  - type: input
+    id: pr
+    attributes:
+      label: PR number
+      description: Optional — add it once the upstream PR exists (you can also file a second claim later just to add it)
+      placeholder: "14400"

@@ -1,0 +1,56 @@
+name: Claim bot
+# Applies "Claim a piece" issues (label: claim) to the overrides JSON, commits,
+# and redeploys the dashboard. Re-runs when the issue is edited (fix + retry).
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: claim-bot   # serialize claims so pushes don't race
+
+jobs:
+  claim:
+    if: contains(github.event.issue.labels.*.name, 'claim') && github.event.issue.state == 'open'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply claim
+        id: apply
+        env:
+          BODY: ${{ github.event.issue.body }}
+          AUTHOR: ${{ github.event.issue.user.login }}
+        run: node scripts/apply-claim.mjs
+      - name: Commit & push
+        env:
+          SUMMARY: ${{ steps.apply.outputs.summary }}
+        run: |
+          git config user.name "claim-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output-schema/overrides.json ai-actions/overrides.json
+          git commit -m "claim: $SUMMARY (#$ISSUE)"
+          for i in 1 2 3; do git push && break || git pull --rebase; done
+      - name: Redeploy dashboard
+        # pushes made with GITHUB_TOKEN don't trigger the push workflow — dispatch it
+        run: gh workflow run deploy.yml --ref main
+      - name: Confirm & close
+        env:
+          SUMMARY: ${{ steps.apply.outputs.summary }}
+        run: |
+          gh issue comment "$ISSUE" --body "✅ Applied: **$SUMMARY** — the dashboard updates in ~5 min."
+          gh issue close "$ISSUE"
+      - name: Report failure
+        if: failure()
+        env:
+          ERR: ${{ steps.apply.outputs.error }}
+        run: gh issue comment "$ISSUE" --body "❌ Couldn't apply this claim${ERR:+ — $ERR}. Edit the issue to fix the fields (the bot re-runs automatically), or edit the overrides JSON directly (see CONTRIBUTING.md)."

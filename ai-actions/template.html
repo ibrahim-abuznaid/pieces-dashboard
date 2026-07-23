@@ -68,6 +68,7 @@ const stageOf = (k) => STAGES.find((s) => s.k === k);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const stageChip = (k) => { const s = stageOf(k); return `<span class="chip"><span class="swatch" style="background:${s.color}"></span>${s.label}</span>`; };
 const prLink = (pr) => pr ? `<a href="https://github.com/activepieces/activepieces/pull/${pr}">#${pr}</a>` : '<span class="muted">—</span>';
+const claimUrl = (piece) => `https://github.com/ibrahim-abuznaid/pieces-dashboard/issues/new?template=claim.yml&title=${encodeURIComponent('claim: ' + piece)}&workstream=ai-actions&piece=${encodeURIComponent(piece)}`;
 
 document.getElementById('gen').textContent = S.prFetched;
 
@@ -151,7 +152,7 @@ function renderPieces() {
     rows.map((p) => `<tr>
       <td>${esc(p.slug)}</td><td class="num">${p.atomics}</td><td class="mono">${esc(p.v ?? '')}</td>
       <td>${prLink(p.pr)}</td><td>${stageChip(p.stage)}</td>
-      <td>${p.assignees?.length ? p.assignees.map(esc).join(', ') : '<span class="muted">—</span>'}</td>
+      <td>${p.assignees?.length ? p.assignees.map(esc).join(', ') : (p.stage !== 'merged' ? `<a href="${claimUrl(p.slug)}" title="Claim ${esc(p.slug)} — pre-filled issue, a bot applies it">claim</a>` : '<span class="muted">—</span>')}</td>
       <td class="num">${p.t2shared ? `<span class="muted">w/ ${esc(p.t2shared)}</span>` : `${p.t2v}/${p.t2t}`}</td>
       <td class="muted">${esc(p.held ?? p.note ?? '')}</td></tr>`).join('') + '</tbody>';
 }

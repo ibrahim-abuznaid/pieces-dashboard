@@ -39,6 +39,9 @@ echo "  $(jq length data/repo-pieces.json) repo pieces"
 SCHEMA_PIECES=$(grep -E '^packages/pieces/community/[^/]+/src/lib/output-schemas\.ts$' data/.tree.txt \
   | sed -E 's|packages/pieces/community/([^/]+)/.*|\1|' | sort)
 rm data/.tree.txt
+# Tree-detected schema files → merged-not-live detection works automatically even
+# before someone enriches data/repo-schemas.json with repoVersion/wiredRepo detail.
+printf '%s\n' $SCHEMA_PIECES | jq -R -s 'split("\n")|map(select(length>0))' > data/repo-schema-files.json
 echo "  pieces with output-schemas.ts in repo:"; echo "$SCHEMA_PIECES" | sed 's/^/    /'
 for p in $SCHEMA_PIECES; do
   if ! jq -e --arg p "$p" '.pieces[$p]' data/repo-schemas.json > /dev/null; then

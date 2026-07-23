@@ -15,6 +15,9 @@ const catalog = read('data/cloud-catalog.json');
 const coverage = read('data/cloud-coverage.json');
 const repoPieces = new Set(read('data/repo-pieces.json'));
 const repoSchemas = read('data/repo-schemas.json');
+// Tree-detected output-schemas.ts files (auto, from fetch-cloud.sh) — detection
+// works without a hand-edit; repo-schemas.json only adds repoVersion/wiredRepo detail.
+const repoSchemaFiles = new Set(read('data/repo-schema-files.json'));
 const overrides = read('overrides.json');
 const prStates = read('../data/pr-states.json').prs;
 const DIST = join(ROOT, '../dist/output-schema');
@@ -37,7 +40,8 @@ const pieces = catalog.map((p) => {
   const cov = covByName.get(p.name);
   const wiredLive = cov && !cov.error ? (cov.actionsWithSchema ?? 0) + (cov.triggersWithSchema ?? 0) : 0;
   const steps = (p.actions ?? 0) + (p.triggers ?? 0);
-  const repoSchema = repoSchemas.pieces[folder];
+  const repoSchema = repoSchemas.pieces[folder]
+    ?? (repoSchemaFiles.has(folder) ? { repoVersion: null, wiredRepo: null } : undefined);
   const ov = overrides.pieces?.[folder] ?? {};
   const claim = { assignee: ov.assignee ?? null, pr: ov.pr ?? null };
 
@@ -50,9 +54,11 @@ const pieces = catalog.map((p) => {
 
   let gapReason = null;
   if (status === 'merged-not-live' && repoSchema) {
-    gapReason = repoSchema.repoVersion !== p.version
-      ? `stale publish (repo ${repoSchema.repoVersion} > cloud ${p.version})`
-      : 'stripped ingestion (pre-#13983) — needs patch bump + republish';
+    gapReason = repoSchema.repoVersion == null
+      ? 'merged upstream — needs publish/sync to go live'
+      : repoSchema.repoVersion !== p.version
+        ? `stale publish (repo ${repoSchema.repoVersion} > cloud ${p.version})`
+        : 'stripped ingestion (pre-#13983) — needs patch bump + republish';
   }
 
   return {
