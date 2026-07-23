@@ -32,9 +32,6 @@
     "ai": {
       "status": "review",
       "note": "Outputs vary by provider/mode; check per-action stability before scheming."
-    },
-    "acumbamail": {
-      "assignee": "ibrahim-abuznaid"
     }
   },
   "aiAtomicsWaves": {
