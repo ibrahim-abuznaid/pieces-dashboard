@@ -72,6 +72,14 @@
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
   section h2.sec { font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
                    color: var(--text-muted); margin: 26px 0 0; font-weight: 600; }
+
+  /* Per-piece rosters: the detail behind two of the tiles. Real
+     <details>/<summary> — keyboard and screen-reader support for free. */
+  details.roster { border-bottom: 1px solid var(--grid); }
+  details.roster summary { cursor: pointer; padding: 8px 0; font-size: 13.5px; color: var(--text-secondary); }
+  details.roster summary:focus-visible { outline: 2px solid var(--s-progress); outline-offset: 2px; }
+  details.roster table { margin: 0 0 10px; }
+  details.roster td { border-bottom: none; }
   footer { margin-top: 34px; font-size: 12.5px; color: var(--text-muted); }
   noscript { display: block; color: var(--text-secondary); font-size: 13px; margin-top: 12px; }
 </style>
@@ -157,6 +165,19 @@ function tileHtml(t) {
     <div class="note">${esc(t.note)}</div></div>`;
 }
 
+// One collapsible group per stage. The first — the most advanced stage that
+// actually has pieces — is open, so the section says something before a click.
+// A roster the snapshot never recorded is simply absent from view.rosters, so
+// nothing here renders an empty shell.
+function rosterHtml(r) {
+  return `<section><h2 class="sec">${esc(r.title)} — ${num(r.total)} in flight</h2>
+    ${r.groups.map((g, i) => `<details class="roster"${i === 0 ? ' open' : ''}>
+      <summary>${esc(g.label)} (${g.count})</summary>
+      <table>${g.pieces.map((p) => `<tr><td>${esc(p.name)}</td>
+        <td class="n">${num(p.actions)} ${esc(r.unit)}</td></tr>`).join('')}</table>
+    </details>`).join('')}</section>`;
+}
+
 function render(view) {
   const app = document.getElementById('app');
   if (view.empty) {
@@ -189,6 +210,7 @@ function render(view) {
       ${view.shipped.testing.map((i) => `<tr><td>tester #${i.number}</td>
         <td><a href="${esc(i.url)}">${esc(i.title)}</a></td><td></td></tr>`).join('')}
       </table></section>` : ''}
+    ${view.rosters.map(rosterHtml).join('')}
     <footer>Full detail: <a href="../output-schema/">outputSchema</a> ·
       <a href="../ai-actions/">AI-actions</a> · <a href="../">overview</a></footer>`;
 

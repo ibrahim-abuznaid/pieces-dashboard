@@ -7,6 +7,9 @@
 //      degraded — the layout must not reflow because a collector failed.
 //   2. A degraded workstream renders as "unknown", never as 0. `value`, `delta`
 //      and `spark` all go empty and the collector's reason is carried through.
+//
+// `rosters` is the opposite kind of list: OPTIONAL detail that appears only
+// when a snapshot recorded it, so older snapshots stay renderable.
 import { pick, deltaFor, seriesFor } from './deltas.mjs';
 import { TESTING_NOTE } from '../collect/testing.mjs';
 
@@ -33,6 +36,57 @@ const TILES = [
     unit: () => 'closed this week',
     note: (ws) => `${ws.byPerson.kishan} Kishan · ${ws.byPerson.sanket} Sanket` },
 ];
+
+// The per-piece list behind a tile. Stages are listed in pipeline order, most
+// advanced first, so the page reads as "how far along is each piece".
+const ROSTERS = [
+  { key: 'outputSchema', title: 'outputSchema', unit: 'actions',
+    stages: ['live', 'merged-not-live', 'review', 'in-progress'] },
+  { key: 'aiActions', title: 'AI-actions', unit: 'AI actions',
+    stages: ['merged', 'pr-open', 'assigned', 'held'] },
+];
+
+const STAGE_LABELS = {
+  live: 'Live on cloud',
+  'merged-not-live': 'Merged, awaiting release',
+  review: 'In review',
+  'in-progress': 'In progress',
+  merged: 'Merged',
+  'pr-open': 'PR open',
+  assigned: 'Assigned',
+  held: 'Held',
+};
+
+// `tier` only exists on the outputSchema roster; adding it as `undefined`
+// elsewhere would put a dead key in the embedded JSON.
+const toPiece = ({ name, actions, tier }) =>
+  (tier === undefined ? { name, actions } : { name, actions, tier });
+
+function rostersFor(selected) {
+  const out = [];
+  for (const spec of ROSTERS) {
+    const ws = selected[spec.key];
+    if (ws?.status !== 'ok') continue;
+    const rows = Array.isArray(ws.roster) ? ws.roster : [];
+    if (!rows.length) continue;
+
+    // A stage we do not know about still gets a group, at the end, labelled
+    // with the raw string. Upstream adding a status must make the page look
+    // odd — never make pieces silently disappear from it.
+    const unknown = [...new Set(rows.map((r) => r.stage))].filter((s) => !spec.stages.includes(s));
+    const groups = [...spec.stages, ...unknown]
+      // `filter` copies: the collector's ordering (actions desc) is preserved
+      // and the input roster is never sorted in place.
+      .map((stage) => {
+        const pieces = rows.filter((r) => r.stage === stage).map(toPiece);
+        return { stage, label: STAGE_LABELS[stage] ?? String(stage), count: pieces.length, pieces };
+      })
+      .filter((g) => g.count > 0);
+
+    out.push({ key: spec.key, title: spec.title, total: rows.length, unit: spec.unit, groups });
+  }
+  return out;
+}
 
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
 // unused: the newest entry in the archive already is the newest complete week,
@@ -83,6 +137,7 @@ export function buildView(archive, { weekId } = {}) {
     label: `Week ${weekNo} · ${from.short} – ${to.short}, ${to.year}`,
     weeks: list,
     tiles, people,
+    rosters: rostersFor(selected),
     shipped: {
       tickets: t?.status === 'ok' ? (t.shipped ?? []) : [],
       testing: selected.testing?.status === 'ok' ? (selected.testing.shipped ?? []) : [],

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { createContext, runInContext } from 'node:vm';
 import { buildAll } from '../weekly/build.mjs';
 
 const snap = (week, over = {}) => ({
@@ -23,6 +24,23 @@ function render(weeks) {
   const outDir = join(dir, 'out');
   const { html } = buildAll({ archiveDir: join(dir, 'data'), outDir });
   return { html, outDir };
+}
+
+// The page's markup only exists once its own script has run, so asserting on
+// the raw file would only ever prove the JSON payload contains a string. Run
+// the template's scripts against a DOM-lite stub and assert on the HTML the
+// page actually produces — that is what catches missing escaping.
+function renderDom(weeks, hash = '') {
+  const { html } = render(weeks);
+  const node = () => ({ innerHTML: '', disabled: false, focus() {} });
+  const nodes = { app: node(), pick: node(), prev: node(), next: node() };
+  const sandbox = createContext({
+    document: { getElementById: (id) => nodes[id] ?? null, activeElement: null },
+    location: { hash },
+    addEventListener: () => {},
+  });
+  for (const [, src] of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) runInContext(src, sandbox);
+  return nodes.app.innerHTML;
 }
 
 test('renders an HTML document', () => {
@@ -84,4 +102,84 @@ test('decisions render when present', () => {
 test('script-closing sequences in data cannot break out of the script tag', () => {
   const { html } = render([snap('2026-W31', { decisions: ['</script><img onerror=x>'] })]);
   assert.doesNotMatch(html, /<\/script><img/);
+});
+
+// ── rosters ────────────────────────────────────────────────────────────────
+
+const withRosters = (over = {}) => snap('2026-W31', {
+  outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756,
+    roster: [
+      { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
+      { name: 'Notion', actions: 12, triggers: 2, stage: 'live', tier: 'P1' },
+      { name: 'Slack', actions: 28, triggers: 4, stage: 'merged-not-live', tier: 'P1' },
+    ] },
+  aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
+    roster: [{ name: 'google-sheets', actions: 37, stage: 'merged' }] },
+  ...over,
+});
+
+// Guards the harness itself: if the sandbox silently rendered nothing, every
+// `doesNotMatch` below would pass for the wrong reason.
+test('the DOM-lite harness actually renders the page body', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.match(dom, /Pieces Team — Weekly Progress/);
+  assert.match(dom, /class="tile"/);
+});
+
+test('the roster renders a section per workstream with its in-flight total', () => {
+  const dom = renderDom([withRosters()]);
+  assert.match(dom, /outputSchema — 3 in flight/);
+  assert.match(dom, /AI-actions — 1 in flight/);
+});
+
+test('the roster renders piece names and counts with the workstream unit', () => {
+  const dom = renderDom([withRosters()]);
+  assert.match(dom, /Live on cloud \(2\)/);
+  assert.match(dom, /Merged, awaiting release \(1\)/);
+  assert.match(dom, /ClickUp/);
+  assert.match(dom, /31 actions/);
+  assert.match(dom, /google-sheets/);
+  assert.match(dom, /37 AI actions/);
+});
+
+test('counts sit in a right-aligned tabular-nums cell', () =>
+  assert.match(renderDom([withRosters()]), /<td class="n">31 actions<\/td>/));
+
+test('the first group of each roster is open, the rest collapsed', () => {
+  const dom = renderDom([withRosters()]);
+  const tags = [...dom.matchAll(/<details[^>]*>/g)].map((m) => m[0]);
+  assert.equal(tags.length, 3);           // live + merged-not-live + AI merged
+  assert.match(tags[0], /\sopen/);
+  assert.doesNotMatch(tags[1], /\sopen/);
+  assert.match(tags[2], /\sopen/);        // first group of the second roster
+});
+
+// Real elements, not divs-plus-JS: <details>/<summary> are keyboard-accessible
+// for free and lose that the moment they are rebuilt.
+test('groups are real details/summary elements', () => {
+  const dom = renderDom([withRosters()]);
+  assert.match(dom, /<summary>Live on cloud \(2\)<\/summary>/);
+});
+
+test('a snapshot with no roster renders no roster section', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.doesNotMatch(dom, /in flight/);
+  assert.doesNotMatch(dom, /<details/);
+});
+
+test('an empty roster array renders no roster section', () => {
+  const dom = renderDom([snap('2026-W31', {
+    outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster: [] },
+  })]);
+  assert.doesNotMatch(dom, /in flight/);
+  assert.doesNotMatch(dom, /<details/);
+});
+
+test('piece names are HTML-escaped', () => {
+  const dom = renderDom([withRosters({
+    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
+      roster: [{ name: '<img onerror=x>', actions: 1, stage: 'merged' }] },
+  })]);
+  assert.match(dom, /&lt;img onerror=x&gt;/);
+  assert.doesNotMatch(dom, /<img onerror=x>/);
 });

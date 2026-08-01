@@ -15,6 +15,21 @@ const REQUIRED = {
   tickets: ['total'],
 };
 
+// `roster` is the optional per-piece detail a workstream may carry. It is
+// OPTIONAL on purpose: snapshots taken before the field existed must keep
+// validating, so absence is fine — but a present roster has to be usable by the
+// renderer, which means every row needs a label and a count.
+function validateRoster(key, ws) {
+  if (ws.roster === undefined) return;
+  if (!Array.isArray(ws.roster)) throw new Error(`${key}.roster must be an array, got ${typeof ws.roster}`);
+  ws.roster.forEach((row, i) => {
+    const at = `${key}.roster[${i}]`;
+    if (!row || typeof row !== 'object' || Array.isArray(row)) throw new Error(`${at} must be an object`);
+    if (typeof row.name !== 'string' || !row.name) throw new Error(`${at}.name must be a non-empty string`);
+    if (typeof row.actions !== 'number') throw new Error(`${at}.actions must be a number`);
+  });
+}
+
 export function validateSnapshot(snap) {
   if (!snap || typeof snap !== 'object') throw new Error('snapshot must be an object');
   if (!WEEK_RE.test(snap.week ?? '')) throw new Error(`bad week id: ${snap.week}`);
@@ -27,6 +42,7 @@ export function validateSnapshot(snap) {
   for (const [key, fields] of Object.entries(REQUIRED)) {
     const ws = snap[key];
     if (!ws || typeof ws !== 'object') throw new Error(`missing workstream: ${key}`);
+    validateRoster(key, ws);
     if (ws.status === 'no-data') {
       if (typeof ws.reason !== 'string' || !ws.reason) throw new Error(`${key}: no-data needs a reason`);
       continue;

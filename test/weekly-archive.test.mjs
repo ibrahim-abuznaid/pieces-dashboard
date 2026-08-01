@@ -1,7 +1,7 @@
 // test/weekly-archive.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFileSync, rmSync } from 'node:fs';
+import { writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { validateSnapshot, appendWeek, readArchive } from '../weekly/lib/archive.mjs';
@@ -89,3 +89,55 @@ test('appendWeek validates before appending', () =>
 
 test('readArchive on a missing file yields an empty archive', () =>
   assert.deepEqual(readArchive('/tmp/definitely-not-here-9f3a.json'), { weeks: [] }));
+
+// --- roster (optional per-piece detail) --------------------------------------
+
+const withRoster = (roster) => ok({
+  outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster },
+});
+
+test('a snapshot with no roster field validates — the field is optional', () => {
+  const snap = ok();
+  assert.equal(snap.outputSchema.roster, undefined);
+  validateSnapshot(snap);
+});
+
+test('every already-committed snapshot still validates unchanged', () => {
+  const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
+  assert.ok(archive.weeks.length > 0, 'the committed archive should not be empty');
+  for (const w of archive.weeks) validateSnapshot(w);
+});
+
+test('a well-formed roster validates', () =>
+  validateSnapshot(withRoster([{ name: 'Slack', actions: 12, triggers: 3, stage: 'live', tier: 'P1' }])));
+
+test('an empty roster validates', () => validateSnapshot(withRoster([])));
+
+test('a roster entry with zero actions validates — only absence is an error', () =>
+  validateSnapshot(withRoster([{ name: 'Slack', actions: 0 }])));
+
+test('a non-array roster is rejected', () =>
+  assert.throws(() => validateSnapshot(withRoster({ Slack: 12 })), /outputSchema\.roster must be an array/));
+
+test('a roster entry that is not an object is rejected', () =>
+  assert.throws(() => validateSnapshot(withRoster(['Slack'])), /outputSchema\.roster\[0\]/));
+
+test('a roster entry without a name is rejected', () =>
+  assert.throws(() => validateSnapshot(withRoster([{ actions: 12 }])), /outputSchema\.roster\[0\]\.name/));
+
+test('a roster entry with an empty name is rejected', () =>
+  assert.throws(() => validateSnapshot(withRoster([{ name: '', actions: 12 }])), /outputSchema\.roster\[0\]\.name/));
+
+test('a roster entry with a non-numeric actions count is rejected', () =>
+  assert.throws(() => validateSnapshot(withRoster([{ name: 'Slack', actions: '12' }])),
+    /outputSchema\.roster\[0\]\.actions/));
+
+test('the offending roster index is named, not just the first one', () =>
+  assert.throws(() => validateSnapshot(withRoster([{ name: 'Slack', actions: 12 }, { name: 'Notion' }])),
+    /outputSchema\.roster\[1\]\.actions/));
+
+test('an aiActions roster is validated too', () =>
+  assert.throws(() => validateSnapshot(ok({
+    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
+                 roster: [{ name: 'gmail' }] },
+  })), /aiActions\.roster\[0\]\.actions/));
