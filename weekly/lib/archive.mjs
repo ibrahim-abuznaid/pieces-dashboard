@@ -30,6 +30,19 @@ function validateRoster(key, ws) {
   });
 }
 
+// `catalogPieces` is the whole-catalog denominator a workstream may record
+// alongside its own tracked count. OPTIONAL for the same reason as `roster`:
+// snapshots written before it existed must keep validating. When it IS present
+// the page divides by it, so a string or a null has to fail here rather than
+// render as "of undefined pieces".
+function validateCatalogPieces(key, ws) {
+  if (ws.catalogPieces === undefined) return;
+  if (typeof ws.catalogPieces !== 'number') {
+    throw new Error(`${key}.catalogPieces must be a number when present, got ${
+      ws.catalogPieces === null ? 'null' : typeof ws.catalogPieces}`);
+  }
+}
+
 export function validateSnapshot(snap) {
   if (!snap || typeof snap !== 'object') throw new Error('snapshot must be an object');
   if (!WEEK_RE.test(snap.week ?? '')) throw new Error(`bad week id: ${snap.week}`);
@@ -43,6 +56,7 @@ export function validateSnapshot(snap) {
     const ws = snap[key];
     if (!ws || typeof ws !== 'object') throw new Error(`missing workstream: ${key}`);
     validateRoster(key, ws);
+    validateCatalogPieces(key, ws);
     if (ws.status === 'no-data') {
       if (typeof ws.reason !== 'string' || !ws.reason) throw new Error(`${key}: no-data needs a reason`);
       continue;

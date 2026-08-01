@@ -208,3 +208,43 @@ test('an AI-actions roster row with an empty slug drops the whole roster', () =>
   assert.equal(out.status, 'ok');
   assert.deepEqual(out.roster, []);
 });
+
+// --- catalog denominator -------------------------------------------------------
+// The AI-actions initiative TRACKS 28 pieces; the catalog is 756. `totalPieces`
+// stays the tracked count — the committed snapshot has it and the schema
+// requires it — and `catalogPieces` carries the real catalog size so the tile
+// can stop reading as "2 of 28", which overstates coverage ~27x. Like `roster`
+// it is OPTIONAL detail: losing it costs the denominator, never the workstream.
+
+const withCatalog = (over) => aiRead({ 'dist/output-schema/summary.json': over ?? OS_SUMMARY });
+
+test('collectAiActions carries the catalog denominator from the outputSchema summary', () => {
+  const out = collectAiActions({ readJson: withCatalog() });
+  assert.equal(out.catalogPieces, 756);
+  assert.equal(out.totalPieces, 28);
+});
+
+test('a missing outputSchema summary omits the denominator rather than guessing one', () => {
+  const out = collectAiActions({ readJson: aiRead() });
+  assert.equal(out.status, 'ok');
+  assert.equal(out.merged, 2);
+  assert.ok(!('catalogPieces' in out), 'the key must be absent, not present-and-undefined');
+});
+
+test('a non-numeric totals.pieces omits the denominator instead of flowing through untyped', () => {
+  const out = collectAiActions({ readJson: withCatalog({ ...OS_SUMMARY, totals: { pieces: '756' } }) });
+  assert.equal(out.status, 'ok');
+  assert.ok(!('catalogPieces' in out));
+});
+
+test('an outputSchema summary with no totals block omits the denominator', () => {
+  const out = collectAiActions({ readJson: withCatalog({ status: OS_SUMMARY.status }) });
+  assert.equal(out.status, 'ok');
+  assert.ok(!('catalogPieces' in out));
+});
+
+// typeof, not truthiness — the same rule every other numeric field here follows.
+test('a zero catalog survives as 0', () => {
+  const out = collectAiActions({ readJson: withCatalog({ ...OS_SUMMARY, totals: { pieces: 0 } }) });
+  assert.equal(out.catalogPieces, 0);
+});

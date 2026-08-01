@@ -23,6 +23,27 @@ function readRoster(readJson) {
   }
 }
 
+// The size of the WHOLE piece catalog, which is not something this initiative
+// knows: `pieces` in the AI-actions summary is the 28 pieces the initiative
+// tracks, and reporting "2 of 28" overstates catalog coverage ~27x to anyone
+// reading the tile as progress. The catalog count lives in the outputSchema
+// build, the one place that walks every piece.
+//
+// OPTIONAL, on the same terms as `roster`: if that summary is missing or its
+// count is not a number we return undefined and the field is omitted, so the
+// tile falls back to the tracked-count wording instead of implying a catalog
+// denominator this week never measured. A denominator is detail — never a
+// reason to turn a measurable week into no-data.
+function readCatalogPieces(readJson) {
+  try {
+    // typeof, not truthiness: a catalog of 0 is a real (if alarming) reading.
+    const { totals } = readJson('dist/output-schema/summary.json');
+    return typeof totals?.pieces === 'number' ? totals.pieces : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function collectAiActions({ readJson }) {
   try {
     const s = readJson('dist/ai-actions/summary.json');
@@ -31,6 +52,7 @@ export function collectAiActions({ readJson }) {
       if (typeof v !== 'number') throw new Error(`summary.json ${name} is not a number`);
       return v;
     };
+    const catalogPieces = readCatalogPieces(readJson);
     return {
       status: 'ok',
       merged: num(s.stages.merged, 'stages.merged'),
@@ -38,6 +60,9 @@ export function collectAiActions({ readJson }) {
       assigned: num(s.stages.assigned, 'stages.assigned'),
       held: num(s.stages.held, 'stages.held'),
       totalPieces: num(s.pieces, 'pieces'),
+      // Spread rather than assign: `catalogPieces: undefined` would survive into
+      // the archive as a dead key and read as "recorded, but unknown".
+      ...(catalogPieces === undefined ? {} : { catalogPieces }),
       blockersOpen: num(s.blockersOpen, 'blockersOpen'),
       roster: readRoster(readJson),
     };

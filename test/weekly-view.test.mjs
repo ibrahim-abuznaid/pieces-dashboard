@@ -137,6 +137,7 @@ test('the outputSchema roster groups by stage in pipeline order, most advanced f
       { stage: 'review', label: 'In review', count: 1,
         pieces: [{ name: 'Jira', actions: 9, tier: 'P3' }] },
     ],
+    done: { total: 3, stages: ['live', 'merged-not-live'], thisWeek: [], hasPrior: false },
   }));
 
 test('the AI-actions roster uses its own stage order, labels and unit', () =>
@@ -147,6 +148,7 @@ test('the AI-actions roster uses its own stage order, labels and unit', () =>
       { stage: 'pr-open', label: 'PR open', count: 1, pieces: [{ name: 'hubspot', actions: 22 }] },
       { stage: 'held', label: 'Held', count: 1, pieces: [{ name: 'intercom', actions: 8 }] },
     ],
+    done: { total: 1, stages: ['merged'], thisWeek: [], hasPrior: false },
   }));
 
 test('an empty stage produces no group at all', () => {
@@ -209,3 +211,165 @@ test('rosters preserve the order the collector recorded, they are not re-sorted'
       { name: 'Big', actions: 99, triggers: 0, stage: 'live', tier: 'P1' },
     ]) }).rosters[0].groups[0].pieces.map((p) => p.name),
     ['Small', 'Big']));
+
+// ── the AI-actions denominator ─────────────────────────────────────────────
+// The initiative tracks 28 pieces out of a 756-piece catalog. "2 of 28 merged"
+// reads as 7% catalog coverage when the truth is 0.3% — ~27x overstated. When
+// the snapshot recorded the catalog size the tile counts against it; when it
+// did not, the wording stays honest about what that week actually measured
+// rather than retrofitting a denominator onto history.
+
+const withCatalog = (catalogPieces) => ({
+  status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2,
+  totalPieces: 28, blockersOpen: 30, catalogPieces });
+
+const aiTile = (v) => v.tiles.find((t) => t.key === 'aiActions');
+
+test('the AI-actions tile counts against the whole catalog when the snapshot recorded it', () => {
+  const t = aiTile(oneWeek({ aiActions: withCatalog(756) }));
+  assert.equal(t.unit, 'of 756 pieces have AI actions');
+  assert.equal(t.note, '28 tracked · 24 PRs open · 30 blockers');
+});
+
+test('the tracked count is still the note, not the headline denominator', () => {
+  const t = aiTile(oneWeek({ aiActions: withCatalog(756) }));
+  assert.equal(t.value, 2);
+  assert.doesNotMatch(t.unit, /28/);
+});
+
+test('a snapshot without a catalog keeps the tracked-count wording', () => {
+  const t = aiTile(buildView(archive));
+  assert.equal(t.unit, 'of 28 merged');
+  assert.equal(t.note, '24 PRs open · 30 blockers');
+});
+
+// typeof, not truthiness: 0 is a recorded catalog size, not a missing one.
+test('a zero catalog is still a recorded catalog', () =>
+  assert.equal(aiTile(oneWeek({ aiActions: withCatalog(0) })).unit, 'of 0 pieces have AI actions'));
+
+// ── done totals ────────────────────────────────────────────────────────────
+// "Done" means merged: `live` + `merged-not-live` for outputSchema (both are
+// merged; `live` additionally shipped to cloud), `merged` for AI-actions. It is
+// split into a running total and what crossed the line THIS week — and the
+// second number is only claimable against a real immediately-preceding week.
+// With nothing to diff against, every piece ever finished would otherwise be
+// reported as finished this week: the same silent overclaim deltaFor guards.
+
+const osDone = (v) => v.rosters.find((r) => r.key === 'outputSchema').done;
+const aiDone = (v) => v.rosters.find((r) => r.key === 'aiActions').done;
+const twoWeeks = (prev, cur, prevWeek = '2026-W30') =>
+  buildView({ weeks: [snap(prevWeek, prev), snap('2026-W31', cur)] });
+
+// ClickUp live, Slack merged-not-live, Notion live, Jira review → 3 done.
+const OS_PRIOR = [
+  { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
+  { name: 'Slack', actions: 28, triggers: 4, stage: 'review', tier: 'P1' },
+  { name: 'Notion', actions: 12, triggers: 2, stage: 'review', tier: 'P1' },
+  { name: 'Jira', actions: 9, triggers: 1, stage: 'review', tier: 'P3' },
+];
+
+test('outputSchema done counts live and merged-not-live, and says so', () => {
+  const d = osDone(oneWeek({ outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.total, 3);
+  assert.deepEqual(d.stages, ['live', 'merged-not-live']);
+});
+
+test('AI-actions done counts only merged', () => {
+  const d = aiDone(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }));
+  assert.equal(d.total, 1);
+  assert.deepEqual(d.stages, ['merged']);
+});
+
+test('with no prior week nothing is claimed for this week', () => {
+  const d = osDone(oneWeek({ outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.hasPrior, false);
+  assert.deepEqual(d.thisWeek, []);
+  assert.equal(d.total, 3, 'the running total is still reported');
+});
+
+test('pieces that became done this week are listed, sorted by name', () => {
+  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                             { outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.hasPrior, true);
+  assert.deepEqual(d.thisWeek, ['Notion', 'Slack']);
+  assert.equal(d.total, 3);
+});
+
+test('a piece that was already done is not re-claimed', () => {
+  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                             { outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.ok(!d.thisWeek.includes('ClickUp'));
+});
+
+test('nothing new is an empty list against a real prior week, not a missing one', () => {
+  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
+                             { outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.hasPrior, true);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+// The gap guard, mirroring deltaFor: W29 → W31 is a two-week jump, so anything
+// "new" spans two weeks and must not be reported as one week's work.
+test('a gap in the archive yields no comparison at all', () => {
+  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                             { outputSchema: withOsRoster(OS_ROSTER) }, '2026-W29'));
+  assert.equal(d.hasPrior, false);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+test('a no-data previous week yields no comparison', () => {
+  const d = osDone(twoWeeks({ outputSchema: { status: 'no-data', reason: 'build missing' } },
+                             { outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.hasPrior, false);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+test('a previous week that never recorded a roster yields no comparison', () => {
+  const d = osDone(twoWeeks({}, { outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.hasPrior, false);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+// An empty roster is indistinguishable from a roster the collector lost — it
+// returns [] on a missing or malformed pieces.json — so it cannot be treated as
+// "nothing was done last week".
+test('a previous week with an empty roster yields no comparison', () => {
+  const d = osDone(twoWeeks({ outputSchema: withOsRoster([]) },
+                             { outputSchema: withOsRoster(OS_ROSTER) }));
+  assert.equal(d.hasPrior, false);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+test('selecting the oldest week in the archive has no prior week', () => {
+  const a = { weeks: [snap('2026-W30', { outputSchema: withOsRoster(OS_ROSTER) }),
+                      snap('2026-W31', { outputSchema: withOsRoster(OS_ROSTER) })] };
+  const d = osDone(buildView(a, { weekId: '2026-W30' }));
+  assert.equal(d.hasPrior, false);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+test('a piece that fell back out of done is not listed and lowers the total', () => {
+  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
+                             { outputSchema: withOsRoster(OS_PRIOR) }));
+  assert.equal(d.total, 1);
+  assert.deepEqual(d.thisWeek, []);
+});
+
+test('each roster carries its own done totals', () => {
+  const v = twoWeeks(
+    { outputSchema: withOsRoster(OS_PRIOR),
+      aiActions: withAiRoster([{ name: 'google-sheets', actions: 37, stage: 'pr-open' }]) },
+    { outputSchema: withOsRoster(OS_ROSTER), aiActions: withAiRoster(AI_ROSTER) });
+  assert.deepEqual(osDone(v), { total: 3, stages: ['live', 'merged-not-live'],
+    thisWeek: ['Notion', 'Slack'], hasPrior: true });
+  assert.deepEqual(aiDone(v), { total: 1, stages: ['merged'],
+    thisWeek: ['google-sheets'], hasPrior: true });
+});
+
+test('computing done does not mutate the input archive', () => {
+  const input = { weeks: [snap('2026-W30', { outputSchema: withOsRoster(OS_PRIOR) }),
+                          snap('2026-W31', { outputSchema: withOsRoster(OS_ROSTER) })] };
+  const before = JSON.stringify(input);
+  buildView(input);
+  assert.equal(JSON.stringify(input), before);
+});

@@ -165,12 +165,25 @@ function tileHtml(t) {
     <div class="note">${esc(t.note)}</div></div>`;
 }
 
+// "Done" = merged. Two numbers, because a running total alone hides whether the
+// week moved: the total, and what crossed the line during this week. With no
+// comparable previous week the page says exactly that, rather than presenting
+// the whole finished backlog as this week's output.
+function doneHtml(d) {
+  if (!d) return '';
+  const tail = !d.hasPrior ? 'no prior week to compare'
+    : d.thisWeek.length ? `${d.thisWeek.length} this week: ${d.thisWeek.map(esc).join(', ')}`
+    : 'none this week';
+  return `<div class="note">${num(d.total)} done in total · ${tail}</div>`;
+}
+
 // One collapsible group per stage. The first — the most advanced stage that
 // actually has pieces — is open, so the section says something before a click.
 // A roster the snapshot never recorded is simply absent from view.rosters, so
 // nothing here renders an empty shell.
 function rosterHtml(r) {
-  return `<section><h2 class="sec">${esc(r.title)} — ${num(r.total)} in flight</h2>
+  return `<section><h2 class="sec">${esc(r.title)} — ${num(r.total)} tracked</h2>
+    ${doneHtml(r.done)}
     ${r.groups.map((g, i) => `<details class="roster"${i === 0 ? ' open' : ''}>
       <summary>${esc(g.label)} (${g.count})</summary>
       <table>${g.pieces.map((p) => `<tr><td>${esc(p.name)}</td>

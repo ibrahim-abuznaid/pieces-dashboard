@@ -126,10 +126,10 @@ test('the DOM-lite harness actually renders the page body', () => {
   assert.match(dom, /class="tile"/);
 });
 
-test('the roster renders a section per workstream with its in-flight total', () => {
+test('the roster renders a section per workstream with its tracked total', () => {
   const dom = renderDom([withRosters()]);
-  assert.match(dom, /outputSchema — 3 in flight/);
-  assert.match(dom, /AI-actions — 1 in flight/);
+  assert.match(dom, /outputSchema — 3 tracked/);
+  assert.match(dom, /AI-actions — 1 tracked/);
 });
 
 test('the roster renders piece names and counts with the workstream unit', () => {
@@ -163,7 +163,7 @@ test('groups are real details/summary elements', () => {
 
 test('a snapshot with no roster renders no roster section', () => {
   const dom = renderDom([snap('2026-W31')]);
-  assert.doesNotMatch(dom, /in flight/);
+  assert.doesNotMatch(dom, / tracked<\/h2>/);
   assert.doesNotMatch(dom, /<details/);
 });
 
@@ -171,7 +171,7 @@ test('an empty roster array renders no roster section', () => {
   const dom = renderDom([snap('2026-W31', {
     outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster: [] },
   })]);
-  assert.doesNotMatch(dom, /in flight/);
+  assert.doesNotMatch(dom, / tracked<\/h2>/);
   assert.doesNotMatch(dom, /<details/);
 });
 
@@ -181,5 +181,73 @@ test('piece names are HTML-escaped', () => {
       roster: [{ name: '<img onerror=x>', actions: 1, stage: 'merged' }] },
   })]);
   assert.match(dom, /&lt;img onerror=x&gt;/);
+  assert.doesNotMatch(dom, /<img onerror=x>/);
+});
+
+// ── the catalog denominator ────────────────────────────────────────────────
+
+test('the AI-actions tile divides by the catalog, not by the tracked count', () => {
+  const dom = renderDom([snap('2026-W31', {
+    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2,
+                 totalPieces: 28, blockersOpen: 30, catalogPieces: 756 },
+  })]);
+  assert.match(dom, /of 756 pieces have AI actions/);
+  assert.match(dom, /28 tracked · 24 PRs open · 30 blockers/);
+});
+
+test('a snapshot without a catalog keeps the wording of the week it measured', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.match(dom, /of 28 merged/);
+  assert.doesNotMatch(dom, /pieces have AI actions/);
+});
+
+// ── done lines ─────────────────────────────────────────────────────────────
+// One line per roster section: how much is merged in total, and what crossed
+// the line during this week. Never a bare list of everything done — see the
+// hasPrior rule in view.mjs.
+
+const osWeek = (week, roster) => snap(week, {
+  outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster },
+});
+
+const PRIOR = [
+  { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
+  { name: 'Notion', actions: 12, triggers: 2, stage: 'review', tier: 'P1' },
+  { name: 'Slack', actions: 28, triggers: 4, stage: 'review', tier: 'P1' },
+];
+
+const CURRENT = [
+  { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
+  { name: 'Notion', actions: 12, triggers: 2, stage: 'live', tier: 'P1' },
+  { name: 'Slack', actions: 28, triggers: 4, stage: 'merged-not-live', tier: 'P1' },
+];
+
+test('the done line names the total and what landed this week', () => {
+  const dom = renderDom([osWeek('2026-W30', PRIOR), osWeek('2026-W31', CURRENT)]);
+  assert.match(dom, /3 done in total · 2 this week: Notion, Slack/);
+});
+
+test('a week where nothing crossed the line says so explicitly', () => {
+  const dom = renderDom([osWeek('2026-W30', CURRENT), osWeek('2026-W31', CURRENT)]);
+  assert.match(dom, /3 done in total · none this week/);
+  assert.doesNotMatch(dom, /this week: /);
+});
+
+test('with no prior week the line says there is nothing to compare against', () => {
+  const dom = renderDom([osWeek('2026-W31', CURRENT)]);
+  assert.match(dom, /3 done in total · no prior week to compare/);
+  assert.doesNotMatch(dom, /this week: /);
+});
+
+test('a done line renders for every roster section', () => {
+  const dom = renderDom([withRosters()]);
+  assert.equal([...dom.matchAll(/done in total/g)].length, 2);
+  assert.match(dom, /1 done in total · no prior week to compare/);   // AI-actions
+});
+
+test('piece names in the done line are HTML-escaped', () => {
+  const evil = [{ name: '<img onerror=x>', actions: 1, triggers: 0, stage: 'live', tier: 'P1' }];
+  const dom = renderDom([osWeek('2026-W30', [{ ...evil[0], stage: 'review' }]), osWeek('2026-W31', evil)]);
+  assert.match(dom, /1 done in total · 1 this week: &lt;img onerror=x&gt;/);
   assert.doesNotMatch(dom, /<img onerror=x>/);
 });

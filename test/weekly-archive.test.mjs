@@ -141,3 +141,31 @@ test('an aiActions roster is validated too', () =>
     aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
                  roster: [{ name: 'gmail' }] },
   })), /aiActions\.roster\[0\]\.actions/));
+
+// --- catalogPieces (optional catalog denominator) ----------------------------
+// Optional exactly like `roster`: snapshots written before the field existed —
+// including the one already committed — must keep validating. But a present
+// value drives a denominator on the page, so a non-number has to be caught here
+// rather than rendered as "of undefined pieces".
+
+const withCatalog = (catalogPieces) => ok({
+  aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2,
+               totalPieces: 28, blockersOpen: 30, catalogPieces },
+});
+
+test('a snapshot with no catalogPieces validates — the field is optional', () => {
+  const snap = ok();
+  assert.equal(snap.aiActions.catalogPieces, undefined);
+  validateSnapshot(snap);
+});
+
+test('a numeric catalogPieces validates', () => validateSnapshot(withCatalog(756)));
+
+test('a zero catalogPieces validates — only a wrong type is an error', () =>
+  validateSnapshot(withCatalog(0)));
+
+test('a non-numeric catalogPieces is rejected', () =>
+  assert.throws(() => validateSnapshot(withCatalog('756')), /aiActions\.catalogPieces must be a number/));
+
+test('a null catalogPieces is rejected', () =>
+  assert.throws(() => validateSnapshot(withCatalog(null)), /aiActions\.catalogPieces must be a number/));
