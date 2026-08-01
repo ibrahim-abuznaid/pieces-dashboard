@@ -18,6 +18,18 @@ export function collectTickets({ window, weekId, readJson, linearRefreshPending 
     if (!Array.isArray(linear?.events)) throw new Error('linear.json has no `events` array');
     if (!Array.isArray(github?.mergedEvents)) throw new Error('github.json has no `mergedEvents` array');
 
+    // Freshness gate. The internal dashboard runs on its own rolling window, so
+    // data that simply predates this week yields 0 everywhere — indistinguishable
+    // from a genuinely quiet week. Absent this, a stale snapshot would publish
+    // "0 tickets" as fact. The NEEDS-LINEAR-REFRESH marker does not cover it:
+    // that flags Linear staleness, not whether the window reaches this week.
+    const covered = [linear.stamp, github.stamp].filter(Boolean).sort()[0];
+    if (!covered) throw new Error('data files carry no `stamp` — cannot establish freshness');
+    if (covered < window.end) {
+      return { status: 'no-data',
+        reason: `internal dashboard data only reaches ${covered}, but this week ends ${window.end} — needs a full refresh` };
+    }
+
     const byPerson = zeroed();
     for (const e of linear.events) {
       if (inWindow(e.d, window) && e.p in byPerson) byPerson[e.p] += 1;

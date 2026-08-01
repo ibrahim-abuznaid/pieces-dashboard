@@ -7,6 +7,7 @@ const WINDOW = { start: '2026-07-25', end: '2026-07-31' };
 const WEEK = '2026-W31';   // Monday = 2026-07-27
 
 const LINEAR = {
+  stamp: '2026-07-31',
   events: [
     { d: '2026-07-27', p: 'kishan', t: 'Pieces' },
     { d: '2026-07-30', p: 'kishan', t: 'GIT' },
@@ -26,6 +27,7 @@ const LINEAR = {
 };
 
 const GITHUB = {
+  stamp: '2026-07-31',
   mergedEvents: [
     { d: '2026-07-27', p: 'kishan', kind: 'pieces' },
     { d: '2026-07-28', p: 'kishan', kind: 'platform' },
@@ -81,6 +83,44 @@ test('a missing data file degrades to no-data', () => {
   });
   assert.equal(out.status, 'no-data');
   assert.match(out.reason, /ENOENT/);
+});
+
+// The internal dashboard runs its own rolling window. Data that predates this
+// week counts 0 everywhere, which is indistinguishable from a quiet week — so
+// freshness is gated separately from the NEEDS-LINEAR-REFRESH marker.
+test('data that does not reach the end of the window degrades to no-data', () => {
+  const stale = { ...LINEAR, stamp: '2026-07-14' };
+  const out = collectTickets({
+    window: WINDOW, weekId: WEEK, linearRefreshPending: false,
+    readJson: read({ 'linear.json': stale }),
+  });
+  assert.equal(out.status, 'no-data');
+  assert.match(out.reason, /2026-07-14/);
+  assert.match(out.reason, /2026-07-31/);
+});
+
+test('freshness uses the older of the two stamps', () => {
+  const out = collectTickets({
+    window: WINDOW, weekId: WEEK, linearRefreshPending: false,
+    readJson: read({ 'github.json': { ...GITHUB, stamp: '2026-07-20' } }),
+  });
+  assert.equal(out.status, 'no-data');
+  assert.match(out.reason, /2026-07-20/);
+});
+
+test('data stamped exactly on the window end is fresh enough', () => {
+  const out = collectTickets({ window: WINDOW, weekId: WEEK, readJson: read(), linearRefreshPending: false });
+  assert.equal(out.status, 'ok');
+});
+
+test('missing stamps degrade rather than being assumed fresh', () => {
+  const { stamp, ...noStamp } = LINEAR;
+  const out = collectTickets({
+    window: WINDOW, weekId: WEEK, linearRefreshPending: false,
+    readJson: read({ 'linear.json': noStamp, 'github.json': (({ stamp: _s, ...g }) => g)(GITHUB) }),
+  });
+  assert.equal(out.status, 'no-data');
+  assert.match(out.reason, /stamp/);
 });
 
 test('an empty week is a real zero, not no-data', () => {

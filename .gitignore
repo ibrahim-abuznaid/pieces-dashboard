@@ -1,3 +1,4 @@
 dist/
 node_modules/
 output-schema/data/.coverage.jsonl
+refresh-weekly.log
