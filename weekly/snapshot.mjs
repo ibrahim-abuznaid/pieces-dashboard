@@ -9,6 +9,9 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { isoWeekId, mondayOfWeekId, latestCompleteWeek, windowForWeekId } from '../lib/isoweek.mjs';
 import { readArchive, appendWeek, writeArchive } from './lib/archive.mjs';
+// One grammar for the whole product: the decision lines this file writes end up
+// in the same band as everything view.mjs phrases, so they share the helper.
+import { plural } from './lib/view.mjs';
 import { collectOutputSchema } from './collect/output-schema.mjs';
 import { collectAiActions } from './collect/ai-actions.mjs';
 import { collectTesting } from './collect/testing.mjs';
@@ -36,21 +39,19 @@ export function buildSnapshot({ weekId, today, collectors }) {
   return snap;
 }
 
+// Only ASKS live here: a line belongs in this list if a person has to go and do
+// something about it. Counts that are merely the state of play — PRs sitting in
+// review, blockers still open — are already the tiles' job, and a degraded
+// workstream is already the tile's "no data". Listing them here padded the band
+// out to four lines of which one mattered, which is how a "needs you" section
+// becomes something readers scroll past. The view filters these shapes out on
+// render as well, so weeks already committed to the archive read clean too.
 export function deriveDecisions(snap) {
   const lines = [];
   const os = snap.outputSchema;
   if (os?.status === 'ok' && os.mergedNotLive > 0) {
-    lines.push(`${os.mergedNotLive} outputSchema pieces merged but not cloud-live — needs a cloud release`);
-  }
-  if (os?.status === 'ok' && os.review > 0) {
-    lines.push(`${os.review} outputSchema PRs awaiting review`);
-  }
-  const ai = snap.aiActions;
-  if (ai?.status === 'ok' && ai.blockersOpen > 0) {
-    lines.push(`${ai.blockersOpen} AI-actions blockers still open`);
-  }
-  for (const key of WORKSTREAMS) {
-    if (snap[key]?.status === 'no-data') lines.push(`${key}: no data — ${snap[key].reason}`);
+    const n = os.mergedNotLive;
+    lines.push(`${n} ${plural(n, 'piece')} merged but not live — needs a cloud release`);
   }
   return lines;
 }

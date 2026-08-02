@@ -35,25 +35,45 @@ test('a throwing collector becomes no-data rather than aborting the snapshot', (
   validateSnapshot(snap);
 });
 
-test('deriveDecisions flags merged-but-not-live outputSchema pieces', () => {
+// A decision line is an ASK: something a human has to go and do. Everything
+// else the snapshot knows is already a tile, and mixing status into this list
+// is what made the band on the page unreadable.
+
+test('deriveDecisions asks for the cloud release, in plain words', () => {
   const lines = deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 6, review: 0 },
     aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
     tickets: { status: 'ok' }, testing: { status: 'ok' },
   });
-  assert.equal(lines.length, 1);
-  assert.match(lines[0], /6 outputSchema pieces merged but not cloud-live/);
+  assert.deepEqual(lines, ['6 pieces merged but not live — needs a cloud release']);
 });
 
-test('deriveDecisions flags a degraded workstream', () => {
+test('the cloud-release ask agrees in number', () => {
+  const lines = deriveDecisions({
+    outputSchema: { status: 'ok', mergedNotLive: 1, review: 0 },
+    aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    tickets: { status: 'ok' }, testing: { status: 'ok' },
+  });
+  assert.deepEqual(lines, ['1 piece merged but not live — needs a cloud release']);
+});
+
+test('PRs in review and open blockers are status, not decisions', () => {
+  const lines = deriveDecisions({
+    outputSchema: { status: 'ok', mergedNotLive: 0, review: 8 },
+    aiActions: { status: 'ok', prOpen: 24, blockersOpen: 30 },
+    tickets: { status: 'ok' }, testing: { status: 'ok' },
+  });
+  assert.deepEqual(lines, []);
+});
+
+test('a degraded workstream is not a decision line — its tile already says so', () => {
   const lines = deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
     aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
-    testing: { status: 'ok' },
+    testing: { status: 'no-data', reason: 'gh unreachable' },
     tickets: { status: 'no-data', reason: 'Linear refresh pending' },
   });
-  assert.equal(lines.length, 1);
-  assert.match(lines[0], /tickets.*Linear refresh pending/);
+  assert.deepEqual(lines, []);
 });
 
 test('a clean week produces no decision lines', () => {

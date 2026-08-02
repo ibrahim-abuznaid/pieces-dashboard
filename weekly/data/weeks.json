@@ -4,7 +4,7 @@
       "week": "2026-W31",
       "start": "2026-07-25",
       "end": "2026-07-31",
-      "builtAt": "2026-08-01",
+      "builtAt": "2026-08-02",
       "outputSchema": {
         "status": "ok",
         "live": 9,
@@ -345,10 +345,7 @@
         "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
       },
       "decisions": [
-        "6 outputSchema pieces merged but not cloud-live — needs a cloud release",
-        "8 outputSchema PRs awaiting review",
-        "30 AI-actions blockers still open",
-        "tickets: no data — Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
+        "6 pieces merged but not live — needs a cloud release"
       ]
     }
   ]

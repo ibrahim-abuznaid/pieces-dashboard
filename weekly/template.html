@@ -24,11 +24,21 @@
          font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; }
   .wrap { max-width: 940px; margin: 0 auto; padding: 32px 20px 64px; }
   header { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; }
-  h1 { font-size: 20px; margin: 0; letter-spacing: -0.01em; }
+  /* The h1 is an eyebrow, not the headline: on a 30-second page the headline is
+     the verdict below it. Uppercasing in CSS rather than in the string keeps
+     the text readable to screen readers and in summary.json. */
+  h1 { font-size: 12px; margin: 0; font-weight: 600; text-transform: uppercase;
+       letter-spacing: .08em; color: var(--text-secondary); }
   .sub { color: var(--text-secondary); font-size: 13px; }
+
+  /* The lede. Larger than body text and held to ~60ch so it reads as a
+     sentence, not as a banner. Everything below it is evidence for it. */
+  .verdict { font-size: 21px; line-height: 1.45; letter-spacing: -0.01em;
+             max-width: 60ch; margin: 14px 0 4px; color: var(--text-primary); }
 
   /* One control row, scoping the whole page — never a per-tile filter. */
   .nav { display: flex; gap: 6px; align-items: center; }
+  .nav .range { color: var(--text-secondary); font-size: 13px; font-variant-numeric: tabular-nums; }
   .nav button, .nav select { background: var(--surface-1); color: var(--text-primary);
     border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px; font: inherit; font-size: 13px; cursor: pointer; }
   .nav button { min-width: 32px; }
@@ -60,9 +70,13 @@
   /* The sparkline is aria-hidden decoration; these are the same values as text. */
   .sparkcap { color: var(--text-muted); font-size: 11.5px; margin-top: 4px; font-variant-numeric: tabular-nums; }
 
+  /* Only asks land here, so the band can afford to look urgent. Bullets are
+     replaced by an arrow marker: these are actions, not an inventory. */
   .band { border: 1px solid var(--sev-high); border-radius: 10px; padding: 14px 18px; margin: 22px 0; }
   .band h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; color: var(--sev-high); }
-  .band ul { margin: 0; padding-left: 18px; } .band li { margin: 3px 0; font-size: 13.5px; }
+  .band ul { margin: 0; padding-left: 0; list-style: none; }
+  .band li { margin: 3px 0; font-size: 13.5px; }
+  .band .mark { color: var(--sev-high); font-weight: 600; }
 
   table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13.5px; }
   th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em;
@@ -93,6 +107,9 @@ const ARCHIVE = /*__DATA__*/null;
 <script>
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : '—');
+// Mirrors plural() in weekly/lib/view.mjs — the template cannot import, and
+// "1 actions" on a leadership page is the kind of thing that gets noticed.
+const plural = (n, word) => (n === 1 ? word : `${word}s`);
 
 // Sparkline geometry. Padded so the 8px end-marker plus its 2px surface ring
 // can never be clipped by the viewBox.
@@ -145,24 +162,27 @@ function trendHtml(points) {
 function deltaHtml(d) {
   // Direction is carried by the glyph and the sign, not by hue alone: red and
   // green are ~ΔE 5 apart under protan/deutan simulation.
-  if (d === null || d === undefined) {
-    return '<span class="delta flat">no prior week</span>';
-  }
+  // No delta, no badge: the caption says "no prior week" once for the page
+  // instead of four pills repeating an absence on every tile.
+  if (d === null || d === undefined) return '';
   const cls = d > 0 ? 'up' : d < 0 ? 'down' : 'flat';
   const glyph = d > 0 ? '▲' : d < 0 ? '▼' : '■';
   const sign = d > 0 ? '+' : '';
   return `<span class="delta ${cls}"><span class="arrow" aria-hidden="true">${glyph}</span> ${sign}${d} vs prior week</span>`;
 }
 
+// Compact by design: one number, one unit, one sub-line. A degraded tile keeps
+// the em dash in the number slot so the KPI row still scans as a row of four.
 function tileHtml(t) {
   if (t.status !== 'ok') {
     return `<div class="tile is-nodata"><h2>${esc(t.title)}</h2>
+      <div><span class="big">—</span></div>
       <div class="nodata"><b>No data</b> — ${esc(t.reason)}</div></div>`;
   }
   return `<div class="tile"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${deltaHtml(t.delta)}</div>
-    ${trendHtml(t.spark)}
-    <div class="note">${esc(t.note)}</div></div>`;
+    <div class="note">${esc(t.sub)}</div>
+    ${trendHtml(t.spark)}</div>`;
 }
 
 // "Done" = merged. Two numbers, because a running total alone hides whether the
@@ -171,60 +191,73 @@ function tileHtml(t) {
 // the whole finished backlog as this week's output.
 function doneHtml(d) {
   if (!d) return '';
-  const tail = !d.hasPrior ? 'no prior week to compare'
-    : d.thisWeek.length ? `${d.thisWeek.length} this week: ${d.thisWeek.map(esc).join(', ')}`
-    : 'none this week';
-  return `<div class="note">${num(d.total)} done in total · ${tail}</div>`;
+  // When there is no prior week the caption already says so once, at the top.
+  // Repeating it per roster is the noise this redesign exists to remove.
+  const tail = !d.hasPrior ? ''
+    : d.thisWeek.length ? ` · ${d.thisWeek.length} this week: ${d.thisWeek.map(esc).join(', ')}`
+    : ' · none this week';
+  return `<div class="note">${num(d.total)} done in total${tail}</div>`;
 }
 
-// One collapsible group per stage. The first — the most advanced stage that
-// actually has pieces — is open, so the section says something before a click.
+// One collapsible group per stage, ALL closed: this is reference detail at the
+// foot of the page, and open by default it was ~80% of everything on screen.
 // A roster the snapshot never recorded is simply absent from view.rosters, so
 // nothing here renders an empty shell.
 function rosterHtml(r) {
+  // `unit` is stored plural ('actions', 'AI actions'); a single-action piece
+  // has to read "1 action".
+  const one = r.unit.replace(/s$/, '');
   return `<section><h2 class="sec">${esc(r.title)} — ${num(r.total)} tracked</h2>
     ${doneHtml(r.done)}
-    ${r.groups.map((g, i) => `<details class="roster"${i === 0 ? ' open' : ''}>
+    ${r.groups.map((g) => `<details class="roster">
       <summary>${esc(g.label)} (${g.count})</summary>
       <table>${g.pieces.map((p) => `<tr><td>${esc(p.name)}</td>
-        <td class="n">${num(p.actions)} ${esc(r.unit)}</td></tr>`).join('')}</table>
+        <td class="n">${num(p.actions)} ${esc(plural(p.actions, one))}</td></tr>`).join('')}</table>
     </details>`).join('')}</section>`;
 }
 
 function render(view) {
   const app = document.getElementById('app');
   if (view.empty) {
-    app.innerHTML = '<h1>Pieces Team — Weekly Progress</h1><p class="sub">No weeks recorded yet.</p>';
+    // The h1 is an eyebrow now, so the placeholder carries the lede's weight.
+    app.innerHTML = '<h1>Pieces Team · Weekly progress</h1><p class="verdict">No weeks recorded yet.</p>';
     return;
   }
   const idx = view.weeks.indexOf(view.week);
   const options = view.weeks.map((w) => `<option value="${w}"${w === view.week ? ' selected' : ''}>${w}</option>`).join('');
+  // Everything the header used to shout — the window definition, the build
+  // stamp, the absence of a prior week — is one quiet line instead.
+  const caption = `7 days ending Friday · built ${esc(view.builtAt)}`
+    + (view.noPriorWeek ? ' · no prior week to compare against yet' : '');
   app.innerHTML = `
     <header>
-      <div><h1>Pieces Team — Weekly Progress</h1>
-        <div class="sub">${esc(view.label)} · 7 days ending Friday · built ${esc(view.builtAt)}</div></div>
+      <h1>${esc(view.title)}</h1>
       <div class="nav">
         <button id="prev" ${idx === view.weeks.length - 1 ? 'disabled' : ''} aria-label="Previous week">←</button>
+        <span class="range">${esc(view.range)}</span>
         <select id="pick" aria-label="Select week">${options}</select>
         <button id="next" ${idx === 0 ? 'disabled' : ''} aria-label="Next week">→</button>
       </div>
     </header>
+    <p class="verdict">${esc(view.verdict)}</p>
+    <div class="sub">${caption}</div>
     <div class="tiles">${view.tiles.map(tileHtml).join('')}</div>
-    ${view.decisions.length ? `<div class="band"><h2>Needs a decision</h2><ul>${
-      view.decisions.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></div>` : ''}
-    ${view.people.length ? `<section><h2 class="sec">Per person</h2><table>
-      <tr><th>Engineer</th><th class="n">Tickets</th><th class="n">PRs merged</th><th class="n">Reviews</th></tr>
-      ${view.people.map((p) => `<tr><td>${esc(p.name)}</td><td class="n">${p.tickets}</td>
-        <td class="n">${p.prsMerged}</td><td class="n">${p.reviews}</td></tr>`).join('')}
-      </table></section>` : ''}
+    ${view.decisions.length ? `<div class="band"><h2>Needs you</h2><ul>${
+      view.decisions.map((d) => `<li><span class="mark" aria-hidden="true">→</span> ${esc(d)}</li>`).join('')}</ul></div>` : ''}
     ${(view.shipped.tickets.length || view.shipped.testing.length) ? `<section><h2 class="sec">Shipped this week</h2><table>
       ${view.shipped.tickets.map((i) => `<tr><td>${esc(i.id)}</td><td>${esc(i.title)}</td>
         <td>${esc(i.assignee ?? '')}</td></tr>`).join('')}
       ${view.shipped.testing.map((i) => `<tr><td>tester #${i.number}</td>
         <td><a href="${esc(i.url)}">${esc(i.title)}</a></td><td></td></tr>`).join('')}
       </table></section>` : ''}
+    ${view.people.length ? `<section><h2 class="sec">Per person</h2><table>
+      <tr><th>Engineer</th><th class="n">Tickets</th><th class="n">PRs merged</th><th class="n">Reviews</th></tr>
+      ${view.people.map((p) => `<tr><td>${esc(p.name)}</td><td class="n">${p.tickets}</td>
+        <td class="n">${p.prsMerged}</td><td class="n">${p.reviews}</td></tr>`).join('')}
+      </table></section>` : ''}
     ${view.rosters.map(rosterHtml).join('')}
-    <footer>Full detail: <a href="../output-schema/">outputSchema</a> ·
+    <footer>${view.testingNote ? `<div>Piece testing: ${esc(view.testingNote)}</div>` : ''}
+      Full detail: <a href="../output-schema/">outputSchema</a> ·
       <a href="../ai-actions/">AI-actions</a> · <a href="../">overview</a></footer>`;
 
   document.getElementById('pick').onchange = (e) => { location.hash = e.target.value; };

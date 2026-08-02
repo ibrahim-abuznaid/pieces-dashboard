@@ -4,14 +4,32 @@
 // when it means "we don't know".
 import { previousWeekId } from '../../lib/isoweek.mjs';
 
+// NaN and Infinity are "we do not know", not numbers: arithmetic across a
+// degraded workstream (`undefined + 9`) produces NaN, and a NaN that survived
+// to the page would render as a value the collectors never measured.
+const asNumber = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+
+// `path` is either a dotted string ('tickets.total') or an accessor called with
+// the whole snapshot. The accessor form exists because some headline numbers
+// are derived rather than stored — "outputSchema merged" is live + mergedNotLive
+// — and deriving it at read time keeps every snapshot already in the archive
+// valid, with no schema change and no backfill. An accessor may reach through
+// a workstream that degraded, so it is allowed to throw: that is a null.
 export function pick(snap, path) {
+  if (typeof path === 'function') {
+    try {
+      return asNumber(path(snap));
+    } catch {
+      return null;
+    }
+  }
   let cur = snap;
   for (const key of path.split('.')) {
     if (!cur || typeof cur !== 'object') return null;
     if (cur.status === 'no-data') return null;
     cur = cur[key];
   }
-  return typeof cur === 'number' ? cur : null;
+  return asNumber(cur);
 }
 
 const indexOfWeek = (weeks, weekId) => weeks.findIndex((w) => w.week === weekId);

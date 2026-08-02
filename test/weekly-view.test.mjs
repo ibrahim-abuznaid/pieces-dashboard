@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildView } from '../weekly/lib/view.mjs';
+import { buildView, plural } from '../weekly/lib/view.mjs';
 
 const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
@@ -44,11 +44,46 @@ test('always four tiles in fixed order', () =>
   assert.deepEqual(buildView(archive).tiles.map((t) => t.key),
     ['outputSchema', 'aiActions', 'testing', 'tickets']));
 
-test('outputSchema tile carries value, delta and sparkline', () => {
+// The headline for outputSchema is MERGED work — live + merged-not-live — not
+// just what reached cloud. Counting only `live` reports 9 when 15 pieces are
+// done, blaming the team for a release train it does not own. The metric is
+// derived at read time, so no snapshot needed rewriting for this.
+test('the outputSchema tile leads with merged, not with cloud-live', () => {
   const tile = buildView(archive).tiles[0];
-  assert.equal(tile.value, 9);
-  assert.equal(tile.delta, 2);
-  assert.deepEqual(tile.spark, [{ week: '2026-W30', value: 7 }, { week: '2026-W31', value: 9 }]);
+  assert.equal(tile.value, 15);                 // 9 live + 6 merged-not-live
+  assert.equal(tile.unit, 'of 756 merged');
+  assert.equal(tile.sub, '9 live on cloud · 8 in review');
+});
+
+test('the outputSchema delta and sparkline follow the same derived merged metric', () => {
+  const tile = buildView(archive).tiles[0];
+  assert.equal(tile.delta, 2);                  // 13 merged last week → 15
+  assert.deepEqual(tile.spark, [{ week: '2026-W30', value: 13 }, { week: '2026-W31', value: 15 }]);
+});
+
+test('the testing tile pluralises its unit and sub-line', () => {
+  const one = buildView(archive).tiles.find((t) => t.key === 'testing');
+  assert.equal(one.value, 1);
+  assert.equal(one.unit, 'PR shipped');
+  assert.equal(one.sub, '4 commits');
+  const many = oneWeek({ testing: { status: 'ok', prsMerged: 3, commits: 1, shipped: [] } })
+    .tiles.find((t) => t.key === 'testing');
+  assert.equal(many.unit, 'PRs shipped');
+  assert.equal(many.sub, '1 commit');
+});
+
+test('the tickets tile splits the week by person', () => {
+  const tile = buildView(archive).tiles.find((t) => t.key === 'tickets');
+  assert.equal(tile.value, 11);
+  assert.equal(tile.unit, 'closed this week');
+  assert.equal(tile.sub, '5 Kishan · 6 Sanket');
+});
+
+test('every ok tile carries the full field set', () => {
+  for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
+    assert.deepEqual(Object.keys(t).sort(),
+      ['delta', 'key', 'reason', 'spark', 'status', 'sub', 'title', 'unit', 'value']);
+  }
 });
 
 test('a no-data workstream produces a no-data tile, not a zero', () => {
@@ -61,8 +96,13 @@ test('a no-data workstream produces a no-data tile, not a zero', () => {
   assert.match(tile.reason, /Linear pending/);
 });
 
-test('the testing tile carries the build-progress caveat', () =>
-  assert.match(buildView(archive).tiles.find((t) => t.key === 'testing').note, /health/i));
+// The caveat still has to be on the page — the tile itself is now too small to
+// carry it, so it moves to the footer rather than disappearing.
+test('the build-progress caveat survives as a page footnote', () =>
+  assert.match(buildView(archive).testingNote, /health/i));
+
+test('no caveat is claimed when the testing workstream is degraded', () =>
+  assert.equal(oneWeek({ testing: { status: 'no-data', reason: 'gh down' } }).testingNote, ''));
 
 test('people rows come from the tickets workstream', () =>
   assert.deepEqual(buildView(archive).people, [
@@ -75,8 +115,15 @@ test('people is empty when tickets is no-data', () => {
   assert.deepEqual(buildView(a).people, []);
 });
 
-test('label reads as a human date range', () =>
-  assert.equal(buildView(archive).label, 'Week 31 · Jul 25 – Jul 31, 2026'));
+test('the heading names the team and the week number', () =>
+  assert.equal(buildView(archive).title, 'Pieces Team · Week 31'));
+
+test('the date range collapses a same-month week', () =>
+  assert.equal(buildView(archive).range, 'Jul 25–31'));
+
+test('a range that crosses a month names both months', () =>
+  assert.equal(buildView({ weeks: [snap('2026-W31', { start: '2026-07-27', end: '2026-08-02' })] }).range,
+    'Jul 27 – Aug 2'));
 
 test('shipped is split by source', () => {
   const v = buildView(archive);
@@ -84,8 +131,111 @@ test('shipped is split by source', () => {
   assert.equal(v.shipped.testing.length, 1);
 });
 
-test('decisions pass through', () =>
-  assert.match(buildView(archive).decisions[0], /cloud-live/));
+// ── the verdict ────────────────────────────────────────────────────────────
+// The lede: what a reader who reads nothing else should walk away with. Built
+// only from workstreams that actually reported, so it can never state a number
+// the collectors did not measure.
+
+test('the verdict states where the two headline workstreams stand', () =>
+  assert.equal(buildView(archive).verdict,
+    'Output schemas are merged on 15 of 756 pieces; 9 are live on cloud. 2 pieces have AI actions.'));
+
+test('a degraded workstream is named in a short trailing clause', () =>
+  assert.equal(oneWeek({ tickets: { status: 'no-data', reason: 'Linear refresh pending' } }).verdict,
+    'Output schemas are merged on 15 of 756 pieces; 9 are live on cloud. 2 pieces have AI actions.'
+    + ' Ticket data unavailable.'));
+
+test('several degraded workstreams share one clause', () =>
+  assert.match(oneWeek({
+    testing: { status: 'no-data', reason: 'gh down' },
+    tickets: { status: 'no-data', reason: 'Linear refresh pending' },
+  }).verdict, /Ticket and testing data unavailable\.$/));
+
+test('the verdict falls back to the workstreams that did report', () => {
+  const v = oneWeek({ outputSchema: { status: 'no-data', reason: 'build missing' } }).verdict;
+  assert.match(v, /^2 pieces have AI actions\./);
+  assert.match(v, /Output-schema data unavailable\.$/);
+  assert.doesNotMatch(v, /Output schemas are merged/);
+});
+
+test('the verdict says so plainly when nothing reported at all', () =>
+  assert.equal(oneWeek({
+    outputSchema: { status: 'no-data', reason: 'a' }, aiActions: { status: 'no-data', reason: 'b' },
+    testing: { status: 'no-data', reason: 'c' }, tickets: { status: 'no-data', reason: 'd' },
+  }).verdict, 'No data is available for this week.'));
+
+test('the verdict stays at two sentences before the degraded clause', () => {
+  const sentences = buildView(archive).verdict.split('. ').length;
+  assert.ok(sentences <= 2, `verdict ran to ${sentences} sentences`);
+});
+
+test('the verdict is grammatical for singular counts', () => {
+  const v = oneWeek({
+    outputSchema: { status: 'ok', live: 1, mergedNotLive: 0, review: 0, todo: 1, totalPieces: 756 },
+    aiActions: { status: 'ok', merged: 1, prOpen: 0, assigned: 0, held: 0, totalPieces: 28, blockersOpen: 0 },
+  }).verdict;
+  assert.match(v, /1 of 756 pieces; 1 is live on cloud\./);
+  assert.match(v, /1 piece has AI actions\./);
+});
+
+// ── decisions: only genuine asks ───────────────────────────────────────────
+// The band is worth reading only if every line asks someone to act. Pure status
+// and "no data" reports are already on the tiles; repeating them here is what
+// made the band skippable. The FILTER lives in the view so weeks already in the
+// archive are cleaned up on render, not just weeks snapshotted from now on.
+
+const decisionsFrom = (lines) => oneWeek({ decisions: lines }).decisions;
+
+test('a genuine ask survives', () =>
+  assert.deepEqual(decisionsFrom(['6 pieces merged but not live — needs a cloud release']),
+    ['6 pieces merged but not live — needs a cloud release']));
+
+test('PRs awaiting review is status, not an ask', () =>
+  assert.deepEqual(decisionsFrom(['8 outputSchema PRs awaiting review']), []));
+
+test('open blockers is status, not an ask', () =>
+  assert.deepEqual(decisionsFrom(['30 AI-actions blockers still open']), []));
+
+test('a no-data report is dropped — the tile already carries it', () =>
+  assert.deepEqual(decisionsFrom(['tickets: no data — Linear refresh pending']), []));
+
+test('historical noise is filtered on render, keeping only the ask', () =>
+  assert.deepEqual(decisionsFrom([
+    '6 outputSchema pieces merged but not cloud-live — needs a cloud release',
+    '8 outputSchema PRs awaiting review',
+    '30 AI-actions blockers still open',
+    'tickets: no data — Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH',
+  ]), ['6 outputSchema pieces merged but not cloud-live — needs a cloud release']));
+
+test('a snapshot with no decisions at all yields an empty list', () =>
+  assert.deepEqual(oneWeek({ decisions: undefined }).decisions, []));
+
+// ── no prior week ──────────────────────────────────────────────────────────
+// Said once, in the caption, instead of stamped on all four tiles.
+
+test('noPriorWeek is true when nothing can be compared', () =>
+  assert.equal(oneWeek({}).noPriorWeek, true));
+
+test('noPriorWeek is false once any tile has a delta', () =>
+  assert.equal(buildView(archive).noPriorWeek, false));
+
+test('a prior week that reported nothing still leaves nothing to compare', () => {
+  const degraded = { status: 'no-data', reason: 'x' };
+  const a = { weeks: [
+    snap('2026-W30', { outputSchema: degraded, aiActions: degraded, testing: degraded, tickets: degraded }),
+    snap('2026-W31'),
+  ] };
+  assert.equal(buildView(a).noPriorWeek, true);
+});
+
+// ── grammar ────────────────────────────────────────────────────────────────
+
+test('plural agrees the noun with the count', () => {
+  assert.equal(plural(1, 'PR'), 'PR');
+  assert.equal(plural(2, 'PR'), 'PRs');
+  assert.equal(plural(0, 'commit'), 'commits');
+  assert.equal(plural(1, 'piece'), 'piece');
+});
 
 // ── rosters ────────────────────────────────────────────────────────────────
 // The per-piece detail behind the outputSchema and AI-actions tiles. It is
@@ -227,8 +377,8 @@ const aiTile = (v) => v.tiles.find((t) => t.key === 'aiActions');
 
 test('the AI-actions tile counts against the whole catalog when the snapshot recorded it', () => {
   const t = aiTile(oneWeek({ aiActions: withCatalog(756) }));
-  assert.equal(t.unit, 'of 756 pieces have AI actions');
-  assert.equal(t.note, '28 tracked · 24 PRs open · 30 blockers');
+  assert.equal(t.unit, 'of 756 have AI actions');
+  assert.equal(t.sub, '28 tracked · 24 PRs open · 30 blockers');
 });
 
 test('the tracked count is still the note, not the headline denominator', () => {
@@ -240,12 +390,16 @@ test('the tracked count is still the note, not the headline denominator', () => 
 test('a snapshot without a catalog keeps the tracked-count wording', () => {
   const t = aiTile(buildView(archive));
   assert.equal(t.unit, 'of 28 merged');
-  assert.equal(t.note, '24 PRs open · 30 blockers');
+  assert.equal(t.sub, '28 tracked · 24 PRs open · 30 blockers');
 });
 
 // typeof, not truthiness: 0 is a recorded catalog size, not a missing one.
 test('a zero catalog is still a recorded catalog', () =>
-  assert.equal(aiTile(oneWeek({ aiActions: withCatalog(0) })).unit, 'of 0 pieces have AI actions'));
+  assert.equal(aiTile(oneWeek({ aiActions: withCatalog(0) })).unit, 'of 0 have AI actions'));
+
+test('a single open PR and a single blocker read in the singular', () =>
+  assert.equal(aiTile(oneWeek({ aiActions: { status: 'ok', merged: 2, prOpen: 1, assigned: 0,
+    held: 2, totalPieces: 28, blockersOpen: 30 } })).sub, '28 tracked · 1 PR open · 30 blockers'));
 
 // ── done totals ────────────────────────────────────────────────────────────
 // "Done" means merged: `live` + `merged-not-live` for outputSchema (both are

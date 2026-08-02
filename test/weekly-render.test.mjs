@@ -122,8 +122,120 @@ const withRosters = (over = {}) => snap('2026-W31', {
 // `doesNotMatch` below would pass for the wrong reason.
 test('the DOM-lite harness actually renders the page body', () => {
   const dom = renderDom([snap('2026-W31')]);
-  assert.match(dom, /Pieces Team — Weekly Progress/);
+  assert.match(dom, /Pieces Team · Week 31/);
   assert.match(dom, /class="tile"/);
+});
+
+// ── hierarchy ──────────────────────────────────────────────────────────────
+// A 30-second skim: verdict first, then the four numbers, then what needs a
+// human, then detail. The rosters are ~80% of the page's length and belong at
+// the bottom, under everything that is actually news.
+
+const at = (dom, needle) => dom.indexOf(needle);
+
+test('the verdict is the lead element, above the tiles', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.match(dom, /class="verdict"/);
+  assert.match(dom, /Output schemas are merged on 15 of 756 pieces; 9 are live on cloud\./);
+  assert.ok(at(dom, 'class="verdict"') < at(dom, 'class="tiles"'), 'verdict must precede the tiles');
+});
+
+test('the verdict names a degraded workstream instead of going silent', () =>
+  assert.match(renderDom([snap('2026-W31', { tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]),
+    /Ticket data unavailable\./));
+
+test('the rosters sit at the bottom, below the shipped and per-person detail', () => {
+  const dom = renderDom([withRosters()]);
+  assert.ok(at(dom, 'Per person') < at(dom, 'outputSchema — 3 tracked'), 'rosters must follow per-person');
+  assert.ok(at(dom, 'class="tiles"') < at(dom, 'outputSchema — 3 tracked'), 'rosters must follow the tiles');
+  assert.ok(at(dom, 'outputSchema — 3 tracked') < at(dom, '<footer'), 'rosters sit above the footer');
+});
+
+test('the header keeps the week, the date range and real nav controls', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.match(dom, /<h1>Pieces Team · Week 31<\/h1>/);
+  assert.match(dom, /Jul 25–31/);
+  assert.match(dom, /<select id="pick"/);
+  assert.match(dom, /<button id="prev"/);
+  assert.match(dom, /<button id="next"/);
+});
+
+test('the quiet caption carries the window, the build date and nothing loud', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.match(dom, /7 days ending Friday/);
+  assert.match(dom, /built 2026-08-01/);
+});
+
+// It used to be stamped on all four tiles. Once, in the caption, is enough.
+test('"no prior week" is said exactly once, in the caption', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.equal([...dom.matchAll(/no prior week/g)].length, 1);
+  assert.ok(at(dom, 'no prior week') < at(dom, 'class="tiles"'));
+});
+
+test('no delta badge is rendered when there is nothing to compare against', () =>
+  assert.doesNotMatch(renderDom([snap('2026-W31')]), /class="delta/));
+
+test('a real delta still renders its badge on the tile', () => {
+  const dom = renderDom([
+    snap('2026-W30', { outputSchema: { status: 'ok', live: 7, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 } }),
+    snap('2026-W31'),
+  ]);
+  assert.match(dom, /class="delta up"/);
+  assert.match(dom, /\+2 vs prior week/);
+  assert.doesNotMatch(dom, /no prior week/);
+});
+
+// ── needs you ──────────────────────────────────────────────────────────────
+
+test('the needs-you band renders genuine asks with a marker', () => {
+  const dom = renderDom([snap('2026-W31', { decisions: ['6 pieces merged but not live — needs a cloud release'] })]);
+  assert.match(dom, /Needs you/);
+  assert.match(dom, /→<\/span> 6 pieces merged but not live — needs a cloud release/);
+});
+
+test('the band does not render at all when nothing is being asked', () =>
+  assert.doesNotMatch(renderDom([snap('2026-W31', { decisions: [] })]), /Needs you/));
+
+// The filter lives in the view, so a week snapshotted before that rule existed
+// renders clean rather than being reprinted with its old noise.
+test('a historical snapshot of pure status renders no band', () => {
+  const dom = renderDom([snap('2026-W31', { decisions: [
+    '8 outputSchema PRs awaiting review',
+    '30 AI-actions blockers still open',
+    'tickets: no data — Linear refresh pending',
+  ] })]);
+  assert.doesNotMatch(dom, /Needs you/);
+  assert.doesNotMatch(dom, /awaiting review/);
+});
+
+// ── grammar ────────────────────────────────────────────────────────────────
+
+test('a count of one never renders a plural noun', () => {
+  const dom = renderDom([snap('2026-W31', {
+    testing: { status: 'ok', prsMerged: 1, commits: 1, shipped: [] },
+    outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756,
+      roster: [{ name: 'Human Input', actions: 1, triggers: 0, stage: 'review', tier: 'P2' }] },
+  })]);
+  assert.match(dom, /PR shipped/);
+  assert.doesNotMatch(dom, /PRs shipped/);
+  assert.match(dom, /1 commit</);
+  assert.match(dom, /<td class="n">1 action<\/td>/);
+});
+
+test('counts above one keep the plural', () => {
+  const dom = renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 3, commits: 2, shipped: [] } })]);
+  assert.match(dom, /PRs shipped/);
+  assert.match(dom, /2 commits</);
+});
+
+// ── the piece-testing caveat ───────────────────────────────────────────────
+// Too long for a compact tile, too important to lose: it moved to the footer.
+
+test('the build-progress caveat survives in the footer', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.match(dom, /piece health numbers need a stats endpoint/);
+  assert.ok(at(dom, 'piece health numbers') > at(dom, 'class="tiles"'));
 });
 
 test('the roster renders a section per workstream with its tracked total', () => {
@@ -145,13 +257,13 @@ test('the roster renders piece names and counts with the workstream unit', () =>
 test('counts sit in a right-aligned tabular-nums cell', () =>
   assert.match(renderDom([withRosters()]), /<td class="n">31 actions<\/td>/));
 
-test('the first group of each roster is open, the rest collapsed', () => {
+// Reference detail, not headline: every group starts closed so the section is
+// a two-line index at the foot of the page rather than 51 rows of roster.
+test('no roster group is open by default', () => {
   const dom = renderDom([withRosters()]);
   const tags = [...dom.matchAll(/<details[^>]*>/g)].map((m) => m[0]);
   assert.equal(tags.length, 3);           // live + merged-not-live + AI merged
-  assert.match(tags[0], /\sopen/);
-  assert.doesNotMatch(tags[1], /\sopen/);
-  assert.match(tags[2], /\sopen/);        // first group of the second roster
+  for (const tag of tags) assert.doesNotMatch(tag, /\sopen/);
 });
 
 // Real elements, not divs-plus-JS: <details>/<summary> are keyboard-accessible
@@ -191,14 +303,14 @@ test('the AI-actions tile divides by the catalog, not by the tracked count', () 
     aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2,
                  totalPieces: 28, blockersOpen: 30, catalogPieces: 756 },
   })]);
-  assert.match(dom, /of 756 pieces have AI actions/);
-  assert.match(dom, /28 tracked · 24 PRs open · 30 blockers/);
+  assert.match(dom, /of 756 have AI actions/);
+  assert.match(dom, /28 tracked · 24 PRs open/);
 });
 
 test('a snapshot without a catalog keeps the wording of the week it measured', () => {
   const dom = renderDom([snap('2026-W31')]);
   assert.match(dom, /of 28 merged/);
-  assert.doesNotMatch(dom, /pieces have AI actions/);
+  assert.doesNotMatch(dom, /of 756 have AI actions/);   // a denominator it never measured
 });
 
 // ── done lines ─────────────────────────────────────────────────────────────
@@ -233,16 +345,19 @@ test('a week where nothing crossed the line says so explicitly', () => {
   assert.doesNotMatch(dom, /this week: /);
 });
 
-test('with no prior week the line says there is nothing to compare against', () => {
+// The caption states it once at the top; repeating it per roster is the noise
+// this redesign removed.
+test('with no prior week the done line carries the total alone', () => {
   const dom = renderDom([osWeek('2026-W31', CURRENT)]);
-  assert.match(dom, /3 done in total · no prior week to compare/);
+  assert.match(dom, /3 done in total</);
   assert.doesNotMatch(dom, /this week: /);
+  assert.equal([...dom.matchAll(/no prior week/g)].length, 1);   // the caption only
 });
 
 test('a done line renders for every roster section', () => {
   const dom = renderDom([withRosters()]);
   assert.equal([...dom.matchAll(/done in total/g)].length, 2);
-  assert.match(dom, /1 done in total · no prior week to compare/);   // AI-actions
+  assert.match(dom, /1 done in total</);   // AI-actions
 });
 
 test('piece names in the done line are HTML-escaped', () => {
