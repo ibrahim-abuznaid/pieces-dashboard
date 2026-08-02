@@ -1,0 +1,56 @@
+// test/weekly-deltas.test.mjs
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { pick, deltaFor, seriesFor } from '../weekly/lib/deltas.mjs';
+
+const snap = (week, total, live) => ({
+  week,
+  tickets: total === null ? { status: 'no-data', reason: 'x' } : { status: 'ok', total },
+  outputSchema: { status: 'ok', live },
+});
+
+const weeks = [snap('2026-W29', 8, 5), snap('2026-W30', 9, 7), snap('2026-W31', 11, 9)];
+
+test('pick reads a dotted path', () => assert.equal(pick(weeks[2], 'tickets.total'), 11));
+test('pick returns null for a no-data workstream', () =>
+  assert.equal(pick(snap('2026-W32', null, 9), 'tickets.total'), null));
+test('pick returns null for an unknown path', () => assert.equal(pick(weeks[0], 'nope.nope'), null));
+test('pick returns null for a missing snapshot', () => assert.equal(pick(undefined, 'tickets.total'), null));
+test('pick preserves a real zero', () => assert.equal(pick(snap('2026-W32', 0, 0), 'tickets.total'), 0));
+
+test('deltaFor computes week-over-week', () => assert.equal(deltaFor(weeks, '2026-W31', 'tickets.total'), 2));
+test('deltaFor is null for the first week in the archive', () =>
+  assert.equal(deltaFor(weeks, '2026-W29', 'tickets.total'), null));
+test('deltaFor is null when the previous week is no-data', () => {
+  const w = [snap('2026-W30', null, 7), snap('2026-W31', 11, 9)];
+  assert.equal(deltaFor(w, '2026-W31', 'tickets.total'), null);
+});
+test('deltaFor is null when the previous week is absent from the archive', () => {
+  const w = [snap('2026-W29', 8, 5), snap('2026-W31', 11, 9)];
+  assert.equal(deltaFor(w, '2026-W31', 'tickets.total'), null);
+});
+test('deltaFor can be negative', () => {
+  const w = [snap('2026-W30', 12, 7), snap('2026-W31', 11, 9)];
+  assert.equal(deltaFor(w, '2026-W31', 'tickets.total'), -1);
+});
+
+test('seriesFor returns oldest to newest ending at the given week', () =>
+  assert.deepEqual(seriesFor(weeks, '2026-W31', 'outputSchema.live'), [
+    { week: '2026-W29', value: 5 },
+    { week: '2026-W30', value: 7 },
+    { week: '2026-W31', value: 9 },
+  ]));
+test('seriesFor caps at count, keeping the most recent', () =>
+  assert.deepEqual(seriesFor(weeks, '2026-W31', 'tickets.total', 2), [
+    { week: '2026-W30', value: 9 },
+    { week: '2026-W31', value: 11 },
+  ]));
+test('seriesFor stops at the selected week, ignoring later ones', () =>
+  assert.deepEqual(seriesFor(weeks, '2026-W30', 'tickets.total').map((p) => p.week), ['2026-W29', '2026-W30']));
+test('seriesFor emits null values for no-data weeks rather than dropping them', () => {
+  const w = [snap('2026-W30', null, 7), snap('2026-W31', 11, 9)];
+  assert.deepEqual(seriesFor(w, '2026-W31', 'tickets.total'), [
+    { week: '2026-W30', value: null },
+    { week: '2026-W31', value: 11 },
+  ]);
+});

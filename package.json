@@ -8,6 +8,7 @@
     "fetch": "bash scripts/fetch-cloud.sh && node scripts/fetch-pr-states.mjs",
     "fetch:prs": "node scripts/fetch-pr-states.mjs",
     "test": "node --test",
-    "build": "node output-schema/build.mjs && node ai-actions/build.mjs && node site/build.mjs"
+    "build": "node output-schema/build.mjs && node ai-actions/build.mjs && node site/build.mjs && node weekly/build.mjs",
+    "snapshot": "node weekly/snapshot.mjs"
   }
 }

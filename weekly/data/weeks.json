@@ -1,0 +1,355 @@
+{
+  "weeks": [
+    {
+      "week": "2026-W31",
+      "start": "2026-07-25",
+      "end": "2026-07-31",
+      "builtAt": "2026-08-01",
+      "outputSchema": {
+        "status": "ok",
+        "live": 9,
+        "mergedNotLive": 6,
+        "review": 8,
+        "todo": 733,
+        "totalPieces": 756,
+        "roster": [
+          {
+            "name": "ClickUp",
+            "actions": 31,
+            "triggers": 30,
+            "stage": "live",
+            "tier": "P2"
+          },
+          {
+            "name": "Google Sheets",
+            "actions": 27,
+            "triggers": 4,
+            "stage": "live",
+            "tier": "P1"
+          },
+          {
+            "name": "Telegram Bot",
+            "actions": 20,
+            "triggers": 1,
+            "stage": "merged-not-live",
+            "tier": "P1"
+          },
+          {
+            "name": "Google Drive",
+            "actions": 16,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P1"
+          },
+          {
+            "name": "Notion",
+            "actions": 15,
+            "triggers": 4,
+            "stage": "live",
+            "tier": "P1"
+          },
+          {
+            "name": "Google Calendar",
+            "actions": 9,
+            "triggers": 7,
+            "stage": "live",
+            "tier": "P1"
+          },
+          {
+            "name": "Supabase",
+            "actions": 9,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P1"
+          },
+          {
+            "name": "Tables",
+            "actions": 9,
+            "triggers": 3,
+            "stage": "review",
+            "tier": "P4"
+          },
+          {
+            "name": "Gmail",
+            "actions": 7,
+            "triggers": 4,
+            "stage": "merged-not-live",
+            "tier": "P1"
+          },
+          {
+            "name": "Google Gemini",
+            "actions": 7,
+            "triggers": 0,
+            "stage": "merged-not-live",
+            "tier": "P1"
+          },
+          {
+            "name": "AI",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "review",
+            "tier": "P1"
+          },
+          {
+            "name": "Google Docs",
+            "actions": 6,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P1"
+          },
+          {
+            "name": "Storage",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "review",
+            "tier": "P1"
+          },
+          {
+            "name": "Groq",
+            "actions": 4,
+            "triggers": 0,
+            "stage": "merged-not-live",
+            "tier": "P1"
+          },
+          {
+            "name": "Anthropic Claude",
+            "actions": 3,
+            "triggers": 0,
+            "stage": "merged-not-live",
+            "tier": "P1"
+          },
+          {
+            "name": "LinkedIn",
+            "actions": 3,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P2"
+          },
+          {
+            "name": "HTTP",
+            "actions": 2,
+            "triggers": 0,
+            "stage": "review",
+            "tier": "P4"
+          },
+          {
+            "name": "OpenRouter",
+            "actions": 2,
+            "triggers": 0,
+            "stage": "merged-not-live",
+            "tier": "P1"
+          },
+          {
+            "name": "Sub Flows",
+            "actions": 2,
+            "triggers": 1,
+            "stage": "review",
+            "tier": "P3"
+          },
+          {
+            "name": "Webhook",
+            "actions": 2,
+            "triggers": 1,
+            "stage": "review",
+            "tier": "P1"
+          },
+          {
+            "name": "Human Input",
+            "actions": 1,
+            "triggers": 2,
+            "stage": "review",
+            "tier": "P1"
+          },
+          {
+            "name": "Manual Trigger",
+            "actions": 0,
+            "triggers": 1,
+            "stage": "review",
+            "tier": "P1"
+          },
+          {
+            "name": "RSS Feed",
+            "actions": 0,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P1"
+          }
+        ]
+      },
+      "aiActions": {
+        "status": "ok",
+        "merged": 2,
+        "prOpen": 24,
+        "assigned": 0,
+        "held": 2,
+        "totalPieces": 28,
+        "catalogPieces": 756,
+        "blockersOpen": 30,
+        "roster": [
+          {
+            "name": "stripe",
+            "actions": 75,
+            "stage": "pr-open"
+          },
+          {
+            "name": "github",
+            "actions": 72,
+            "stage": "pr-open"
+          },
+          {
+            "name": "clickup",
+            "actions": 59,
+            "stage": "pr-open"
+          },
+          {
+            "name": "trello",
+            "actions": 46,
+            "stage": "pr-open"
+          },
+          {
+            "name": "discord",
+            "actions": 45,
+            "stage": "pr-open"
+          },
+          {
+            "name": "slack",
+            "actions": 44,
+            "stage": "pr-open"
+          },
+          {
+            "name": "todoist",
+            "actions": 42,
+            "stage": "pr-open"
+          },
+          {
+            "name": "google-docs",
+            "actions": 37,
+            "stage": "pr-open"
+          },
+          {
+            "name": "google-drive",
+            "actions": 36,
+            "stage": "pr-open"
+          },
+          {
+            "name": "resend",
+            "actions": 36,
+            "stage": "held"
+          },
+          {
+            "name": "google-sheets",
+            "actions": 34,
+            "stage": "pr-open"
+          },
+          {
+            "name": "apify",
+            "actions": 32,
+            "stage": "merged"
+          },
+          {
+            "name": "notion",
+            "actions": 22,
+            "stage": "pr-open"
+          },
+          {
+            "name": "telegram-bot",
+            "actions": 21,
+            "stage": "pr-open"
+          },
+          {
+            "name": "sendinblue",
+            "actions": 20,
+            "stage": "held"
+          },
+          {
+            "name": "gmail",
+            "actions": 19,
+            "stage": "pr-open"
+          },
+          {
+            "name": "airtable",
+            "actions": 18,
+            "stage": "pr-open"
+          },
+          {
+            "name": "cody",
+            "actions": 18,
+            "stage": "pr-open"
+          },
+          {
+            "name": "serp-api",
+            "actions": 17,
+            "stage": "pr-open"
+          },
+          {
+            "name": "google-calendar",
+            "actions": 16,
+            "stage": "pr-open"
+          },
+          {
+            "name": "firecrawl",
+            "actions": 15,
+            "stage": "merged"
+          },
+          {
+            "name": "pubrio",
+            "actions": 14,
+            "stage": "pr-open"
+          },
+          {
+            "name": "google-tasks",
+            "actions": 9,
+            "stage": "pr-open"
+          },
+          {
+            "name": "senja",
+            "actions": 5,
+            "stage": "pr-open"
+          },
+          {
+            "name": "quizell",
+            "actions": 4,
+            "stage": "pr-open"
+          },
+          {
+            "name": "google-forms",
+            "actions": 3,
+            "stage": "pr-open"
+          },
+          {
+            "name": "reoon-verifier",
+            "actions": 3,
+            "stage": "pr-open"
+          },
+          {
+            "name": "prompthub",
+            "actions": 1,
+            "stage": "pr-open"
+          }
+        ]
+      },
+      "testing": {
+        "status": "ok",
+        "prsMerged": 1,
+        "commits": 2,
+        "shipped": [
+          {
+            "number": 5,
+            "title": "feat(health): piece health board, needs-attention inbox, persisted ru…",
+            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5"
+          }
+        ]
+      },
+      "tickets": {
+        "status": "no-data",
+        "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
+      },
+      "decisions": [
+        "6 outputSchema pieces merged but not cloud-live — needs a cloud release",
+        "8 outputSchema PRs awaiting review",
+        "30 AI-actions blockers still open",
+        "tickets: no data — Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
+      ]
+    }
+  ]
+}

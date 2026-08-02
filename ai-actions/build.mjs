@@ -55,4 +55,11 @@ renderPage({
   outPath: join(DIST, 'index.html'),
 });
 writeFileSync(join(DIST, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
+// Per-piece roster for consumers that need the detail behind the stage counts
+// (the weekly snapshot). Built from the same `enriched` array the counts come
+// from, so the roster can never disagree with the tiles.
+writeFileSync(join(DIST, 'pieces.json'), JSON.stringify({
+  generated: summary.generated,
+  pieces: enriched.map(({ slug, atomics, stage, pr, prState }) => ({ slug, atomics, stage, pr, prState })),
+}, null, 2) + '\n');
 console.log(`✓ ai-actions: ${summary.pieces} pieces · ${summary.atomics} atomics · held ${summary.stages.held} / assigned ${summary.stages.assigned} / PR-open ${summary.stages.prOpen} / merged ${summary.stages.merged} · ${summary.blockersOpen} open blockers`);
