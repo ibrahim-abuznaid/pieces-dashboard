@@ -1,7 +1,7 @@
 // test/weekly-collect-testing.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { collectTesting, TESTING_NOTE } from '../weekly/collect/testing.mjs';
+import { collectTesting } from '../weekly/collect/testing.mjs';
 
 const WINDOW = { start: '2026-07-25', end: '2026-07-31' };
 
@@ -65,6 +65,3 @@ test('unparseable gh output degrades to no-data', () => {
   const out = collectTesting({ window: WINDOW, gh: () => 'not json' });
   assert.equal(out.status, 'no-data');
 });
-
-test('the tile note states the build-progress caveat', () =>
-  assert.match(TESTING_NOTE, /health/i));

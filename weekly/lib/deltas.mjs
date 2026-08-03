@@ -46,11 +46,3 @@ export function deltaFor(weeks, weekId, path) {
   if (current === null || previous === null) return null;
   return current - previous;
 }
-
-export function seriesFor(weeks, weekId, path, count = 6) {
-  const at = indexOfWeek(weeks, weekId);
-  if (at === -1) return [];
-  return weeks
-    .slice(Math.max(0, at + 1 - count), at + 1)
-    .map((w) => ({ week: w.week, value: pick(w, path) }));
-}

@@ -28,6 +28,17 @@ rewrite past weeks every morning.
 `weeks.json` is append-only and past weeks are immutable — re-snapshotting an existing week fails unless you
 pass `--force-week`.
 
+The page is written for a **project manager**: the week, four numbers, the pieces behind each number, and
+anything that needs a decision. Engineering caveats are recorded here rather than on the page.
+
+### Known limitation — piece testing is build progress, not piece health
+
+The `Piece testing` number counts **merged PRs on `piece-tester-web`** (with commits collected alongside it).
+It says nothing about how many pieces pass or fail. Run results live in a local SQLite DB that the repo's
+export script does not dump, so pass/fail counts are not reachable yet: unlocking them needs a
+**stats endpoint on `piece-tester-web`**, or a committed `health.json`. Until then do not read that box as
+"pieces tested" — see `weekly/collect/testing.mjs`.
+
 ## Claiming work (the 3-stage model)
 
 Stages are **derived, never hand-edited**: assignee only → `assigned` · open PR → `PR open` · merged PR → `merged`.

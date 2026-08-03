@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildView, plural } from '../weekly/lib/view.mjs';
+import { buildView, plural, STRIP_CAP } from '../weekly/lib/view.mjs';
 
 const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
@@ -52,37 +52,102 @@ test('the outputSchema tile leads with merged, not with cloud-live', () => {
   const tile = buildView(archive).tiles[0];
   assert.equal(tile.value, 15);                 // 9 live + 6 merged-not-live
   assert.equal(tile.unit, 'of 756 merged');
-  assert.equal(tile.sub, '9 live on cloud · 8 in review');
 });
 
-test('the outputSchema delta and sparkline follow the same derived merged metric', () => {
+test('the outputSchema delta follows the same derived merged metric', () => {
   const tile = buildView(archive).tiles[0];
   assert.equal(tile.delta, 2);                  // 13 merged last week → 15
-  assert.deepEqual(tile.spark, [{ week: '2026-W30', value: 13 }, { week: '2026-W31', value: 15 }]);
 });
 
-test('the testing tile pluralises its unit and sub-line', () => {
+// The delta pill is now the ONLY comparison a tile carries. The per-tile trend
+// series went with the sparkline it fed: read by index over the archive, it drew
+// weeks that were never recorded as if they were adjacent, and it was the tallest
+// block on a page whose acceptance criterion is fitting one laptop screen. A
+// field the page does not render is a field the next reader is misled by, so it
+// is gone from the model too — the rendered page is asserted in
+// test/weekly-render.test.mjs.
+test('no tile carries a trend series any more', () => {
+  for (const t of buildView(archive).tiles) {
+    assert.equal(t.spark, undefined);
+    assert.equal(t.series, undefined);
+  }
+  assert.doesNotMatch(JSON.stringify(buildView(archive)), /spark|series/i);
+});
+
+test('the testing tile pluralises its unit', () => {
   const one = buildView(archive).tiles.find((t) => t.key === 'testing');
   assert.equal(one.value, 1);
   assert.equal(one.unit, 'PR shipped');
-  assert.equal(one.sub, '4 commits');
   const many = oneWeek({ testing: { status: 'ok', prsMerged: 3, commits: 1, shipped: [] } })
     .tiles.find((t) => t.key === 'testing');
   assert.equal(many.unit, 'PRs shipped');
-  assert.equal(many.sub, '1 commit');
 });
 
-test('the tickets tile splits the week by person', () => {
+// A tile is a number, its unit and the pieces behind it. The sub-lines that used
+// to sit under each number (`9 live on cloud · 8 in review`, `2 commits`) were
+// detail, not signal, for a project manager — and a field the page no longer
+// renders is a field the next reader gets misled by, so it is gone from the
+// model too, not just from the markup.
+test('no tile carries a sub-line any more', () => {
+  for (const t of buildView(archive).tiles) assert.equal(t.sub, undefined);
+});
+
+// The one exception, and the reason it is not a sub-line: who closed the tickets
+// is management-relevant, so it folds into the box as a single line rather than
+// into a table of its own.
+test('the tickets tile folds per-person into one line', () => {
   const tile = buildView(archive).tiles.find((t) => t.key === 'tickets');
   assert.equal(tile.value, 11);
   assert.equal(tile.unit, 'closed this week');
-  assert.equal(tile.sub, '5 Kishan · 6 Sanket');
+  assert.equal(tile.perPerson, 'Kishan 5 · Sanket 6');
 });
+
+test('a person who closed nothing still reads as zero rather than vanishing', () =>
+  assert.equal(oneWeek({ tickets: { status: 'ok', total: 5, byPerson: { kishan: 5, sanket: 0 } } })
+    .tiles.find((t) => t.key === 'tickets').perPerson, 'Kishan 5 · Sanket 0'));
+
+// The line is read out of the SAME object the total is summed from, never out of
+// a list of names held here. The team is hiring a third member: a view that
+// iterated its own roster would publish their tickets as a silent 0 beside a
+// total that already counts them, and nothing on the page would say so.
+const perPersonOf = (over) => oneWeek({ tickets: { status: 'ok', ...over } })
+  .tiles.find((t) => t.key === 'tickets').perPerson;
+
+test('the per-person line names whoever the snapshot recorded, not a list held in the view', () =>
+  assert.equal(perPersonOf({ total: 18, byPerson: { kishan: 5, sanket: 6, newbie: 7 } }),
+    'Kishan 5 · Sanket 6 · Newbie 7'));
+
+// The failure mode this guards is the box contradicting itself: a total of 11
+// printed inches above an attribution that adds up to 5. When the two disagree,
+// the number stands alone and the attribution goes — a missing line is honest,
+// a wrong one is not.
+test('attribution that does not add up to the total is dropped rather than contradicting it', () => {
+  assert.equal(perPersonOf({ total: 11, byPerson: { kishan: 5 } }), '');
+  assert.equal(perPersonOf({ total: 11, byPerson: { kishan: 5, sanket: 6, newbie: 7 } }), '');
+});
+
+test('a snapshot with no per-person record carries no per-person line', () => {
+  assert.equal(perPersonOf({ total: 11 }), '');
+  assert.equal(perPersonOf({ total: 11, byPerson: {} }), '');
+});
+
+// `byPerson` is not validated by the archive, so a count that is not a number is
+// reachable. It must cost the line, never render as "Kishan undefined".
+test('a count that is not a number costs the line', () => {
+  assert.equal(perPersonOf({ total: 11, byPerson: { kishan: '5', sanket: 6 } }), '');
+  assert.equal(perPersonOf({ total: 11, byPerson: { kishan: null, sanket: 11 } }), '');
+});
+
+test('a real zero week still reads as a zero for each person', () =>
+  assert.equal(perPersonOf({ total: 0, byPerson: { kishan: 0, sanket: 0 } }), 'Kishan 0 · Sanket 0'));
+
+test('only the tickets tile carries a per-person line', () =>
+  assert.deepEqual(buildView(archive).tiles.filter((t) => t.perPerson).map((t) => t.key), ['tickets']));
 
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'key', 'reason', 'spark', 'status', 'sub', 'title', 'unit', 'value']);
+      ['delta', 'key', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value']);
   }
 });
 
@@ -92,27 +157,24 @@ test('a no-data workstream produces a no-data tile, not a zero', () => {
   assert.equal(tile.status, 'no-data');
   assert.equal(tile.value, null);
   assert.equal(tile.delta, null);
-  assert.deepEqual(tile.spark, []);
+  assert.equal(tile.perPerson, '');
   assert.match(tile.reason, /Linear pending/);
 });
 
-// The caveat still has to be on the page — the tile itself is now too small to
-// carry it, so it moves to the footer rather than disappearing.
-test('the build-progress caveat survives as a page footnote', () =>
-  assert.match(buildView(archive).testingNote, /health/i));
+// The piece-tester-web stats-endpoint caveat is an engineering note, so it left
+// the page. It is not smuggled back in as a view field either — the record for
+// it is README.md (see weekly-wiring.test.mjs).
+test('no view field carries the piece-testing caveat any more', () => {
+  assert.equal(buildView(archive).testingNote, undefined);
+  assert.doesNotMatch(JSON.stringify(buildView(archive)), /stats endpoint/i);
+});
 
-test('no caveat is claimed when the testing workstream is degraded', () =>
-  assert.equal(oneWeek({ testing: { status: 'no-data', reason: 'gh down' } }).testingNote, ''));
-
-test('people rows come from the tickets workstream', () =>
-  assert.deepEqual(buildView(archive).people, [
-    { key: 'kishan', name: 'Kishan', tickets: 5, prsMerged: 3, reviews: 12 },
-    { key: 'sanket', name: 'Sanket', tickets: 6, prsMerged: 4, reviews: 9 },
-  ]));
-
-test('people is empty when tickets is no-data', () => {
-  const a = { weeks: [snap('2026-W31', { tickets: { status: 'no-data', reason: 'x' } })] };
-  assert.deepEqual(buildView(a).people, []);
+// The per-person TABLE is gone, so the columns only it read — PRs merged and
+// reviews — must not be left computed and unrendered.
+test('the view no longer builds a per-person table', () => {
+  const v = buildView(archive);
+  assert.equal(v.people, undefined);
+  assert.doesNotMatch(JSON.stringify(v), /prsMerged|reviews/);
 });
 
 test('the heading names the team and the week number', () =>
@@ -125,58 +187,31 @@ test('a range that crosses a month names both months', () =>
   assert.equal(buildView({ weeks: [snap('2026-W31', { start: '2026-07-27', end: '2026-08-02' })] }).range,
     'Jul 27 – Aug 2'));
 
-test('shipped is split by source', () => {
+// ── nothing the page does not render ───────────────────────────────────────
+// The page is a week header, four boxes and an ask. This is the whole contract
+// between the view and the template: a field computed but never rendered is how
+// the next reader gets misled about what the page shows.
+//
+// `start`/`end` are the exception, deliberately: they are the counting window
+// itself, published in `dist/weekly/summary.json` for machine readers, and
+// `range` ("Jul 25–31") is lossy — no year, no ISO dates.
+
+test('the view carries exactly the fields the page renders', () =>
+  assert.deepEqual(Object.keys(buildView(archive)).sort(),
+    ['builtAt', 'decisions', 'end', 'noPriorWeek', 'range', 'start', 'tiles', 'title', 'week', 'weeks']));
+
+// The lede restated the numbers in prose above the boxes that already carry
+// them. Two rounds of editing it did not make the page clearer, so it is gone.
+test('the view builds no verdict sentence', () => {
   const v = buildView(archive);
-  assert.equal(v.shipped.tickets.length, 1);
-  assert.equal(v.shipped.testing.length, 1);
+  assert.equal(v.verdict, undefined);
+  assert.doesNotMatch(JSON.stringify(v), /Output schemas are merged/);
 });
 
-// ── the verdict ────────────────────────────────────────────────────────────
-// The lede: what a reader who reads nothing else should walk away with. Built
-// only from workstreams that actually reported, so it can never state a number
-// the collectors did not measure.
-
-test('the verdict states where the two headline workstreams stand', () =>
-  assert.equal(buildView(archive).verdict,
-    'Output schemas are merged on 15 of 756 pieces; 9 are live on cloud. 2 pieces have AI actions.'));
-
-test('a degraded workstream is named in a short trailing clause', () =>
-  assert.equal(oneWeek({ tickets: { status: 'no-data', reason: 'Linear refresh pending' } }).verdict,
-    'Output schemas are merged on 15 of 756 pieces; 9 are live on cloud. 2 pieces have AI actions.'
-    + ' Ticket data unavailable.'));
-
-test('several degraded workstreams share one clause', () =>
-  assert.match(oneWeek({
-    testing: { status: 'no-data', reason: 'gh down' },
-    tickets: { status: 'no-data', reason: 'Linear refresh pending' },
-  }).verdict, /Ticket and testing data unavailable\.$/));
-
-test('the verdict falls back to the workstreams that did report', () => {
-  const v = oneWeek({ outputSchema: { status: 'no-data', reason: 'build missing' } }).verdict;
-  assert.match(v, /^2 pieces have AI actions\./);
-  assert.match(v, /Output-schema data unavailable\.$/);
-  assert.doesNotMatch(v, /Output schemas are merged/);
-});
-
-test('the verdict says so plainly when nothing reported at all', () =>
-  assert.equal(oneWeek({
-    outputSchema: { status: 'no-data', reason: 'a' }, aiActions: { status: 'no-data', reason: 'b' },
-    testing: { status: 'no-data', reason: 'c' }, tickets: { status: 'no-data', reason: 'd' },
-  }).verdict, 'No data is available for this week.'));
-
-test('the verdict stays at two sentences before the degraded clause', () => {
-  const sentences = buildView(archive).verdict.split('. ').length;
-  assert.ok(sentences <= 2, `verdict ran to ${sentences} sentences`);
-});
-
-test('the verdict is grammatical for singular counts', () => {
-  const v = oneWeek({
-    outputSchema: { status: 'ok', live: 1, mergedNotLive: 0, review: 0, todo: 1, totalPieces: 756 },
-    aiActions: { status: 'ok', merged: 1, prOpen: 0, assigned: 0, held: 0, totalPieces: 28, blockersOpen: 0 },
-  }).verdict;
-  assert.match(v, /1 of 756 pieces; 1 is live on cloud\./);
-  assert.match(v, /1 piece has AI actions\./);
-});
+// Shipped ticket ids and titles were a table of their own below the boxes. They
+// are also exactly what this public repo's data policy keeps off the site.
+test('the view no longer assembles a shipped list', () =>
+  assert.equal(buildView(archive).shipped, undefined));
 
 // ── decisions: only genuine asks ───────────────────────────────────────────
 // The band is worth reading only if every line asks someone to act. Pure status
@@ -238,9 +273,14 @@ test('plural agrees the noun with the count', () => {
 });
 
 // ── rosters ────────────────────────────────────────────────────────────────
-// The per-piece detail behind the outputSchema and AI-actions tiles. It is
-// OPTIONAL: snapshots taken before the collectors recorded it carry no roster
-// at all, and must keep rendering.
+// A snapshot's roster is the per-piece record behind the outputSchema and
+// AI-actions numbers. It is OPTIONAL: snapshots taken before the collectors
+// recorded it carry no roster at all, and must keep rendering.
+//
+// The page no longer has roster SECTIONS — 51 stage-grouped rows at the foot of
+// the page, the exact cross-referencing this redesign removed — so the roster's
+// only consumer is now the pieces strip inside each box. The view therefore
+// builds no stage grouping at all.
 
 const OS_ROSTER = [
   { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
@@ -262,84 +302,43 @@ const withAiRoster = (roster) => ({
 
 const oneWeek = (over) => buildView({ weeks: [snap('2026-W31', over)] });
 
-test('rosters is empty when no workstream carries one', () =>
-  assert.deepEqual(buildView(archive).rosters, []));
+// The strip is the roster's only consumer now, so it is what these read.
+const stripOf = (v, key) => v.tiles.find((t) => t.key === key).strip;
+const stripNames = (v, key) => (stripOf(v, key)?.items ?? []).map((i) => i.name);
+const labelOf = (v, key) => stripOf(v, key)?.label ?? null;
 
-test('an absent roster keeps the workstream out of rosters — back-compat with older snapshots', () =>
-  assert.deepEqual(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }).rosters.map((r) => r.key), ['aiActions']));
-
-test('an empty roster array produces no roster entry', () =>
-  assert.deepEqual(oneWeek({ outputSchema: withOsRoster([]) }).rosters, []));
-
-test('a no-data workstream produces no roster entry even if one is attached', () => {
-  const v = oneWeek({ outputSchema: { status: 'no-data', reason: 'build missing', roster: OS_ROSTER } });
-  assert.deepEqual(v.rosters, []);
-});
-
-test('the outputSchema roster groups by stage in pipeline order, most advanced first', () =>
-  assert.deepEqual(oneWeek({ outputSchema: withOsRoster(OS_ROSTER) }).rosters[0], {
-    key: 'outputSchema', title: 'outputSchema', total: 4, unit: 'actions',
-    groups: [
-      { stage: 'live', label: 'Live on cloud', count: 2,
-        pieces: [{ name: 'ClickUp', actions: 31, tier: 'P2' }, { name: 'Notion', actions: 12, tier: 'P1' }] },
-      { stage: 'merged-not-live', label: 'Merged, awaiting release', count: 1,
-        pieces: [{ name: 'Slack', actions: 28, tier: 'P1' }] },
-      { stage: 'review', label: 'In review', count: 1,
-        pieces: [{ name: 'Jira', actions: 9, tier: 'P3' }] },
-    ],
-    done: { total: 3, stages: ['live', 'merged-not-live'], thisWeek: [], hasPrior: false },
-  }));
-
-test('the AI-actions roster uses its own stage order, labels and unit', () =>
-  assert.deepEqual(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }).rosters[0], {
-    key: 'aiActions', title: 'AI-actions', total: 3, unit: 'AI actions',
-    groups: [
-      { stage: 'merged', label: 'Merged', count: 1, pieces: [{ name: 'google-sheets', actions: 37 }] },
-      { stage: 'pr-open', label: 'PR open', count: 1, pieces: [{ name: 'hubspot', actions: 22 }] },
-      { stage: 'held', label: 'Held', count: 1, pieces: [{ name: 'intercom', actions: 8 }] },
-    ],
-    done: { total: 1, stages: ['merged'], thisWeek: [], hasPrior: false },
-  }));
-
-test('an empty stage produces no group at all', () => {
+test('the view builds no stage-grouped roster for the page', () => {
   const v = oneWeek({ outputSchema: withOsRoster(OS_ROSTER), aiActions: withAiRoster(AI_ROSTER) });
-  assert.deepEqual(v.rosters[0].groups.map((g) => g.stage), ['live', 'merged-not-live', 'review']);
-  assert.deepEqual(v.rosters[1].groups.map((g) => g.stage), ['merged', 'pr-open', 'held']);
+  assert.equal(v.rosters, undefined);
+  assert.doesNotMatch(JSON.stringify(v), /Live on cloud|Merged, awaiting release|In review|PR open/);
 });
 
-test('the remaining known stages label correctly when they are populated', () => {
-  const v = oneWeek({
-    outputSchema: withOsRoster([{ name: 'Asana', actions: 4, triggers: 0, stage: 'in-progress', tier: 'P2' }]),
-    aiActions: withAiRoster([{ name: 'stripe', actions: 6, stage: 'assigned' }]),
-  });
-  assert.deepEqual(v.rosters[0].groups[0], { stage: 'in-progress', label: 'In progress', count: 1,
-    pieces: [{ name: 'Asana', actions: 4, tier: 'P2' }] });
-  assert.deepEqual(v.rosters[1].groups[0], { stage: 'assigned', label: 'Assigned', count: 1,
-    pieces: [{ name: 'stripe', actions: 6 }] });
+// A roster row carries `actions`, `triggers` and `tier`; the tables that read
+// them are gone, so a chip is a name and a logo and nothing more.
+test('a roster row reaches the page as a name and a logo only', () =>
+  assert.deepEqual(stripOf(oneWeek({ outputSchema: withOsRoster(OS_ROSTER) }), 'outputSchema').items,
+    [{ name: 'ClickUp', logo: null }, { name: 'Slack', logo: null }, { name: 'Notion', logo: null }]));
+
+test('an absent roster leaves the workstream with no strip — back-compat with older snapshots', () => {
+  const v = oneWeek({ aiActions: withAiRoster(AI_ROSTER) });
+  assert.equal(stripOf(v, 'outputSchema'), null);
+  assert.deepEqual(stripNames(v, 'aiActions'), ['google-sheets']);
 });
 
-// A piece vanishing from the page because upstream added a status is exactly
-// the silent loss this project keeps guarding against.
-test('an unrecognised stage gets its own trailing group instead of vanishing', () => {
-  const v = oneWeek({ outputSchema: withOsRoster([
-    ...OS_ROSTER,
-    { name: 'Airtable', actions: 3, triggers: 0, stage: 'sunsetting', tier: 'P4' },
-  ]) });
-  const groups = v.rosters[0].groups;
-  assert.deepEqual(groups.map((g) => g.stage), ['live', 'merged-not-live', 'review', 'sunsetting']);
-  assert.deepEqual(groups.at(-1), { stage: 'sunsetting', label: 'sunsetting', count: 1,
-    pieces: [{ name: 'Airtable', actions: 3, tier: 'P4' }] });
-  assert.equal(v.rosters[0].total, 5);
-});
+test('an empty roster array produces no strip', () =>
+  assert.equal(stripOf(oneWeek({ outputSchema: withOsRoster([]) }), 'outputSchema'), null));
 
-test('several unrecognised stages each keep a group, in first-seen order', () => {
-  const v = oneWeek({ aiActions: withAiRoster([
-    { name: 'a', actions: 9, stage: 'quarantined' },
-    { name: 'b', actions: 5, stage: 'merged' },
-    { name: 'c', actions: 2, stage: 'draft' },
-  ]) });
-  assert.deepEqual(v.rosters[0].groups.map((g) => g.stage), ['merged', 'quarantined', 'draft']);
-});
+test('a no-data workstream produces no strip even if a roster is attached', () =>
+  assert.equal(stripOf(oneWeek({ outputSchema: { status: 'no-data', reason: 'build missing',
+    roster: OS_ROSTER } }), 'outputSchema'), null));
+
+// A piece silently disappearing because upstream added a status is the loss this
+// project keeps guarding against — but the guard is now "do not COUNT it as
+// done", since only done pieces are on the page at all.
+test('a stage the page does not recognise is never counted as done', () =>
+  assert.equal(stripOf(oneWeek({ outputSchema: withOsRoster(
+    [{ name: 'Airtable', actions: 3, triggers: 0, stage: 'sunsetting', tier: 'P4' }]) }), 'outputSchema'),
+  null));
 
 test('buildView does not mutate the input archive — no in-place sorting of rosters', () => {
   const input = { weeks: [snap('2026-W31', {
@@ -354,12 +353,12 @@ test('buildView does not mutate the input archive — no in-place sorting of ros
   assert.equal(JSON.stringify(input), before);
 });
 
-test('rosters preserve the order the collector recorded, they are not re-sorted', () =>
+test('a strip preserves the order the collector recorded, it is not re-sorted', () =>
   assert.deepEqual(
-    oneWeek({ outputSchema: withOsRoster([
+    stripNames(oneWeek({ outputSchema: withOsRoster([
       { name: 'Small', actions: 1, triggers: 0, stage: 'live', tier: 'P3' },
       { name: 'Big', actions: 99, triggers: 0, stage: 'live', tier: 'P1' },
-    ]) }).rosters[0].groups[0].pieces.map((p) => p.name),
+    ]) }), 'outputSchema'),
     ['Small', 'Big']));
 
 // ── the AI-actions denominator ─────────────────────────────────────────────
@@ -375,42 +374,40 @@ const withCatalog = (catalogPieces) => ({
 
 const aiTile = (v) => v.tiles.find((t) => t.key === 'aiActions');
 
-test('the AI-actions tile counts against the whole catalog when the snapshot recorded it', () => {
-  const t = aiTile(oneWeek({ aiActions: withCatalog(756) }));
-  assert.equal(t.unit, 'of 756 have AI actions');
-  assert.equal(t.sub, '28 tracked · 24 PRs open · 30 blockers');
-});
+test('the AI-actions tile counts against the whole catalog when the snapshot recorded it', () =>
+  assert.equal(aiTile(oneWeek({ aiActions: withCatalog(756) })).unit, 'of 756 have AI actions'));
 
-test('the tracked count is still the note, not the headline denominator', () => {
+test('the tracked count is not the headline denominator', () => {
   const t = aiTile(oneWeek({ aiActions: withCatalog(756) }));
   assert.equal(t.value, 2);
   assert.doesNotMatch(t.unit, /28/);
 });
 
-test('a snapshot without a catalog keeps the tracked-count wording', () => {
-  const t = aiTile(buildView(archive));
-  assert.equal(t.unit, 'of 28 merged');
-  assert.equal(t.sub, '28 tracked · 24 PRs open · 30 blockers');
-});
+test('a snapshot without a catalog keeps the tracked-count wording', () =>
+  assert.equal(aiTile(buildView(archive)).unit, 'of 28 merged'));
 
 // typeof, not truthiness: 0 is a recorded catalog size, not a missing one.
 test('a zero catalog is still a recorded catalog', () =>
   assert.equal(aiTile(oneWeek({ aiActions: withCatalog(0) })).unit, 'of 0 have AI actions'));
 
-test('a single open PR and a single blocker read in the singular', () =>
-  assert.equal(aiTile(oneWeek({ aiActions: { status: 'ok', merged: 2, prOpen: 1, assigned: 0,
-    held: 2, totalPieces: 28, blockersOpen: 30 } })).sub, '28 tracked · 1 PR open · 30 blockers'));
+// The tracked count, the open PRs and the open blockers were the tile's
+// sub-line. They are collector detail, and the box is a number now.
+test('the tracked count, open PRs and blockers are not carried onto the tile', () => {
+  const t = aiTile(oneWeek({ aiActions: withCatalog(756) }));
+  assert.doesNotMatch(JSON.stringify(t), /tracked|blocker|PRs open/);
+});
 
-// ── done totals ────────────────────────────────────────────────────────────
+// ── what counts as done ────────────────────────────────────────────────────
 // "Done" means merged: `live` + `merged-not-live` for outputSchema (both are
-// merged; `live` additionally shipped to cloud), `merged` for AI-actions. It is
-// split into a running total and what crossed the line THIS week — and the
-// second number is only claimable against a real immediately-preceding week.
-// With nothing to diff against, every piece ever finished would otherwise be
-// reported as finished this week: the same silent overclaim deltaFor guards.
+// merged; `live` additionally shipped to cloud), `merged` for AI-actions. What
+// crossed the line THIS week is only claimable against a real
+// immediately-preceding week. With nothing to diff against, every piece ever
+// finished would otherwise be reported as finished this week: the same silent
+// overclaim deltaFor guards.
+//
+// The strip is the only thing this diff feeds now — the running total and the
+// list of names that the roster's done LINE used to print are gone with it.
 
-const osDone = (v) => v.rosters.find((r) => r.key === 'outputSchema').done;
-const aiDone = (v) => v.rosters.find((r) => r.key === 'aiActions').done;
 const twoWeeks = (prev, cur, prevWeek = '2026-W30') =>
   buildView({ weeks: [snap(prevWeek, prev), snap('2026-W31', cur)] });
 
@@ -422,108 +419,338 @@ const OS_PRIOR = [
   { name: 'Jira', actions: 9, triggers: 1, stage: 'review', tier: 'P3' },
 ];
 
-test('outputSchema done counts live and merged-not-live, and says so', () => {
-  const d = osDone(oneWeek({ outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.total, 3);
-  assert.deepEqual(d.stages, ['live', 'merged-not-live']);
+test('outputSchema done counts live and merged-not-live, not just cloud-live', () => {
+  const v = oneWeek({ outputSchema: withOsRoster(OS_ROSTER) });
+  assert.deepEqual(stripNames(v, 'outputSchema'), ['ClickUp', 'Slack', 'Notion']);
+  assert.equal(labelOf(v, 'outputSchema'), 'Done in total');
 });
 
 test('AI-actions done counts only merged', () => {
-  const d = aiDone(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }));
-  assert.equal(d.total, 1);
-  assert.deepEqual(d.stages, ['merged']);
+  const v = oneWeek({ aiActions: withAiRoster(AI_ROSTER) });
+  assert.deepEqual(stripNames(v, 'aiActions'), ['google-sheets']);
+  assert.equal(labelOf(v, 'aiActions'), 'Done in total');
 });
 
 test('with no prior week nothing is claimed for this week', () => {
-  const d = osDone(oneWeek({ outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.hasPrior, false);
-  assert.deepEqual(d.thisWeek, []);
-  assert.equal(d.total, 3, 'the running total is still reported');
+  const v = oneWeek({ outputSchema: withOsRoster(OS_ROSTER) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Done in total');
+  assert.equal(stripNames(v, 'outputSchema').length, 3, 'everything done is still listed');
 });
 
 test('pieces that became done this week are listed, sorted by name', () => {
-  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
-                             { outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.hasPrior, true);
-  assert.deepEqual(d.thisWeek, ['Notion', 'Slack']);
-  assert.equal(d.total, 3);
+  const v = twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                     { outputSchema: withOsRoster(OS_ROSTER) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Done this week');
+  assert.deepEqual(stripNames(v, 'outputSchema'), ['Notion', 'Slack']);
 });
 
 test('a piece that was already done is not re-claimed', () => {
-  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
-                             { outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.ok(!d.thisWeek.includes('ClickUp'));
+  const v = twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                     { outputSchema: withOsRoster(OS_ROSTER) });
+  assert.ok(!stripNames(v, 'outputSchema').includes('ClickUp'));
 });
 
-test('nothing new is an empty list against a real prior week, not a missing one', () => {
-  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
-                             { outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.hasPrior, true);
-  assert.deepEqual(d.thisWeek, []);
+test('nothing new says so against a real prior week, rather than re-listing', () => {
+  const v = twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
+                     { outputSchema: withOsRoster(OS_ROSTER) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Nothing new this week');
+  assert.deepEqual(stripNames(v, 'outputSchema'), []);
 });
 
 // The gap guard, mirroring deltaFor: W29 → W31 is a two-week jump, so anything
 // "new" spans two weeks and must not be reported as one week's work.
-test('a gap in the archive yields no comparison at all', () => {
-  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
-                             { outputSchema: withOsRoster(OS_ROSTER) }, '2026-W29'));
-  assert.equal(d.hasPrior, false);
-  assert.deepEqual(d.thisWeek, []);
-});
+test('a gap in the archive yields no comparison at all', () =>
+  assert.equal(labelOf(twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                                { outputSchema: withOsRoster(OS_ROSTER) }, '2026-W29'), 'outputSchema'),
+    'Done in total'));
 
-test('a no-data previous week yields no comparison', () => {
-  const d = osDone(twoWeeks({ outputSchema: { status: 'no-data', reason: 'build missing' } },
-                             { outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.hasPrior, false);
-  assert.deepEqual(d.thisWeek, []);
-});
+test('a no-data previous week yields no comparison', () =>
+  assert.equal(labelOf(twoWeeks({ outputSchema: { status: 'no-data', reason: 'build missing' } },
+                                { outputSchema: withOsRoster(OS_ROSTER) }), 'outputSchema'),
+    'Done in total'));
 
-test('a previous week that never recorded a roster yields no comparison', () => {
-  const d = osDone(twoWeeks({}, { outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.hasPrior, false);
-  assert.deepEqual(d.thisWeek, []);
-});
+test('a previous week that never recorded a roster yields no comparison', () =>
+  assert.equal(labelOf(twoWeeks({}, { outputSchema: withOsRoster(OS_ROSTER) }), 'outputSchema'),
+    'Done in total'));
 
 // An empty roster is indistinguishable from a roster the collector lost — it
 // returns [] on a missing or malformed pieces.json — so it cannot be treated as
 // "nothing was done last week".
-test('a previous week with an empty roster yields no comparison', () => {
-  const d = osDone(twoWeeks({ outputSchema: withOsRoster([]) },
-                             { outputSchema: withOsRoster(OS_ROSTER) }));
-  assert.equal(d.hasPrior, false);
-  assert.deepEqual(d.thisWeek, []);
-});
+test('a previous week with an empty roster yields no comparison', () =>
+  assert.equal(labelOf(twoWeeks({ outputSchema: withOsRoster([]) },
+                                { outputSchema: withOsRoster(OS_ROSTER) }), 'outputSchema'),
+    'Done in total'));
 
 test('selecting the oldest week in the archive has no prior week', () => {
   const a = { weeks: [snap('2026-W30', { outputSchema: withOsRoster(OS_ROSTER) }),
                       snap('2026-W31', { outputSchema: withOsRoster(OS_ROSTER) })] };
-  const d = osDone(buildView(a, { weekId: '2026-W30' }));
-  assert.equal(d.hasPrior, false);
-  assert.deepEqual(d.thisWeek, []);
+  assert.equal(labelOf(buildView(a, { weekId: '2026-W30' }), 'outputSchema'), 'Done in total');
 });
 
-test('a piece that fell back out of done is not listed and lowers the total', () => {
-  const d = osDone(twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
-                             { outputSchema: withOsRoster(OS_PRIOR) }));
-  assert.equal(d.total, 1);
-  assert.deepEqual(d.thisWeek, []);
+test('a piece that fell back out of done is not claimed as this week\'s work', () => {
+  const v = twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
+                     { outputSchema: withOsRoster(OS_PRIOR) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Nothing new this week');
+  assert.deepEqual(stripNames(v, 'outputSchema'), []);
 });
 
-test('each roster carries its own done totals', () => {
+test('each box carries its own diff', () => {
   const v = twoWeeks(
     { outputSchema: withOsRoster(OS_PRIOR),
       aiActions: withAiRoster([{ name: 'google-sheets', actions: 37, stage: 'pr-open' }]) },
     { outputSchema: withOsRoster(OS_ROSTER), aiActions: withAiRoster(AI_ROSTER) });
-  assert.deepEqual(osDone(v), { total: 3, stages: ['live', 'merged-not-live'],
-    thisWeek: ['Notion', 'Slack'], hasPrior: true });
-  assert.deepEqual(aiDone(v), { total: 1, stages: ['merged'],
-    thisWeek: ['google-sheets'], hasPrior: true });
+  assert.deepEqual(stripOf(v, 'outputSchema'), { kind: 'pieces', label: 'Done this week', more: 0,
+    items: [{ name: 'Notion', logo: null }, { name: 'Slack', logo: null }] });
+  assert.deepEqual(stripOf(v, 'aiActions'), { kind: 'pieces', label: 'Done this week', more: 0,
+    items: [{ name: 'google-sheets', logo: null }] });
 });
 
-test('computing done does not mutate the input archive', () => {
+test('computing the diff does not mutate the input archive', () => {
   const input = { weeks: [snap('2026-W30', { outputSchema: withOsRoster(OS_PRIOR) }),
                           snap('2026-W31', { outputSchema: withOsRoster(OS_ROSTER) })] };
   const before = JSON.stringify(input);
   buildView(input);
   assert.equal(JSON.stringify(input), before);
+});
+
+// ── the pieces strip ───────────────────────────────────────────────────────
+// The pieces behind the number, in the same box as the number, so the reader
+// never holds a number in their head and scrolls for the list. Two rules carry
+// the weight:
+//
+//   · the strip is CAPPED, so a big week cannot push the page past one screen;
+//   · its LABEL says WHICH set it is. What landed this week is only claimable
+//     against a real immediately-preceding week; with no prior week, or across
+//     a gap, the strip is the running total and has to be labelled the total.
+//     A finished backlog presented as one week's output is the overclaim this
+//     page has guarded against throughout.
+//
+// The label and the list come out of one computation, so they can never end up
+// describing different weeks.
+
+const LOGO = (slug) => `https://cdn.activepieces.com/pieces/${slug}.png`;
+
+// Notion's logo is deliberately null: the catalog resolves per piece, so one
+// unresolved logo must cost that one logo and nothing else.
+const OS_LOGOS = [
+  { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2', logo: LOGO('clickup') },
+  { name: 'Slack', actions: 28, triggers: 4, stage: 'merged-not-live', tier: 'P1', logo: LOGO('slack') },
+  { name: 'Notion', actions: 12, triggers: 2, stage: 'live', tier: 'P1', logo: null },
+  { name: 'Jira', actions: 9, triggers: 1, stage: 'review', tier: 'P3', logo: LOGO('jira') },
+];
+
+// Same four pieces a week earlier, with only ClickUp done.
+const OS_LOGOS_PRIOR = OS_LOGOS.map((r) =>
+  (r.name === 'ClickUp' ? r : { ...r, stage: 'review' }));
+
+test('with nothing to diff against, the strip is every done piece, labelled the total', () =>
+  assert.deepEqual(stripOf(oneWeek({ outputSchema: withOsRoster(OS_LOGOS) }), 'outputSchema'), {
+    kind: 'pieces', label: 'Done in total', more: 0,
+    items: [{ name: 'ClickUp', logo: LOGO('clickup') },
+            { name: 'Slack', logo: LOGO('slack') },
+            { name: 'Notion', logo: null }],
+  }));
+
+test('with a consecutive prior week the strip is only what newly landed, labelled the week', () =>
+  assert.deepEqual(stripOf(twoWeeks({ outputSchema: withOsRoster(OS_LOGOS_PRIOR) },
+                                    { outputSchema: withOsRoster(OS_LOGOS) }), 'outputSchema'), {
+    kind: 'pieces', label: 'Done this week', more: 0,
+    items: [{ name: 'Notion', logo: null }, { name: 'Slack', logo: LOGO('slack') }],
+  }));
+
+// The gap guard, mirroring deltaFor: W29 → W31 spans two weeks, so anything
+// "new" across it is not one week's work and the strip falls back to the total.
+test('across a gap in the archive the strip is the total, never a one-week claim', () => {
+  const s = stripOf(twoWeeks({ outputSchema: withOsRoster(OS_LOGOS_PRIOR) },
+                             { outputSchema: withOsRoster(OS_LOGOS) }, '2026-W29'), 'outputSchema');
+  assert.equal(s.label, 'Done in total');
+  assert.deepEqual(s.items.map((i) => i.name), ['ClickUp', 'Slack', 'Notion']);
+});
+
+test('a week where nothing crossed the line says so and shows no chips', () => {
+  const s = stripOf(twoWeeks({ outputSchema: withOsRoster(OS_LOGOS) },
+                             { outputSchema: withOsRoster(OS_LOGOS) }), 'outputSchema');
+  assert.equal(s.label, 'Nothing new this week');
+  assert.deepEqual(s.items, []);
+  assert.equal(s.more, 0);
+});
+
+test('the strip is capped, and the pieces it could not fit are counted', () => {
+  const many = Array.from({ length: STRIP_CAP + 3 }, (_, i) =>
+    ({ name: `Piece ${i}`, actions: 20 - i, triggers: 0, stage: 'live', tier: 'P1', logo: LOGO(`p${i}`) }));
+  const s = stripOf(oneWeek({ outputSchema: withOsRoster(many) }), 'outputSchema');
+  assert.equal(s.items.length, STRIP_CAP);
+  assert.equal(s.more, 3);
+  assert.deepEqual(s.items[0], { name: 'Piece 0', logo: LOGO('p0') });
+});
+
+test('an exactly-full strip reports no remainder', () => {
+  const many = Array.from({ length: STRIP_CAP }, (_, i) =>
+    ({ name: `Piece ${i}`, actions: 1, triggers: 0, stage: 'live', tier: 'P1', logo: null }));
+  assert.equal(stripOf(oneWeek({ outputSchema: withOsRoster(many) }), 'outputSchema').more, 0);
+});
+
+// `<img src="">` re-requests the page itself and renders as a broken image, so
+// an empty URL has to reach the template as the same null as no URL at all.
+test('an empty-string logo is normalised to null rather than reaching an img src', () => {
+  const s = stripOf(oneWeek({ outputSchema: withOsRoster(
+    [{ name: 'Slack', actions: 28, triggers: 4, stage: 'live', tier: 'P1', logo: '' }]) }), 'outputSchema');
+  assert.deepEqual(s.items, [{ name: 'Slack', logo: null }]);
+});
+
+test('a roster row from a snapshot written before logos existed still gets a chip', () =>
+  assert.deepEqual(stripOf(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }), 'aiActions').items,
+    [{ name: 'google-sheets', logo: null }]));
+
+test('the AI-actions strip shows merged pieces only — not the PRs still open', () => {
+  const s = stripOf(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }), 'aiActions');
+  assert.deepEqual(s.items.map((i) => i.name), ['google-sheets']);
+  assert.equal(s.label, 'Done in total');
+});
+
+test("the testing tile's strip is the titles of the PRs it shipped", () =>
+  assert.deepEqual(stripOf(buildView(archive), 'testing'),
+    { kind: 'prs', label: 'Shipped', items: [{ name: 't' }], more: 0 }));
+
+test('the testing strip is capped like any other', () => {
+  const shipped = Array.from({ length: STRIP_CAP + 1 }, (_, i) => ({ number: i, title: `pr ${i}`, url: 'u' }));
+  const s = stripOf(oneWeek({ testing: { status: 'ok', prsMerged: shipped.length, commits: 9, shipped } }), 'testing');
+  assert.equal(s.items.length, STRIP_CAP);
+  assert.equal(s.more, 1);
+});
+
+test('a testing week that shipped no PRs carries no strip', () =>
+  assert.equal(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 0, commits: 3, shipped: [] } }), 'testing'),
+    null));
+
+// Deliberate: tickets are not pieces, and the per-person line is the detail
+// that box carries instead.
+test('the tickets tile has no strip', () =>
+  assert.equal(stripOf(buildView(archive), 'tickets'), null));
+
+test('a no-data workstream carries no strip alongside its reason', () => {
+  const tile = oneWeek({ outputSchema: { status: 'no-data', reason: 'build missing', roster: OS_LOGOS } })
+    .tiles.find((t) => t.key === 'outputSchema');
+  assert.equal(tile.status, 'no-data');
+  assert.equal(tile.strip, null);
+  assert.match(tile.reason, /build missing/);
+});
+
+test('a workstream that recorded no roster at all carries no strip', () =>
+  assert.equal(stripOf(buildView(archive), 'outputSchema'), null));
+
+test('a workstream with nothing done yet carries no strip rather than an empty one', () =>
+  assert.equal(stripOf(oneWeek({ aiActions: withAiRoster(
+    [{ name: 'hubspot', actions: 22, stage: 'pr-open' }]) }), 'aiActions'), null));
+
+test('building a strip does not mutate the archive', () => {
+  const input = { weeks: [snap('2026-W30', { outputSchema: withOsRoster(OS_LOGOS_PRIOR) }),
+                          snap('2026-W31', { outputSchema: withOsRoster(OS_LOGOS) })] };
+  const before = JSON.stringify(input);
+  buildView(input);
+  assert.equal(JSON.stringify(input), before);
+});
+
+// `shipped` is optional detail the archive schema does not check, so a snapshot
+// that lost it must cost the strip and never the tile's number.
+test('a malformed shipped list costs the testing strip, not the tile', () => {
+  const v = oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped: 'nope' } });
+  const tile = v.tiles.find((t) => t.key === 'testing');
+  assert.equal(tile.strip, null);
+  assert.equal(tile.value, 2);
+});
+
+test('a shipped entry with no title is skipped rather than rendered as a blank chip', () => {
+  const shipped = [{ number: 1, url: 'u' }, { number: 2, title: 'feat: real one', url: 'u' }];
+  assert.deepEqual(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped } }), 'testing').items,
+    [{ name: 'feat: real one' }]);
+});
+
+// ── which piece is which ───────────────────────────────────────────────────
+// The week-over-week diff needs a piece's STABLE identity, and `displayName` is
+// not one. It is editorial — the cloud catalog renames pieces; 'Telegram Bot'
+// and 'Google Gemini' are current examples — and it is not even unique: two
+// folders publish 'Cashfree Payments' and two publish 'Weekdone' today. A
+// name-keyed diff therefore fails in both directions, and since the strip is
+// now the tile's headline claim, both failures land above the fold:
+//
+//   · a rename re-reports finished work as this week's output;
+//   · a duplicated name hides a genuinely new piece behind its twin, so the
+//     tile's delta pill and its strip contradict each other.
+//
+// `folder` is the catalog's own key — the piece's directory — and is stable and
+// unique, so the diff is keyed on it.
+
+const foldered = (rows) => rows.map((r) => ({ ...r, folder: r.name.toLowerCase().replace(/ /g, '-') }));
+
+// One piece, live both weeks, renamed upstream in between.
+const TELEGRAM = [{ folder: 'telegram-bot', name: 'Telegram Bot', actions: 20, triggers: 0,
+                    stage: 'live', tier: 'P1', logo: null }];
+const TELEGRAM_RENAMED = [{ ...TELEGRAM[0], name: 'Telegram' }];
+
+// Two DIFFERENT pieces that share a display name, as the catalog publishes them.
+const CASHFREE_PRIOR = [
+  { folder: '@activepieces/cashfree-payments', name: 'Cashfree Payments', actions: 5, triggers: 0,
+    stage: 'live', tier: 'P1', logo: null },
+  { folder: 'cashfree-payments', name: 'Cashfree Payments', actions: 3, triggers: 0,
+    stage: 'review', tier: 'P2', logo: null },
+];
+const CASHFREE_NOW = CASHFREE_PRIOR.map((r) => ({ ...r, stage: 'live' }));
+
+test('a piece the catalog renamed is not re-reported as this week\'s work', () => {
+  const v = twoWeeks({ outputSchema: withOsRoster(TELEGRAM) },
+                     { outputSchema: withOsRoster(TELEGRAM_RENAMED) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Nothing new this week');
+  assert.deepEqual(stripNames(v, 'outputSchema'), []);
+});
+
+test('a rename does not hide a piece that really did land the same week', () => {
+  const landed = { folder: 'gemini', name: 'Google Gemini', actions: 4, triggers: 0,
+                   stage: 'live', tier: 'P1', logo: null };
+  const v = twoWeeks({ outputSchema: withOsRoster(TELEGRAM) },
+                     { outputSchema: withOsRoster([...TELEGRAM_RENAMED, landed]) });
+  assert.deepEqual(stripNames(v, 'outputSchema'), ['Google Gemini']);
+});
+
+test('two pieces sharing a display name are diffed as the separate pieces they are', () => {
+  const v = twoWeeks({ outputSchema: withOsRoster(CASHFREE_PRIOR) },
+                     { outputSchema: withOsRoster(CASHFREE_NOW) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Done this week');
+  assert.deepEqual(stripNames(v, 'outputSchema'), ['Cashfree Payments'],
+    'the second folder crossed the line this week — once, not twice');
+});
+
+// Back-compat, and the reason the folder key cannot simply replace the name one:
+// every snapshot already in the archive is name-keyed. Comparing this week's
+// folders against those rows would find nothing in common and report the whole
+// finished backlog as one week's output — the overclaim this page exists to
+// avoid — so a prior roster that is not folder-keyed is diffed by name.
+test('a prior roster written before folders existed is diffed by name, not re-reported wholesale', () => {
+  const v = twoWeeks({ outputSchema: withOsRoster(OS_ROSTER) },
+                      { outputSchema: withOsRoster(foldered(OS_ROSTER)) });
+  assert.equal(labelOf(v, 'outputSchema'), 'Nothing new this week');
+  assert.deepEqual(stripNames(v, 'outputSchema'), []);
+});
+
+test('a piece that landed this week is still found across the name→folder change', () => {
+  const v = twoWeeks({ outputSchema: withOsRoster(OS_PRIOR) },
+                      { outputSchema: withOsRoster(foldered(OS_ROSTER)) });
+  assert.deepEqual(stripNames(v, 'outputSchema'), ['Notion', 'Slack']);
+});
+
+// The AI-actions roster identifies a piece by SLUG in `name`, which already is
+// the stable key, so it keeps working with no folder recorded at all.
+test('the AI-actions diff still works with slugs as the identity', () => {
+  const v = twoWeeks({ aiActions: withAiRoster([{ name: 'google-sheets', actions: 37, stage: 'pr-open' }]) },
+                      { aiActions: withAiRoster(AI_ROSTER) });
+  assert.deepEqual(stripNames(v, 'aiActions'), ['google-sheets']);
+});
+
+// A folder is optional detail, like a logo: one catalog row missing it must cost
+// that row's precision and nothing else — never the whole week's diff.
+test('one row with no folder does not throw away the rest of the diff', () => {
+  const prior = foldered(OS_PRIOR);
+  const now = [{ ...foldered(OS_ROSTER)[0], folder: undefined }, ...foldered(OS_ROSTER).slice(1)];
+  const v = twoWeeks({ outputSchema: withOsRoster(prior) }, { outputSchema: withOsRoster(now) });
+  assert.deepEqual(stripNames(v, 'outputSchema'), ['Notion', 'Slack']);
 });

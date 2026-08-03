@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createContext, runInContext } from 'node:vm';
 import { buildAll } from '../weekly/build.mjs';
+import { STRIP_CAP } from '../weekly/lib/view.mjs';
 
 const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
@@ -30,18 +31,30 @@ function render(weeks) {
 // the raw file would only ever prove the JSON payload contains a string. Run
 // the template's scripts against a DOM-lite stub and assert on the HTML the
 // page actually produces — that is what catches missing escaping.
-function renderDom(weeks, hash = '') {
+//
+// `mount` keeps the sandbox, so the page's own nav wiring and focus handling can
+// be driven the way a keyboard user drives them rather than read as markup.
+function mount(weeks, hash = '') {
   const { html } = render(weeks);
-  const node = () => ({ innerHTML: '', disabled: false, focus() {} });
-  const nodes = { app: node(), pick: node(), prev: node(), next: node() };
+  const focused = [];
+  const node = (id) => ({ id, innerHTML: '', disabled: false, focus() { focused.push(id); } });
+  const nodes = { app: node('app'), pick: node('pick'), prev: node('prev'), next: node('next') };
+  const listeners = [];
+  const doc = { getElementById: (id) => nodes[id] ?? null, activeElement: null };
   const sandbox = createContext({
-    document: { getElementById: (id) => nodes[id] ?? null, activeElement: null },
+    document: doc,
     location: { hash },
-    addEventListener: () => {},
+    addEventListener: (type, fn) => listeners.push([type, fn]),
   });
   for (const [, src] of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) runInContext(src, sandbox);
-  return nodes.app.innerHTML;
+  const go = (to) => {
+    sandbox.location.hash = to;
+    for (const [type, fn] of listeners) if (type === 'hashchange') fn();
+  };
+  return { nodes, doc, focused, go, hash: () => sandbox.location.hash };
 }
+
+const renderDom = (weeks, hash = '') => mount(weeks, hash).nodes.app.innerHTML;
 
 test('renders an HTML document', () => {
   const { html } = render([snap('2026-W31')]);
@@ -126,29 +139,37 @@ test('the DOM-lite harness actually renders the page body', () => {
   assert.match(dom, /class="tile"/);
 });
 
-// ── hierarchy ──────────────────────────────────────────────────────────────
-// A 30-second skim: verdict first, then the four numbers, then what needs a
-// human, then detail. The rosters are ~80% of the page's length and belong at
-// the bottom, under everything that is actually news.
+// ── what is on the page ────────────────────────────────────────────────────
+// A project manager's page: the week and its nav, four numbers with the pieces
+// behind them, and an ask when there is one. Nothing else — no lede restating
+// the numbers, no sub-lines under them, no engineering caveat, no tables of
+// per-piece detail to cross-reference against.
 
 const at = (dom, needle) => dom.indexOf(needle);
 
-test('the verdict is the lead element, above the tiles', () => {
-  const dom = renderDom([snap('2026-W31')]);
-  assert.match(dom, /class="verdict"/);
-  assert.match(dom, /Output schemas are merged on 15 of 756 pieces; 9 are live on cloud\./);
-  assert.ok(at(dom, 'class="verdict"') < at(dom, 'class="tiles"'), 'verdict must precede the tiles');
+test('the page is a header, four boxes and nothing structural besides', () => {
+  const dom = renderDom([withRosters()]);
+  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 4);
+  assert.doesNotMatch(dom, /<section/, 'the roster and detail sections are gone');
+  assert.doesNotMatch(dom, /<table|<tr|<td|<th/, 'nothing on this page is a table any more');
+  assert.doesNotMatch(dom, /<details|<summary/, 'no collapsible per-piece detail');
+  assert.ok(at(dom, '<header') < at(dom, 'class="tiles"'), 'the week leads the page');
+  assert.ok(at(dom, 'class="tiles"') < at(dom, '<footer'), 'the boxes are the page body');
 });
 
-test('the verdict names a degraded workstream instead of going silent', () =>
-  assert.match(renderDom([snap('2026-W31', { tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]),
-    /Ticket data unavailable\./));
+test('no lede restates the numbers as prose above the boxes', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.doesNotMatch(dom, /class="verdict"/);
+  assert.doesNotMatch(dom, /Output schemas are merged/);
+  assert.doesNotMatch(dom, /have AI actions\./);
+});
 
-test('the rosters sit at the bottom, below the shipped and per-person detail', () => {
-  const dom = renderDom([withRosters()]);
-  assert.ok(at(dom, 'Per person') < at(dom, 'outputSchema — 3 tracked'), 'rosters must follow per-person');
-  assert.ok(at(dom, 'class="tiles"') < at(dom, 'outputSchema — 3 tracked'), 'rosters must follow the tiles');
-  assert.ok(at(dom, 'outputSchema — 3 tracked') < at(dom, '<footer'), 'rosters sit above the footer');
+// A degraded workstream is named in its own box — see 'a no-data box shows its
+// reason' below — instead of in a sentence at the top of the page as well.
+test('a degraded workstream is reported once, in its own box', () => {
+  const dom = renderDom([snap('2026-W31', { tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]);
+  assert.doesNotMatch(dom, /Ticket data unavailable/);
+  assert.equal([...dom.matchAll(/Linear refresh pending/g)].length, 1);
 });
 
 test('the header keeps the week, the date range and real nav controls', () => {
@@ -160,9 +181,11 @@ test('the header keeps the week, the date range and real nav controls', () => {
   assert.match(dom, /<button id="next"/);
 });
 
-test('the quiet caption carries the window, the build date and nothing loud', () => {
+// The date range says which 7 days these are; spelling out the window definition
+// is process explanation, which is what this page stopped carrying.
+test('the caption is the build date, not an explanation of the window', () => {
   const dom = renderDom([snap('2026-W31')]);
-  assert.match(dom, /7 days ending Friday/);
+  assert.doesNotMatch(dom, /7 days ending Friday/);
   assert.match(dom, /built 2026-08-01/);
 });
 
@@ -184,6 +207,50 @@ test('a real delta still renders its badge on the tile', () => {
   assert.match(dom, /class="delta up"/);
   assert.match(dom, /\+2 vs prior week/);
   assert.doesNotMatch(dom, /no prior week/);
+});
+
+// ── moving between weeks ───────────────────────────────────────────────────
+// The header is the only chrome left on the page, so its wiring is load-bearing:
+// the newest week by default, the arrows and the picker driving the hash, and
+// keyboard focus surviving a re-render. Nothing here is markup — it is the
+// page's own handlers, called.
+
+const TWO = [snap('2026-W30'), snap('2026-W31')];
+
+test('the newest week is the default and the newest-end arrow is disabled', () => {
+  const dom = renderDom(TWO);
+  assert.match(dom, /Week 31/);
+  assert.match(dom, /<button id="next" disabled/);
+  assert.doesNotMatch(dom, /<button id="prev" disabled/);
+});
+
+test('the arrows and the picker move the selection through the hash', () => {
+  const page = mount(TWO);
+  page.nodes.prev.onclick();
+  assert.equal(page.hash(), '2026-W30');
+  page.go('#2026-W30');
+  assert.match(page.nodes.app.innerHTML, /Week 30/);
+  page.nodes.next.onclick();
+  assert.equal(page.hash(), '2026-W31');
+  page.nodes.pick.onchange({ target: { value: '2026-W30' } });
+  assert.equal(page.hash(), '2026-W30');
+});
+
+test('keyboard focus survives the re-render a week change causes', () => {
+  const page = mount(TWO);
+  page.doc.activeElement = page.nodes.prev;
+  page.go('#2026-W30');
+  assert.deepEqual(page.focused, ['prev']);
+});
+
+// At the oldest week the button the user was on goes disabled, and focus on a
+// disabled control is focus lost — it lands on the picker instead.
+test('focus moves to the picker when the control it was on goes disabled', () => {
+  const page = mount(TWO);
+  page.doc.activeElement = page.nodes.prev;
+  page.nodes.prev.disabled = true;
+  page.go('#2026-W30');
+  assert.deepEqual(page.focused, ['pick']);
 });
 
 // ── needs you ──────────────────────────────────────────────────────────────
@@ -214,86 +281,83 @@ test('a historical snapshot of pure status renders no band', () => {
 test('a count of one never renders a plural noun', () => {
   const dom = renderDom([snap('2026-W31', {
     testing: { status: 'ok', prsMerged: 1, commits: 1, shipped: [] },
-    outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756,
-      roster: [{ name: 'Human Input', actions: 1, triggers: 0, stage: 'review', tier: 'P2' }] },
   })]);
   assert.match(dom, /PR shipped/);
   assert.doesNotMatch(dom, /PRs shipped/);
-  assert.match(dom, /1 commit</);
-  assert.match(dom, /<td class="n">1 action<\/td>/);
 });
 
-test('counts above one keep the plural', () => {
-  const dom = renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 3, commits: 2, shipped: [] } })]);
-  assert.match(dom, /PRs shipped/);
-  assert.match(dom, /2 commits</);
+test('counts above one keep the plural', () =>
+  assert.match(renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 3, commits: 2, shipped: [] } })]),
+    /PRs shipped/));
+
+// ── no sub-lines ───────────────────────────────────────────────────────────
+// Each box was a number and then a line of detail under it. The detail was for
+// engineers; the per-person split is the one line management does read, so it is
+// the only `.note` left on the page.
+
+test('no box carries a sub-line under its number', () => {
+  const dom = renderDom([withRosters()]);
+  assert.doesNotMatch(dom, /live on cloud · /);
+  assert.doesNotMatch(dom, /in review/);
+  assert.doesNotMatch(dom, /tracked · /);
+  assert.doesNotMatch(dom, /blockers?</);
+  assert.doesNotMatch(dom, /\d+ commits?</);
+  assert.equal([...dom.matchAll(/class="note"/g)].length, 1, 'only the per-person line remains');
+});
+
+test('the per-person line is gone entirely when tickets did not report', () => {
+  const dom = renderDom([withRosters({ tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]);
+  assert.doesNotMatch(dom, /class="note"/);
 });
 
 // ── the piece-testing caveat ───────────────────────────────────────────────
-// Too long for a compact tile, too important to lose: it moved to the footer.
+// An engineering limitation, not page copy. It left the page for README.md —
+// see weekly-wiring.test.mjs, which holds it to being on the record there.
 
-test('the build-progress caveat survives in the footer', () => {
+test('the build-progress caveat is not on the page', () => {
   const dom = renderDom([snap('2026-W31')]);
-  assert.match(dom, /piece health numbers need a stats endpoint/);
-  assert.ok(at(dom, 'piece health numbers') > at(dom, 'class="tiles"'));
+  assert.doesNotMatch(dom, /stats endpoint/i);
+  assert.doesNotMatch(dom, /piece health/i);
+  assert.doesNotMatch(dom, /Build progress/i);
 });
 
-test('the roster renders a section per workstream with its tracked total', () => {
+// ── no roster sections ─────────────────────────────────────────────────────
+// 51 stage-grouped rows at the foot of the page, holding the numbers the tiles
+// already showed. Their content is the strip inside each box now.
+
+test('the per-piece rosters are not rendered anywhere on the page', () => {
   const dom = renderDom([withRosters()]);
-  assert.match(dom, /outputSchema — 3 tracked/);
-  assert.match(dom, /AI-actions — 1 tracked/);
+  assert.doesNotMatch(dom, / tracked/);
+  assert.doesNotMatch(dom, /Live on cloud|Merged, awaiting release|In progress|PR open|Held/);
+  assert.doesNotMatch(dom, /31 actions|37 AI actions/);
 });
 
-test('the roster renders piece names and counts with the workstream unit', () => {
-  const dom = renderDom([withRosters()]);
-  assert.match(dom, /Live on cloud \(2\)/);
-  assert.match(dom, /Merged, awaiting release \(1\)/);
-  assert.match(dom, /ClickUp/);
-  assert.match(dom, /31 actions/);
-  assert.match(dom, /google-sheets/);
-  assert.match(dom, /37 AI actions/);
-});
-
-test('counts sit in a right-aligned tabular-nums cell', () =>
-  assert.match(renderDom([withRosters()]), /<td class="n">31 actions<\/td>/));
-
-// Reference detail, not headline: every group starts closed so the section is
-// a two-line index at the foot of the page rather than 51 rows of roster.
-test('no roster group is open by default', () => {
-  const dom = renderDom([withRosters()]);
-  const tags = [...dom.matchAll(/<details[^>]*>/g)].map((m) => m[0]);
-  assert.equal(tags.length, 3);           // live + merged-not-live + AI merged
-  for (const tag of tags) assert.doesNotMatch(tag, /\sopen/);
-});
-
-// Real elements, not divs-plus-JS: <details>/<summary> are keyboard-accessible
-// for free and lose that the moment they are rebuilt.
-test('groups are real details/summary elements', () => {
-  const dom = renderDom([withRosters()]);
-  assert.match(dom, /<summary>Live on cloud \(2\)<\/summary>/);
-});
-
-test('a snapshot with no roster renders no roster section', () => {
-  const dom = renderDom([snap('2026-W31')]);
-  assert.doesNotMatch(dom, / tracked<\/h2>/);
-  assert.doesNotMatch(dom, /<details/);
-});
-
-test('an empty roster array renders no roster section', () => {
-  const dom = renderDom([snap('2026-W31', {
-    outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster: [] },
-  })]);
-  assert.doesNotMatch(dom, / tracked<\/h2>/);
-  assert.doesNotMatch(dom, /<details/);
-});
-
-test('piece names are HTML-escaped', () => {
+// A piece in review is not done, so it is not on a PM's page at all.
+test('a piece that is not done is not named anywhere on the page', () => {
   const dom = renderDom([withRosters({
-    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
-      roster: [{ name: '<img onerror=x>', actions: 1, stage: 'merged' }] },
+    outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756,
+      roster: [{ name: 'Jira', actions: 9, triggers: 1, stage: 'review', tier: 'P3' }] },
   })]);
-  assert.match(dom, /&lt;img onerror=x&gt;/);
-  assert.doesNotMatch(dom, /<img onerror=x>/);
+  assert.doesNotMatch(dom, /Jira/);
+});
+
+test('the per-person table is gone, folded into the tickets box as one line', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.doesNotMatch(dom, /Per person/);
+  assert.doesNotMatch(dom, /PRs merged|Reviews|Engineer/);
+  assert.match(dom, /Kishan 5 · Sanket 6/);
+});
+
+// Ticket ids and titles are also exactly what this public repo's data policy
+// keeps off the site.
+test('the shipped-this-week table is gone', () => {
+  const dom = renderDom([snap('2026-W31', {
+    tickets: { status: 'ok', total: 2, byPerson: { kishan: 2, sanket: 0 },
+      shipped: [{ id: 'PIE-101', title: 'internal ticket title', assignee: 'kishan' }] },
+  })]);
+  assert.doesNotMatch(dom, /Shipped this week/);
+  assert.doesNotMatch(dom, /PIE-101/);
+  assert.doesNotMatch(dom, /internal ticket title/);
 });
 
 // ── the catalog denominator ────────────────────────────────────────────────
@@ -304,7 +368,7 @@ test('the AI-actions tile divides by the catalog, not by the tracked count', () 
                  totalPieces: 28, blockersOpen: 30, catalogPieces: 756 },
   })]);
   assert.match(dom, /of 756 have AI actions/);
-  assert.match(dom, /28 tracked · 24 PRs open/);
+  assert.doesNotMatch(dom, /28 tracked/);
 });
 
 test('a snapshot without a catalog keeps the wording of the week it measured', () => {
@@ -313,20 +377,13 @@ test('a snapshot without a catalog keeps the wording of the week it measured', (
   assert.doesNotMatch(dom, /of 756 have AI actions/);   // a denominator it never measured
 });
 
-// ── done lines ─────────────────────────────────────────────────────────────
-// One line per roster section: how much is merged in total, and what crossed
-// the line during this week. Never a bare list of everything done — see the
-// hasPrior rule in view.mjs.
+// ── no done lines ──────────────────────────────────────────────────────────
+// Each roster section used to print "3 done in total · 2 this week: Notion,
+// Slack" — the same claim the box's strip now makes, in prose, below the fold.
 
 const osWeek = (week, roster) => snap(week, {
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster },
 });
-
-const PRIOR = [
-  { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
-  { name: 'Notion', actions: 12, triggers: 2, stage: 'review', tier: 'P1' },
-  { name: 'Slack', actions: 28, triggers: 4, stage: 'review', tier: 'P1' },
-];
 
 const CURRENT = [
   { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2' },
@@ -334,35 +391,399 @@ const CURRENT = [
   { name: 'Slack', actions: 28, triggers: 4, stage: 'merged-not-live', tier: 'P1' },
 ];
 
-test('the done line names the total and what landed this week', () => {
-  const dom = renderDom([osWeek('2026-W30', PRIOR), osWeek('2026-W31', CURRENT)]);
-  assert.match(dom, /3 done in total · 2 this week: Notion, Slack/);
-});
-
-test('a week where nothing crossed the line says so explicitly', () => {
-  const dom = renderDom([osWeek('2026-W30', CURRENT), osWeek('2026-W31', CURRENT)]);
-  assert.match(dom, /3 done in total · none this week/);
-  assert.doesNotMatch(dom, /this week: /);
-});
-
-// The caption states it once at the top; repeating it per roster is the noise
-// this redesign removed.
-test('with no prior week the done line carries the total alone', () => {
+test('the page states each claim once — the strip, not a prose done line too', () => {
   const dom = renderDom([osWeek('2026-W31', CURRENT)]);
-  assert.match(dom, /3 done in total</);
+  assert.doesNotMatch(dom, /done in total/);
+  assert.doesNotMatch(dom, /none this week/);
   assert.doesNotMatch(dom, /this week: /);
-  assert.equal([...dom.matchAll(/no prior week/g)].length, 1);   // the caption only
+  assert.equal([...dom.matchAll(/Done in total/g)].length, 1, 'the strip label, once');
 });
 
-test('a done line renders for every roster section', () => {
-  const dom = renderDom([withRosters()]);
-  assert.equal([...dom.matchAll(/done in total/g)].length, 2);
-  assert.match(dom, /1 done in total</);   // AI-actions
+// ── the pieces strip ───────────────────────────────────────────────────────
+// The pieces behind each number, rendered INSIDE the box that carries the
+// number. Asserted against the tile's own slice of the DOM, because "on the
+// page somewhere" is the exact failure this redesign exists to fix.
+
+const LOGO = (slug) => `https://cdn.activepieces.com/pieces/${slug}.png`;
+
+// Notion carries no logo: the catalog resolves per piece, and one unresolved
+// logo must cost that one logo and nothing else.
+const OS_LOGOS = [
+  { name: 'ClickUp', actions: 31, triggers: 5, stage: 'live', tier: 'P2', logo: LOGO('clickup') },
+  { name: 'Slack', actions: 28, triggers: 4, stage: 'merged-not-live', tier: 'P1', logo: LOGO('slack') },
+  { name: 'Notion', actions: 12, triggers: 2, stage: 'live', tier: 'P1', logo: null },
+  { name: 'Jira', actions: 9, triggers: 1, stage: 'review', tier: 'P3', logo: LOGO('jira') },
+];
+const OS_LOGOS_PRIOR = OS_LOGOS.map((r) => (r.name === 'ClickUp' ? r : { ...r, stage: 'review' }));
+
+const osLogoWeek = (week, roster) => snap(week, {
+  outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster },
 });
 
-test('piece names in the done line are HTML-escaped', () => {
-  const evil = [{ name: '<img onerror=x>', actions: 1, triggers: 0, stage: 'live', tier: 'P1' }];
-  const dom = renderDom([osWeek('2026-W30', [{ ...evil[0], stage: 'review' }]), osWeek('2026-W31', evil)]);
-  assert.match(dom, /1 done in total · 1 this week: &lt;img onerror=x&gt;/);
-  assert.doesNotMatch(dom, /<img onerror=x>/);
+// Tiles are the unit of this feature, so assertions are scoped to one tile's
+// markup rather than to the whole page. Splitting on tile boundaries leaves the
+// LAST tile's block running to the end of the document, so cut the DOM back to
+// the tiles container first: everything after it is a different part of the
+// page, and the footer alone names two of the workstreams.
+const tilesOnly = (dom) => {
+  const start = dom.indexOf('<div class="tiles">');
+  const ends = ['<div class="band"', '<footer']
+    .map((tag) => dom.indexOf(tag, start)).filter((i) => i !== -1);
+  return dom.slice(start, ends.length ? Math.min(...ends) : dom.length);
+};
+
+const tileOf = (dom, title) =>
+  tilesOnly(dom).split('<div class="tile').find((block) => block.includes(`<h2>${title}</h2>`)) ?? '';
+
+test('the harness can isolate a single tile', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')]), 'Tickets solved');
+  assert.match(tile, /class="big">11</);
+  assert.doesNotMatch(tile, /outputSchema/);
+});
+
+test('the done pieces render inside the outputSchema box, not in a list elsewhere', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema');
+  assert.match(tile, /<ul class="strip">/);
+  for (const name of ['ClickUp', 'Slack', 'Notion']) assert.match(tile, new RegExp(`>${name}</li>`));
+  assert.doesNotMatch(tile, />Jira</, 'Jira is in review, not done');
+});
+
+test('a logo renders as an img with the URL the catalog published', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema');
+  assert.match(tile, /<img src="https:\/\/cdn\.activepieces\.com\/pieces\/clickup\.png"/);
+});
+
+// The logo is decoration next to a name the reader can already see; announcing
+// it would read the piece out twice.
+test('logos are hidden from assistive tech, leaving the name as the accessible text', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema');
+  assert.match(tile, /<span class="ic" aria-hidden="true">/);
+  assert.match(tile, /<img [^>]*alt=""/);
+});
+
+// The initial is rendered UNDERNEATH the logo and revealed when the image is
+// removed, so a 404 — or a page opened with no network at all — shows a letter
+// rather than a broken-image icon.
+test('every logo has an inline onerror fallback to the first letter', () => {
+  const dom = renderDom([osLogoWeek('2026-W31', OS_LOGOS)]);
+  const imgs = [...dom.matchAll(/<img [^>]*>/g)].map((m) => m[0]);
+  assert.ok(imgs.length >= 2, `expected logo imgs, found ${imgs.length}`);
+  for (const img of imgs) assert.match(img, /onerror="this\.remove\(\)"/);
+  assert.match(tileOf(dom, 'outputSchema'), /<b class="init">C<\/b>/);
+});
+
+test('a piece with no logo renders its initial and no img at all', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31',
+    [{ name: 'Notion', actions: 12, triggers: 2, stage: 'live', tier: 'P1', logo: null }])]), 'outputSchema');
+  assert.match(tile, /<b class="init">N<\/b>/);
+  assert.doesNotMatch(tile, /<img/);
+});
+
+// Nothing on this page may need the network to be READABLE: the theme and the
+// data are inlined, and the only external requests are logos, every one of
+// which degrades to a letter.
+test('the document loads no external script or stylesheet', () => {
+  const { html } = render([osLogoWeek('2026-W31', OS_LOGOS)]);
+  assert.doesNotMatch(html, /<script[^>]+src=/i);
+  assert.doesNotMatch(html, /<link[^>]+stylesheet/i);
+  assert.doesNotMatch(html, /@import/i);
+});
+
+test('the strip is labelled as the total when there is no prior week to diff against', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema');
+  assert.match(tile, /Done in total/);
+  assert.doesNotMatch(tile, /Done this week/);
+});
+
+test('no strip claims "this week" while the archive holds a single week', () => {
+  const dom = renderDom([osLogoWeek('2026-W31', OS_LOGOS)]);
+  assert.doesNotMatch(dom, /Done this week/);
+  assert.doesNotMatch(dom, /Nothing new this week/);
+});
+
+test('with a consecutive prior week the strip is labelled the week and lists only what landed', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W30', OS_LOGOS_PRIOR), osLogoWeek('2026-W31', OS_LOGOS)]),
+    'outputSchema');
+  assert.match(tile, /Done this week/);
+  assert.doesNotMatch(tile, /Done in total/);
+  assert.match(tile, />Notion<\/li>/);
+  assert.match(tile, />Slack<\/li>/);
+  assert.doesNotMatch(tile, />ClickUp</, 'ClickUp was already done last week');
+});
+
+test('a gap in the archive renders the total, not a two-week claim', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W29', OS_LOGOS_PRIOR), osLogoWeek('2026-W31', OS_LOGOS)]),
+    'outputSchema');
+  assert.match(tile, /Done in total/);
+  assert.doesNotMatch(tile, /Done this week/);
+  assert.match(tile, />ClickUp<\/li>/);
+});
+
+test('a week that moved nothing says so instead of re-listing finished work', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W30', OS_LOGOS), osLogoWeek('2026-W31', OS_LOGOS)]),
+    'outputSchema');
+  assert.match(tile, /Nothing new this week/);
+  assert.doesNotMatch(tile, /<ul class="strip">/);
+});
+
+// Derived from STRIP_CAP, not hardcoded: this assertion went stale the moment
+// the cap changed, while the view tests that derive from the constant did not.
+test('an overflowing strip is capped and says how many it did not show', () => {
+  const over = 3;
+  const many = Array.from({ length: STRIP_CAP + over }, (_, i) =>
+    ({ name: `Piece ${i}`, actions: 20 - i, triggers: 0, stage: 'live', tier: 'P1', logo: LOGO(`p${i}`) }));
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31', many)]), 'outputSchema');
+  assert.match(tile, new RegExp(`\\+${over} more`));
+  assert.equal([...tile.matchAll(/<li class="chip"/g)].length, STRIP_CAP);
+  assert.match(tile, />Piece 0<\/li>/);
+  assert.doesNotMatch(tile, new RegExp(`>Piece ${STRIP_CAP + over - 1}<`));
+});
+
+test('a strip that fits shows no "+N more"', () =>
+  assert.doesNotMatch(tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema'), /more/));
+
+test("the testing box carries the titles of the PRs it shipped", () => {
+  const tile = tileOf(renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4,
+    shipped: [{ number: 5, title: 'feat(health): piece health board', url: 'https://x/pull/5' }] } })]),
+    'Piece testing');
+  assert.match(tile, /feat\(health\): piece health board/);
+  assert.match(tile, /Shipped/);
+  assert.doesNotMatch(tile, /class="ic"/, 'a PR title has no logo');
+});
+
+test('the tickets box keeps its number and its per-person line, and shows no strip', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')]), 'Tickets solved');
+  assert.match(tile, /class="big">11</);
+  assert.match(tile, /<div class="note">Kishan 5 · Sanket 6<\/div>/);
+  assert.doesNotMatch(tile, /class="strip"/);
+});
+
+// The line is built from the snapshot's own person KEYS now — that is the fix
+// for a view that iterated its own list of names — so the key is what reaches
+// the page, and it is escaped like any other value.
+test('the per-person line is HTML-escaped', () => {
+  const tile = tileOf(renderDom([snap('2026-W31', { tickets: { status: 'ok', total: 1,
+    byPerson: { '<img onerror=x>': 1 } } })]), 'Tickets solved');
+  assert.match(tile, /&lt;img onerror=x&gt; 1/);
+  assert.doesNotMatch(tile, /<img onerror=x>/);
+});
+
+// The other half of the same fix: a count that is not a number cannot be summed
+// against the total, so the attribution goes rather than rendering as junk.
+test('an unusable per-person count renders no line at all', () => {
+  const tile = tileOf(renderDom([snap('2026-W31', { tickets: { status: 'ok', total: 1,
+    byPerson: { kishan: '<img onerror=x>' } } })]), 'Tickets solved');
+  assert.doesNotMatch(tile, /class="note"/);
+  assert.doesNotMatch(tile, /img onerror/);
+  assert.match(tile, /class="big">1</);           // the number itself still stands
+});
+
+test('a no-data box shows its reason and no strip', () => {
+  const tile = tileOf(renderDom([snap('2026-W31', {
+    outputSchema: { status: 'no-data', reason: 'build output missing', roster: OS_LOGOS } })]), 'outputSchema');
+  assert.match(tile, /No data<\/b> — build output missing/);
+  assert.doesNotMatch(tile, /class="strip"/);
+  assert.doesNotMatch(tile, /Done in total/);
+});
+
+// ── escaping ───────────────────────────────────────────────────────────────
+// Both halves of a chip are attacker-influenced: the name comes from a piece's
+// displayName and the URL from the catalog, and the URL lands in an attribute.
+
+test('a piece name in the strip is HTML-escaped, initial included', () => {
+  const dom = renderDom([osLogoWeek('2026-W31',
+    [{ name: '<img onerror=alert(1)>', actions: 1, triggers: 0, stage: 'live', tier: 'P1', logo: null }])]);
+  assert.match(dom, /&lt;img onerror=alert\(1\)&gt;/);
+  assert.doesNotMatch(dom, /<img onerror=alert\(1\)>/);
+  assert.match(dom, /<b class="init">&lt;<\/b>/);
+});
+
+test('a logo URL cannot break out of its attribute', () => {
+  const dom = renderDom([osLogoWeek('2026-W31',
+    [{ name: 'Slack', actions: 1, triggers: 0, stage: 'live', tier: 'P1',
+       logo: 'https://x/a.png" onload="alert(1)' }])]);
+  assert.doesNotMatch(dom, /onload="alert\(1\)"/);
+  assert.match(dom, /&quot; onload=&quot;alert\(1\)/);
+});
+
+test('a shipped PR title in the strip is HTML-escaped', () => {
+  const dom = renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 1,
+    shipped: [{ number: 1, title: '<script>alert(1)</script>', url: 'u' }] } })]);
+  assert.match(dom, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+  assert.doesNotMatch(dom, /<script>alert\(1\)/);
+});
+
+// ── which piece is which ───────────────────────────────────────────────────
+// Issue #4 promoted the week-over-week diff from a footnote at the foot of the
+// page into the tile's headline claim, so an identity bug now lands above the
+// fold. `displayName` is not an identity: the cloud catalog renames pieces, and
+// two folders publish 'Cashfree Payments' today. Keyed on the name, the tile
+// either overclaims or contradicts itself inside one box.
+
+// The counts are per-week here, because the point of these two tests is that
+// the number and the strip inside one box have to tell the same story.
+const osCountedWeek = (week, roster, over = {}) => snap(week, {
+  outputSchema: { status: 'ok', live: 1, mergedNotLive: 0, review: 0, todo: 733, totalPieces: 756,
+                  roster, ...over },
+});
+
+const TELEGRAM = [{ folder: 'telegram-bot', name: 'Telegram Bot', actions: 20, triggers: 0,
+                    stage: 'live', tier: 'P1', logo: LOGO('telegram-bot') }];
+
+test('a piece renamed upstream is not presented in its tile as this week\'s output', () => {
+  const tile = tileOf(renderDom([osCountedWeek('2026-W30', TELEGRAM),
+                                 osCountedWeek('2026-W31', [{ ...TELEGRAM[0], name: 'Telegram' }])]),
+    'outputSchema');
+  assert.match(tile, /Nothing new this week/);
+  assert.doesNotMatch(tile, /class="strip"/, 'nothing crossed the line, so there is nothing to list');
+});
+
+test('the delta pill and the strip in the same box agree when two pieces share a name', () => {
+  const dup = (stage) => ([
+    { folder: '@activepieces/cashfree-payments', name: 'Cashfree Payments', actions: 5, triggers: 0,
+      stage: 'live', tier: 'P1', logo: LOGO('cashfree-payments') },
+    { folder: 'cashfree-payments', name: 'Cashfree Payments', actions: 3, triggers: 0,
+      stage, tier: 'P2', logo: LOGO('cashfree-payments') },
+  ]);
+  const tile = tileOf(renderDom([osCountedWeek('2026-W30', dup('review'), { live: 1, review: 1 }),
+                                 osCountedWeek('2026-W31', dup('live'), { live: 2 })]), 'outputSchema');
+  assert.match(tile, /▲<\/span> \+1 vs prior week/);
+  assert.match(tile, /Done this week/);
+  assert.equal([...tile.matchAll(/<li class="chip"/g)].length, 1);
+  assert.doesNotMatch(tile, /Nothing new this week/);
+});
+
+// ── the initial must not show through the logo ──────────────────────────────
+// The fallback letter is painted UNDERNEATH every logo and stays in the DOM
+// after the logo loads, which is what makes the offline path free. It only works
+// if the logo layer OCCLUDES it: published Activepieces logos are RGBA PNGs with
+// transparent backgrounds, so an unfilled <img> lets a bold letter show through
+// the artwork on the success path — the path the whole "recognise a piece by its
+// logo" story depends on.
+//
+// This is a painting invariant, so it is asserted on the page's own stylesheet:
+// no DOM assertion can see a letter bleeding through a logo.
+
+const CSS_COMMENT = /\/\*[\s\S]*?\*\//g;
+const pageCss = (html) =>
+  [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n').replace(CSS_COMMENT, '');
+
+// Declarations that apply to exactly this selector, later rules winning — enough
+// CSS to reason about one 16px box, not a cascade implementation.
+const declarationsFor = (css, selector) => {
+  const out = {};
+  for (const [, sel, body] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (!sel.split(',').map((s) => s.trim()).includes(selector)) continue;
+    for (const decl of body.split(';')) {
+      const at = decl.indexOf(':');
+      if (at !== -1) out[decl.slice(0, at).trim()] = decl.slice(at + 1).trim();
+    }
+  }
+  return out;
+};
+
+const themeValues = (token) => [...readFileSync(new URL('../shared/theme.css', import.meta.url), 'utf8')
+  .matchAll(new RegExp(`${token}\\s*:\\s*([^;]+);`, 'g'))].map((m) => m[1].trim());
+
+test('the initial is emitted before the logo, so the logo paints over it', () => {
+  const tile = tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema');
+  assert.match(tile, /<b class="init">C<\/b><img src="[^"]*clickup\.png"/);
+});
+
+test('the logo is filled, so the initial underneath it cannot show through', () => {
+  const css = pageCss(render([osLogoWeek('2026-W31', OS_LOGOS)]).html);
+  assert.ok(declarationsFor(css, '.ic .init').background, 'the fallback letter sits on a filled tile');
+  const fill = declarationsFor(css, '.ic img').background ?? declarationsFor(css, '.ic img')['background-color'];
+  assert.ok(fill, '.ic img needs its own fill or every transparent logo pixel reveals the letter');
+  assert.match(fill, /^var\(--[a-z0-9-]+\)$/, `the fill must be a theme token, got ${fill}`);
+});
+
+// A translucent fill would leak the letter through just as well, and the page
+// ships light and dark, so the token has to be opaque in every theme block.
+test('the logo fill is an opaque token in every theme', () => {
+  const css = pageCss(render([osLogoWeek('2026-W31', OS_LOGOS)]).html);
+  const decls = declarationsFor(css, '.ic img');
+  const token = /^var\((--[a-z0-9-]+)\)$/.exec(decls.background ?? decls['background-color'] ?? '')?.[1];
+  assert.ok(token, 'no theme token to resolve');
+  const values = themeValues(token);
+  assert.ok(values.length >= 2, `${token} must be defined for light and dark, found ${values.length}`);
+  for (const v of values) assert.match(v, /^#[0-9a-f]{6}$/i, `${token} is not opaque in every theme: ${v}`);
+});
+
+// ── one screen ─────────────────────────────────────────────────────────────
+// The page's own acceptance criterion is that it fits a laptop screen without
+// scrolling. Measured in headless Chrome against the tallest LEGITIMATE week
+// (two weeks recorded, the outputSchema strip at its cap plus "+N more", all
+// four workstreams ok, one "Needs you" line) the page was 917px against a 681px
+// viewport on a 1366x768 laptop. The two biggest contributors were both blocks
+// sitting under each number: the trend chart plus its caption (~67px per tile,
+// ~134px across the two grid rows) and the chip strip (~93px).
+//
+// The chart is gone. The delta pill on the number line already carries the
+// week-over-week move, which is the only comparison a PM asked for, and the
+// chart was also the one thing on the page that drew a hole in the archive as if
+// it were not there — see the gap test below.
+//
+// No test here can measure pixels without a browser, so what these pin is the
+// structure the measurement established: the blocks that are gone stay gone, the
+// strip stays capped, and the whitespace budget stays where it was tuned.
+
+const SIX_WEEKS = ['2026-W26', '2026-W27', '2026-W28', '2026-W29', '2026-W30', '2026-W31']
+  .map((w, i) => snap(w, { tickets: { status: 'ok', total: 4 + i * 2, byPerson: { kishan: 2 + i, sanket: 2 + i } } }));
+
+test('no box draws a trend chart or claims "last N weeks"', () => {
+  const dom = renderDom(SIX_WEEKS);         // six contiguous weeks: a chart would have every point it wants
+  assert.doesNotMatch(dom, /<svg/);
+  assert.doesNotMatch(dom, /class="trend"|sparkcap/);
+  assert.doesNotMatch(dom, /last \d+ weeks/);
+});
+
+test('the stylesheet keeps no rules for the chart it no longer draws', () => {
+  const css = pageCss(render([snap('2026-W31')]).html);
+  for (const sel of ['.trend', '.sparkcap', 'svg.spark', '.spark']) {
+    assert.deepEqual(declarationsFor(css, sel), {}, `dead CSS left behind for ${sel}`);
+  }
+  assert.doesNotMatch(css, /--spark-/, 'dead sparkline custom properties left behind');
+});
+
+// The archive holds one week today and the refresh job runs on Saturdays, so a
+// single missed run puts a hole in it. The chart drew two entries eleven weeks
+// apart as adjacent weeks and captioned them "last 2 weeks · 1 → 15", directly
+// under a strip this same slice correctly labels "Done in total": one box
+// contradicting itself, with the overstated half below the honest half.
+test('a hole in the archive is never presented as recent movement', () => {
+  const dom = renderDom([
+    snap('2026-W20', { outputSchema: { status: 'ok', live: 1, mergedNotLive: 0, review: 0, todo: 755, totalPieces: 756 } }),
+    snap('2026-W31'),
+  ]);
+  assert.doesNotMatch(dom, /last \d+ weeks/);
+  assert.doesNotMatch(dom, /<svg/);
+  assert.doesNotMatch(dom, /vs prior week/, 'W20 is not the week before W31, so there is no delta either');
+  assert.match(dom, /no prior week to compare against yet/);
+});
+
+// Shorthand box sides, top and bottom only: `16px 20px 24px` → top 16, bottom 24.
+const sidesY = (shorthand) => {
+  const parts = String(shorthand).trim().split(/\s+/).map((v) => Number(/^(-?[\d.]+)(px)?$/.exec(v)?.[1]));
+  const [top, , third] = parts;
+  return { top, bottom: parts.length >= 3 ? third : top };
+};
+
+// Everything on the page that is whitespace rather than content: the wrap's own
+// padding, the gaps around and inside the tile grid, and the footer's lead-in.
+// Chrome-measured, 1366x768 (681px of viewport): the header, caption, four boxes
+// at their tallest and a one-line "Needs you" band come to ~570px, so the page
+// only fits while its furniture stays inside what is left. 64px of dead space
+// under the footer was a third of that budget on its own.
+test('the page keeps the whitespace budget that makes it fit a laptop screen', () => {
+  const css = pageCss(render([snap('2026-W31')]).html);
+  const wrap = sidesY(declarationsFor(css, '.wrap').padding);
+  const tiles = declarationsFor(css, '.tiles');
+  const grid = sidesY(tiles.margin);
+  const gap = Number(/^([\d.]+)px$/.exec(tiles.gap)?.[1]);
+  const footer = Number(/^([\d.]+)px$/.exec(declarationsFor(css, 'footer')['margin-top'])?.[1]);
+  const budget = [wrap.top, wrap.bottom, grid.top, grid.bottom, gap, footer];
+  for (const v of budget) assert.ok(Number.isFinite(v), `unreadable vertical metric in the page CSS: ${budget}`);
+  const total = budget.reduce((a, b) => a + b, 0);
+  assert.ok(total <= 110, `page furniture is ${total}px of whitespace; the one-screen budget is 110px`);
 });

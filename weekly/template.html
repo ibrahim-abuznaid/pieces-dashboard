@@ -11,30 +11,39 @@
      literals — so light and dark both follow the design system.
 
      dataviz rules encoded here:
-     · The 4 workstreams are a KPI ROW of stat tiles (value + delta + sparkline),
-       not a chart. One number each is the whole story.
-     · Sparkline = de-emphasis gray for the trend, accent only on the current
-       week. Status hues (--s-live / --s-merged / --s-review) are RESERVED for
-       status and are never reused as a series colour.
+     · The 4 workstreams are a KPI ROW of stat tiles (value + delta pill + the
+       pieces behind the number), not a chart. One number each is the whole
+       story, and there is no chart anywhere on this page: the trend sparkline
+       and its caption were the two tallest blocks in a page whose acceptance
+       criterion is fitting one laptop screen, and the delta pill already carries
+       the only comparison this reader asked for.
+     · Status hues (--s-live / --s-merged / --s-review) are RESERVED for status
+       and are never reused for anything else here.
      · Direction is never colour-alone: the delta pill carries a glyph and a
        sign as well as a hue (red↔green separate by only ΔE ~5 under protan /
        deutan, per scripts/validate_palette.js).
-     · Big numbers use proportional figures; tabular-nums is only for columns. */
+     · Big numbers use proportional figures. tabular-nums is kept for the one
+       small figure that must not jitter as the week changes, the date range;
+       there are no columns of numbers on this page.
+     · Vertical rhythm is a BUDGET, not a taste: see the one-screen test in
+       test/weekly-render.test.mjs before loosening any margin below. */
   body { background: var(--page); color: var(--text-primary); margin: 0;
          font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; }
-  .wrap { max-width: 940px; margin: 0 auto; padding: 32px 20px 64px; }
+  /* Padding, not decoration: 64px of dead space under the footer was a tenth of
+     a 1366x768 viewport, and this page has to fit one. */
+  .wrap { max-width: 940px; margin: 0 auto; padding: 24px 20px 24px; }
   header { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; }
-  /* The h1 is an eyebrow, not the headline: on a 30-second page the headline is
-     the verdict below it. Uppercasing in CSS rather than in the string keeps
-     the text readable to screen readers and in summary.json. */
+  /* The h1 is an eyebrow, not the headline: the headline of this page is the
+     four numbers. Uppercasing in CSS rather than in the string keeps the text
+     readable to screen readers and in summary.json. */
   h1 { font-size: 12px; margin: 0; font-weight: 600; text-transform: uppercase;
        letter-spacing: .08em; color: var(--text-secondary); }
-  .sub { color: var(--text-secondary); font-size: 13px; }
+  .sub { color: var(--text-secondary); font-size: 13px; margin-top: 8px; }
 
-  /* The lede. Larger than body text and held to ~60ch so it reads as a
-     sentence, not as a banner. Everything below it is evidence for it. */
-  .verdict { font-size: 21px; line-height: 1.45; letter-spacing: -0.01em;
-             max-width: 60ch; margin: 14px 0 4px; color: var(--text-primary); }
+  /* An archive with no weeks yet. The placeholder is the only thing on the page,
+     so it is sized to be read rather than skimmed past. */
+  .empty { font-size: 21px; line-height: 1.45; letter-spacing: -0.01em;
+           margin: 14px 0 0; color: var(--text-primary); }
 
   /* One control row, scoping the whole page — never a per-tile filter. */
   .nav { display: flex; gap: 6px; align-items: center; }
@@ -45,12 +54,11 @@
   .nav button[disabled] { opacity: .4; cursor: default; }
   .nav :focus-visible { outline: 2px solid var(--s-progress); outline-offset: 2px; }
 
-  .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 22px 0; }
+  .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
   @media (max-width: 640px) { .tiles { grid-template-columns: 1fr; } }
-  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px;
-          --spark-line: var(--text-muted); --spark-now: var(--bar-hue); }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
   .tile h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
-             color: var(--text-muted); margin: 0 0 10px; font-weight: 600; }
+             color: var(--text-muted); margin: 0 0 8px; font-weight: 600; }
   /* Proportional figures on purpose — tabular-nums makes a display-size number look loose. */
   .big { font-size: 34px; font-weight: 650; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: proportional-nums; }
   .unit { color: var(--text-secondary); font-size: 13px; margin-left: 6px; }
@@ -59,42 +67,56 @@
   .delta .arrow { font-size: 10px; }
   .delta.up { color: var(--good-text); } .delta.down { color: var(--sev-high); }
   .delta.flat { color: var(--text-muted); }
-  .note { color: var(--text-secondary); font-size: 12.5px; margin-top: 10px; }
+  /* The per-person line in the tickets box — the only line of detail left under
+     any number on this page. */
+  .note { color: var(--text-secondary); font-size: 12.5px; margin-top: 8px; }
   /* Degraded state gets a non-colour cue too: a dashed edge and the word "No data". */
   .tile.is-nodata { border-style: dashed; }
   .nodata { color: var(--text-secondary); font-size: 13px; }
   .nodata b { color: var(--text-muted); font-weight: 600; }
 
-  .trend { margin-top: 12px; }
-  svg.spark { display: block; overflow: visible; }
-  /* The sparkline is aria-hidden decoration; these are the same values as text. */
-  .sparkcap { color: var(--text-muted); font-size: 11.5px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  /* The pieces behind the number, in the same box as the number. `.chip` is the
+     shared vocabulary from shared/theme.css; the pill shape, the colours (all
+     theme tokens) and the wrapping are page-level.
+
+     Chips WRAP and are allowed to break internally — theme's .chip is nowrap,
+     which a long PR title would ride straight out of a phone-width tile. */
+  .striplab { color: var(--text-muted); font-size: 11.5px; font-weight: 600;
+              text-transform: uppercase; letter-spacing: .05em; margin-top: 10px; }
+  ul.strip { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0 0; padding: 0; }
+  ul.strip .chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+                   color: var(--text-primary); font-size: 12px; white-space: normal;
+                   background: var(--page); border: 1px solid var(--border);
+                   border-radius: 999px; padding: 2px 9px 2px 3px; }
+  ul.strip .chip.more { color: var(--text-secondary); padding-left: 9px; }
+  /* The initial sits UNDERNEATH the logo. A logo that 404s — or a page opened
+     with no network at all — removes the img and reveals the letter, so a piece
+     never degrades to a broken-image icon.
+
+     Which makes the img layer's FILL load-bearing rather than cosmetic: piece
+     logos are RGBA PNGs with transparent backgrounds, so an unfilled img lets the
+     bold letter show through the artwork on the success path — the path the whole
+     "recognise a piece by its logo" story rests on. The fill is the chip's own
+     --page, so a logo still reads as sitting directly on the chip; the grey
+     --grid square belongs to the fallback, where there is no logo to show. */
+  .ic { position: relative; width: 16px; height: 16px; flex: none; }
+  .ic img, .ic .init { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 4px; }
+  .ic img { object-fit: contain; background: var(--page); }
+  .ic .init { display: grid; place-items: center; background: var(--grid);
+              color: var(--text-secondary); font-size: 10px; font-weight: 700; }
 
   /* Only asks land here, so the band can afford to look urgent. Bullets are
      replaced by an arrow marker: these are actions, not an inventory. */
-  .band { border: 1px solid var(--sev-high); border-radius: 10px; padding: 14px 18px; margin: 22px 0; }
+  .band { border: 1px solid var(--sev-high); border-radius: 10px; padding: 10px 18px; margin: 16px 0; }
   .band h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; color: var(--sev-high); }
   .band ul { margin: 0; padding-left: 0; list-style: none; }
   .band li { margin: 3px 0; font-size: 13.5px; }
   .band .mark { color: var(--sev-high); font-weight: 600; }
 
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13.5px; }
-  th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em;
-       color: var(--text-muted); font-weight: 600; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--grid); }
-  td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--grid); }
-  /* tabular-nums belongs here: columns of numbers that must align vertically. */
-  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
-  section h2.sec { font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
-                   color: var(--text-muted); margin: 26px 0 0; font-weight: 600; }
-
-  /* Per-piece rosters: the detail behind two of the tiles. Real
-     <details>/<summary> — keyboard and screen-reader support for free. */
-  details.roster { border-bottom: 1px solid var(--grid); }
-  details.roster summary { cursor: pointer; padding: 8px 0; font-size: 13.5px; color: var(--text-secondary); }
-  details.roster summary:focus-visible { outline: 2px solid var(--s-progress); outline-offset: 2px; }
-  details.roster table { margin: 0 0 10px; }
-  details.roster td { border-bottom: none; }
-  footer { margin-top: 34px; font-size: 12.5px; color: var(--text-muted); }
+  /* Nothing below the boxes but the links to the pages that hold the detail.
+     There are no tables, sections or rosters on this page: everything a project
+     manager needs is a number, its pieces, or an ask. */
+  footer { margin-top: 18px; font-size: 12.5px; color: var(--text-muted); }
   noscript { display: block; color: var(--text-secondary); font-size: 13px; margin-top: 12px; }
 </style>
 </head>
@@ -107,57 +129,6 @@ const ARCHIVE = /*__DATA__*/null;
 <script>
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : '—');
-// Mirrors plural() in weekly/lib/view.mjs — the template cannot import, and
-// "1 actions" on a leadership page is the kind of thing that gets noticed.
-const plural = (n, word) => (n === 1 ? word : `${word}s`);
-
-// Sparkline geometry. Padded so the 8px end-marker plus its 2px surface ring
-// can never be clipped by the viewBox.
-const SPARK = { w: 132, h: 34, padX: 5, padY: 6 };
-
-function sparkSvg(points) {
-  const vals = points.map((p) => p.value).filter((v) => typeof v === 'number');
-  if (vals.length < 2) return '';
-  const { w, h, padX, padY } = SPARK;
-  const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1;
-  const x0 = padX, x1 = w - padX, y0 = padY, y1 = h - padY;
-  const step = (x1 - x0) / (points.length - 1);
-  const xy = points.map((p, i) => [x0 + i * step, p.value === null ? null : y1 - ((p.value - min) / span) * (y1 - y0)]);
-  let d = '', open = false;
-  for (const [x, y] of xy) {
-    if (y === null) { open = false; continue; }   // a no-data week breaks the line rather than bridging it
-    d += `${open ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)} `;
-    open = true;
-  }
-  const lastIdx = xy.reduce((acc, [, y], i) => (y === null ? acc : i), -1);
-  const last = lastIdx === -1 ? null : xy[lastIdx];
-  // A point whose neighbours are both missing would be a bare moveto and draw
-  // nothing at all — a real value must never render as blank space.
-  const dots = xy.map(([x, y], i) => {
-    if (y === null || i === lastIdx) return '';
-    const before = xy[i - 1], after = xy[i + 1];
-    const isolated = (!before || before[1] === null) && (!after || after[1] === null);
-    return isolated ? `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="var(--spark-line)"/>` : '';
-  }).join('');
-  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true" focusable="false">
-    <path d="${d.trim()}" fill="none" stroke="var(--spark-line)" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round"/>${dots}
-    ${last ? `<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="4"
-          fill="var(--spark-now)" stroke="var(--surface-1)" stroke-width="2"/>` : ''}
-  </svg>`;
-}
-
-// The chart is aria-hidden, so the same numbers ship as text: endpoints in the
-// caption, every point in the hover title. Nothing is gated behind the tooltip.
-function trendHtml(points) {
-  const svg = sparkSvg(points);
-  if (!svg) return '';
-  const shown = points.filter((p) => typeof p.value === 'number');
-  const first = shown[0], last = shown[shown.length - 1];
-  const full = points.map((p) => `${p.week}: ${p.value === null ? 'no data' : p.value}`).join(' · ');
-  return `<div class="trend" title="${esc(full)}">${svg}
-    <div class="sparkcap">last ${points.length} weeks · ${num(first.value)} → ${num(last.value)}</div></div>`;
-}
 
 function deltaHtml(d) {
   // Direction is carried by the glyph and the sign, not by hue alone: red and
@@ -171,8 +142,40 @@ function deltaHtml(d) {
   return `<span class="delta ${cls}"><span class="arrow" aria-hidden="true">${glyph}</span> ${sign}${d} vs prior week</span>`;
 }
 
-// Compact by design: one number, one unit, one sub-line. A degraded tile keeps
-// the em dash in the number slot so the KPI row still scans as a row of four.
+// A piece's logo, with its first letter underneath. The letter is always in the
+// DOM and the img is stacked on top of it, so `onerror` only has to REMOVE the
+// image for the fallback to appear — no second request, nothing to load, and it
+// works with the network entirely absent. A piece the catalog had no URL for
+// renders the letter alone.
+//
+// The letter is emitted FIRST on purpose: paint order is DOM order, so the img
+// covers it. That only hides it because `.ic img` is filled — piece logos are
+// transparent PNGs; see the CSS.
+//
+// Decorative, every one of them: the piece's name is right there in the chip,
+// so the icon is aria-hidden and the name is the accessible text.
+const initial = (name) => esc(([...String(name)][0] ?? '·').toUpperCase());
+const iconHtml = (p) => `<span class="ic" aria-hidden="true"><b class="init">${initial(p.name)}</b>${
+  p.logo ? `<img src="${esc(p.logo)}" alt="" width="16" height="16" onerror="this.remove()">` : ''}</span>`;
+
+// The pieces the number refers to, in the same box as the number. `label` is
+// built in the view and is the honest part: "Done this week" only when there was
+// a real preceding week to diff against, "Done in total" otherwise. A strip with
+// a label and no chips is a week that moved nothing — that says itself.
+function stripHtml(s) {
+  if (!s) return '';
+  const chips = s.items.map((it) =>
+    `<li class="chip">${s.kind === 'pieces' ? iconHtml(it) : ''}${esc(it.name)}</li>`).join('');
+  // Capped in the view: a big week must not push the page past one screen.
+  const more = s.more ? `<li class="chip more">+${num(s.more)} more</li>` : '';
+  return `<div class="striplab">${esc(s.label)}</div>${
+    s.items.length ? `<ul class="strip">${chips}${more}</ul>` : ''}`;
+}
+
+// A box is a number, its unit, and the pieces behind it. `perPerson` is the one
+// line of detail any box carries — who closed the tickets — and it is empty on
+// the other three. A degraded tile keeps the em dash in the number slot so the
+// KPI row still scans as a row of four, and carries no strip: only its reason.
 function tileHtml(t) {
   if (t.status !== 'ok') {
     return `<div class="tile is-nodata"><h2>${esc(t.title)}</h2>
@@ -181,53 +184,22 @@ function tileHtml(t) {
   }
   return `<div class="tile"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${deltaHtml(t.delta)}</div>
-    <div class="note">${esc(t.sub)}</div>
-    ${trendHtml(t.spark)}</div>`;
-}
-
-// "Done" = merged. Two numbers, because a running total alone hides whether the
-// week moved: the total, and what crossed the line during this week. With no
-// comparable previous week the page says exactly that, rather than presenting
-// the whole finished backlog as this week's output.
-function doneHtml(d) {
-  if (!d) return '';
-  // When there is no prior week the caption already says so once, at the top.
-  // Repeating it per roster is the noise this redesign exists to remove.
-  const tail = !d.hasPrior ? ''
-    : d.thisWeek.length ? ` · ${d.thisWeek.length} this week: ${d.thisWeek.map(esc).join(', ')}`
-    : ' · none this week';
-  return `<div class="note">${num(d.total)} done in total${tail}</div>`;
-}
-
-// One collapsible group per stage, ALL closed: this is reference detail at the
-// foot of the page, and open by default it was ~80% of everything on screen.
-// A roster the snapshot never recorded is simply absent from view.rosters, so
-// nothing here renders an empty shell.
-function rosterHtml(r) {
-  // `unit` is stored plural ('actions', 'AI actions'); a single-action piece
-  // has to read "1 action".
-  const one = r.unit.replace(/s$/, '');
-  return `<section><h2 class="sec">${esc(r.title)} — ${num(r.total)} tracked</h2>
-    ${doneHtml(r.done)}
-    ${r.groups.map((g) => `<details class="roster">
-      <summary>${esc(g.label)} (${g.count})</summary>
-      <table>${g.pieces.map((p) => `<tr><td>${esc(p.name)}</td>
-        <td class="n">${num(p.actions)} ${esc(plural(p.actions, one))}</td></tr>`).join('')}</table>
-    </details>`).join('')}</section>`;
+    ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
+    ${stripHtml(t.strip)}</div>`;
 }
 
 function render(view) {
   const app = document.getElementById('app');
   if (view.empty) {
-    // The h1 is an eyebrow now, so the placeholder carries the lede's weight.
-    app.innerHTML = '<h1>Pieces Team · Weekly progress</h1><p class="verdict">No weeks recorded yet.</p>';
+    app.innerHTML = '<h1>Pieces Team · Weekly progress</h1><p class="empty">No weeks recorded yet.</p>';
     return;
   }
   const idx = view.weeks.indexOf(view.week);
   const options = view.weeks.map((w) => `<option value="${w}"${w === view.week ? ' selected' : ''}>${w}</option>`).join('');
-  // Everything the header used to shout — the window definition, the build
-  // stamp, the absence of a prior week — is one quiet line instead.
-  const caption = `7 days ending Friday · built ${esc(view.builtAt)}`
+  // How fresh the page is, and — when it applies — why no box carries a delta.
+  // The date range beside the week already says which 7 days these are, so the
+  // window definition is not spelled out.
+  const caption = `built ${esc(view.builtAt)}`
     + (view.noPriorWeek ? ' · no prior week to compare against yet' : '');
   app.innerHTML = `
     <header>
@@ -239,25 +211,11 @@ function render(view) {
         <button id="next" ${idx === 0 ? 'disabled' : ''} aria-label="Next week">→</button>
       </div>
     </header>
-    <p class="verdict">${esc(view.verdict)}</p>
     <div class="sub">${caption}</div>
     <div class="tiles">${view.tiles.map(tileHtml).join('')}</div>
     ${view.decisions.length ? `<div class="band"><h2>Needs you</h2><ul>${
       view.decisions.map((d) => `<li><span class="mark" aria-hidden="true">→</span> ${esc(d)}</li>`).join('')}</ul></div>` : ''}
-    ${(view.shipped.tickets.length || view.shipped.testing.length) ? `<section><h2 class="sec">Shipped this week</h2><table>
-      ${view.shipped.tickets.map((i) => `<tr><td>${esc(i.id)}</td><td>${esc(i.title)}</td>
-        <td>${esc(i.assignee ?? '')}</td></tr>`).join('')}
-      ${view.shipped.testing.map((i) => `<tr><td>tester #${i.number}</td>
-        <td><a href="${esc(i.url)}">${esc(i.title)}</a></td><td></td></tr>`).join('')}
-      </table></section>` : ''}
-    ${view.people.length ? `<section><h2 class="sec">Per person</h2><table>
-      <tr><th>Engineer</th><th class="n">Tickets</th><th class="n">PRs merged</th><th class="n">Reviews</th></tr>
-      ${view.people.map((p) => `<tr><td>${esc(p.name)}</td><td class="n">${p.tickets}</td>
-        <td class="n">${p.prsMerged}</td><td class="n">${p.reviews}</td></tr>`).join('')}
-      </table></section>` : ''}
-    ${view.rosters.map(rosterHtml).join('')}
-    <footer>${view.testingNote ? `<div>Piece testing: ${esc(view.testingNote)}</div>` : ''}
-      Full detail: <a href="../output-schema/">outputSchema</a> ·
+    <footer>Full detail: <a href="../output-schema/">outputSchema</a> ·
       <a href="../ai-actions/">AI-actions</a> · <a href="../">overview</a></footer>`;
 
   document.getElementById('pick').onchange = (e) => { location.hash = e.target.value; };

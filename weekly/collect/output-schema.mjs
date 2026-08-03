@@ -10,11 +10,63 @@ const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 // every snapshot forever would bloat the archive for no signal.
 const PARKED = new Set(['todo', 'skip']);
 
+// This file is the piece CATALOG: it is the one build output that walks every
+// piece, so it is also the only place a piece's real logo URL is published, keyed
+// by `folder`. Both rosters resolve logos out of it, which is why the lookup
+// below lives in this module rather than in the collector that needs it.
+const CATALOG = 'dist/output-schema/pieces.json';
+
+// A logo is a recognition cue, not data: a row with no usable URL keeps its name
+// and its count and records `logo: null`. `null` and NEVER a URL assembled from
+// the folder — a guessed CDN path 200s for every piece whose folder matches its
+// logo file name and silently 404s for the first one that does not, with no
+// signal at snapshot time.
+//
+// An empty string is as unusable as no string at all: `<img src="">` re-requests
+// the page itself and renders as a broken image.
+const logoOf = (p) => (typeof p?.logoUrl === 'string' && p.logoUrl ? p.logoUrl : null);
+
+// The piece's directory in the monorepo, and the only identity it keeps: the
+// catalog is keyed by it, it is unique across all 756 rows, and it never changes.
+// `displayName` is neither of those things — it is editorial (the cloud catalog
+// renames pieces; 'Telegram Bot' and 'Google Gemini' are current examples) and
+// two folders publish 'Cashfree Payments' today — so the week-over-week diff in
+// view.mjs identifies a piece by this, not by its name.
+//
+// Spread rather than assigned, so a catalog row without one carries no key at
+// all instead of a `folder: undefined` that JSON turns into a dead field. The
+// diff falls back to the name for that row alone; like a logo, this is detail,
+// and one junk row must not cost the other 755 pieces their roster.
+const folderOf = (p) => (typeof p?.folder === 'string' && p.folder ? { folder: p.folder } : {});
+
+// `folder` → logo URL, for rosters that identify a piece by slug and so cannot
+// carry the URL themselves.
+//
+// OPTIONAL detail on the same terms as the rosters: a missing or malformed
+// catalog yields an EMPTY index, never a throw. Every row then resolves to
+// `logo: null` and keeps its numbers — losing this file costs the logos and
+// nothing else. Rows the catalog cannot key are skipped individually so one junk
+// entry cannot take the other 755 pieces' logos with it.
+export function readLogoIndex(readJson) {
+  const index = new Map();
+  try {
+    const { pieces } = readJson(CATALOG);
+    if (!Array.isArray(pieces)) return index;
+    for (const p of pieces) {
+      const logo = logoOf(p);
+      if (logo && typeof p.folder === 'string' && p.folder) index.set(p.folder, logo);
+    }
+  } catch {
+    // Deliberately empty: an empty index IS the degraded answer.
+  }
+  return index;
+}
+
 // The roster is DETAIL behind the tile, so it degrades on its own: a missing or
 // malformed pieces.json costs the per-piece list, never the headline numbers.
 function readRoster(readJson) {
   try {
-    const { pieces } = readJson('dist/output-schema/pieces.json');
+    const { pieces } = readJson(CATALOG);
     if (!Array.isArray(pieces)) throw new Error('pieces.json has no `pieces` array');
     return pieces
       .filter((p) => !PARKED.has(p?.status))
@@ -23,7 +75,11 @@ function readRoster(readJson) {
         if (typeof p.displayName !== 'string' || !p.displayName) throw new Error('a piece has no displayName');
         if (typeof p.actions !== 'number') throw new Error(`${p.displayName}: actions is not a number`);
         if (typeof p.triggers !== 'number') throw new Error(`${p.displayName}: triggers is not a number`);
-        return { name: p.displayName, actions: p.actions, triggers: p.triggers, stage: p.status, tier: p.tier };
+        // These rows ARE catalog rows, so the folder and the URL are read
+        // straight off them — no lookup needed, and neither shares the numeric
+        // fields' all-or-nothing strictness.
+        return { ...folderOf(p), name: p.displayName, actions: p.actions, triggers: p.triggers,
+                 stage: p.status, tier: p.tier, logo: logoOf(p) };
       })
       .sort((a, b) => b.actions - a.actions || a.name.localeCompare(b.name));
   } catch {

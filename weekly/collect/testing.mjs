@@ -3,8 +3,11 @@
 // commits) — not piece health. Run results live in a local SQLite DB that the
 // repo's export script does not dump, so pass/fail counts are not reachable
 // yet; unlocking them needs a stats endpoint or a committed health.json.
+//
+// That limitation used to ship as a footnote on the weekly page. The page is for
+// a project manager now, so it is recorded in README.md instead — and nowhere
+// else, because a caveat string nothing renders is a caveat nobody reads.
 export const REPO = 'ibrahim-abuznaid/piece-tester-web';
-export const TESTING_NOTE = 'Build progress only — piece health numbers need a stats endpoint on piece-tester-web.';
 
 const dayOf = (iso) => String(iso).slice(0, 10);
 const inWindow = (iso, { start, end }) => {

@@ -15,6 +15,39 @@ const REQUIRED = {
   tickets: ['total'],
 };
 
+// `logo` is a roster row's real logo URL, resolved by the collectors from the
+// published catalog. OPTIONAL for the same reason as `roster` itself: rows
+// written before the field existed must keep validating.
+//
+// `null` is a VALID recorded value, not a missing one — it is what the collectors
+// record when the catalog has no URL for a piece, in preference to guessing one.
+// Any other present value goes straight into an `<img src>`, so a number, an
+// object or an empty string has to fail here rather than reach the page as a
+// broken image.
+function validateLogo(at, row) {
+  if (row.logo === undefined || row.logo === null) return;
+  if (typeof row.logo !== 'string' || !row.logo) {
+    throw new Error(`${at}.logo must be a non-empty string or null when present, got ${
+      typeof row.logo === 'string' ? 'an empty string' : typeof row.logo}`);
+  }
+}
+
+// `folder` is the piece's directory — the catalog's own key, and the identity the
+// "done this week" diff is computed on. OPTIONAL like `logo`: the weeks already
+// committed were written before the field existed and must keep validating, and
+// the diff falls back to the name for a row that has none.
+//
+// Unlike `logo` there is no null spelling. Absence already says "not recorded",
+// and a present value is a key the strip's honesty rests on — junk in it would
+// quietly change which pieces get claimed for this week — so it must be usable.
+function validateFolder(at, row) {
+  if (row.folder === undefined) return;
+  if (typeof row.folder !== 'string' || !row.folder) {
+    throw new Error(`${at}.folder must be a non-empty string when present, got ${
+      row.folder === null ? 'null' : typeof row.folder === 'string' ? 'an empty string' : typeof row.folder}`);
+  }
+}
+
 // `roster` is the optional per-piece detail a workstream may carry. It is
 // OPTIONAL on purpose: snapshots taken before the field existed must keep
 // validating, so absence is fine — but a present roster has to be usable by the
@@ -27,6 +60,8 @@ function validateRoster(key, ws) {
     if (!row || typeof row !== 'object' || Array.isArray(row)) throw new Error(`${at} must be an object`);
     if (typeof row.name !== 'string' || !row.name) throw new Error(`${at}.name must be a non-empty string`);
     if (typeof row.actions !== 'number') throw new Error(`${at}.actions must be a number`);
+    validateFolder(at, row);
+    validateLogo(at, row);
   });
 }
 

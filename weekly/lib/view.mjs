@@ -2,24 +2,27 @@
 // Pure: archive + selected week → everything the template renders. No I/O, no
 // clock, so the whole page shape is unit-testable.
 //
+// The reader is a project manager, which sets the whole scope: a week header,
+// four numbers, the pieces behind each number, and an ask when there is one.
+// Nothing else is built here — a field computed but never rendered is how the
+// next reader gets misled about what the page actually shows.
+//
 // Two invariants the page depends on:
 //   1. `tiles` is ALWAYS length 4 in a fixed order, even when workstreams are
 //      degraded — the layout must not reflow because a collector failed.
-//   2. A degraded workstream renders as "unknown", never as 0. `value`, `delta`
-//      and `spark` all go empty and the collector's reason is carried through.
+//   2. A degraded workstream renders as "unknown", never as 0. `value` and
+//      `delta` both go empty and the collector's reason is carried through.
 //
-// `rosters` is the opposite kind of list: OPTIONAL detail that appears only
-// when a snapshot recorded it, so older snapshots stay renderable.
-import { pick, deltaFor, seriesFor } from './deltas.mjs';
+// A tile's `strip` is the opposite kind of field: OPTIONAL detail that exists
+// only when a snapshot recorded a roster, so older snapshots stay renderable.
+import { pick, deltaFor } from './deltas.mjs';
 import { previousWeekId } from '../../lib/isoweek.mjs';
-import { TESTING_NOTE } from '../collect/testing.mjs';
 
-const PEOPLE = [{ key: 'kishan', name: 'Kishan' }, { key: 'sanket', name: 'Sanket' }];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-// Every count on this page meets a noun, and "1 PRs merged" is the kind of
-// detail that makes a leadership page look unmaintained. The template keeps its
-// own copy of this — it cannot import — so the two must stay in step.
+// Every count on this page meets a noun, and "1 PRs shipped" is the kind of
+// detail that makes a dashboard look unmaintained. Every phrase that needs it is
+// assembled here, so the template no longer carries a copy of it.
 export const plural = (n, word) => (n === 1 ? word : `${word}s`);
 
 // "Jul 25–31" inside a month, "Jul 27 – Aug 2" across one. The year lives in
@@ -43,75 +46,99 @@ const mergedSchemas = (snap) => {
   return live === null || mergedNotLive === null ? null : live + mergedNotLive;
 };
 
-// key, title, the metric the big number shows, and how to phrase it. `sub` is
-// one line: the tile is a headline, and the detail behind it is the roster.
+// ── who closed the tickets ──────────────────────────────────────────────────
+// One line inside the tickets box, read out of the SAME object the total is
+// summed from. Never out of a list of names kept here: the team is hiring a
+// third member, and a view iterating its own roster would print their tickets as
+// a silent 0 beside a total that already counts them — a box contradicting
+// itself, with nothing on the page to say so.
+//
+// So the attribution is CHECKED against the number it sits under, and dropped
+// when the two disagree — a snapshot with no `byPerson` at all, a count that is
+// not a number, a person the collector recorded after the total was computed.
+// The archive validates `tickets.total` and nothing else here, so all of those
+// are legal shapes on disk. A missing line is honest; a wrong one is not.
+//
+// The key is the collector's own person key ('kishan'), which is the display
+// name lowercased, so a leading capital is the whole transform.
+const titled = (key) => key.charAt(0).toUpperCase() + key.slice(1);
+
+function perPersonLine(ws) {
+  const entries = Object.entries(ws.byPerson ?? {});
+  if (!entries.length) return '';
+  if (entries.some(([, n]) => typeof n !== 'number' || !Number.isFinite(n))) return '';
+  if (entries.reduce((sum, [, n]) => sum + n, 0) !== ws.total) return '';
+  return entries.map(([key, n]) => `${titled(key)} ${n}`).join(' · ');
+}
+
+// ── the pieces strip ────────────────────────────────────────────────────────
+// The pieces behind a number, inside the box that carries the number, so the
+// reader never holds a figure in their head and scrolls for the list it means.
+//
+// CAPPED: a big week must not push the page past one screen, so the overflow is
+// counted rather than listed. Capped here rather than in the template because
+// the count is part of the view model a test can read.
+//
+// Six, measured rather than chosen: chips wrap, so a strip is the least
+// predictable part of the page's height — piece names run from 'Slack' to
+// 'Google Business Profile'. At eight the tallest legitimate week measured 4px
+// past a 1366x768 laptop viewport in headless Chrome; six leaves the page room
+// to breathe even when every name is a long one. See the one-screen test in
+// test/weekly-render.test.mjs.
+export const STRIP_CAP = 6;
+
+const capped = (kind, label, items) => ({
+  kind, label, items: items.slice(0, STRIP_CAP), more: Math.max(0, items.length - STRIP_CAP),
+});
+
+// Piece testing ships PRs, not pieces: its strip is their titles, and there is
+// no logo to show for a pull request. The collector already windowed them to
+// this week, so no diff is involved.
+//
+// `shipped` is optional detail the archive does not validate — a snapshot
+// missing it, or carrying a titleless entry, costs the strip and never the
+// tile's number.
+function prStrip(shipped) {
+  const items = (Array.isArray(shipped) ? shipped : [])
+    .filter((pr) => typeof pr?.title === 'string' && pr.title)
+    .map(({ title }) => ({ name: title }));
+  return items.length ? capped('prs', 'Shipped', items) : null;
+}
+
+// key, title, the metric the big number shows, and how to phrase it. A box is a
+// number, its unit and the pieces behind it: the sub-lines each one used to
+// carry (`9 live on cloud · 8 in review`, `28 tracked · 24 PRs open`,
+// `2 commits`) were collector detail, not signal for this reader.
+//
+// `strip` is the pieces the number refers to — see pieceStrip below — and `done`
+// is which of a workstream's stages count as finished for it.
 const TILES = [
+  // Done = MERGED, so both `live` and `merged-not-live`: the work landed either
+  // way; `live` merely also caught a cloud release the team does not control, so
+  // counting only `live` under-reports delivery by whatever is queued behind it.
   { key: 'outputSchema', title: 'outputSchema', path: mergedSchemas,
     unit: (ws) => `of ${ws.totalPieces} merged`,
-    sub: (ws) => `${ws.live} live on cloud · ${ws.review} in review` },
+    strip: pieceStrip, done: ['live', 'merged-not-live'] },
   // `totalPieces` here is only the 28 pieces the initiative TRACKS, so
   // "2 of 28 merged" reads as ~7% catalog coverage when the real figure is
-  // 0.3%. When the snapshot recorded the catalog size, count against that and
-  // demote the tracked count to the sub-line. When it did not — every snapshot
-  // written before the field existed — keep the old wording: a historical week
-  // must not be retrofitted with a denominator it never measured.
+  // 0.3%. When the snapshot recorded the catalog size, count against that. When
+  // it did not — every snapshot written before the field existed — keep the old
+  // wording: a historical week must not be retrofitted with a denominator it
+  // never measured.
   { key: 'aiActions', title: 'AI-actions', path: 'aiActions.merged',
     unit: (ws) => (typeof ws.catalogPieces === 'number'
       ? `of ${ws.catalogPieces} have AI actions`
       : `of ${ws.totalPieces} merged`),
-    // Blockers stay on the page: they are the reason only 2 of 28 have landed,
-    // and dropping them would make the tile look like idle progress.
-    sub: (ws) => `${ws.totalPieces} tracked · ${ws.prOpen} ${plural(ws.prOpen, 'PR')} open`
-      + ` · ${ws.blockersOpen} ${plural(ws.blockersOpen, 'blocker')}` },
+    strip: pieceStrip, done: ['merged'] },
   { key: 'testing', title: 'Piece testing', path: 'testing.prsMerged',
     unit: (ws) => `${plural(ws.prsMerged, 'PR')} shipped`,
-    sub: (ws) => `${ws.commits} ${plural(ws.commits, 'commit')}` },
+    strip: (ws) => prStrip(ws.shipped) },
+  // No strip: tickets are not pieces. Who closed them is the one piece of detail
+  // management does read, so it folds into this box as a single line rather than
+  // into a table of its own.
   { key: 'tickets', title: 'Tickets solved', path: 'tickets.total',
-    unit: () => 'closed this week',
-    sub: (ws) => `${ws.byPerson?.kishan ?? 0} Kishan · ${ws.byPerson?.sanket ?? 0} Sanket` },
+    unit: () => 'closed this week', perPerson: perPersonLine },
 ];
-
-// ── the verdict ─────────────────────────────────────────────────────────────
-// The lede. One or two sentences a person would say out loud, assembled ONLY
-// from workstreams that reported — a verdict must never state a number the
-// collectors did not measure. Degraded workstreams get named, briefly, at the
-// end: the reader has to know what the sentence is silent about.
-const VERDICT_ORDER = [
-  { key: 'outputSchema',
-    say: (ws) => `Output schemas are merged on ${ws.live + ws.mergedNotLive} of ${ws.totalPieces} `
-      + `${plural(ws.totalPieces, 'piece')}; ${ws.live} ${ws.live === 1 ? 'is' : 'are'} live on cloud.` },
-  { key: 'aiActions',
-    say: (ws) => `${ws.merged} ${plural(ws.merged, 'piece')} ${ws.merged === 1 ? 'has' : 'have'} AI actions.` },
-  { key: 'tickets',
-    say: (ws) => `${ws.total} ${plural(ws.total, 'ticket')} closed this week.` },
-  { key: 'testing',
-    say: (ws) => `${ws.prsMerged} tester ${plural(ws.prsMerged, 'PR')} shipped.` },
-];
-
-const DEGRADED_NAME = {
-  outputSchema: 'output-schema', aiActions: 'AI-actions', testing: 'testing', tickets: 'ticket',
-};
-
-const sentenceCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
-const listOf = (names) => (names.length < 2
-  ? names.join('')
-  : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`);
-
-function verdictFor(selected) {
-  const sentences = [];
-  const degraded = [];
-  for (const { key, say } of VERDICT_ORDER) {
-    const ws = selected[key];
-    if (ws?.status !== 'ok') { degraded.push(DEGRADED_NAME[key]); continue; }
-    // Two sentences is the whole budget: this is a 30-second read, and a third
-    // clause is what turns a verdict back into a list of numbers.
-    if (sentences.length < 2) sentences.push(say(ws));
-  }
-  if (!sentences.length) return 'No data is available for this week.';
-  if (degraded.length) sentences.push(sentenceCase(`${listOf(degraded)} data unavailable.`));
-  return sentences.join(' ');
-}
 
 // ── decisions ───────────────────────────────────────────────────────────────
 // The band earns attention only if every line asks someone to DO something.
@@ -128,37 +155,19 @@ const NOT_AN_ASK = [
 const isAsk = (line) =>
   typeof line === 'string' && line.trim() !== '' && !NOT_AN_ASK.some((re) => re.test(line));
 
-// The per-piece list behind a tile. Stages are listed in pipeline order, most
-// advanced first, so the page reads as "how far along is each piece".
-//
-// `done` is the subset of those stages that means MERGED. For outputSchema that
-// is both `live` and `merged-not-live` — the work landed either way; `live`
-// merely also shipped to cloud — so counting only `live` would undercount
-// delivered work by whatever is queued behind a cloud release.
-const ROSTERS = [
-  { key: 'outputSchema', title: 'outputSchema', unit: 'actions',
-    stages: ['live', 'merged-not-live', 'review', 'in-progress'],
-    done: ['live', 'merged-not-live'] },
-  { key: 'aiActions', title: 'AI-actions', unit: 'AI actions',
-    stages: ['merged', 'pr-open', 'assigned', 'held'],
-    done: ['merged'] },
-];
+// ── which pieces are done ───────────────────────────────────────────────────
+// A snapshot's roster is the per-piece record behind two of the numbers. The
+// page has no roster SECTION any more — stage-grouped tables of every tracked
+// piece, which is the cross-referencing this page was rebuilt to remove — so the
+// only question asked of a roster now is which pieces are DONE, and of those,
+// which crossed the line this week.
 
-const STAGE_LABELS = {
-  live: 'Live on cloud',
-  'merged-not-live': 'Merged, awaiting release',
-  review: 'In review',
-  'in-progress': 'In progress',
-  merged: 'Merged',
-  'pr-open': 'PR open',
-  assigned: 'Assigned',
-  held: 'Held',
-};
-
-// `tier` only exists on the outputSchema roster; adding it as `undefined`
-// elsewhere would put a dead key in the embedded JSON.
-const toPiece = ({ name, actions, tier }) =>
-  (tier === undefined ? { name, actions } : { name, actions, tier });
+// A strip chip: the two things a reader recognises a piece by. `logo` is
+// normalised to null unless it is a usable URL — an empty string in an
+// `<img src>` re-requests the page and renders as a broken image, and a
+// snapshot written before logos existed carries no `logo` at all.
+const toChip = ({ name, logo }) =>
+  ({ name, logo: typeof logo === 'string' && logo ? logo : null });
 
 // The roster of the immediately-preceding archive entry, or null when there is
 // nothing legitimate to diff against. Mirrors the gap guard in `deltaFor`: the
@@ -175,48 +184,63 @@ function priorRoster(weeks, selected, key) {
   return ws.roster;
 }
 
-// Done = merged, split into the running total and what crossed the line this
-// week. `thisWeek` is EMPTY whenever `hasPrior` is false: with nothing to diff
-// against, listing every finished piece would report the whole backlog of
-// completed work as one week's output.
-function doneFor(spec, rows, prior) {
-  const isDone = (r) => spec.done.includes(r.stage);
-  const doneNow = rows.filter(isDone).map((r) => r.name);
-  const base = { total: doneNow.length, stages: [...spec.done] };
-  if (!prior) return { ...base, thisWeek: [], hasPrior: false };
-  const before = new Set(prior.filter(isDone).map((r) => r.name));
-  return {
-    ...base,
-    thisWeek: doneNow.filter((name) => !before.has(name)).sort((a, b) => a.localeCompare(b)),
-    hasPrior: true,
-  };
+// A row's stable identity, or null when it carries none. `folder` is the piece's
+// directory: the catalog's own key, unique across every row, and the one thing
+// about a piece that does not change.
+//
+// A DISPLAY NAME is not an identity. It is editorial — the cloud catalog renames
+// pieces, 'Telegram Bot' and 'Google Gemini' among them — and it is not unique:
+// two folders publish 'Cashfree Payments' and two publish 'Weekdone' today. Both
+// failures land in the diff below, and since the strip is the tile's headline
+// claim they land above the fold: a rename re-reports finished work as this
+// week's output, and a duplicated name hides a genuinely new piece behind its
+// twin, so the tile's delta pill and its strip contradict each other.
+const folderOf = (r) => (typeof r.folder === 'string' && r.folder ? r.folder : null);
+
+// "Was this piece already done a week ago?", keyed on identity.
+//
+// Falls back to matching by NAME when last week's roster is not fully
+// folder-keyed. That is not a preference, it is a bridge: the AI-actions roster
+// identifies a piece by SLUG in `name`, which already is stable and unique, and
+// every snapshot written before `folder` existed is name-keyed — comparing this
+// week's folders against those rows would find nothing in common and report the
+// whole finished backlog as one week's work. When in doubt this errs toward
+// "already done", because the one rule this page has is never to overstate a
+// week.
+function alreadyDone(priorDone) {
+  const folders = new Set(priorDone.map(folderOf).filter(Boolean));
+  const names = new Set(priorDone.map((r) => r.name));
+  const keyedByFolder = priorDone.length > 0 && folders.size === priorDone.length;
+  return (r) => (keyedByFolder && folderOf(r) ? folders.has(folderOf(r)) : names.has(r.name));
 }
 
-function rostersFor(weeks, selected) {
-  const out = [];
-  for (const spec of ROSTERS) {
-    const ws = selected[spec.key];
-    if (ws?.status !== 'ok') continue;
-    const rows = Array.isArray(ws.roster) ? ws.roster : [];
-    if (!rows.length) continue;
-
-    // A stage we do not know about still gets a group, at the end, labelled
-    // with the raw string. Upstream adding a status must make the page look
-    // odd — never make pieces silently disappear from it.
-    const unknown = [...new Set(rows.map((r) => r.stage))].filter((s) => !spec.stages.includes(s));
-    const groups = [...spec.stages, ...unknown]
-      // `filter` copies: the collector's ordering (actions desc) is preserved
-      // and the input roster is never sorted in place.
-      .map((stage) => {
-        const pieces = rows.filter((r) => r.stage === stage).map(toPiece);
-        return { stage, label: STAGE_LABELS[stage] ?? String(stage), count: pieces.length, pieces };
-      })
-      .filter((g) => g.count > 0);
-
-    out.push({ key: spec.key, title: spec.title, total: rows.length, unit: spec.unit, groups,
-               done: doneFor(spec, rows, priorRoster(weeks, selected, spec.key)) });
-  }
-  return out;
+// The pieces strip: the LABEL and the list come out of this one computation, so
+// they can never end up describing different weeks.
+//
+// The label is the load-bearing part. What crossed the line THIS WEEK is only
+// claimable against a real immediately-preceding week; with no prior week, or
+// across a gap in the archive, the strip is the running TOTAL and has to say so.
+// A finished backlog presented as one week's output is the overclaim this page
+// has guarded against throughout.
+//
+// `filter` copies, so the collector's ordering (actions desc) is preserved and
+// the input roster is never sorted in place.
+function pieceStrip(ws, spec, weeks, selected) {
+  const rows = Array.isArray(ws.roster) ? ws.roster : [];
+  if (!rows.length) return null;                  // no roster recorded: nothing to show
+  const isDone = (r) => spec.done.includes(r.stage);
+  const done = rows.filter(isDone);
+  const prior = priorRoster(weeks, selected, spec.key);
+  // With nothing to diff against, the tile's own number is the whole answer, so
+  // a workstream with nothing finished yet carries no strip at all.
+  if (!prior) return done.length ? capped('pieces', 'Done in total', done.map(toChip)) : null;
+  const before = alreadyDone(prior.filter(isDone));
+  const landed = done.filter((r) => !before(r)).sort((a, b) => a.name.localeCompare(b.name));
+  // A week that moved nothing has to say it out loud — silence reads as "not
+  // measured".
+  return landed.length
+    ? capped('pieces', 'Done this week', landed.map(toChip))
+    : { kind: 'pieces', label: 'Nothing new this week', items: [], more: 0 };
 }
 
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
@@ -235,49 +259,35 @@ export function buildView(archive, { weekId } = {}) {
   const tiles = TILES.map((spec) => {
     const ws = selected[spec.key];
     if (ws?.status !== 'ok') {
+      // No strip on a degraded tile: the reason is the only honest content it
+      // has, and a stale list beside it would read as this week's work.
       return { key: spec.key, title: spec.title, status: 'no-data',
                reason: ws?.reason ?? 'workstream missing from this snapshot',
-               value: null, delta: null, unit: '', sub: '', spark: [] };
+               value: null, delta: null, unit: '', strip: null, perPerson: '' };
     }
     return {
       key: spec.key, title: spec.title, status: 'ok', reason: '',
       value: pick(selected, spec.path),
       delta: deltaFor(weeks, selected.week, spec.path),
       unit: spec.unit(ws),
-      sub: spec.sub(ws),
-      spark: seriesFor(weeks, selected.week, spec.path),
+      strip: spec.strip?.(ws, spec, weeks, selected) ?? null,
+      perPerson: spec.perPerson?.(ws) ?? '',
     };
   });
-
-  const t = selected.tickets;
-  const people = t?.status === 'ok'
-    ? PEOPLE.map(({ key, name }) => ({
-        key, name,
-        tickets: t.byPerson?.[key] ?? 0,
-        prsMerged: t.prsMerged?.[key] ?? 0,
-        reviews: t.reviews?.[key] ?? 0,
-      }))
-    : [];
 
   const weekNo = Number(selected.week.split('-W')[1]);
 
   return {
+    // `start`/`end` are the counting window itself, published in
+    // dist/weekly/summary.json for machine readers. The page shows `range`
+    // instead, which is lossy on purpose — no year, no ISO dates.
     week: selected.week, start: selected.start, end: selected.end, builtAt: selected.builtAt,
     title: `Pieces Team · Week ${weekNo}`,
     range: rangeOf(selected.start, selected.end),
     weeks: list,
-    verdict: verdictFor(selected),
-    tiles, people,
+    tiles,
     // Said once, in the caption, rather than stamped on all four tiles.
     noPriorWeek: tiles.every((tile) => tile.delta === null),
-    rosters: rostersFor(weeks, selected),
-    shipped: {
-      tickets: t?.status === 'ok' ? (t.shipped ?? []) : [],
-      testing: selected.testing?.status === 'ok' ? (selected.testing.shipped ?? []) : [],
-    },
     decisions: (selected.decisions ?? []).filter(isAsk),
-    // Too big for a compact tile, too important to drop: the testing numbers
-    // are build progress, not piece health, and the page has to keep saying so.
-    testingNote: selected.testing?.status === 'ok' ? TESTING_NOTE : '',
   };
 }

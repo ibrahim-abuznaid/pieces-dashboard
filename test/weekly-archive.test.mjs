@@ -169,3 +169,64 @@ test('a non-numeric catalogPieces is rejected', () =>
 
 test('a null catalogPieces is rejected', () =>
   assert.throws(() => validateSnapshot(withCatalog(null)), /aiActions\.catalogPieces must be a number/));
+
+// --- logo (optional per-row logo URL) ----------------------------------------
+// OPTIONAL for the same reason as `roster` and `catalogPieces`: the snapshot
+// already committed has rows without it and must keep validating. `null` is the
+// recorded answer for "the catalog had no URL for this piece" — the collectors
+// never guess one — so it is a valid value, not a missing field.
+//
+// A present value goes straight into an `<img src>`, so a number, an object or
+// an empty string has to fail here rather than render as a broken image.
+
+const withLogo = (logo) => withRoster([{ name: 'Slack', actions: 12, logo }]);
+
+test('a roster entry with no logo validates — the field is optional', () =>
+  validateSnapshot(withRoster([{ name: 'Slack', actions: 12 }])));
+
+test('a string logo validates', () =>
+  validateSnapshot(withLogo('https://cdn.activepieces.com/pieces/slack.png')));
+
+test('a null logo validates — it is the recorded answer for "not in the catalog"', () =>
+  validateSnapshot(withLogo(null)));
+
+test('a non-string logo is rejected', () =>
+  assert.throws(() => validateSnapshot(withLogo(42)), /outputSchema\.roster\[0\]\.logo/));
+
+test('an empty-string logo is rejected — null means unresolved, "" means broken image', () =>
+  assert.throws(() => validateSnapshot(withLogo('')), /outputSchema\.roster\[0\]\.logo/));
+
+test('the offending logo index is named, not just the first one', () =>
+  assert.throws(() => validateSnapshot(withRoster([
+    { name: 'Slack', actions: 12, logo: null },
+    { name: 'Notion', actions: 3, logo: { url: 'x' } },
+  ])), /outputSchema\.roster\[1\]\.logo/));
+
+test('an aiActions roster logo is validated too', () =>
+  assert.throws(() => validateSnapshot(ok({
+    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
+                 roster: [{ name: 'gmail', actions: 19, logo: 12 }] },
+  })), /aiActions\.roster\[0\]\.logo/));
+
+// --- folder (optional per-row stable key) ------------------------------------
+// The key the week-over-week diff is computed on, so a hand-edited or junk value
+// would silently corrupt the honesty claim the whole page rests on: which pieces
+// crossed the line THIS week. OPTIONAL like `logo` — the weeks already committed
+// were written before the field existed and must keep validating — but a present
+// value has to be a usable key.
+
+const withFolder = (folder) => withRoster([{ name: 'Slack', actions: 12, folder }]);
+
+test('a roster entry with no folder validates — the field is optional', () =>
+  validateSnapshot(withRoster([{ name: 'Slack', actions: 12 }])));
+
+test('a string folder validates', () => validateSnapshot(withFolder('slack')));
+
+test('a non-string folder is rejected — the diff would key on junk', () =>
+  assert.throws(() => validateSnapshot(withFolder(42)), /outputSchema\.roster\[0\]\.folder/));
+
+test('an empty-string folder is rejected', () =>
+  assert.throws(() => validateSnapshot(withFolder('')), /outputSchema\.roster\[0\]\.folder/));
+
+test('a null folder is rejected — absence is how "not recorded" is expressed', () =>
+  assert.throws(() => validateSnapshot(withFolder(null)), /outputSchema\.roster\[0\]\.folder/));

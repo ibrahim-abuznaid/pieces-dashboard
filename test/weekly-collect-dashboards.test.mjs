@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { collectOutputSchema } from '../weekly/collect/output-schema.mjs';
 import { collectAiActions } from '../weekly/collect/ai-actions.mjs';
+import { validateSnapshot } from '../weekly/lib/archive.mjs';
 
 const OS_SUMMARY = {
   generated: '2026-07-23',
@@ -17,15 +18,37 @@ const AI_SUMMARY = {
 
 // Roster fixtures. Both collectors read a second file for the per-piece detail;
 // the aggregate tiles must survive that file being absent or junk.
+//
+// `dist/output-schema/pieces.json` is also the catalog both workstreams resolve
+// logos against, so it carries `folder` and `logoUrl` exactly as the real build
+// publishes them.
 const OS_PIECES = {
   summary: {},
   pieces: [
-    { displayName: 'Slack', actions: 12, triggers: 3, tier: 'P1', status: 'live' },
-    { displayName: 'Notion', actions: 12, triggers: 1, tier: 'P1', status: 'merged-not-live' },
-    { displayName: 'Airtable', actions: 20, triggers: 2, tier: 'P2', status: 'review' },
-    { displayName: 'Zendesk', actions: 4, triggers: 0, tier: 'P3', status: 'in-progress' },
-    { displayName: 'Trello', actions: 99, triggers: 9, tier: 'P1', status: 'todo' },
-    { displayName: 'Webhook', actions: 88, triggers: 8, tier: 'P1', status: 'skip' },
+    { folder: 'slack', displayName: 'Slack', actions: 12, triggers: 3, tier: 'P1', status: 'live',
+      logoUrl: 'https://cdn.activepieces.com/pieces/slack.png' },
+    { folder: 'notion', displayName: 'Notion', actions: 12, triggers: 1, tier: 'P1', status: 'merged-not-live',
+      logoUrl: 'https://cdn.activepieces.com/pieces/notion.png' },
+    // Folder and logo file name deliberately DIVERGE. The URL has to be looked
+    // up, and the tests below assert this exact string, so an implementation
+    // that concatenates the folder into a CDN path cannot pass.
+    { folder: 'airtable', displayName: 'Airtable', actions: 20, triggers: 2, tier: 'P2', status: 'review',
+      logoUrl: 'https://cdn.activepieces.com/pieces/airtable-v2.png' },
+    { folder: 'zendesk', displayName: 'Zendesk', actions: 4, triggers: 0, tier: 'P3', status: 'in-progress',
+      logoUrl: 'https://cdn.activepieces.com/pieces/zendesk.png' },
+    { folder: 'trello', displayName: 'Trello', actions: 99, triggers: 9, tier: 'P1', status: 'todo',
+      logoUrl: 'https://cdn.activepieces.com/pieces/trello.png' },
+    { folder: 'webhook', displayName: 'Webhook', actions: 88, triggers: 8, tier: 'P1', status: 'skip',
+      logoUrl: 'https://cdn.activepieces.com/pieces/webhook.png' },
+    // Parked out of the outputSchema roster by `todo`, but still catalogued —
+    // one file serves both workstreams, so the AI-actions roster resolves its
+    // logos against these rows too.
+    { folder: 'gmail', displayName: 'Gmail', actions: 19, triggers: 2, tier: 'P1', status: 'todo',
+      logoUrl: 'https://cdn.activepieces.com/pieces/gmail.png' },
+    { folder: 'google-docs', displayName: 'Google Docs', actions: 37, triggers: 0, tier: 'P1', status: 'todo',
+      logoUrl: 'https://cdn.activepieces.com/pieces/google-docs.png' },
+    // `asana` is deliberately ABSENT: the AI-actions roster tracks it, so it
+    // exercises the unresolved path.
   ],
 };
 
@@ -51,17 +74,28 @@ const osRead = (over = {}) => reader({
   ...over,
 });
 
+// The catalog is part of the default map: a real snapshot always has it, because
+// the outputSchema build runs before the AI-actions one. The tests that drop it
+// build their own reader.
 const aiRead = (over = {}) => reader({
   'dist/ai-actions/summary.json': AI_SUMMARY,
   'dist/ai-actions/pieces.json': AI_PIECES,
+  'dist/output-schema/pieces.json': OS_PIECES,
   ...over,
 });
 
+// `folder` is carried as well as `name`: it is the catalog's own key and the
+// only stable, unique one, so the week-over-week diff in view.mjs is keyed on it
+// rather than on an editorial displayName that upstream renames.
 const OS_ROSTER = [
-  { name: 'Airtable', actions: 20, triggers: 2, stage: 'review', tier: 'P2' },
-  { name: 'Notion', actions: 12, triggers: 1, stage: 'merged-not-live', tier: 'P1' },
-  { name: 'Slack', actions: 12, triggers: 3, stage: 'live', tier: 'P1' },
-  { name: 'Zendesk', actions: 4, triggers: 0, stage: 'in-progress', tier: 'P3' },
+  { folder: 'airtable', name: 'Airtable', actions: 20, triggers: 2, stage: 'review', tier: 'P2',
+    logo: 'https://cdn.activepieces.com/pieces/airtable-v2.png' },
+  { folder: 'notion', name: 'Notion', actions: 12, triggers: 1, stage: 'merged-not-live', tier: 'P1',
+    logo: 'https://cdn.activepieces.com/pieces/notion.png' },
+  { folder: 'slack', name: 'Slack', actions: 12, triggers: 3, stage: 'live', tier: 'P1',
+    logo: 'https://cdn.activepieces.com/pieces/slack.png' },
+  { folder: 'zendesk', name: 'Zendesk', actions: 4, triggers: 0, stage: 'in-progress', tier: 'P3',
+    logo: 'https://cdn.activepieces.com/pieces/zendesk.png' },
 ];
 
 test('collectOutputSchema maps the real summary shape', () => {
@@ -163,19 +197,59 @@ test('an outputSchema roster row with a non-numeric actions count drops the whol
 });
 
 test('an outputSchema roster row with zero actions survives — only absence drops it', () => {
-  const zeroed = { pieces: [{ displayName: 'Slack', actions: 0, triggers: 0, tier: 'P1', status: 'review' }] };
+  const zeroed = { pieces: [{ folder: 'slack', displayName: 'Slack', actions: 0, triggers: 0, tier: 'P1',
+                              status: 'review', logoUrl: 'https://cdn.activepieces.com/pieces/slack.png' }] };
   const out = collectOutputSchema({ readJson: osRead({ 'dist/output-schema/pieces.json': zeroed }) });
-  assert.deepEqual(out.roster, [{ name: 'Slack', actions: 0, triggers: 0, stage: 'review', tier: 'P1' }]);
+  assert.deepEqual(out.roster, [{ folder: 'slack', name: 'Slack', actions: 0, triggers: 0, stage: 'review',
+                                  tier: 'P1', logo: 'https://cdn.activepieces.com/pieces/slack.png' }]);
+});
+
+// --- folder (the diff's stable key) ------------------------------------------
+// The one identity a piece keeps. `displayName` is editorial — upstream renames
+// pieces — and not unique: two folders publish 'Cashfree Payments' today. The
+// collector read `folder` for the logo index and then threw it away, which left
+// view.mjs diffing the weeks by name; see the tests in weekly-view.test.mjs for
+// what that costs.
+
+test('the outputSchema roster records the catalog folder alongside the display name', () => {
+  const { roster } = collectOutputSchema({ readJson: osRead() });
+  assert.deepEqual(roster.map((r) => r.folder), ['airtable', 'notion', 'slack', 'zendesk']);
+});
+
+test('two catalog rows sharing a displayName stay distinguishable by folder', () => {
+  const dup = { pieces: [
+    { folder: '@activepieces/cashfree-payments', displayName: 'Cashfree Payments', actions: 5, triggers: 0,
+      tier: 'P1', status: 'live', logoUrl: 'https://cdn.activepieces.com/pieces/cashfree-payments.png' },
+    { folder: 'cashfree-payments', displayName: 'Cashfree Payments', actions: 3, triggers: 0,
+      tier: 'P2', status: 'review', logoUrl: 'https://cdn.activepieces.com/pieces/cashfree-payments.png' },
+  ] };
+  const { roster } = collectOutputSchema({ readJson: osRead({ 'dist/output-schema/pieces.json': dup }) });
+  assert.deepEqual(roster.map((r) => r.folder), ['@activepieces/cashfree-payments', 'cashfree-payments']);
+});
+
+// A folder is optional detail on the same terms as a logo: a catalog row that
+// lost it keeps its name and its numbers, and the diff falls back to the name
+// for that row alone.
+test('a catalog row with no usable folder still yields a roster row, without the key', () => {
+  const noFolder = { pieces: [{ displayName: 'Slack', actions: 12, triggers: 3, tier: 'P1', status: 'live',
+                                logoUrl: 'https://cdn.activepieces.com/pieces/slack.png' }] };
+  const { roster } = collectOutputSchema({ readJson: osRead({ 'dist/output-schema/pieces.json': noFolder }) });
+  assert.equal(roster.length, 1);
+  assert.equal('folder' in roster[0], false, 'an absent folder must not become a dead key in the archive');
+  assert.equal(roster[0].name, 'Slack');
 });
 
 test('collectAiActions carries a roster, sorted by actions desc then name', () => {
   assert.deepEqual(collectAiActions({ readJson: aiRead() }), {
     status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
     roster: [
-      { name: 'google-docs', actions: 37, stage: 'merged' },
-      { name: 'airtable', actions: 19, stage: 'held' },
-      { name: 'gmail', actions: 19, stage: 'pr-open' },
-      { name: 'asana', actions: 5, stage: 'assigned' },
+      { name: 'google-docs', actions: 37, stage: 'merged',
+        logo: 'https://cdn.activepieces.com/pieces/google-docs.png' },
+      { name: 'airtable', actions: 19, stage: 'held',
+        logo: 'https://cdn.activepieces.com/pieces/airtable-v2.png' },
+      { name: 'gmail', actions: 19, stage: 'pr-open',
+        logo: 'https://cdn.activepieces.com/pieces/gmail.png' },
+      { name: 'asana', actions: 5, stage: 'assigned', logo: null },
     ],
   });
 });
@@ -247,4 +321,133 @@ test('an outputSchema summary with no totals block omits the denominator', () =>
 test('a zero catalog survives as 0', () => {
   const out = collectAiActions({ readJson: withCatalog({ ...OS_SUMMARY, totals: { pieces: 0 } }) });
   assert.equal(out.catalogPieces, 0);
+});
+
+// --- logos ---------------------------------------------------------------------
+// `dist/output-schema/pieces.json` is the ONLY source of a logo URL. The
+// outputSchema roster reads it off the row it is already mapping; the AI-actions
+// roster has a slug and nothing else, so it looks the URL up by `folder`.
+//
+// It is never CONSTRUCTED from the slug. A guessed CDN path returns 200 for
+// every piece whose slug happens to equal its folder and a silent 404 for the
+// first one where they diverge — with no signal at snapshot time and no signal
+// on the page beyond a piece that quietly loses its logo.
+//
+// Logos are a recognition cue, so they degrade one row at a time: an unresolved
+// logo is `null` and its row still carries the name and the count.
+
+const logosOf = (roster) => Object.fromEntries(roster.map((r) => [r.name, r.logo]));
+
+test('outputSchema roster rows carry the logo URL the catalog publishes', () => {
+  const { roster } = collectOutputSchema({ readJson: osRead() });
+  assert.deepEqual(logosOf(roster), {
+    Airtable: 'https://cdn.activepieces.com/pieces/airtable-v2.png',
+    Notion: 'https://cdn.activepieces.com/pieces/notion.png',
+    Slack: 'https://cdn.activepieces.com/pieces/slack.png',
+    Zendesk: 'https://cdn.activepieces.com/pieces/zendesk.png',
+  });
+});
+
+// The fixture's airtable logo is `airtable-v2.png`, not `airtable.png`: this
+// only passes if the URL was read, not derived.
+test('the outputSchema logo is read from the row, not derived from its folder', () => {
+  const { roster } = collectOutputSchema({ readJson: osRead() });
+  assert.equal(roster.find((r) => r.name === 'Airtable').logo,
+    'https://cdn.activepieces.com/pieces/airtable-v2.png');
+});
+
+test('a catalogued piece with no logoUrl keeps its row with logo null', () => {
+  const noLogo = { pieces: [{ folder: 'slack', displayName: 'Slack', actions: 12, triggers: 3, status: 'live' }] };
+  const out = collectOutputSchema({ readJson: osRead({ 'dist/output-schema/pieces.json': noLogo }) });
+  assert.equal(out.status, 'ok');
+  assert.deepEqual(out.roster, [{ folder: 'slack', name: 'Slack', actions: 12, triggers: 3, stage: 'live',
+                                  tier: undefined, logo: null }]);
+});
+
+// A logo is decoration, so a junk one costs that one logo. Contrast the numeric
+// fields, where a junk value drops the whole roster.
+test('a non-string logoUrl yields logo null without dropping the roster', () => {
+  const junk = { pieces: [{ folder: 'slack', displayName: 'Slack', actions: 12, triggers: 3, tier: 'P1',
+                            status: 'live', logoUrl: 42 }] };
+  const { roster } = collectOutputSchema({ readJson: osRead({ 'dist/output-schema/pieces.json': junk }) });
+  assert.equal(roster.length, 1);
+  assert.equal(roster[0].logo, null);
+});
+
+// `<img src="">` re-requests the page itself and renders as a broken image, so
+// an empty URL has to become the same `null` as no URL at all.
+test('an empty logoUrl yields logo null, not an empty string', () => {
+  const empty = { pieces: [{ folder: 'slack', displayName: 'Slack', actions: 12, triggers: 3, tier: 'P1',
+                             status: 'live', logoUrl: '' }] };
+  const { roster } = collectOutputSchema({ readJson: osRead({ 'dist/output-schema/pieces.json': empty }) });
+  assert.equal(roster[0].logo, null);
+});
+
+test('AI-actions roster rows resolve their logo by slug → catalog folder', () => {
+  const { roster } = collectAiActions({ readJson: aiRead() });
+  assert.deepEqual(logosOf(roster), {
+    'google-docs': 'https://cdn.activepieces.com/pieces/google-docs.png',
+    airtable: 'https://cdn.activepieces.com/pieces/airtable-v2.png',
+    gmail: 'https://cdn.activepieces.com/pieces/gmail.png',
+    asana: null,
+  });
+});
+
+test('an AI-actions slug missing from the catalog yields null, never a guessed URL', () => {
+  const { roster } = collectAiActions({ readJson: aiRead() });
+  const asana = roster.find((r) => r.name === 'asana');
+  assert.equal(asana.logo, null, 'unresolved must be null — a constructed CDN path would 404 silently');
+  assert.equal(asana.actions, 5, 'the row itself survives: name and count are the data');
+});
+
+test('a missing catalog file costs the AI-actions logos and nothing else', () => {
+  const out = collectAiActions({ readJson: reader({
+    'dist/ai-actions/summary.json': AI_SUMMARY,
+    'dist/ai-actions/pieces.json': AI_PIECES,
+  }) });
+  assert.equal(out.status, 'ok');
+  assert.equal(out.prOpen, 24);
+  assert.equal(out.totalPieces, 28);
+  assert.equal(out.roster.length, 4);
+  assert.deepEqual(out.roster.map((r) => r.logo), [null, null, null, null]);
+});
+
+test('a malformed catalog file costs the AI-actions logos and nothing else', () => {
+  const out = collectAiActions({ readJson: aiRead({ 'dist/output-schema/pieces.json': { pieces: 'nope' } }) });
+  assert.equal(out.status, 'ok');
+  assert.equal(out.prOpen, 24);
+  assert.equal(out.roster.length, 4);
+  assert.deepEqual(out.roster.map((r) => r.logo), [null, null, null, null]);
+});
+
+test('a catalog entry with a folder but no usable logoUrl resolves to null', () => {
+  const partial = { pieces: [{ folder: 'gmail', displayName: 'Gmail', status: 'todo', logoUrl: null }] };
+  const { roster } = collectAiActions({ readJson: aiRead({ 'dist/output-schema/pieces.json': partial }) });
+  assert.equal(roster.find((r) => r.name === 'gmail').logo, null);
+});
+
+// A row the catalog cannot key must not take the other 755 rows' logos with it.
+test('a catalog entry with no folder is skipped, leaving the rest resolvable', () => {
+  const withJunkRow = { pieces: [{ displayName: 'Nameless', logoUrl: 'https://cdn.activepieces.com/x.png' },
+                                 ...OS_PIECES.pieces] };
+  const { roster } = collectAiActions({ readJson: aiRead({ 'dist/output-schema/pieces.json': withJunkRow }) });
+  assert.equal(roster.find((r) => r.name === 'gmail').logo, 'https://cdn.activepieces.com/pieces/gmail.png');
+});
+
+// The collectors and the archive schema are two halves of one contract, and the
+// only place they meet is inside snapshot.mjs — which cannot run in a test,
+// because it writes the committed archive. Pipe real collector output through
+// the real validator instead, so an unresolved logo the collectors emit can
+// never be a value the schema rejects at snapshot time.
+test('what the collectors emit — including an unresolved logo — passes validateSnapshot', () => {
+  const snap = {
+    week: '2026-W31', start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01', decisions: [],
+    outputSchema: collectOutputSchema({ readJson: osRead() }),
+    aiActions: collectAiActions({ readJson: aiRead() }),
+    testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
+    tickets: { status: 'ok', total: 11 },
+  };
+  assert.ok(snap.aiActions.roster.some((r) => r.logo === null), 'the fixture must exercise the unresolved path');
+  assert.ok(snap.outputSchema.roster.every((r) => typeof r.logo === 'string'));
+  validateSnapshot(snap);
 });

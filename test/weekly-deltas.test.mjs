@@ -1,7 +1,16 @@
 // test/weekly-deltas.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { pick, deltaFor, seriesFor } from '../weekly/lib/deltas.mjs';
+import { pick, deltaFor } from '../weekly/lib/deltas.mjs';
+
+// There is no `seriesFor` any more, so there are no series tests here. It read a
+// window of weeks for the per-tile sparkline, and the sparkline is gone: it drew
+// two entries eleven weeks apart as adjacent weeks under a caption that called
+// them consecutive, and it was the tallest block on a page whose acceptance
+// criterion is fitting one laptop screen. `deltaFor` below is now the only read
+// that crosses weeks, and its gap guard is asserted at the bottom of this file.
+// That a hole in the archive cannot be drawn as a trend is asserted on the
+// rendered page, in test/weekly-render.test.mjs.
 
 const snap = (week, total, live) => ({
   week,
@@ -21,8 +30,8 @@ test('pick preserves a real zero', () => assert.equal(pick(snap('2026-W32', 0, 0
 // ── derived metrics ────────────────────────────────────────────────────────
 // Some headline numbers are not stored fields: "outputSchema merged" is
 // live + mergedNotLive. Accepting an accessor here keeps every snapshot ever
-// written renderable — no schema change, no backfill — and gives deltaFor and
-// seriesFor the same derived metric for free.
+// written renderable — no schema change, no backfill — and gives deltaFor the
+// same derived metric for free.
 
 test('pick accepts an accessor function', () =>
   assert.equal(pick(weeks[2], (s) => s.tickets.total + s.outputSchema.live), 20));
@@ -61,18 +70,6 @@ test('deltaFor with an accessor is null when a week is no-data', () => {
   assert.equal(deltaFor(w, '2026-W31', (s) => s.tickets.total), null);
 });
 
-test('seriesFor accepts an accessor', () =>
-  assert.deepEqual(seriesFor(weeks, '2026-W31', (s) => s.outputSchema.live + s.tickets.total, 2), [
-    { week: '2026-W30', value: 16 },
-    { week: '2026-W31', value: 20 },
-  ]));
-
-test('a throwing accessor inside seriesFor produces null points, not a crash', () =>
-  assert.deepEqual(seriesFor(weeks, '2026-W30', (s) => s.missing.deep, 2), [
-    { week: '2026-W29', value: null },
-    { week: '2026-W30', value: null },
-  ]));
-
 test('deltaFor computes week-over-week', () => assert.equal(deltaFor(weeks, '2026-W31', 'tickets.total'), 2));
 test('deltaFor is null for the first week in the archive', () =>
   assert.equal(deltaFor(weeks, '2026-W29', 'tickets.total'), null));
@@ -89,23 +86,3 @@ test('deltaFor can be negative', () => {
   assert.equal(deltaFor(w, '2026-W31', 'tickets.total'), -1);
 });
 
-test('seriesFor returns oldest to newest ending at the given week', () =>
-  assert.deepEqual(seriesFor(weeks, '2026-W31', 'outputSchema.live'), [
-    { week: '2026-W29', value: 5 },
-    { week: '2026-W30', value: 7 },
-    { week: '2026-W31', value: 9 },
-  ]));
-test('seriesFor caps at count, keeping the most recent', () =>
-  assert.deepEqual(seriesFor(weeks, '2026-W31', 'tickets.total', 2), [
-    { week: '2026-W30', value: 9 },
-    { week: '2026-W31', value: 11 },
-  ]));
-test('seriesFor stops at the selected week, ignoring later ones', () =>
-  assert.deepEqual(seriesFor(weeks, '2026-W30', 'tickets.total').map((p) => p.week), ['2026-W29', '2026-W30']));
-test('seriesFor emits null values for no-data weeks rather than dropping them', () => {
-  const w = [snap('2026-W30', null, 7), snap('2026-W31', 11, 9)];
-  assert.deepEqual(seriesFor(w, '2026-W31', 'tickets.total'), [
-    { week: '2026-W30', value: null },
-    { week: '2026-W31', value: 11 },
-  ]);
-});

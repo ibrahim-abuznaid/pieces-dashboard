@@ -21,3 +21,14 @@ test('the landing page links to the weekly page', () => {
   const tpl = readFileSync(new URL('../site/template.html', import.meta.url), 'utf8');
   assert.match(tpl, /weekly\//);
 });
+
+// The weekly page is written for a project manager, so the piece-tester-web
+// caveat came off it. It is an engineering limitation, not page copy — losing it
+// entirely would let someone read `prsMerged` as "pieces tested", so the repo
+// has to keep saying what those numbers are and what it would take to fix them.
+test('the piece-tester-web stats-endpoint limitation stays on the record in the README', () => {
+  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  assert.match(readme, /piece-tester-web/);
+  assert.match(readme, /build progress/i);
+  assert.match(readme, /stats endpoint/i);
+});
