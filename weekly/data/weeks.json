@@ -4,7 +4,7 @@
       "week": "2026-W31",
       "start": "2026-07-25",
       "end": "2026-07-31",
-      "builtAt": "2026-08-02",
+      "builtAt": "2026-08-03",
       "outputSchema": {
         "status": "ok",
         "live": 9,
@@ -14,165 +14,211 @@
         "totalPieces": 756,
         "roster": [
           {
+            "folder": "clickup",
             "name": "ClickUp",
             "actions": 31,
             "triggers": 30,
             "stage": "live",
-            "tier": "P2"
+            "tier": "P2",
+            "logo": "https://cdn.activepieces.com/pieces/clickup.png"
           },
           {
+            "folder": "google-sheets",
             "name": "Google Sheets",
             "actions": 27,
             "triggers": 4,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png"
           },
           {
+            "folder": "telegram-bot",
             "name": "Telegram Bot",
             "actions": 20,
             "triggers": 1,
             "stage": "merged-not-live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
           },
           {
+            "folder": "google-drive",
             "name": "Google Drive",
             "actions": 16,
             "triggers": 2,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png"
           },
           {
+            "folder": "notion",
             "name": "Notion",
             "actions": 15,
             "triggers": 4,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png"
           },
           {
+            "folder": "google-calendar",
             "name": "Google Calendar",
             "actions": 9,
             "triggers": 7,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
           {
+            "folder": "supabase",
             "name": "Supabase",
             "actions": 9,
             "triggers": 1,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/supabase.png"
           },
           {
+            "folder": "tables",
             "name": "Tables",
             "actions": 9,
             "triggers": 3,
             "stage": "review",
-            "tier": "P4"
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/tables.svg"
           },
           {
+            "folder": "gmail",
             "name": "Gmail",
             "actions": 7,
             "triggers": 4,
             "stage": "merged-not-live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
           {
+            "folder": "google-gemini",
             "name": "Google Gemini",
             "actions": 7,
             "triggers": 0,
             "stage": "merged-not-live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/google-gemini.png"
           },
           {
+            "folder": "ai",
             "name": "AI",
             "actions": 6,
             "triggers": 0,
             "stage": "review",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg"
           },
           {
+            "folder": "google-docs",
             "name": "Google Docs",
             "actions": 6,
             "triggers": 1,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
           {
+            "folder": "store",
             "name": "Storage",
             "actions": 6,
             "triggers": 0,
             "stage": "review",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/store.svg"
           },
           {
+            "folder": "groq",
             "name": "Groq",
             "actions": 4,
             "triggers": 0,
             "stage": "merged-not-live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/groq.png"
           },
           {
+            "folder": "claude",
             "name": "Anthropic Claude",
             "actions": 3,
             "triggers": 0,
             "stage": "merged-not-live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/claude.png"
           },
           {
+            "folder": "linkedin",
             "name": "LinkedIn",
             "actions": 3,
             "triggers": 0,
             "stage": "live",
-            "tier": "P2"
+            "tier": "P2",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png"
           },
           {
+            "folder": "http",
             "name": "HTTP",
             "actions": 2,
             "triggers": 0,
             "stage": "review",
-            "tier": "P4"
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
           },
           {
+            "folder": "open-router",
             "name": "OpenRouter",
             "actions": 2,
             "triggers": 0,
             "stage": "merged-not-live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/open-router.png"
           },
           {
+            "folder": "subflows",
             "name": "Sub Flows",
             "actions": 2,
             "triggers": 1,
             "stage": "review",
-            "tier": "P3"
+            "tier": "P3",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/subflows.svg"
           },
           {
+            "folder": "webhook",
             "name": "Webhook",
             "actions": 2,
             "triggers": 1,
             "stage": "review",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/webhooks.svg"
           },
           {
+            "folder": "forms",
             "name": "Human Input",
             "actions": 1,
             "triggers": 2,
             "stage": "review",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/human-input.svg"
           },
           {
+            "folder": "manual-trigger",
             "name": "Manual Trigger",
             "actions": 0,
             "triggers": 1,
             "stage": "review",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/manual-trigger.svg"
           },
           {
+            "folder": "rss",
             "name": "RSS Feed",
             "actions": 0,
             "triggers": 2,
             "stage": "live",
-            "tier": "P1"
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/rss.png"
           }
         ]
       },
@@ -189,149 +235,205 @@
           {
             "name": "stripe",
             "actions": 75,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Stripe",
+            "logo": "https://cdn.activepieces.com/pieces/stripe.png"
           },
           {
             "name": "github",
             "actions": 72,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "GitHub",
+            "logo": "https://cdn.activepieces.com/pieces/github.png"
           },
           {
             "name": "clickup",
             "actions": 59,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "ClickUp",
+            "logo": "https://cdn.activepieces.com/pieces/clickup.png"
           },
           {
             "name": "trello",
             "actions": 46,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Trello",
+            "logo": "https://cdn.activepieces.com/pieces/trello.png"
           },
           {
             "name": "discord",
             "actions": 45,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Discord",
+            "logo": "https://cdn.activepieces.com/pieces/discord.png"
           },
           {
             "name": "slack",
             "actions": 44,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Slack",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png"
           },
           {
             "name": "todoist",
             "actions": 42,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Todoist",
+            "logo": "https://cdn.activepieces.com/pieces/todoist.png"
           },
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Google Docs",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
           {
             "name": "google-drive",
             "actions": 36,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Google Drive",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png"
           },
           {
             "name": "resend",
             "actions": 36,
-            "stage": "held"
+            "stage": "held",
+            "displayName": "Resend",
+            "logo": "https://cdn.activepieces.com/pieces/resend.png"
           },
           {
             "name": "google-sheets",
             "actions": 34,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Google Sheets",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png"
           },
           {
             "name": "apify",
             "actions": 32,
-            "stage": "merged"
+            "stage": "merged",
+            "displayName": "Apify",
+            "logo": "https://cdn.activepieces.com/pieces/apify.png"
           },
           {
             "name": "notion",
             "actions": 22,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Notion",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png"
           },
           {
             "name": "telegram-bot",
             "actions": 21,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Telegram Bot",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
           },
           {
             "name": "sendinblue",
             "actions": 20,
-            "stage": "held"
+            "stage": "held",
+            "displayName": "Brevo",
+            "logo": "https://cdn.activepieces.com/pieces/brevo.png"
           },
           {
             "name": "gmail",
             "actions": 19,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Gmail",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
           {
             "name": "airtable",
             "actions": 18,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Airtable",
+            "logo": "https://cdn.activepieces.com/pieces/airtable.png"
           },
           {
             "name": "cody",
             "actions": 18,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Cody",
+            "logo": "https://cdn.activepieces.com/pieces/cody.png"
           },
           {
             "name": "serp-api",
             "actions": 17,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "SerpApi",
+            "logo": "https://cdn.activepieces.com/pieces/serp-api.png"
           },
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Google Calendar",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
           {
             "name": "firecrawl",
             "actions": 15,
-            "stage": "merged"
+            "stage": "merged",
+            "displayName": "Firecrawl",
+            "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
           },
           {
             "name": "pubrio",
             "actions": 14,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Pubrio",
+            "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
           {
             "name": "google-tasks",
             "actions": 9,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Google Tasks",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png"
           },
           {
             "name": "senja",
             "actions": 5,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Senja",
+            "logo": "https://cdn.activepieces.com/pieces/senja.png"
           },
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Quizell",
+            "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
           {
             "name": "google-forms",
             "actions": 3,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Google Forms",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png"
           },
           {
             "name": "reoon-verifier",
             "actions": 3,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "Reoon Email Verifier",
+            "logo": "https://cdn.activepieces.com/pieces/reoon-verifier.png"
           },
           {
             "name": "prompthub",
             "actions": 1,
-            "stage": "pr-open"
+            "stage": "pr-open",
+            "displayName": "PromptHub",
+            "logo": "https://cdn.activepieces.com/pieces/prompthub.png"
           }
         ]
       },
       "testing": {
         "status": "ok",
         "prsMerged": 1,
-        "commits": 2,
+        "commits": 6,
         "shipped": [
           {
             "number": 5,

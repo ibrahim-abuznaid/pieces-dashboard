@@ -2,7 +2,7 @@
 // Reads the existing AI-actions build output. A missing file or a missing
 // `stages` block is a no-data reason, never a zero — a silent 0 would read as
 // "no progress this week" when it means "we could not measure".
-import { readLogoIndex } from './output-schema.mjs';
+import { readCatalogIndex } from './output-schema.mjs';
 
 const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 
@@ -10,12 +10,23 @@ const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 // derives it once for both the tile counts and this roster — the two can never
 // disagree. Losing this file costs the list, not the numbers.
 //
-// These rows identify a piece by SLUG and carry no URL, so `logos` — the
-// catalog's folder → logo index — supplies it. All 28 tracked slugs currently
-// match a catalog folder; one that stops matching records `logo: null` rather
-// than a URL built from the slug, which would 404 in the reader's browser and
-// nowhere a maintainer would see it.
-function readRoster(readJson, logos) {
+// These rows identify a piece by SLUG and carry neither its logo nor the name it
+// is published under, so `catalog` — the folder → { displayName, logo } index —
+// supplies both. The slug is the folder, so the lookup is a hit for all 28 tracked
+// pieces today; one that stops matching keeps its slug and records no logo, rather
+// than a URL built from the slug (a silent 404 in the reader's browser, visible
+// nowhere a maintainer looks) or a name title-cased out of it (`Sendinblue` for a
+// piece the catalog calls `Brevo`).
+//
+// `name` STAYS the slug. It is this row's identity: the week-over-week diff in
+// lib/view.mjs matches on it, and the snapshots already committed carry no other
+// key — so a display name replacing it would match nothing against them and
+// re-report the whole finished backlog as this week's work.
+//
+// Spread rather than assigned, like `folder` in the outputSchema collector: an
+// unresolved name carries no key at all instead of a `displayName: undefined` that
+// JSON turns into a dead field.
+function readRoster(readJson, catalog) {
   try {
     const { pieces } = readJson('dist/ai-actions/pieces.json');
     if (!Array.isArray(pieces)) throw new Error('pieces.json has no `pieces` array');
@@ -23,7 +34,14 @@ function readRoster(readJson, logos) {
       .map((p) => {
         if (typeof p.slug !== 'string' || !p.slug) throw new Error('a piece has no slug');
         if (typeof p.atomics !== 'number') throw new Error(`${p.slug}: atomics is not a number`);
-        return { name: p.slug, actions: p.atomics, stage: p.stage, logo: logos.get(p.slug) ?? null };
+        const known = catalog.get(p.slug);
+        return {
+          name: p.slug,
+          actions: p.atomics,
+          stage: p.stage,
+          ...(known?.displayName ? { displayName: known.displayName } : {}),
+          logo: known?.logo ?? null,
+        };
       })
       .sort((a, b) => b.actions - a.actions || a.name.localeCompare(b.name));
   } catch {
@@ -72,7 +90,7 @@ export function collectAiActions({ readJson }) {
       // the archive as a dead key and read as "recorded, but unknown".
       ...(catalogPieces === undefined ? {} : { catalogPieces }),
       blockersOpen: num(s.blockersOpen, 'blockersOpen'),
-      roster: readRoster(readJson, readLogoIndex(readJson)),
+      roster: readRoster(readJson, readCatalogIndex(readJson)),
     };
   } catch (err) {
     return { status: 'no-data', reason: `AI-actions summary unavailable (${err.message}) — ${BUILD_HINT}` };

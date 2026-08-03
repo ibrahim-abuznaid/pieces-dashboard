@@ -6,7 +6,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createContext, runInContext } from 'node:vm';
 import { buildAll } from '../weekly/build.mjs';
-import { STRIP_CAP } from '../weekly/lib/view.mjs';
+import { prTitle, STRIP_CAP } from '../weekly/lib/view.mjs';
+// The degraded-box tests below assert against the reasons the collectors really
+// produce rather than a retyped copy of them.
+import { collectOutputSchema } from '../weekly/collect/output-schema.mjs';
+import { collectAiActions } from '../weekly/collect/ai-actions.mjs';
+import { collectTesting } from '../weekly/collect/testing.mjs';
+import { collectTickets } from '../weekly/collect/tickets.mjs';
 
 const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
@@ -102,9 +108,12 @@ test('a populated archive embeds the newest week as the default', () => {
   assert.deepEqual(Object.keys(payload.views).sort(), ['2026-W30', '2026-W31']);
 });
 
-test('a no-data tile renders its reason text', () => {
+// The box explains its own em dash. In the page's words, not the collector's —
+// see 'no collector diagnostic reaches the page' below.
+test('a no-data tile says why it has no number', () => {
   const { html } = render([snap('2026-W31', { tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]);
-  assert.match(html, /Linear refresh pending/);
+  assert.match(html, /No data/);
+  assert.match(html, /not measured this week/);
 });
 
 test('decisions render when present', () => {
@@ -169,7 +178,7 @@ test('no lede restates the numbers as prose above the boxes', () => {
 test('a degraded workstream is reported once, in its own box', () => {
   const dom = renderDom([snap('2026-W31', { tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]);
   assert.doesNotMatch(dom, /Ticket data unavailable/);
-  assert.equal([...dom.matchAll(/Linear refresh pending/g)].length, 1);
+  assert.equal([...dom.matchAll(/not measured this week/g)].length, 1);
 });
 
 test('the header keeps the week, the date range and real nav controls', () => {
@@ -321,6 +330,68 @@ test('the build-progress caveat is not on the page', () => {
   assert.doesNotMatch(dom, /Build progress/i);
 });
 
+// ── a dark box, in words this reader can use ───────────────────────────────
+// A collector's `reason` is written for whoever has to FIX the pipeline: it names
+// the internal marker the tickets refresh writes, the JSON field that went
+// missing, and the commands to re-run. Printing it verbatim put
+// `NEEDS-LINEAR-REFRESH` on the one box that is dark in the week the site ships
+// today — an internal field name and a process explanation, which is exactly what
+// this slice took off every other part of the page.
+//
+// The reasons are not retyped here: they come from the collectors themselves, so
+// one added or reworded later is covered without this file learning it. The
+// verbatim strings stay on the record in the committed archive.
+
+// esc() in the template, so a reason containing HTML specials cannot pass the
+// "not on the page" check just by arriving escaped.
+const escaped = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+const collectorReasons = () => {
+  const boom = () => { throw new Error("ENOENT: no such file, open 'dist/output-schema/summary.json'"); };
+  const window = { start: '2026-07-25', end: '2026-07-31' };
+  const stale = (name) => ({
+    'linear.json': { stamp: '2026-07-20', events: [], recent: [] },
+    'github.json': { stamp: '2026-07-20', mergedEvents: [], reviews: { weekly: [] } },
+  }[name]);
+  const tickets = (over) => collectTickets({ window, weekId: '2026-W31', linearRefreshPending: false, ...over });
+  return [
+    collectOutputSchema({ readJson: boom }),
+    collectAiActions({ readJson: boom }),
+    collectTesting({ window, gh: boom }),
+    tickets({ linearRefreshPending: true }),
+    tickets({ readJson: stale }),
+    tickets({ readJson: boom }),
+  ].map((ws) => ws.reason);
+};
+
+test('no collector diagnostic reaches the page, whatever it says', () => {
+  const reasons = collectorReasons();
+  assert.equal(reasons.filter(Boolean).length, reasons.length, 'a reasonless degrade would make this vacuous');
+  for (const reason of reasons) {
+    const dom = renderDom([snap('2026-W31', { tickets: { status: 'no-data', reason } })]);
+    for (const form of [reason, escaped(reason)]) {
+      assert.ok(!dom.includes(form), `the page prints the collector's own words: "${reason}"`);
+    }
+  }
+});
+
+test('a box with no number says so, however it came to be missing', () => {
+  for (const reason of collectorReasons()) {
+    const tile = tileOf(renderDom([snap('2026-W31', { tickets: { status: 'no-data', reason } })]), 'Tickets solved');
+    assert.match(tile, /<b>No data<\/b> — not measured this week/);
+    assert.match(tile, /class="big">—</, 'a missing number must still read as unknown, not as 0');
+  }
+});
+
+// The reason recorded in the week the site is serving right now, verbatim.
+test('the internal refresh marker in the shipping week is not on the page', () => {
+  const dom = renderDom([snap('2026-W31', { tickets: { status: 'no-data',
+    reason: 'Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH' } })]);
+  assert.doesNotMatch(dom, /NEEDS-LINEAR-REFRESH/);
+  assert.doesNotMatch(dom, /internal dashboard/);
+  assert.match(dom, /No data<\/b> — not measured this week/);
+});
+
 // ── no roster sections ─────────────────────────────────────────────────────
 // 51 stage-grouped rows at the foot of the page, holding the numbers the tiles
 // already showed. Their content is the strip inside each box now.
@@ -444,7 +515,8 @@ test('the harness can isolate a single tile', () => {
 test('the done pieces render inside the outputSchema box, not in a list elsewhere', () => {
   const tile = tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema');
   assert.match(tile, /<ul class="strip">/);
-  for (const name of ['ClickUp', 'Slack', 'Notion']) assert.match(tile, new RegExp(`>${name}</li>`));
+  for (const name of ['ClickUp', 'Slack', 'Notion'])
+    assert.match(tile, new RegExp(`<span class="nm">${name}</span></li>`));
   assert.doesNotMatch(tile, />Jira</, 'Jira is in review, not done');
 });
 
@@ -506,8 +578,8 @@ test('with a consecutive prior week the strip is labelled the week and lists onl
     'outputSchema');
   assert.match(tile, /Done this week/);
   assert.doesNotMatch(tile, /Done in total/);
-  assert.match(tile, />Notion<\/li>/);
-  assert.match(tile, />Slack<\/li>/);
+  assert.match(tile, /<span class="nm">Notion<\/span><\/li>/);
+  assert.match(tile, /<span class="nm">Slack<\/span><\/li>/);
   assert.doesNotMatch(tile, />ClickUp</, 'ClickUp was already done last week');
 });
 
@@ -516,7 +588,7 @@ test('a gap in the archive renders the total, not a two-week claim', () => {
     'outputSchema');
   assert.match(tile, /Done in total/);
   assert.doesNotMatch(tile, /Done this week/);
-  assert.match(tile, />ClickUp<\/li>/);
+  assert.match(tile, /<span class="nm">ClickUp<\/span><\/li>/);
 });
 
 test('a week that moved nothing says so instead of re-listing finished work', () => {
@@ -535,18 +607,20 @@ test('an overflowing strip is capped and says how many it did not show', () => {
   const tile = tileOf(renderDom([osLogoWeek('2026-W31', many)]), 'outputSchema');
   assert.match(tile, new RegExp(`\\+${over} more`));
   assert.equal([...tile.matchAll(/<li class="chip"/g)].length, STRIP_CAP);
-  assert.match(tile, />Piece 0<\/li>/);
+  assert.match(tile, /<span class="nm">Piece 0<\/span><\/li>/);
   assert.doesNotMatch(tile, new RegExp(`>Piece ${STRIP_CAP + over - 1}<`));
 });
 
 test('a strip that fits shows no "+N more"', () =>
   assert.doesNotMatch(tileOf(renderDom([osLogoWeek('2026-W31', OS_LOGOS)]), 'outputSchema'), /more/));
 
+// The title arrives as a commit subject, so what the box shows is the sentence
+// without its machine-readable prefix — see the display tests further down.
 test("the testing box carries the titles of the PRs it shipped", () => {
   const tile = tileOf(renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4,
     shipped: [{ number: 5, title: 'feat(health): piece health board', url: 'https://x/pull/5' }] } })]),
     'Piece testing');
-  assert.match(tile, /feat\(health\): piece health board/);
+  assert.match(tile, /Piece health board/);
   assert.match(tile, /Shipped/);
   assert.doesNotMatch(tile, /class="ic"/, 'a PR title has no logo');
 });
@@ -578,10 +652,10 @@ test('an unusable per-person count renders no line at all', () => {
   assert.match(tile, /class="big">1</);           // the number itself still stands
 });
 
-test('a no-data box shows its reason and no strip', () => {
+test('a no-data box shows why it has no number and no strip', () => {
   const tile = tileOf(renderDom([snap('2026-W31', {
     outputSchema: { status: 'no-data', reason: 'build output missing', roster: OS_LOGOS } })]), 'outputSchema');
-  assert.match(tile, /No data<\/b> — build output missing/);
+  assert.match(tile, /No data<\/b> — not measured this week/);
   assert.doesNotMatch(tile, /class="strip"/);
   assert.doesNotMatch(tile, /Done in total/);
 });
@@ -651,6 +725,123 @@ test('the delta pill and the strip in the same box agree when two pieces share a
   assert.match(tile, /Done this week/);
   assert.equal([...tile.matchAll(/<li class="chip"/g)].length, 1);
   assert.doesNotMatch(tile, /Nothing new this week/);
+});
+
+// ── one page, one naming convention ────────────────────────────────────────
+// The AI-actions roster identifies a piece by SLUG, so its box rendered `apify`,
+// `firecrawl` and `google-docs` next to a box rendering `ClickUp` and `Google
+// Sheets`. A lowercase-hyphen slug is an internal identifier: it is how the
+// monorepo names a directory, not how anyone names a product, and this page is
+// read by someone who has never seen the directory.
+//
+// The catalog publishes the piece's real name and is already the file the logos
+// come from, so the chip shows that. The roster row's `name` is untouched — see
+// the diff tests in weekly-view.test.mjs for what changing it would cost.
+
+const aiWeek = (week, roster) => snap(week, {
+  aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2,
+               totalPieces: 28, blockersOpen: 30, roster },
+});
+
+// The three slugs the AI-actions box really showed, with the names the real
+// catalog publishes for them. `serp-api` → `SerpApi` is the one no amount of
+// title-casing produces.
+const AI_NAMED = [
+  { name: 'apify', actions: 12, stage: 'merged', displayName: 'Apify', logo: LOGO('apify') },
+  { name: 'firecrawl', actions: 9, stage: 'merged', displayName: 'Firecrawl', logo: LOGO('firecrawl') },
+  { name: 'serp-api', actions: 4, stage: 'merged', displayName: 'SerpApi', logo: null },
+];
+
+const chipNames = (html) => [...html.matchAll(/<span class="nm">([^<]*)<\/span>/g)].map((m) => m[1]);
+
+test('the AI-actions box names a piece the way the catalog does', () => {
+  const tile = tileOf(renderDom([aiWeek('2026-W31', AI_NAMED)]), 'AI-actions');
+  assert.deepEqual(chipNames(tile), ['Apify', 'Firecrawl', 'SerpApi']);
+});
+
+// Across BOTH boxes, because the complaint was that the page read as two pages.
+test('no box on the page names a piece by its internal identifier', () => {
+  const dom = renderDom([snap('2026-W31', {
+    outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756,
+                    roster: OS_LOGOS },
+    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28,
+                 blockersOpen: 30, roster: AI_NAMED },
+  })]);
+  const names = chipNames(tilesOnly(dom));
+  assert.ok(names.length >= 6, `expected chips in both boxes, found ${names.length}`);
+  for (const name of names) {
+    assert.doesNotMatch(name, /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      `"${name}" is a piece slug, not a piece name`);
+  }
+});
+
+// Every week already in the archive carries slugs and no display name, and a slug
+// the catalog cannot name has nothing to fall back to but itself.
+test('a slug with no catalog name is shown as the slug, never a prettified guess', () => {
+  const tile = tileOf(renderDom([aiWeek('2026-W31',
+    [{ name: 'reoon-verifier', actions: 4, stage: 'merged', logo: null }])]), 'AI-actions');
+  assert.deepEqual(chipNames(tile), ['reoon-verifier']);
+});
+
+// The fallback letter is the one the reader sees, not the one the archive keys on.
+test('the fallback initial follows the name on screen', () => {
+  const tile = tileOf(renderDom([aiWeek('2026-W31',
+    [{ name: 'sendinblue', actions: 6, stage: 'merged', displayName: 'Brevo', logo: null }])]), 'AI-actions');
+  assert.match(tile, /<b class="init">B<\/b>/);
+  assert.doesNotMatch(tile, /<b class="init">S<\/b>/);
+});
+
+test('a display name is HTML-escaped like any other value', () => {
+  const dom = renderDom([aiWeek('2026-W31',
+    [{ name: 'apify', actions: 1, stage: 'merged', displayName: '<img onerror=alert(1)>', logo: null }])]);
+  assert.match(dom, /&lt;img onerror=alert\(1\)&gt;/);
+  assert.doesNotMatch(dom, /<img onerror=alert\(1\)>/);
+});
+
+// ── and the testing box named PRs by their commit subject ──────────────────
+// The same complaint, one box over: `feat(health): piece health board, needs-
+// attention inbox, persisted ru…`. The prefix is a classifier for the repo's own
+// tooling, and a chip is clamped to half a strip row — so those nine characters
+// are paid for at the far end of the string, in the words that get ellipsized.
+//
+// The transform lives in the view (unit-tested in weekly-view.test.mjs); these
+// pin that it is wired to the page, and that nothing else on the page changed.
+
+const testingWeek = (week, shipped) => snap(week, {
+  testing: { status: 'ok', prsMerged: shipped.length, commits: 4, shipped },
+});
+
+test('the testing box shows the sentence, not the commit classifier', () => {
+  const tile = tileOf(renderDom([testingWeek('2026-W31', [
+    { number: 5, title: 'feat(health): piece health board', url: 'https://x/pull/5' },
+    { number: 6, title: 'chore(deps): bump the test runner', url: 'https://x/pull/6' },
+  ])]), 'Piece testing');
+  assert.deepEqual(chipNames(tile), ['Piece health board', 'Bump the test runner']);
+  assert.doesNotMatch(tile, /feat\(|chore\(/);
+});
+
+test('a shipped title that is only a prefix is never rendered as an empty chip', () => {
+  const tile = tileOf(renderDom([testingWeek('2026-W31',
+    [{ number: 7, title: 'feat:', url: 'https://x/pull/7' }])]), 'Piece testing');
+  assert.deepEqual(chipNames(tile), ['feat:']);
+});
+
+// Real data, not a fixture: the week the site is serving right now, out of the
+// committed archive. The snapshot keeps the subject verbatim — that is the record
+// of what shipped — so this is also the check that the two never got confused.
+test('the week in the committed archive reaches the page without its prefix', () => {
+  const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
+  const week = archive.weeks.at(-1);
+  const prefixed = (week.testing.shipped ?? []).filter((pr) => prTitle(pr.title) !== pr.title);
+  assert.ok(prefixed.length, 'the committed archive no longer exercises the prefix path');
+  const tile = tileOf(renderDom([week]), 'Piece testing');
+  for (const pr of prefixed) {
+    const prefix = pr.title.slice(0, pr.title.indexOf(':') + 1);          // 'feat(health):'
+    assert.ok(!tile.includes(prefix), `the page still shows "${prefix}"`);
+    assert.ok(tile.includes(`<span class="nm">${escaped(prTitle(pr.title))}</span>`),
+      `the chip is not the display form of "${pr.title}"`);
+    assert.equal(pr.title.slice(0, prefix.length), prefix, 'the archive was rewritten, not just re-rendered');
+  }
 });
 
 // ── the initial must not show through the logo ──────────────────────────────
@@ -724,9 +915,15 @@ test('the logo fill is an opaque token in every theme', () => {
 // chart was also the one thing on the page that drew a hole in the archive as if
 // it were not there — see the gap test below.
 //
+// Removing it took the same week to 796px, which still scrolled: the strip was
+// the other unbounded block, because a chip could wrap inside itself. Chips are
+// one line and half a row wide now, and the cap is 5 — see the chip tests below.
+// The same week measures 662px, the committed archive 575px.
+//
 // No test here can measure pixels without a browser, so what these pin is the
-// structure the measurement established: the blocks that are gone stay gone, the
-// strip stays capped, and the whitespace budget stays where it was tuned.
+// structure the measurement established: the blocks that are gone stay gone, no
+// block's height depends on how long a name is, the strip stays capped, and the
+// whitespace budget stays where it was tuned.
 
 const SIX_WEEKS = ['2026-W26', '2026-W27', '2026-W28', '2026-W29', '2026-W30', '2026-W31']
   .map((w, i) => snap(w, { tickets: { status: 'ok', total: 4 + i * 2, byPerson: { kishan: 2 + i, sanket: 2 + i } } }));
@@ -762,6 +959,107 @@ test('a hole in the archive is never presented as recent movement', () => {
   assert.match(dom, /no prior week to compare against yet/);
 });
 
+// ── a chip is one line, and never a whole row ──────────────────────────────
+// The strip was the last block on the page whose height was unbounded: a chip
+// carried whatever text a collector recorded and was allowed to wrap INSIDE
+// itself, so a box grew with the LENGTH of a name rather than with the cap.
+// Measured in headless Chrome at 1366x768 (681px of viewport), a week that
+// shipped eight PRs with ordinary 70-character titles drew chips 408px wide
+// inside a 418px box — one chip per row, seven rows, a 336px box — and the page
+// came to 796px. The cap was doing nothing for height there.
+//
+// Two structural bounds replace that, one pinned by each test below: a chip
+// renders on ONE line, and no chip may take more than half a row. Six chips
+// (the cap plus "+N more") are then three rows at worst, every box measures
+// 202px, and the same week comes to 662px — 19px inside the viewport, which is
+// what leaves room for a second "Needs you" line.
+//
+// The clipping is an ellipsis, not a truncation: the full name stays in the DOM,
+// so a screen reader, a text selection and summary.json all still get it.
+
+test('a strip chip renders on one line and cannot fill a whole row', () => {
+  const chip = declarationsFor(pageCss(render([snap('2026-W31')]).html), 'ul.strip .chip');
+  assert.equal(chip['white-space'], 'nowrap',
+    'a chip that wraps inside itself makes the page height depend on how long a name is');
+  assert.match(chip['max-width'] ?? '', /^calc\(50% - [\d.]+px\)$/,
+    `a chip must be clamped to half a strip row, got max-width: ${chip['max-width']}`);
+});
+
+test('a clamped chip ellipsizes its name rather than clipping it mid-glyph', () => {
+  const nm = declarationsFor(pageCss(render([snap('2026-W31')]).html), 'ul.strip .chip .nm');
+  assert.equal(nm.overflow, 'hidden');
+  assert.equal(nm['text-overflow'], 'ellipsis');
+  assert.equal(nm['min-width'], '0', 'without this the name will not shrink inside the flex chip');
+});
+
+// The ellipsis needs something of its own to apply to — a bare text node in a
+// flex chip cannot be ellipsized — so the name is its own element. Which means
+// the page must still carry the whole string: clipped on screen, intact in the
+// markup. Nothing here is truncated at any length, which is what keeps text
+// selection and a screen reader whole.
+test('a chip keeps the full name in the markup, however long it is', () => {
+  const title = 'feat(health): piece health board, needs-attention inbox, persisted runs';
+  const tile = tileOf(renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4,
+    shipped: [{ number: 5, title, url: 'https://x/pull/5' }] } })]), 'Piece testing');
+  // The prefix is dropped for display; every one of the remaining 57 characters
+  // stays, and the CSS above is what clips them.
+  assert.deepEqual(chipNames(tile), ['Piece health board, needs-attention inbox, persisted runs']);
+});
+
+// ── the clamp needs a track that can shrink ────────────────────────────────
+// `nowrap` buys a bounded HEIGHT at the cost of an unbounded intrinsic WIDTH: a
+// chip's min-content size is now its entire name, so a tile's min-content size is
+// the longest name inside it. `grid-template-columns: 1fr` is `minmax(auto, 1fr)`
+// and that `auto` floor IS min-content — so the track grows to fit the name
+// instead of the name ellipsizing to fit the track, and the tile stops being
+// bounded by its container at all.
+//
+// Measured in headless Chrome at 375x667 with every strip at the cap: the
+// one-column track computed to 566px inside a 335px container, and the document
+// came out 586px wide in a 375px viewport — all four boxes hanging off the right
+// edge of the phone, which is the one thing the mobile rule exists to prevent.
+// The two-column rule never had the bug because it spells the floor out as
+// `minmax(0, 1fr)`; the one-column override dropped it. Both are pinned here.
+//
+// A width invariant, so it is asserted on the stylesheet: no DOM assertion can
+// see a grid track outgrow its container.
+//
+// The page's OWN layer, not pageCss: shared/theme.css is inlined above it and
+// carries a `.tiles` rule of its own for the sibling pages' grid, which this page
+// overrides and which is not what these tracks are.
+const ownCss = (html) =>
+  [...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].at(-1)[1].replace(CSS_COMMENT, '');
+
+const tileTracks = (css) => [...css.matchAll(/\.tiles\s*\{([^{}]*)\}/g)]
+  .map((m) => /grid-template-columns\s*:\s*([^;]+)/.exec(m[1])?.[1].trim())
+  .filter(Boolean);
+
+test('every tile track zeroes its automatic minimum, so a long name cannot widen the page', () => {
+  const css = ownCss(render([snap('2026-W31')]).html);
+  assert.match(css, /@media[^{]*max-width:\s*640px[^{]*\{\s*\.tiles\s*\{/,
+    'the one-column override is not a .tiles rule any more, so this test measures nothing');
+  const tracks = tileTracks(css);
+  assert.equal(tracks.length, 2,
+    `expected a two-column track and a one-column override, found ${tracks.length}: ${tracks}`);
+  for (const track of tracks) {
+    assert.match(track, /minmax\(\s*0\s*,/,
+      `tile track "${track}" leaves its automatic minimum at auto, which is min-content — and a `
+      + "nowrap chip's min-content is its whole name, so the track grows to fit the longest name");
+  }
+});
+
+// Height is rows, and the clamp above guarantees at least two chips per row, so
+// the cap is what actually keeps a box at the 202px it was measured at: the cap
+// plus the "+N more" chip must not need a fourth row.
+const CHIPS_PER_ROW = 2;      // guaranteed by the half-row clamp, whatever the names are
+const ROW_BUDGET = 3;         // Chrome-measured: 3 rows of chips = a 202px box = a 662px page
+
+test('the strip cap keeps every box inside its three-row height budget', () => {
+  const rows = Math.ceil((STRIP_CAP + 1) / CHIPS_PER_ROW);   // +1: "+N more" takes a chip slot too
+  assert.ok(rows <= ROW_BUDGET,
+    `${STRIP_CAP} chips plus "+N more" is ${rows} rows of chips; the one-screen budget is ${ROW_BUDGET}`);
+});
+
 // Shorthand box sides, top and bottom only: `16px 20px 24px` → top 16, bottom 24.
 const sidesY = (shorthand) => {
   const parts = String(shorthand).trim().split(/\s+/).map((v) => Number(/^(-?[\d.]+)(px)?$/.exec(v)?.[1]));
@@ -772,9 +1070,14 @@ const sidesY = (shorthand) => {
 // Everything on the page that is whitespace rather than content: the wrap's own
 // padding, the gaps around and inside the tile grid, and the footer's lead-in.
 // Chrome-measured, 1366x768 (681px of viewport): the header, caption, four boxes
-// at their tallest and a one-line "Needs you" band come to ~570px, so the page
+// at their tallest and a one-line "Needs you" band come to ~552px, so the page
 // only fits while its furniture stays inside what is left. 64px of dead space
 // under the footer was a third of that budget on its own.
+//
+// 98px is what the tallest week measured at: it leaves 31px spare, which is one
+// more "Needs you" line (26px). Loosen this and the page stops fitting for a
+// week with two asks — the one part of the page that asks for an action is the
+// last thing that should fall below the fold.
 test('the page keeps the whitespace budget that makes it fit a laptop screen', () => {
   const css = pageCss(render([snap('2026-W31')]).html);
   const wrap = sidesY(declarationsFor(css, '.wrap').padding);
@@ -785,5 +1088,5 @@ test('the page keeps the whitespace budget that makes it fit a laptop screen', (
   const budget = [wrap.top, wrap.bottom, grid.top, grid.bottom, gap, footer];
   for (const v of budget) assert.ok(Number.isFinite(v), `unreadable vertical metric in the page CSS: ${budget}`);
   const total = budget.reduce((a, b) => a + b, 0);
-  assert.ok(total <= 110, `page furniture is ${total}px of whitespace; the one-screen budget is 110px`);
+  assert.ok(total <= 98, `page furniture is ${total}px of whitespace; the one-screen budget is 98px`);
 });

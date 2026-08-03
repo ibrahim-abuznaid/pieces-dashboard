@@ -11,7 +11,8 @@
 //   1. `tiles` is ALWAYS length 4 in a fixed order, even when workstreams are
 //      degraded — the layout must not reflow because a collector failed.
 //   2. A degraded workstream renders as "unknown", never as 0. `value` and
-//      `delta` both go empty and the collector's reason is carried through.
+//      `delta` both go empty and the box says it was not measured — see
+//      NOT_MEASURED below for why it does not repeat the collector's own words.
 //
 // A tile's `strip` is the opposite kind of field: OPTIONAL detail that exists
 // only when a snapshot recorded a roster, so older snapshots stay renderable.
@@ -79,17 +80,55 @@ function perPersonLine(ws) {
 // counted rather than listed. Capped here rather than in the template because
 // the count is part of the view model a test can read.
 //
-// Six, measured rather than chosen: chips wrap, so a strip is the least
-// predictable part of the page's height — piece names run from 'Slack' to
-// 'Google Business Profile'. At eight the tallest legitimate week measured 4px
-// past a 1366x768 laptop viewport in headless Chrome; six leaves the page room
-// to breathe even when every name is a long one. See the one-screen test in
-// test/weekly-render.test.mjs.
-export const STRIP_CAP = 6;
+// Five, measured rather than chosen. A strip's height is ROWS of chips, and the
+// page's CSS guarantees two chips per row whatever the names are (a chip is one
+// line and at most half a row wide — see template.html), so the cap is what
+// decides how many rows a box can grow to: five plus the "+N more" chip is six
+// chips, three rows, a 202px box.
+//
+// Measured in headless Chrome at 1366x768, which is 681px of viewport. The
+// tallest legitimate week — two weeks recorded, every strip at the cap plus
+// "+N more", all four workstreams ok, one "Needs you" line — comes to 662px at
+// five and 691px at six. See the one-screen tests in test/weekly-render.test.mjs.
+export const STRIP_CAP = 5;
 
 const capped = (kind, label, items) => ({
   kind, label, items: items.slice(0, STRIP_CAP), more: Math.max(0, items.length - STRIP_CAP),
 });
+
+// ── a PR title, for a reader outside the repo ───────────────────────────────
+// A shipped PR's title is a commit subject: `feat(health): piece health board,
+// needs-attention inbox, persisted ru…`. Everything up to the colon is a
+// machine-readable classifier — a conventional-commit type and scope, written for
+// the repo's own tooling — and it is charged to the front of a chip clamped to half
+// a strip row, so what it actually costs is the words at the END of the sentence,
+// ellipsized away. This reader can use `piece health board`; they cannot use
+// `feat(health)`.
+//
+// DISPLAY ONLY. The collector records the subject verbatim and the committed
+// archive keeps it that way, because that is the record of what shipped; this is
+// the last transform before the chip. Here rather than in the template so it is
+// unit-testable — see test/weekly-view.test.mjs.
+//
+// Matched against the conventional-commit VOCABULARY rather than `\w+:`, and only
+// in lower case, which is the form the specification defines and the form the repo
+// commits in. A colon is ordinary punctuation: a generic pattern amputates whatever
+// stands in front of one — `Update: the tester UI` losing its verb, a bare URL
+// losing its scheme — and a page that drops a word to save nine characters is
+// misleading its reader, which costs more than the nine characters buy. An
+// unrecognised prefix therefore stays, exactly as a title with no prefix does.
+const CC_TYPES = ['build', 'chore', 'ci', 'docs', 'feat', 'fix', 'perf', 'refactor', 'revert', 'style', 'test'];
+// `type(scope)!:` — the scope and the breaking-change marker are both optional, and
+// both belong to the classifier rather than to the sentence.
+const CC_PREFIX = new RegExp(`^(?:${CC_TYPES.join('|')})(?:\\([^)]*\\))?!?:\\s*`);
+
+export function prTitle(title) {
+  const sentence = title.replace(CC_PREFIX, '');
+  // Nothing but a prefix is all the title there is: stripping it would render a
+  // chip with no name at all, which reads as a broken page rather than as a PR.
+  if (sentence === title || !sentence) return title;
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+}
 
 // Piece testing ships PRs, not pieces: its strip is their titles, and there is
 // no logo to show for a pull request. The collector already windowed them to
@@ -101,7 +140,7 @@ const capped = (kind, label, items) => ({
 function prStrip(shipped) {
   const items = (Array.isArray(shipped) ? shipped : [])
     .filter((pr) => typeof pr?.title === 'string' && pr.title)
-    .map(({ title }) => ({ name: title }));
+    .map(({ title }) => ({ name: prTitle(title) }));
   return items.length ? capped('prs', 'Shipped', items) : null;
 }
 
@@ -162,12 +201,27 @@ const isAsk = (line) =>
 // only question asked of a roster now is which pieces are DONE, and of those,
 // which crossed the line this week.
 
-// A strip chip: the two things a reader recognises a piece by. `logo` is
-// normalised to null unless it is a usable URL — an empty string in an
-// `<img src>` re-requests the page and renders as a broken image, and a
-// snapshot written before logos existed carries no `logo` at all.
-const toChip = ({ name, logo }) =>
-  ({ name, logo: typeof logo === 'string' && logo ? logo : null });
+// A strip chip: the two things a reader recognises a piece by, and nothing else.
+//
+// The NAME is the piece's published name when the snapshot resolved one, and the
+// row's own `name` otherwise. The AI-actions roster identifies a piece by slug, so
+// without this the box read `apify`, `firecrawl`, `google-docs` beside a box
+// reading `ClickUp`, `Google Sheets` — one page, two naming conventions, one of
+// them the name of a directory in a monorepo this reader has never opened.
+//
+// It is resolved HERE and not by renaming the row, because `name` is the identity
+// the done-this-week diff matches on and the only key the snapshots in the archive
+// carry — see `alreadyDone` below. The diff never sees this function.
+//
+// Both fields are normalised rather than trusted: an empty string in an `<img src>`
+// re-requests the page and renders as a broken image, an empty display name renders
+// as a chip with no name at all, and a snapshot written before either field existed
+// carries neither. In every one of those cases the honest answer is what the row
+// already says.
+const usable = (v) => (typeof v === 'string' && v ? v : null);
+
+const toChip = ({ name, displayName, logo }) =>
+  ({ name: usable(displayName) ?? name, logo: usable(logo) });
 
 // The roster of the immediately-preceding archive entry, or null when there is
 // nothing legitimate to diff against. Mirrors the gap guard in `deltaFor`: the
@@ -188,8 +242,10 @@ function priorRoster(weeks, selected, key) {
 // directory: the catalog's own key, unique across every row, and the one thing
 // about a piece that does not change.
 //
-// A DISPLAY NAME is not an identity. It is editorial — the cloud catalog renames
-// pieces, 'Telegram Bot' and 'Google Gemini' among them — and it is not unique:
+// A DISPLAY NAME is not an identity, which is exactly why a row may carry one for
+// the chip to render (see `toChip`) and the diff still reads this. It is editorial —
+// the cloud catalog renames pieces, 'Telegram Bot' and 'Google Gemini' among
+// them — and it is not unique:
 // two folders publish 'Cashfree Payments' and two publish 'Weekdone' today. Both
 // failures land in the diff below, and since the strip is the tile's headline
 // claim they land above the fold: a rename re-reports finished work as this
@@ -243,6 +299,28 @@ function pieceStrip(ws, spec, weeks, selected) {
     : { kind: 'pieces', label: 'Nothing new this week', items: [], more: 0 };
 }
 
+// ── a box with no number ────────────────────────────────────────────────────
+// A degraded box has to explain its em dash or it reads as a broken page. What it
+// must not do is repeat the collector's `reason`: those are written for whoever
+// has to fix the pipeline, and they carry the internal marker the tickets refresh
+// writes (NEEDS-LINEAR-REFRESH), the JSON field that went missing
+// (`summary.json has no status block`) and the commands to re-run (`npm run fetch
+// && npm run build`). An internal field name and a process explanation — the two
+// things this page was stripped of everywhere else, sitting on the one box that is
+// dark in the week the site is serving right now.
+//
+// So the box says the only part this reader can use: the number is MISSING, not
+// zero. The collector's sentence is not lost — every snapshot stores it verbatim
+// in weekly/data/weeks.json, which is committed, where whoever can act on it is
+// already looking. The same trade as the piece-tester-web caveat, which moved to
+// README.md rather than being deleted.
+//
+// Phrased on RENDER rather than at snapshot time, so the weeks already in the
+// archive read clean too — as with the NOT_AN_ASK filter above. Which is also why
+// there is no per-workstream wording: the tile's own heading already names what is
+// missing, and a second copy of that name is the filler this page has none of.
+const NOT_MEASURED = 'not measured this week';
+
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
 // unused: the newest entry in the archive already is the newest complete week,
 // and reading a clock here would break purity.
@@ -259,10 +337,12 @@ export function buildView(archive, { weekId } = {}) {
   const tiles = TILES.map((spec) => {
     const ws = selected[spec.key];
     if (ws?.status !== 'ok') {
-      // No strip on a degraded tile: the reason is the only honest content it
-      // has, and a stale list beside it would read as this week's work.
-      return { key: spec.key, title: spec.title, status: 'no-data',
-               reason: ws?.reason ?? 'workstream missing from this snapshot',
+      // No strip on a degraded tile: that the number is missing is the only honest
+      // content it has, and a stale list beside it would read as this week's work.
+      // A workstream absent from the snapshot altogether lands here too — there is
+      // nothing to distinguish for this reader between "not collected" and
+      // "collected and failed".
+      return { key: spec.key, title: spec.title, status: 'no-data', reason: NOT_MEASURED,
                value: null, delta: null, unit: '', strip: null, perPerson: '' };
     }
     return {

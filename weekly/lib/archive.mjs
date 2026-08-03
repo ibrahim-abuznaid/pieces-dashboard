@@ -15,36 +15,27 @@ const REQUIRED = {
   tickets: ['total'],
 };
 
-// `logo` is a roster row's real logo URL, resolved by the collectors from the
-// published catalog. OPTIONAL for the same reason as `roster` itself: rows
-// written before the field existed must keep validating.
+// The three optional string fields a roster row may carry. All three are optional
+// for the same reason as `roster` itself — rows written before each field existed
+// must keep validating — and each is rejected rather than coerced when present,
+// because each one reaches the page: as an `<img src>`, as the chip's name, or as
+// the key that decides which pieces get claimed for this week.
 //
-// `null` is a VALID recorded value, not a missing one — it is what the collectors
-// record when the catalog has no URL for a piece, in preference to guessing one.
-// Any other present value goes straight into an `<img src>`, so a number, an
-// object or an empty string has to fail here rather than reach the page as a
-// broken image.
-function validateLogo(at, row) {
-  if (row.logo === undefined || row.logo === null) return;
-  if (typeof row.logo !== 'string' || !row.logo) {
-    throw new Error(`${at}.logo must be a non-empty string or null when present, got ${
-      typeof row.logo === 'string' ? 'an empty string' : typeof row.logo}`);
-  }
-}
-
-// `folder` is the piece's directory — the catalog's own key, and the identity the
-// "done this week" diff is computed on. OPTIONAL like `logo`: the weeks already
-// committed were written before the field existed and must keep validating, and
-// the diff falls back to the name for a row that has none.
+// `nullable` is the difference between them, and it tracks what a null MEANS:
 //
-// Unlike `logo` there is no null spelling. Absence already says "not recorded",
-// and a present value is a key the strip's honesty rests on — junk in it would
-// quietly change which pieces get claimed for this week — so it must be usable.
-function validateFolder(at, row) {
-  if (row.folder === undefined) return;
-  if (typeof row.folder !== 'string' || !row.folder) {
-    throw new Error(`${at}.folder must be a non-empty string when present, got ${
-      row.folder === null ? 'null' : typeof row.folder === 'string' ? 'an empty string' : typeof row.folder}`);
+// · `logo` and `displayName` are DECORATION resolved per row from the catalog, and
+//   `null` is a recorded answer — "the catalog had none for this piece" — in
+//   preference to guessing. Both degrade visibly and harmlessly (no image; the
+//   slug), so tolerating it costs a chip its polish and never the week's snapshot.
+// · `folder` is the piece's directory: the catalog's own key and the identity the
+//   "done this week" diff is computed on. Absence already says "not recorded" and
+//   the diff falls back to the name for that row, so a null spells nothing new —
+//   while junk in it would quietly change which pieces the page claims.
+function optionalString(at, field, value, { nullable }) {
+  if (value === undefined || (nullable && value === null)) return;
+  if (typeof value !== 'string' || !value) {
+    throw new Error(`${at}.${field} must be a non-empty string${nullable ? ' or null' : ''} when present, got ${
+      value === null ? 'null' : typeof value === 'string' ? 'an empty string' : typeof value}`);
   }
 }
 
@@ -60,8 +51,12 @@ function validateRoster(key, ws) {
     if (!row || typeof row !== 'object' || Array.isArray(row)) throw new Error(`${at} must be an object`);
     if (typeof row.name !== 'string' || !row.name) throw new Error(`${at}.name must be a non-empty string`);
     if (typeof row.actions !== 'number') throw new Error(`${at}.actions must be a number`);
-    validateFolder(at, row);
-    validateLogo(at, row);
+    optionalString(at, 'folder', row.folder, { nullable: false });
+    optionalString(at, 'logo', row.logo, { nullable: true });
+    // `name` is the row's identity — a display name is what the reader is SHOWN,
+    // so it rides alongside rather than replacing it. The AI-actions roster puts a
+    // slug in `name` and the catalog's editorial name here.
+    optionalString(at, 'displayName', row.displayName, { nullable: true });
   });
 }
 

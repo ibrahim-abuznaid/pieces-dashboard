@@ -230,3 +230,42 @@ test('an empty-string folder is rejected', () =>
 
 test('a null folder is rejected — absence is how "not recorded" is expressed', () =>
   assert.throws(() => validateSnapshot(withFolder(null)), /outputSchema\.roster\[0\]\.folder/));
+
+// --- displayName (optional per-row label for the page) -----------------------
+// The AI-actions roster identifies a piece by SLUG in `name`, and that is the key
+// the week-over-week diff matches on, so the catalog's editorial name rides
+// ALONGSIDE it rather than replacing it. OPTIONAL like `logo` — the weeks already
+// committed were written before the field existed — and nullable for the same
+// reason a logo is: it is a display cue, so one unresolved label costs that chip
+// its label (it falls back to the slug) and never the week's snapshot.
+//
+// A present value is exactly what the reader sees, so a number, an object or an
+// empty string has to fail here rather than render as a nameless chip.
+
+const withDisplayName = (displayName) => withRoster([{ name: 'google-docs', actions: 12, displayName }]);
+
+test('a roster entry with no displayName validates — the field is optional', () =>
+  validateSnapshot(withRoster([{ name: 'google-docs', actions: 12 }])));
+
+test('a string displayName validates', () => validateSnapshot(withDisplayName('Google Docs')));
+
+test('a null displayName validates — the chip falls back to the slug', () =>
+  validateSnapshot(withDisplayName(null)));
+
+test('a non-string displayName is rejected', () =>
+  assert.throws(() => validateSnapshot(withDisplayName(42)), /outputSchema\.roster\[0\]\.displayName/));
+
+test('an empty-string displayName is rejected — a chip with no name at all', () =>
+  assert.throws(() => validateSnapshot(withDisplayName('')), /outputSchema\.roster\[0\]\.displayName/));
+
+test('the offending displayName index is named, not just the first one', () =>
+  assert.throws(() => validateSnapshot(withRoster([
+    { name: 'apify', actions: 12, displayName: 'Apify' },
+    { name: 'serp-api', actions: 3, displayName: { text: 'SerpApi' } },
+  ])), /outputSchema\.roster\[1\]\.displayName/));
+
+test('an aiActions roster displayName is validated too', () =>
+  assert.throws(() => validateSnapshot(ok({
+    aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
+                 roster: [{ name: 'gmail', actions: 19, displayName: 12 }] },
+  })), /aiActions\.roster\[0\]\.displayName/));

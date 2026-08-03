@@ -30,8 +30,10 @@
   body { background: var(--page); color: var(--text-primary); margin: 0;
          font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; }
   /* Padding, not decoration: 64px of dead space under the footer was a tenth of
-     a 1366x768 viewport, and this page has to fit one. */
-  .wrap { max-width: 940px; margin: 0 auto; padding: 24px 20px 24px; }
+     a 1366x768 viewport, and this page has to fit one. Nothing follows the
+     footer, so the bottom is the cheapest 8px on the page — spent instead on
+     room for a second "Needs you" line, which is content. */
+  .wrap { max-width: 940px; margin: 0 auto; padding: 24px 20px 16px; }
   header { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; }
   /* The h1 is an eyebrow, not the headline: the headline of this page is the
      four numbers. Uppercasing in CSS rather than in the string keeps the text
@@ -54,8 +56,14 @@
   .nav button[disabled] { opacity: .4; cursor: default; }
   .nav :focus-visible { outline: 2px solid var(--s-progress); outline-offset: 2px; }
 
+  /* `minmax(0, ...)` in BOTH tracks, and load-bearing in both: a bare `1fr` is
+     `minmax(auto, 1fr)`, whose floor is min-content — and since a chip is nowrap
+     (see the strip below) a tile's min-content width is its longest piece name.
+     A one-column track left at `auto` grew to 566px inside a 335px container and
+     pushed the boxes off the right edge of a 375px phone. Zeroing the floor lets
+     the track take its container's width and the chip ellipsize inside it. */
   .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
-  @media (max-width: 640px) { .tiles { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
   .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
   .tile h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
              color: var(--text-muted); margin: 0 0 8px; font-weight: 600; }
@@ -79,15 +87,36 @@
      shared vocabulary from shared/theme.css; the pill shape, the colours (all
      theme tokens) and the wrapping are page-level.
 
-     Chips WRAP and are allowed to break internally — theme's .chip is nowrap,
-     which a long PR title would ride straight out of a phone-width tile. */
+     The strip WRAPS BETWEEN chips and never inside one, which is the page's last
+     height bound. A chip that broke internally made a box as tall as its longest
+     name: eight PR titles at 70 characters each drew seven one-chip rows and a
+     336px box, and the page came to 796px against a 681px viewport (Chrome,
+     1366x768). Two rules keep that from coming back:
+
+     · `nowrap` — one line per chip, whatever the collector recorded.
+     · `max-width: calc(50% - 3px)` — half a row less half the 5px gap, so TWO
+       chips always fit on one row. With the cap at 5 a strip is 3 rows at worst,
+       every box measures 202px and the same week comes to 662px. See the chip
+       tests in test/weekly-render.test.mjs.
+
+     What overflows is ellipsized, not truncated: the whole name stays in the
+     markup, so selection and screen readers get it in full. The name needs an
+     element of its own because a bare text node in a flex chip cannot be
+     ellipsized, and `min-width: 0` because a flex item otherwise refuses to shrink
+     below its text.
+
+     That name is what the READER is shown — a piece's published name, a PR's
+     subject without its commit prefix — resolved in the view, not here. The
+     collectors' own strings stay verbatim in weekly/data/weeks.json, which is the
+     record of what shipped. */
   .striplab { color: var(--text-muted); font-size: 11.5px; font-weight: 600;
               text-transform: uppercase; letter-spacing: .05em; margin-top: 10px; }
   ul.strip { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0 0; padding: 0; }
-  ul.strip .chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
-                   color: var(--text-primary); font-size: 12px; white-space: normal;
+  ul.strip .chip { display: inline-flex; align-items: center; gap: 6px; max-width: calc(50% - 3px);
+                   color: var(--text-primary); font-size: 12px; white-space: nowrap;
                    background: var(--page); border: 1px solid var(--border);
                    border-radius: 999px; padding: 2px 9px 2px 3px; }
+  ul.strip .chip .nm { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   ul.strip .chip.more { color: var(--text-secondary); padding-left: 9px; }
   /* The initial sits UNDERNEATH the logo. A logo that 404s — or a page opened
      with no network at all — removes the img and reveals the letter, so a piece
@@ -116,7 +145,7 @@
   /* Nothing below the boxes but the links to the pages that hold the detail.
      There are no tables, sections or rosters on this page: everything a project
      manager needs is a number, its pieces, or an ask. */
-  footer { margin-top: 18px; font-size: 12.5px; color: var(--text-muted); }
+  footer { margin-top: 14px; font-size: 12.5px; color: var(--text-muted); }
   noscript { display: block; color: var(--text-secondary); font-size: 13px; margin-top: 12px; }
 </style>
 </head>
@@ -164,8 +193,10 @@ const iconHtml = (p) => `<span class="ic" aria-hidden="true"><b class="init">${i
 // a label and no chips is a week that moved nothing — that says itself.
 function stripHtml(s) {
   if (!s) return '';
+  // The name is its own element so the CSS can ellipsize it inside a chip that
+  // is clamped to half a row — the whole string stays here either way.
   const chips = s.items.map((it) =>
-    `<li class="chip">${s.kind === 'pieces' ? iconHtml(it) : ''}${esc(it.name)}</li>`).join('');
+    `<li class="chip">${s.kind === 'pieces' ? iconHtml(it) : ''}<span class="nm">${esc(it.name)}</span></li>`).join('');
   // Capped in the view: a big week must not push the page past one screen.
   const more = s.more ? `<li class="chip more">+${num(s.more)} more</li>` : '';
   return `<div class="striplab">${esc(s.label)}</div>${

@@ -239,15 +239,19 @@ test('a catalog row with no usable folder still yields a roster row, without the
   assert.equal(roster[0].name, 'Slack');
 });
 
+// `name` stays the SLUG — it is the identity the week-over-week diff matches on
+// and the only key the committed snapshots carry — and the catalog's editorial
+// name rides alongside it as `displayName`, for the page to render. `asana` is
+// absent from the catalog, so it resolves to neither.
 test('collectAiActions carries a roster, sorted by actions desc then name', () => {
   assert.deepEqual(collectAiActions({ readJson: aiRead() }), {
     status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
     roster: [
-      { name: 'google-docs', actions: 37, stage: 'merged',
+      { name: 'google-docs', actions: 37, stage: 'merged', displayName: 'Google Docs',
         logo: 'https://cdn.activepieces.com/pieces/google-docs.png' },
-      { name: 'airtable', actions: 19, stage: 'held',
+      { name: 'airtable', actions: 19, stage: 'held', displayName: 'Airtable',
         logo: 'https://cdn.activepieces.com/pieces/airtable-v2.png' },
-      { name: 'gmail', actions: 19, stage: 'pr-open',
+      { name: 'gmail', actions: 19, stage: 'pr-open', displayName: 'Gmail',
         logo: 'https://cdn.activepieces.com/pieces/gmail.png' },
       { name: 'asana', actions: 5, stage: 'assigned', logo: null },
     ],
@@ -410,6 +414,8 @@ test('a missing catalog file costs the AI-actions logos and nothing else', () =>
   assert.equal(out.totalPieces, 28);
   assert.equal(out.roster.length, 4);
   assert.deepEqual(out.roster.map((r) => r.logo), [null, null, null, null]);
+  assert.deepEqual(out.roster.map((r) => r.name), ['google-docs', 'airtable', 'gmail', 'asana'],
+    'the slug is the row, so every piece keeps its identity and its count');
 });
 
 test('a malformed catalog file costs the AI-actions logos and nothing else', () => {
@@ -434,6 +440,88 @@ test('a catalog entry with no folder is skipped, leaving the rest resolvable', (
   assert.equal(roster.find((r) => r.name === 'gmail').logo, 'https://cdn.activepieces.com/pieces/gmail.png');
 });
 
+// --- display names -------------------------------------------------------------
+// The AI-actions build knows a piece by its SLUG (`google-docs`) and nothing else,
+// so its roster used to put that on the page beside boxes naming pieces `ClickUp`
+// and `Google Sheets` — one page, two naming conventions, one of them an internal
+// identifier a project manager has no use for.
+//
+// The catalog is the same file the logos come from and it publishes the piece's
+// real `displayName`, keyed by `folder`. So the name is LOOKED UP, on exactly the
+// terms the logo is: resolved per row, `name` still the slug (the identity the
+// week-over-week diff matches on — see weekly-view.test.mjs), and an unresolved
+// row keeping its slug rather than a prettified guess.
+
+const namesOf = (roster) => Object.fromEntries(roster.map((r) => [r.name, r.displayName]));
+
+test('AI-actions roster rows resolve their display name by slug → catalog folder', () => {
+  const { roster } = collectAiActions({ readJson: aiRead() });
+  assert.deepEqual(namesOf(roster), {
+    'google-docs': 'Google Docs',
+    airtable: 'Airtable',
+    gmail: 'Gmail',
+    asana: undefined,
+  });
+});
+
+test('a resolved display name never replaces the slug the diff is keyed on', () => {
+  const { roster } = collectAiActions({ readJson: aiRead() });
+  assert.deepEqual(roster.map((r) => r.name), ['google-docs', 'airtable', 'gmail', 'asana']);
+});
+
+// The catalog renames pieces — `sendinblue` publishes as `Brevo` today — so a name
+// derived from the slug is not merely uglier, it is wrong. Nothing an
+// implementation could title-case out of `sendinblue` is `Brevo`.
+test('a display name is read from the catalog, never derived from the slug', () => {
+  const { roster } = collectAiActions({ readJson: aiRead({
+    'dist/ai-actions/pieces.json': { pieces: [{ slug: 'sendinblue', atomics: 4, stage: 'merged' }] },
+    'dist/output-schema/pieces.json': { pieces: [{ folder: 'sendinblue', displayName: 'Brevo', status: 'todo',
+      logoUrl: 'https://cdn.activepieces.com/pieces/brevo.png' }] },
+  }) });
+  assert.deepEqual(roster, [{ name: 'sendinblue', actions: 4, stage: 'merged', displayName: 'Brevo',
+                             logo: 'https://cdn.activepieces.com/pieces/brevo.png' }]);
+});
+
+test('a slug missing from the catalog carries no display name at all', () => {
+  const { roster } = collectAiActions({ readJson: aiRead() });
+  const asana = roster.find((r) => r.name === 'asana');
+  assert.equal('displayName' in asana, false, 'an unresolved name must not become a dead key in the archive');
+  assert.equal(asana.actions, 5, 'the row itself survives: the slug and the count are the data');
+});
+
+// A display name is a label, so a junk one costs that label. Contrast the numeric
+// fields, where a junk value drops the whole roster.
+test('a catalogued piece with no usable displayName keeps its row and its slug', () => {
+  for (const displayName of [undefined, null, '', 42]) {
+    const { roster } = collectAiActions({ readJson: aiRead({
+      'dist/output-schema/pieces.json': { pieces: [{ folder: 'gmail', displayName, status: 'todo',
+        logoUrl: 'https://cdn.activepieces.com/pieces/gmail.png' }] } }) });
+    const gmail = roster.find((r) => r.name === 'gmail');
+    assert.equal('displayName' in gmail, false, `displayName ${JSON.stringify(displayName)} became a key`);
+    assert.equal(gmail.logo, 'https://cdn.activepieces.com/pieces/gmail.png', 'the logo still resolved');
+  }
+});
+
+test('a missing catalog file costs the AI-actions display names and nothing else', () => {
+  const { roster } = collectAiActions({ readJson: reader({
+    'dist/ai-actions/summary.json': AI_SUMMARY,
+    'dist/ai-actions/pieces.json': AI_PIECES,
+  }) });
+  assert.equal(roster.length, 4);
+  assert.ok(roster.every((r) => !('displayName' in r)));
+  assert.deepEqual(roster.map((r) => r.name), ['google-docs', 'airtable', 'gmail', 'asana']);
+});
+
+// The catalog row a slug resolves against may be parked out of the outputSchema
+// roster (`todo`/`skip`) — `google-docs` is — so the index must key every
+// catalogued piece, not just the ones that workstream reports on.
+test('a slug resolves against a catalog row the outputSchema roster parks', () => {
+  const { roster } = collectOutputSchema({ readJson: osRead() });
+  assert.ok(!roster.some((r) => r.name === 'Google Docs'), 'the fixture must park it');
+  assert.equal(collectAiActions({ readJson: aiRead() }).roster
+    .find((r) => r.name === 'google-docs').displayName, 'Google Docs');
+});
+
 // The collectors and the archive schema are two halves of one contract, and the
 // only place they meet is inside snapshot.mjs — which cannot run in a test,
 // because it writes the committed archive. Pipe real collector output through
@@ -448,6 +536,8 @@ test('what the collectors emit — including an unresolved logo — passes valid
     tickets: { status: 'ok', total: 11 },
   };
   assert.ok(snap.aiActions.roster.some((r) => r.logo === null), 'the fixture must exercise the unresolved path');
+  assert.ok(snap.aiActions.roster.some((r) => typeof r.displayName === 'string'), 'and the resolved name path');
+  assert.ok(snap.aiActions.roster.some((r) => !('displayName' in r)), 'and the unresolved name path');
   assert.ok(snap.outputSchema.roster.every((r) => typeof r.logo === 'string'));
   validateSnapshot(snap);
 });

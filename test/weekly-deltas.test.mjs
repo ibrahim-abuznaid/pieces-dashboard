@@ -1,6 +1,7 @@
 // test/weekly-deltas.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import * as deltas from '../weekly/lib/deltas.mjs';
 import { pick, deltaFor } from '../weekly/lib/deltas.mjs';
 
 // There is no `seriesFor` any more, so there are no series tests here. It read a
@@ -11,6 +12,14 @@ import { pick, deltaFor } from '../weekly/lib/deltas.mjs';
 // that crosses weeks, and its gap guard is asserted at the bottom of this file.
 // That a hole in the archive cannot be drawn as a trend is asserted on the
 // rendered page, in test/weekly-render.test.mjs.
+
+// The difference that mattered: `deltaFor` REFUSES to compare across a hole
+// (the test at the bottom of this file), while `seriesFor` sliced the weeks array
+// by index, so a missing week was simply not among the points and the two either
+// side of it were drawn adjacent. Any future windowed read would have the same
+// hazard, so the module's surface is pinned rather than the one function's name.
+test('the module exposes no windowed read for a chart to draw a gap as adjacent', () =>
+  assert.deepEqual(Object.keys(deltas).sort(), ['deltaFor', 'pick']));
 
 const snap = (week, total, live) => ({
   week,

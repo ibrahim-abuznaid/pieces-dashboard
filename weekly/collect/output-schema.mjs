@@ -11,9 +11,10 @@ const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 const PARKED = new Set(['todo', 'skip']);
 
 // This file is the piece CATALOG: it is the one build output that walks every
-// piece, so it is also the only place a piece's real logo URL is published, keyed
-// by `folder`. Both rosters resolve logos out of it, which is why the lookup
-// below lives in this module rather than in the collector that needs it.
+// piece, so it is also the only place a piece's real logo URL and published name
+// are to be found, both keyed by `folder`. Both rosters resolve those out of it,
+// which is why the lookup below lives in this module rather than in the collector
+// that needs it.
 const CATALOG = 'dist/output-schema/pieces.json';
 
 // A logo is a recognition cue, not data: a row with no usable URL keeps its name
@@ -39,22 +40,39 @@ const logoOf = (p) => (typeof p?.logoUrl === 'string' && p.logoUrl ? p.logoUrl :
 // and one junk row must not cost the other 755 pieces their roster.
 const folderOf = (p) => (typeof p?.folder === 'string' && p.folder ? { folder: p.folder } : {});
 
-// `folder` → logo URL, for rosters that identify a piece by slug and so cannot
-// carry the URL themselves.
+// The piece's published name, or null when the catalog has none to publish. A
+// LABEL, not an identity — see `folderOf` above — so it degrades exactly as a logo
+// does: null, never a name assembled from the key it was looked up by. `Brevo` is
+// what `sendinblue` publishes as and `SerpApi` is what `serp-api` publishes as, so
+// a prettified slug is not a lesser version of this string, it is a wrong one.
+const displayNameOf = (p) =>
+  (typeof p?.displayName === 'string' && p.displayName ? p.displayName : null);
+
+// `folder` → what the catalog knows about a piece that a roster keyed by slug
+// cannot carry itself: its logo URL and its published name. One index and one
+// read, because both come off the same row.
 //
-// OPTIONAL detail on the same terms as the rosters: a missing or malformed
-// catalog yields an EMPTY index, never a throw. Every row then resolves to
-// `logo: null` and keeps its numbers — losing this file costs the logos and
-// nothing else. Rows the catalog cannot key are skipped individually so one junk
-// entry cannot take the other 755 pieces' logos with it.
-export function readLogoIndex(readJson) {
+// EVERY keyable row is indexed, including the `todo`/`skip` pieces the outputSchema
+// roster parks: the AI-actions initiative tracks pieces that have not started their
+// outputSchema work, and those still have names and logos.
+//
+// OPTIONAL detail on the same terms as the rosters: a missing or malformed catalog
+// yields an EMPTY index, never a throw. Every row then keeps its slug and its
+// numbers — losing this file costs the decoration and nothing else. Rows the
+// catalog cannot key are skipped individually so one junk entry cannot take the
+// other 755 pieces' logos with it.
+//
+// One entry per folder, last row winning. A folder is a directory, so the catalog
+// publishes each exactly once — 756 rows, 756 keys today — and two rows claiming
+// one folder is a catalog bug to fix there, not a merge to attempt here.
+export function readCatalogIndex(readJson) {
   const index = new Map();
   try {
     const { pieces } = readJson(CATALOG);
     if (!Array.isArray(pieces)) return index;
     for (const p of pieces) {
-      const logo = logoOf(p);
-      if (logo && typeof p.folder === 'string' && p.folder) index.set(p.folder, logo);
+      if (typeof p?.folder !== 'string' || !p.folder) continue;
+      index.set(p.folder, { displayName: displayNameOf(p), logo: logoOf(p) });
     }
   } catch {
     // Deliberately empty: an empty index IS the degraded answer.

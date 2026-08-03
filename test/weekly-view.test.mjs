@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildView, plural, STRIP_CAP } from '../weekly/lib/view.mjs';
+import { buildView, plural, prTitle, STRIP_CAP } from '../weekly/lib/view.mjs';
+import { collectTickets } from '../weekly/collect/tickets.mjs';
 
 const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
@@ -141,6 +142,40 @@ test('a count that is not a number costs the line', () => {
 test('a real zero week still reads as a zero for each person', () =>
   assert.equal(perPersonOf({ total: 0, byPerson: { kishan: 0, sanket: 0 } }), 'Kishan 0 · Sanket 0'));
 
+// The fixtures above are hand-written shapes; this one is the collector's own
+// output, because the bug was a SEAM between two files. `collect/tickets.mjs`
+// owns the list of people and sums the total from it; this file owns the line
+// that names them. While the line was built from a second copy of that list kept
+// here, adding a person to the collector — the team is hiring — would have
+// counted their tickets in the total and printed them as a silent 0, or dropped
+// them from the line altogether.
+//
+// Roster-agnostic on purpose: the keys come from the collector, so this covers
+// whoever it records today AND whoever is added to it later, without this file
+// having to learn the names.
+const ticketsFrom = (events) => collectTickets({
+  window: { start: '2026-07-25', end: '2026-07-31' }, weekId: '2026-W31', linearRefreshPending: false,
+  readJson: (name) => ({
+    'linear.json': { stamp: '2026-07-31', events, recent: [] },
+    'github.json': { stamp: '2026-07-31', mergedEvents: [], reviews: { weekly: [] } },
+  }[name]),
+});
+
+test('every person the tickets collector records is named on the page', () => {
+  const people = Object.keys(ticketsFrom([]).byPerson);          // the collector's own roster
+  assert.ok(people.length >= 2, 'the collector recorded nobody, so this test would prove nothing');
+  // A different count per person, so a name dropped from the line cannot hide
+  // behind a number that happens to belong to someone else.
+  const events = people.flatMap((p, i) => Array.from({ length: i + 1 }, () => ({ d: '2026-07-27', p })));
+  const ws = ticketsFrom(events);
+  const line = oneWeek({ tickets: ws }).tiles.find((t) => t.key === 'tickets').perPerson;
+  assert.equal(ws.total, people.reduce((sum, _, i) => sum + i + 1, 0), 'the collector did not count them all');
+  for (const [i, p] of people.entries()) {
+    assert.match(line, new RegExp(`${p.charAt(0).toUpperCase()}${p.slice(1)} ${i + 1}(?!\\d)`),
+      `${p} closed ${i + 1} of the ${ws.total} tickets and the page does not say so: "${line}"`);
+  }
+});
+
 test('only the tickets tile carries a per-person line', () =>
   assert.deepEqual(buildView(archive).tiles.filter((t) => t.perPerson).map((t) => t.key), ['tickets']));
 
@@ -158,7 +193,27 @@ test('a no-data workstream produces a no-data tile, not a zero', () => {
   assert.equal(tile.value, null);
   assert.equal(tile.delta, null);
   assert.equal(tile.perPerson, '');
-  assert.match(tile.reason, /Linear pending/);
+  assert.equal(tile.reason, 'not measured this week');
+});
+
+// The collector's own sentence names internal markers, JSON fields and the
+// commands to re-run — see the reason strings in weekly/collect/*.mjs. It stays on
+// the record in the committed archive; it does not become page copy, and it is not
+// smuggled into the view under another key for a later reader to render.
+test('a collector diagnostic does not survive anywhere in the view', () => {
+  const reason = 'Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH';
+  const view = buildView({ weeks: [snap('2026-W31', { tickets: { status: 'no-data', reason } })] });
+  assert.doesNotMatch(JSON.stringify(view), /NEEDS-LINEAR-REFRESH|internal dashboard/);
+});
+
+// Including a workstream a snapshot never recorded at all: that box must not be
+// left with a bare em dash and nothing to explain it.
+test('a workstream missing from the snapshot entirely reads as unmeasured too', () => {
+  const week = snap('2026-W31');
+  delete week.tickets;
+  const tile = buildView({ weeks: [week] }).tiles.find((t) => t.key === 'tickets');
+  assert.equal(tile.status, 'no-data');
+  assert.equal(tile.reason, 'not measured this week');
 });
 
 // The piece-tester-web stats-endpoint caveat is an engineering note, so it left
@@ -633,7 +688,7 @@ test('a no-data workstream carries no strip alongside its reason', () => {
     .tiles.find((t) => t.key === 'outputSchema');
   assert.equal(tile.status, 'no-data');
   assert.equal(tile.strip, null);
-  assert.match(tile.reason, /build missing/);
+  assert.equal(tile.reason, 'not measured this week');
 });
 
 test('a workstream that recorded no roster at all carries no strip', () =>
@@ -663,7 +718,77 @@ test('a malformed shipped list costs the testing strip, not the tile', () => {
 test('a shipped entry with no title is skipped rather than rendered as a blank chip', () => {
   const shipped = [{ number: 1, url: 'u' }, { number: 2, title: 'feat: real one', url: 'u' }];
   assert.deepEqual(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped } }), 'testing').items,
-    [{ name: 'feat: real one' }]);
+    [{ name: 'Real one' }]);
+});
+
+// ── a shipped PR, in words a reader outside the repo can use ───────────────
+// The testing box lists the PRs that shipped, and their titles are commit
+// subjects: `feat(health): piece health board, needs-attention inbox, persisted
+// ru…`. Everything up to the colon is a machine-readable classifier — a type and
+// a scope, for the repo's own tooling — and it is charged to the front of a chip
+// that is clamped to half a strip row, so what it costs is the words at the end,
+// ellipsized away. A project manager cannot use `feat(health)`; they can use
+// `piece health board`.
+//
+// DISPLAY ONLY, and this is the last transform before the chip: the collector
+// records the subject verbatim (see weekly-collect-testing.test.mjs) and the
+// committed archive keeps it that way, because that is the record of what actually
+// shipped.
+
+test('a conventional-commit prefix is dropped and the sentence capitalised', () => {
+  assert.equal(prTitle('feat(health): piece health board'), 'Piece health board');
+  assert.equal(prTitle('fix: flaky run poller'), 'Flaky run poller');
+  assert.equal(prTitle('chore(deps): bump the runner'), 'Bump the runner');
+});
+
+// `!` marks a breaking change and is part of the classifier, not of the sentence.
+test('a breaking-change marker goes with the prefix', () => {
+  assert.equal(prTitle('feat!: drop node 18'), 'Drop node 18');
+  assert.equal(prTitle('refactor(engine)!: one runner per piece'), 'One runner per piece');
+});
+
+// Unchanged, capitalisation included: the transform's whole justification is that
+// the prefix is not the author's words, so where there is no prefix there is
+// nothing this may touch.
+test('a title with no prefix passes through completely unchanged', () => {
+  for (const title of ['piece health board', 'Add a run poller', 'PIE-114 fallout', 'wip on the tester']) {
+    assert.equal(prTitle(title), title);
+  }
+});
+
+// The prefix is matched against the conventional-commit VOCABULARY, not against
+// `\w+:`. A colon is ordinary punctuation, and a generic pattern amputates whatever
+// stands in front of one — `Update: the tester UI` losing its verb, a bare URL
+// losing its scheme — which is a page misleading its reader to save nine
+// characters.
+test('a colon that is not a conventional-commit prefix is left alone', () => {
+  for (const title of ['Update: the tester UI', 'note: read this first', 'https://github.com/x/y']) {
+    assert.equal(prTitle(title), title);
+  }
+});
+
+// All the title there is. Stripping it leaves a chip with a logo-less dot and no
+// name, which reads as a rendering bug rather than as a PR.
+test('a title that is nothing but a prefix keeps the original string', () => {
+  for (const title of ['feat:', 'feat(health):', 'fix: ', 'chore(deps):   ']) {
+    assert.equal(prTitle(title), title);
+  }
+});
+
+test('the testing strip carries the display form of each title', () =>
+  assert.deepEqual(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped: [
+    { number: 5, title: 'feat(health): piece health board', url: 'u' },
+    { number: 6, title: 'fix(runner): stop double-counting a retry', url: 'u' },
+  ] } }), 'testing').items,
+  [{ name: 'Piece health board' }, { name: 'Stop double-counting a retry' }]));
+
+// The archive is the record of what shipped, so the subject stays in it verbatim —
+// including in the week this view was just built from.
+test('rendering a week does not rewrite the title the snapshot recorded', () => {
+  const shipped = [{ number: 5, title: 'feat(health): piece health board', url: 'u' }];
+  const week = snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4, shipped } });
+  buildView({ weeks: [week] });
+  assert.equal(week.testing.shipped[0].title, 'feat(health): piece health board');
 });
 
 // ── which piece is which ───────────────────────────────────────────────────
@@ -744,6 +869,71 @@ test('the AI-actions diff still works with slugs as the identity', () => {
   const v = twoWeeks({ aiActions: withAiRoster([{ name: 'google-sheets', actions: 37, stage: 'pr-open' }]) },
                       { aiActions: withAiRoster(AI_ROSTER) });
   assert.deepEqual(stripNames(v, 'aiActions'), ['google-sheets']);
+});
+
+// ── what the reader is shown a piece as ────────────────────────────────────
+// The AI-actions roster identifies a piece by SLUG, so its box rendered `apify`,
+// `firecrawl` and `google-docs` beside a box rendering `ClickUp` and `Google
+// Sheets`: one page, two naming conventions, and the lowercase-hyphen one is an
+// internal identifier. The catalog's own `displayName` rides alongside the slug so
+// the chip can show it.
+//
+// ALONGSIDE, never instead of. `name` is the identity this diff matches on and the
+// only key the snapshots already in the archive carry — they hold no `folder` — so
+// keying on the display name would find nothing in common with them and re-report
+// the entire finished backlog as "Done this week". That is the overclaim this page
+// has guarded against throughout, which is why the two tests below exist.
+
+const AI_NAMED = [
+  { name: 'google-docs', actions: 37, stage: 'merged', displayName: 'Google Docs', logo: LOGO('google-docs') },
+  { name: 'hubspot', actions: 22, stage: 'pr-open', displayName: 'HubSpot', logo: LOGO('hubspot') },
+];
+
+test('a chip shows the catalog display name rather than the slug', () =>
+  assert.deepEqual(stripOf(oneWeek({ aiActions: withAiRoster(AI_NAMED) }), 'aiActions').items,
+    [{ name: 'Google Docs', logo: LOGO('google-docs') }]));
+
+// Every week already in the archive, and any slug the catalog cannot name.
+test('a row with no display name still shows its slug', () =>
+  assert.deepEqual(stripNames(oneWeek({ aiActions: withAiRoster(AI_ROSTER) }), 'aiActions'),
+    ['google-sheets']));
+
+// The archive validates a string or null, but `byPerson` proves unvalidated
+// shapes reach this file; a label is decoration, so junk costs the label, and the
+// slug is the honest fallback — never a prettified guess at what it should say.
+test('an unusable display name falls back to the slug rather than rendering as junk', () => {
+  for (const displayName of [null, '', 42, {}]) {
+    assert.deepEqual(stripNames(oneWeek({ aiActions: withAiRoster(
+      [{ name: 'serp-api', actions: 4, stage: 'merged', displayName }]) }), 'aiActions'), ['serp-api'],
+      `displayName ${JSON.stringify(displayName)} reached the page`);
+  }
+});
+
+// The diff, across the exact change this slice makes: last week's rows are the
+// slug-keyed ones already committed, this week's are the same pieces with a
+// display name resolved. Nothing moved, and the page has to say so.
+const AI_SLUGS_PRIOR = [
+  { name: 'apify', actions: 12, stage: 'merged' },
+  { name: 'firecrawl', actions: 9, stage: 'merged' },
+];
+const AI_SLUGS_NAMED = [
+  { name: 'apify', actions: 12, stage: 'merged', displayName: 'Apify' },
+  { name: 'firecrawl', actions: 9, stage: 'merged', displayName: 'Firecrawl' },
+];
+
+test('adding a display name does not re-report the finished backlog as this week', () => {
+  const v = twoWeeks({ aiActions: withAiRoster(AI_SLUGS_PRIOR) },
+                     { aiActions: withAiRoster(AI_SLUGS_NAMED) });
+  assert.equal(labelOf(v, 'aiActions'), 'Nothing new this week');
+  assert.deepEqual(stripNames(v, 'aiActions'), []);
+});
+
+test('a piece that really did land is still found once display names exist', () => {
+  const landed = { name: 'sendinblue', actions: 6, stage: 'merged', displayName: 'Brevo' };
+  const v = twoWeeks({ aiActions: withAiRoster(AI_SLUGS_PRIOR) },
+                     { aiActions: withAiRoster([...AI_SLUGS_NAMED, landed]) });
+  assert.equal(labelOf(v, 'aiActions'), 'Done this week');
+  assert.deepEqual(stripNames(v, 'aiActions'), ['Brevo']);
 });
 
 // A folder is optional detail, like a logo: one catalog row missing it must cost
