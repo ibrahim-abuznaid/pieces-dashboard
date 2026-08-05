@@ -28,6 +28,22 @@ rewrite past weeks every morning.
 `weeks.json` is append-only and past weeks are immutable — re-snapshotting an existing week fails unless you
 pass `--force-week`.
 
+### Verification
+
+Neither job ends at "I pushed it". After the push, `refresh-weekly.sh` waits for the **Refresh & deploy** run
+for that exact commit (filtered by workflow name *and* SHA — "Claim bot" also runs here) and then reads the
+live page back, so a red run or a deploy that never landed exits non-zero and cron mails it.
+
+`verify-weekly.sh` is the same assertion on a **daily** cron, read-only: live page reachable and rendering,
+its default week equal to the newest committed week, every archived week passing `validateSnapshot`, and the
+newest snapshot no older than 8 days (a missed Saturday blanks the *following* week's deltas too). Run it any
+time; `--url=` points it at another build. Schedule it well away from the Saturday 09:00 +03 job — a run
+inside that window would see the new commit before the deploy finishes and report a false mismatch.
+
+Both read the page the way a reader gets it: the DOM is built client-side from an embedded `const ARCHIVE`
+blob, so grepping the served HTML for a week id proves nothing. `verify-weekly.mjs` parses that blob and
+executes the page's scripts in a `node:vm` sandbox.
+
 The page is written for a **project manager**: the week, four numbers, the pieces behind each number, and
 anything that needs a decision. Engineering caveats are recorded here rather than on the page.
 

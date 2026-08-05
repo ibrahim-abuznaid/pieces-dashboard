@@ -4,6 +4,11 @@
 # Order matters: the tickets collector reads the internal dashboard's data
 # files, and the outputSchema/AI-actions collectors read dist/, which is
 # gitignored and therefore absent until a local build runs.
+#
+# The job does not finish at the push. Steps 5 and 6 wait for CI and then read
+# the live page back, so "the Saturday job succeeded" means a reader can see the
+# week — not that a commit left this machine. verify-weekly.sh re-checks the
+# same liveness daily.
 set -euo pipefail
 
 # cron gives us /usr/bin:/bin, but node/npm are nvm-installed and gh may not be
@@ -44,31 +49,50 @@ if node -e 'const{readArchive}=await import("./weekly/lib/archive.mjs");process.
   exit 0
 fi
 
-log "1/4 internal dashboard refresh (Linear + GitHub) — see $DASHBOARD/refresh.log for its output"
+log "1/6 internal dashboard refresh (Linear + GitHub) — see $DASHBOARD/refresh.log for its output"
 # Non-fatal. Note refresh.sh does NOT run the Linear half (the MCP is
 # interactive-only); it writes NEEDS-LINEAR-REFRESH whenever the Linear data is
 # stale. Either way the tickets collector degrades to no-data rather than
 # reporting a false zero — including when the data simply predates this week.
 bash "$DASHBOARD/refresh.sh" || log "WARN internal refresh failed — tickets will degrade to no-data"
 
-log "2/4 fetch + build this repo (populates dist/*/summary.json)"
+log "2/6 fetch + build this repo (populates dist/*/summary.json)"
 npm run fetch
 npm run build
 
-log "3/4 append $WEEK"
+log "3/6 append $WEEK"
 node weekly/snapshot.mjs --today="$TODAY"
 
-log "4/4 commit + push (CI renders and deploys)"
+log "4/6 commit + push (CI renders and deploys)"
 # HEAD, not the bare form: a prior run that died between add and commit leaves
 # the change staged, where `git diff --quiet` reports no change and the week
 # would go unpublished.
 if git diff --quiet HEAD -- weekly/data/weeks.json; then
+  # Nothing was pushed, so there is no run to wait for and no new week to see on
+  # the live page. verify-weekly.sh checks liveness daily anyway.
   log "no archive change — nothing to push"
-else
-  git add weekly/data/weeks.json
-  git commit -m "chore(weekly): snapshot $WEEK"
-  git push
-  log "pushed $WEEK — GitHub Pages deploy will pick it up"
+  log "✓ $WEEK needed no change — nothing published"
+  exit 0
 fi
 
-log "done"
+git add weekly/data/weeks.json
+git commit -m "chore(weekly): snapshot $WEEK"
+git push
+SHA="$(git rev-parse HEAD)"
+log "pushed $WEEK as $SHA"
+
+# Everything above this line is the job doing its work; everything below is the
+# job proving the work landed. The push used to be the last step, which meant a
+# red CI run or a Pages deploy that never happened looked exactly like success.
+#
+# `|| exit 1` rather than letting the ERR trap fire: each mode already prints its
+# own verdict line with the run URL, and the trap's "ERROR line N" would land
+# after it and bury the one line that says what happened.
+log "5/6 waiting for the 'Refresh & deploy' run for $SHA"
+node verify-weekly.mjs --await-run="$SHA" || exit 1
+
+# CI green is not the same as published: the run can succeed while Pages serves
+# the previous build for a little longer, and only the live page can settle
+# whether a reader would see this week. --live retries for that lag.
+log "6/6 asserting the live page serves $WEEK"
+node verify-weekly.mjs --live="$WEEK" || exit 1
