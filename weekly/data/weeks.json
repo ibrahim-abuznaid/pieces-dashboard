@@ -4,7 +4,7 @@
       "week": "2026-W31",
       "start": "2026-07-25",
       "end": "2026-07-31",
-      "builtAt": "2026-08-03",
+      "builtAt": "2026-08-05",
       "outputSchema": {
         "status": "ok",
         "live": 9,
@@ -443,8 +443,46 @@
         ]
       },
       "tickets": {
-        "status": "no-data",
-        "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
+        "status": "ok",
+        "total": 4,
+        "byPerson": {
+          "kishan": 3,
+          "sanket": 1
+        },
+        "prsMerged": {
+          "kishan": 9,
+          "sanket": 2
+        },
+        "reviews": {
+          "kishan": 15,
+          "sanket": 10
+        },
+        "shipped": [
+          {
+            "id": "GIT-1690",
+            "title": "[BUG] [Pieces] [Salesforce] Find Record always fails: FIELDS(ALL) query uses LIMIT 2000, Salesforce caps it at 200",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "GIT-1673",
+            "title": "[BUG] Slack channel_created trigger test is a false green (passes when app-webhook is fully unconfigured)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "GIT-441",
+            "title": "[BUG]: Update member in GhostCMS pieces triggers when new member is created.",
+            "assignee": "sanket",
+            "team": "GIT"
+          },
+          {
+            "id": "PIE-369",
+            "title": "Review #14413 pr",
+            "assignee": "kishan",
+            "team": "Pieces"
+          }
+        ]
       },
       "decisions": [
         "6 pieces merged but not live — needs a cloud release"

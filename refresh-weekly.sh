@@ -50,10 +50,16 @@ if node -e 'const{readArchive}=await import("./weekly/lib/archive.mjs");process.
 fi
 
 log "1/6 internal dashboard refresh (Linear + GitHub) — see $DASHBOARD/refresh.log for its output"
-# Non-fatal. Note refresh.sh does NOT run the Linear half (the MCP is
-# interactive-only); it writes NEEDS-LINEAR-REFRESH whenever the Linear data is
-# stale. Either way the tickets collector degrades to no-data rather than
-# reporting a false zero — including when the data simply predates this week.
+# Non-fatal, and slow: refresh.sh now runs BOTH halves over a window ending
+# today — the GitHub half plus a headless-Claude Linear half — so budget ~15 min
+# here, bounded by refresh-linear.sh's own 1800s cap. The Linear MCP turned out
+# to be reachable headless; what blocked it was a missing --allowedTools grant,
+# not connectivity.
+#
+# On any failure it fails closed: the previous data files are restored and
+# NEEDS-LINEAR-REFRESH is written, so the tickets collector degrades to no-data
+# rather than reporting a false zero — including when the data merely predates
+# this week, which the old frozen window used to guarantee forever.
 bash "$DASHBOARD/refresh.sh" || log "WARN internal refresh failed — tickets will degrade to no-data"
 
 log "2/6 fetch + build this repo (populates dist/*/summary.json)"
