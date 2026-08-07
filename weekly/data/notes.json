@@ -1,0 +1,5 @@
+{
+  "2026-W31": {
+    "testing": "Shipped the piece health board and needs-attention inbox; scheduled-run history now persists."
+  }
+}

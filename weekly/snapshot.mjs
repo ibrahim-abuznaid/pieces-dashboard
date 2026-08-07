@@ -116,13 +116,19 @@ export function main(argv) {
   const readRepoJson = (rel) => JSON.parse(readFileSync(join(ROOT, rel), 'utf8'));
   const readTeamJson = (name) => JSON.parse(readFileSync(join(TEAM_DASHBOARD, 'data', name), 'utf8'));
   const gh = (args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+  // The tester's address is deployment detail, kept out of this public repo:
+  // it reaches the collector only through the environment of the (local-only)
+  // machine that takes snapshots. `-f` turns HTTP errors into exit codes so a
+  // 500 degrades the coverage half instead of parsing an error page as JSON.
+  const curl = (url) => execFileSync('curl', ['-fsS', '--max-time', '30', url],
+    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
 
   const snap = buildSnapshot({
     weekId, today,
     collectors: {
       outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
       aiActions: () => collectAiActions({ readJson: readRepoJson }),
-      testing: () => collectTesting({ window, gh }),
+      testing: () => collectTesting({ window, gh, curl, testerUrl: process.env.PIECE_TESTER_URL }),
       tickets: () => collectTickets({
         window, weekId, readJson: readTeamJson,
         linearRefreshPending: existsSync(join(TEAM_DASHBOARD, 'NEEDS-LINEAR-REFRESH')),
@@ -134,6 +140,9 @@ export function main(argv) {
   const degraded = WORKSTREAMS.filter((k) => snap[k].status === 'no-data');
   console.log(`✓ snapshot ${weekId} (${snap.start}→${snap.end}) appended`);
   if (degraded.length) console.warn(`⚠ degraded: ${degraded.join(', ')}`);
+  // A coverage miss is not a degraded workstream (PRs and commits landed), but
+  // the operator standing at this terminal is the only person who can fix it.
+  if (snap.testing?.coverageError) console.warn(`⚠ testing: ${snap.testing.coverageError}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

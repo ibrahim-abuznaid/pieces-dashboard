@@ -4,7 +4,7 @@
 // out to nothing, and never writes weeks.json — snapshots are appended locally
 // by weekly/snapshot.mjs. CI runs this daily, so a build that could mutate the
 // archive would rewrite history every morning.
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderPage } from '../lib/render.mjs';
@@ -13,12 +13,23 @@ import { buildView } from './lib/view.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
+// Curated one-line notes, keyed week → workstream (see notes.json itself).
+// Display layer on purpose: weeks.json is immutable once appended, but a
+// sentence of prose gets written — or fixed — after the fact, so it lives in a
+// file a person edits and CI merely renders. Malformed JSON here should fail
+// the build loudly, not publish a page with every note silently gone.
+const readNotes = (dir) => {
+  const path = join(dir, 'notes.json');
+  return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {};
+};
+
 export function buildAll({ archiveDir = join(HERE, 'data'), outDir = join(HERE, '../dist/weekly') } = {}) {
   const archive = readArchive(join(archiveDir, 'weeks.json'));
+  const notes = readNotes(archiveDir);
   // Precompute one view per week so the client only ever does a lookup — no
   // view logic is duplicated in the template.
   const views = {};
-  for (const w of archive.weeks) views[w.week] = buildView(archive, { weekId: w.week });
+  for (const w of archive.weeks) views[w.week] = buildView(archive, { weekId: w.week, notes });
   const latest = archive.weeks.at(-1)?.week ?? null;
   const data = latest ? { views, default: latest } : { views: {}, default: null };
 

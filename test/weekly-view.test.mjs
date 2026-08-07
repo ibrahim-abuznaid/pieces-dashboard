@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildView, plural, prTitle, STRIP_CAP } from '../weekly/lib/view.mjs';
+import { buildView, plural, prTitle, ticketTitle, STRIP_CAP } from '../weekly/lib/view.mjs';
 import { collectTickets } from '../weekly/collect/tickets.mjs';
 
 const snap = (week, over = {}) => ({
@@ -182,7 +182,7 @@ test('only the tickets tile carries a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'key', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value']);
+      ['delta', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value']);
   }
 });
 
@@ -678,10 +678,55 @@ test('a testing week that shipped no PRs carries no strip', () =>
   assert.equal(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 0, commits: 3, shipped: [] } }), 'testing'),
     null));
 
-// Deliberate: tickets are not pieces, and the per-person line is the detail
-// that box carries instead.
-test('the tickets tile has no strip', () =>
-  assert.equal(stripOf(buildView(archive), 'tickets'), null));
+// ── the tickets strip ───────────────────────────────────────────────────────
+// One chip per closed ticket: id, shortened title, and a link to the ticket
+// itself. Label-less on purpose — the unit line ("closed this week") has
+// already named the set, and a heading that repeats the previous line is
+// filler. The fixture's title 'x' carries no routing tags, so it reaches the
+// chip verbatim.
+test('the tickets strip is one linked chip per closed ticket', () =>
+  assert.deepEqual(stripOf(buildView(archive), 'tickets'),
+    { kind: 'tickets', label: '', more: 0,
+      items: [{ id: 'PIE-101', name: 'x', href: 'https://linear.app/activepieces/issue/PIE-101' }] }));
+
+// The id goes into a URL, so junk must cost the chip, never become a dead or
+// dangerous link.
+test('a ticket whose id is not Linear-shaped gets no chip', () => {
+  const shipped = [
+    { id: 'PIE-7', title: 'ok', assignee: 'kishan', team: 'Pieces' },
+    { id: 'not an "id"', title: 'junk', assignee: 'kishan', team: 'Pieces' },
+    { id: 42, title: 'numeric', assignee: 'kishan', team: 'Pieces' },
+  ];
+  const s = stripOf(oneWeek({ tickets: { status: 'ok', total: 3,
+    byPerson: { kishan: 3, sanket: 0 }, shipped } }), 'tickets');
+  assert.deepEqual(s.items.map((i) => i.id), ['PIE-7']);
+});
+
+test('a ticket with no usable title keeps its chip — the id alone still links', () => {
+  const shipped = [{ id: 'GIT-9', assignee: 'sanket', team: 'GIT' }];
+  const s = stripOf(oneWeek({ tickets: { status: 'ok', total: 1,
+    byPerson: { kishan: 0, sanket: 1 }, shipped } }), 'tickets');
+  assert.deepEqual(s.items, [{ id: 'GIT-9', name: '', href: 'https://linear.app/activepieces/issue/GIT-9' }]);
+});
+
+test('the tickets strip is capped like any other', () => {
+  const shipped = Array.from({ length: STRIP_CAP + 2 }, (_, i) =>
+    ({ id: `PIE-${i + 1}`, title: `t ${i}`, assignee: 'kishan', team: 'Pieces' }));
+  const s = stripOf(oneWeek({ tickets: { status: 'ok', total: shipped.length,
+    byPerson: { kishan: shipped.length, sanket: 0 }, shipped } }), 'tickets');
+  assert.equal(s.items.length, STRIP_CAP);
+  assert.equal(s.more, 2);
+});
+
+// `shipped` is optional detail the archive schema does not check, so a snapshot
+// that lost it must cost the strip and never the tile's number.
+test('a malformed shipped list costs the tickets strip, not the tile', () => {
+  const v = oneWeek({ tickets: { status: 'ok', total: 2,
+    byPerson: { kishan: 2, sanket: 0 }, shipped: 'nope' } });
+  const tile = v.tiles.find((t) => t.key === 'tickets');
+  assert.equal(tile.strip, null);
+  assert.equal(tile.value, 2);
+});
 
 test('a no-data workstream carries no strip alongside its reason', () => {
   const tile = oneWeek({ outputSchema: { status: 'no-data', reason: 'build missing', roster: OS_LOGOS } })
@@ -943,4 +988,138 @@ test('one row with no folder does not throw away the rest of the diff', () => {
   const now = [{ ...foldered(OS_ROSTER)[0], folder: undefined }, ...foldered(OS_ROSTER).slice(1)];
   const v = twoWeeks({ outputSchema: withOsRoster(prior) }, { outputSchema: withOsRoster(now) });
   assert.deepEqual(stripNames(v, 'outputSchema'), ['Notion', 'Slack']);
+});
+
+// ── ticket titles, in words a reader outside the tracker can use ────────────
+// Subjects lead with routing tags — `[BUG] [Pieces] …` — written for triage.
+// Tags are stripped by VOCABULARY, exactly as prTitle strips conventional-commit
+// types: a generic bracket-stripper would amputate `[Salesforce]`, which is the
+// sentence's subject.
+
+test('routing tags are stripped, informative brackets survive', () => {
+  assert.equal(
+    ticketTitle('[BUG] [Pieces] [Salesforce] Find Record always fails'),
+    '[Salesforce] Find Record always fails');
+  assert.equal(ticketTitle('[BUG]: Update member triggers twice.'), 'Update member triggers twice.');
+  assert.equal(ticketTitle('[Feature] [Request] Bulk import'), 'Bulk import');
+});
+
+test('a title with no routing tags is untouched', () => {
+  assert.equal(ticketTitle('Review #14413 pr'), 'Review #14413 pr');
+  assert.equal(ticketTitle('[Salesforce] Find Record fails'), '[Salesforce] Find Record fails');
+});
+
+test('the sentence left behind is capitalised', () =>
+  assert.equal(ticketTitle('[bug] fix the flow editor'), 'Fix the flow editor'));
+
+test('a title that is nothing but tags keeps the original string', () => {
+  assert.equal(ticketTitle('[BUG]'), '[BUG]');
+  assert.equal(ticketTitle('[bug] [pieces] '), '[bug] [pieces] ');
+});
+
+// ── the testing tile, once coverage is measured ──────────────────────────────
+// With a coverage roster recorded the headline is pieces COVERED; build
+// progress (PRs, commits) drops to the note line. Without one — every older
+// snapshot, and any week the tester was unreachable — the tile is build
+// progress exactly as it always was (pinned by the tests above).
+
+const COVERED = [
+  { name: 'zendesk', folder: 'zendesk', displayName: 'Zendesk', logo: null, actions: 12, stage: 'covered' },
+  { name: 'slack', folder: 'slack', displayName: 'Slack', logo: LOGO('slack'), actions: 2, stage: 'covered' },
+];
+
+const testingCovered = (roster = COVERED, extra = {}) => ({
+  status: 'ok', prsMerged: 1, commits: 6,
+  shipped: [{ number: 5, title: 'feat: x', url: 'https://x/pull/5' }],
+  roster, catalogPieces: 720, ...extra,
+});
+
+const testingTile = (over) => oneWeek(over).tiles.find((t) => t.key === 'testing');
+
+test('with coverage measured the headline is pieces covered, of the catalog', () => {
+  const tile = testingTile({ testing: testingCovered() });
+  assert.equal(tile.value, 2);
+  assert.equal(tile.unit, 'of 720 pieces covered');
+});
+
+test('the covered strip is label-less chips, display names and logos intact', () =>
+  assert.deepEqual(stripOf(oneWeek({ testing: testingCovered() }), 'testing'),
+    { kind: 'pieces', label: '', more: 0,
+      items: [{ name: 'Zendesk', logo: null }, { name: 'Slack', logo: LOGO('slack') }] }));
+
+test('build progress moves to the note line under the coverage headline', () =>
+  assert.equal(testingTile({ testing: testingCovered() }).note, '1 PR merged · 6 commits this week'));
+
+test('a week without coverage derives no note', () =>
+  assert.equal(testingTile({}).note, ''));
+
+test('with no catalog size recorded the unit does not invent a denominator', () => {
+  const { catalogPieces, ...ws } = testingCovered();
+  assert.equal(testingTile({ testing: ws }).unit, 'pieces covered');
+  const one = testingTile({ testing: { ...ws, roster: [COVERED[0]] } });
+  assert.equal(one.unit, 'piece covered');
+});
+
+test('an empty coverage roster is a measured zero, not a fallback to PRs', () => {
+  const tile = testingTile({ testing: testingCovered([]) });
+  assert.equal(tile.value, 0);
+  assert.equal(tile.unit, 'of 720 pieces covered');
+  assert.equal(tile.strip, null);
+});
+
+test('the covered strip is capped like any other', () => {
+  const many = Array.from({ length: STRIP_CAP + 2 }, (_, i) =>
+    ({ name: `p${i}`, folder: `p${i}`, displayName: `P${i}`, logo: null, actions: 1, stage: 'covered' }));
+  const s = stripOf(oneWeek({ testing: testingCovered(many) }), 'testing');
+  assert.equal(s.items.length, STRIP_CAP);
+  assert.equal(s.more, 2);
+});
+
+// The changeover week: last week measured PRs only, this week measured
+// coverage. A delta of "2 covered minus 1 PR" would be a number with no
+// meaning, so there must be none at all.
+test('the delta never compares a coverage count against a PR count', () => {
+  const v = twoWeeks({}, { testing: testingCovered() });
+  assert.equal(v.tiles.find((t) => t.key === 'testing').delta, null);
+});
+
+test('two measured weeks diff coverage against coverage', () => {
+  const v = twoWeeks({ testing: testingCovered([COVERED[0]]) }, { testing: testingCovered() });
+  assert.equal(v.tiles.find((t) => t.key === 'testing').delta, 1);
+});
+
+test('two unmeasured weeks still diff PRs against PRs', () => {
+  const v = twoWeeks({}, {});
+  assert.equal(v.tiles.find((t) => t.key === 'testing').delta, 0);
+});
+
+// ── curated notes ────────────────────────────────────────────────────────────
+// One sentence of prose per tile per week, out of weekly/data/notes.json —
+// display layer, so it can be written or fixed after the week is sealed.
+
+test('a curated note reaches its tile, collapsed to one line', () => {
+  const v = buildView(archive, { notes: { '2026-W31': { tickets: '  Salesforce fix\n shipped  ' } } });
+  assert.equal(v.tiles.find((t) => t.key === 'tickets').note, 'Salesforce fix shipped');
+});
+
+test('a curated note beats the derived one', () => {
+  const a = { weeks: [snap('2026-W31', { testing: testingCovered() })] };
+  const v = buildView(a, { notes: { '2026-W31': { testing: 'Health board shipped' } } });
+  assert.equal(v.tiles.find((t) => t.key === 'testing').note, 'Health board shipped');
+});
+
+test('a note for another week does not leak into this one', () => {
+  const v = buildView(archive, { notes: { '2026-W30': { tickets: 'last week' } } });
+  assert.equal(v.tiles.find((t) => t.key === 'tickets').note, '');
+});
+
+test('a non-string note is ignored rather than rendered', () => {
+  const v = buildView(archive, { notes: { '2026-W31': { tickets: 42 } } });
+  assert.equal(v.tiles.find((t) => t.key === 'tickets').note, '');
+});
+
+test('a degraded tile carries no note, even a curated one', () => {
+  const a = { weeks: [snap('2026-W31', { tickets: { status: 'no-data', reason: 'Linear pending' } })] };
+  const v = buildView(a, { notes: { '2026-W31': { tickets: 'should not render' } } });
+  assert.equal(v.tiles.find((t) => t.key === 'tickets').note, '');
 });

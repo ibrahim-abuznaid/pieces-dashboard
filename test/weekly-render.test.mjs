@@ -24,10 +24,11 @@ const snap = (week, over = {}) => ({
   decisions: [], ...over,
 });
 
-function render(weeks) {
+function render(weeks, { notes } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'weekly-'));
   mkdirSync(join(dir, 'data'), { recursive: true });
   writeFileSync(join(dir, 'data/weeks.json'), JSON.stringify({ weeks }));
+  if (notes) writeFileSync(join(dir, 'data/notes.json'), JSON.stringify(notes));
   const outDir = join(dir, 'out');
   const { html } = buildAll({ archiveDir: join(dir, 'data'), outDir });
   return { html, outDir };
@@ -40,8 +41,8 @@ function render(weeks) {
 //
 // `mount` keeps the sandbox, so the page's own nav wiring and focus handling can
 // be driven the way a keyboard user drives them rather than read as markup.
-function mount(weeks, hash = '') {
-  const { html } = render(weeks);
+function mount(weeks, hash = '', opts = {}) {
+  const { html } = render(weeks, opts);
   const focused = [];
   const node = (id) => ({ id, innerHTML: '', disabled: false, focus() { focused.push(id); } });
   const nodes = { app: node('app'), pick: node('pick'), prev: node('prev'), next: node('next') };
@@ -60,7 +61,7 @@ function mount(weeks, hash = '') {
   return { nodes, doc, focused, go, hash: () => sandbox.location.hash };
 }
 
-const renderDom = (weeks, hash = '') => mount(weeks, hash).nodes.app.innerHTML;
+const renderDom = (weeks, hash = '', opts = {}) => mount(weeks, hash, opts).nodes.app.innerHTML;
 
 test('renders an HTML document', () => {
   const { html } = render([snap('2026-W31')]);
@@ -419,16 +420,39 @@ test('the per-person table is gone, folded into the tickets box as one line', ()
   assert.match(dom, /Kishan 5 · Sanket 6/);
 });
 
-// Ticket ids and titles are also exactly what this public repo's data policy
-// keeps off the site.
-test('the shipped-this-week table is gone', () => {
+// The tickets table stays gone; what replaced it is a strip of linked CHIPS —
+// id plus shortened title, each opening the ticket itself in Linear. Ticket
+// ids and short titles on the public site are a deliberate policy decision
+// (see README.md, "Public-data policy"): the ceiling moved because a list the
+// reader cannot click through was the page's most-asked-for missing feature.
+test('the shipped-this-week table is gone; linked ticket chips carry the list instead', () => {
   const dom = renderDom([snap('2026-W31', {
     tickets: { status: 'ok', total: 2, byPerson: { kishan: 2, sanket: 0 },
-      shipped: [{ id: 'PIE-101', title: 'internal ticket title', assignee: 'kishan' }] },
+      shipped: [{ id: 'PIE-101', title: '[BUG] flow editor crash', assignee: 'kishan' }] },
   })]);
   assert.doesNotMatch(dom, /Shipped this week/);
-  assert.doesNotMatch(dom, /PIE-101/);
-  assert.doesNotMatch(dom, /internal ticket title/);
+  const tile = tileOf(dom, 'Tickets solved');
+  assert.match(tile, /<a href="https:\/\/linear\.app\/activepieces\/issue\/PIE-101" target="_blank" rel="noopener">/);
+  assert.match(tile, /<span class="tid">PIE-101<\/span>/);
+  // The routing tag is stripped for display; the sentence survives.
+  assert.deepEqual(chipNames(tile), ['Flow editor crash']);
+  assert.doesNotMatch(tile, /\[BUG\]/);
+});
+
+// Both halves of a ticket chip pass through the same escaping as every other
+// chip, and a hostile id never becomes an href at all.
+test('a hostile ticket title is escaped and a hostile id gets no link', () => {
+  const dom = renderDom([snap('2026-W31', {
+    tickets: { status: 'ok', total: 2, byPerson: { kishan: 2, sanket: 0 },
+      shipped: [
+        { id: 'PIE-9', title: '<img src=x onerror=alert(1)>', assignee: 'kishan' },
+        { id: '"><script>alert(1)</script>-1', title: 'evil id', assignee: 'kishan' },
+      ] },
+  })]);
+  assert.doesNotMatch(dom, /<img src=x/);
+  assert.doesNotMatch(dom, /<script>alert/);
+  assert.match(dom, /&lt;img src=x onerror=alert\(1\)&gt;/);
+  assert.doesNotMatch(dom, /evil id/);
 });
 
 // ── the catalog denominator ────────────────────────────────────────────────
@@ -1089,4 +1113,79 @@ test('the page keeps the whitespace budget that makes it fit a laptop screen', (
   for (const v of budget) assert.ok(Number.isFinite(v), `unreadable vertical metric in the page CSS: ${budget}`);
   const total = budget.reduce((a, b) => a + b, 0);
   assert.ok(total <= 98, `page furniture is ${total}px of whitespace; the one-screen budget is 98px`);
+});
+
+// ── linked chips, coverage, and notes on the rendered page ──────────────────
+// The view builds hrefs, short titles and notes; these pin that they reach the
+// DOM wired the way a reader uses them — and that nothing unescaped rides in.
+
+const coveredWeek = (week = '2026-W31') => snap(week, {
+  testing: { status: 'ok', prsMerged: 1, commits: 6,
+    shipped: [{ number: 5, title: 'feat(health): piece health board',
+                url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5' }],
+    catalogPieces: 720,
+    roster: [
+      { name: 'zendesk', folder: 'zendesk', displayName: 'Zendesk', logo: null, actions: 12, stage: 'covered' },
+      { name: 'slack', folder: 'slack', displayName: 'Slack',
+        logo: 'https://cdn.activepieces.com/pieces/slack.png', actions: 2, stage: 'covered' },
+    ] },
+});
+
+test('a covered week leads with the coverage headline and lists the pieces', () => {
+  const tile = tileOf(renderDom([coveredWeek()]), 'Piece testing');
+  assert.match(tile, /of 720 pieces covered/);
+  assert.deepEqual(chipNames(tile), ['Zendesk', 'Slack']);
+  assert.match(tile, /cdn\.activepieces\.com\/pieces\/slack\.png/);
+  assert.match(tile, /1 PR merged · 6 commits this week/);
+});
+
+test('a label-less strip renders chips with no striplab heading', () => {
+  const tile = tileOf(renderDom([coveredWeek()]), 'Piece testing');
+  assert.doesNotMatch(tile, /striplab/);
+});
+
+test('a curated note replaces the derived build-progress line', () => {
+  const tile = tileOf(renderDom([coveredWeek()], '',
+    { notes: { '2026-W31': { testing: 'Health board shipped; nightly runs live' } } }), 'Piece testing');
+  assert.match(tile, /Health board shipped; nightly runs live/);
+  assert.doesNotMatch(tile, /6 commits this week/);
+});
+
+test('a hostile curated note is escaped on its way to the DOM', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')], '',
+    { notes: { '2026-W31': { tickets: '<script>alert(1)</script>' } } }), 'Tickets solved');
+  assert.doesNotMatch(tile, /<script>/);
+  assert.match(tile, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+});
+
+test('a shipped PR chip links to the PR when the archive recorded an https URL', () => {
+  const tile = tileOf(renderDom([testingWeek('2026-W31', [
+    { number: 5, title: 'feat(health): piece health board',
+      url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5' },
+  ])]), 'Piece testing');
+  assert.match(tile,
+    /<a href="https:\/\/github\.com\/ibrahim-abuznaid\/piece-tester-web\/pull\/5" target="_blank" rel="noopener">/);
+});
+
+test('a PR whose recorded url is not https renders a plain, unlinked chip', () => {
+  const tile = tileOf(renderDom([testingWeek('2026-W31', [
+    { number: 6, title: 'feat: alerts', url: 'javascript:alert(1)' },
+  ])]), 'Piece testing');
+  assert.doesNotMatch(tile, /<a /);
+  assert.doesNotMatch(tile, /javascript:/);
+  assert.deepEqual(chipNames(tile), ['Alerts']);
+});
+
+// The ticket chips of the week the site is serving right now, out of the
+// committed archive — the check that the real data renders, not just fixtures.
+test('the committed archive renders linked ticket chips', () => {
+  const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
+  const week = archive.weeks.at(-1);
+  const shipped = week.tickets?.shipped ?? [];
+  if (!shipped.length) return; // a quiet week is not a failure of the wiring
+  const tile = tileOf(renderDom([week]), 'Tickets solved');
+  for (const t of shipped) {
+    assert.match(tile, new RegExp(`<a href="https://linear\\.app/activepieces/issue/${t.id}"`));
+    assert.match(tile, new RegExp(`<span class="tid">${t.id}</span>`));
+  }
 });

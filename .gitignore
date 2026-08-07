@@ -2,3 +2,7 @@ dist/
 node_modules/
 output-schema/data/.coverage.jsonl
 refresh-weekly.log
+verify-weekly.log
+# Local-only environment (PIECE_TESTER_URL etc.) — deployment addresses stay
+# out of this public repo. Sourced by refresh-weekly.sh when present.
+.env.local

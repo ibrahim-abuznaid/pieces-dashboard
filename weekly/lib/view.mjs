@@ -130,18 +130,98 @@ export function prTitle(title) {
   return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 }
 
+// ── links on chips ──────────────────────────────────────────────────────────
+// A chip that names an artifact with a home of its own — a PR, a ticket — links
+// to it, so the reader who wants the detail behind a one-line name is one click
+// from the source instead of searching for it. https only, checked here rather
+// than trusted from the archive: a chip's href lands verbatim in an <a>, and
+// weeks.json is hand-editable, so this is the same boundary the template's
+// escaping defends. A refused href costs the chip its link, never its place.
+const httpsHref = (v) => (typeof v === 'string' && /^https:\/\//.test(v) ? v : undefined);
+
 // Piece testing ships PRs, not pieces: its strip is their titles, and there is
 // no logo to show for a pull request. The collector already windowed them to
 // this week, so no diff is involved.
 //
 // `shipped` is optional detail the archive does not validate — a snapshot
 // missing it, or carrying a titleless entry, costs the strip and never the
-// tile's number.
+// tile's number. `href` is omitted rather than set undefined when the URL is
+// unusable, so a chip's shape says what it carries.
 function prStrip(shipped) {
   const items = (Array.isArray(shipped) ? shipped : [])
     .filter((pr) => typeof pr?.title === 'string' && pr.title)
-    .map(({ title }) => ({ name: prTitle(title) }));
+    .map(({ title, url }) => {
+      const href = httpsHref(url);
+      return href ? { name: prTitle(title), href } : { name: prTitle(title) };
+    });
   return items.length ? capped('prs', 'Shipped', items) : null;
+}
+
+// ── the tickets a week closed ───────────────────────────────────────────────
+// One chip per closed ticket: the id, a shortened title, and a link to the
+// ticket itself. The strip carries NO label — the tile's unit line ("closed
+// this week") already says exactly what these are, and a second heading between
+// the number and its list was the kind of filler this page has none of.
+//
+// The link is the ticket's home in Linear, built from the id rather than stored:
+// the workspace is fixed for this team, and Linear resolves id-only URLs. Only
+// ids in Linear's own shape get a chip at all — the id goes into a URL, so junk
+// stays off the page entirely rather than becoming a dead link.
+const LINEAR_ID = /^[A-Za-z][A-Za-z0-9]*-\d+$/;
+const ticketUrl = (id) => `https://linear.app/activepieces/issue/${id}`;
+
+// A ticket's subject leads with routing tags — `[BUG] [Pieces] [Salesforce]
+// Find Record always fails: …` — written for the tracker's triage, not for a
+// reader. Tags are stripped by VOCABULARY, exactly as prTitle strips
+// conventional-commit types: `[BUG]` and `[Pieces]` classify, but `[Salesforce]`
+// is the sentence's subject and a generic bracket-stripper would amputate it.
+// The verbatim title survives in the chip's hover tooltip and in weeks.json.
+const TICKET_TAGS = ['bug', 'feature', 'improvement', 'request', 'task', 'pieces', 'piece'];
+const TICKET_TAG = new RegExp(`^\\[\\s*(?:${TICKET_TAGS.join('|')})\\s*\\]\\s*:?\\s*`, 'i');
+
+export function ticketTitle(title) {
+  let out = String(title);
+  while (TICKET_TAG.test(out)) out = out.replace(TICKET_TAG, '');
+  // Nothing left but tags is all the title there is — as with prTitle, an empty
+  // chip reads as a broken page, so the verbatim title wins.
+  if (!out || out === title) return title;
+  return out.charAt(0).toUpperCase() + out.slice(1);
+}
+
+function ticketStrip(ws) {
+  const items = (Array.isArray(ws.shipped) ? ws.shipped : [])
+    .filter((t) => typeof t?.id === 'string' && LINEAR_ID.test(t.id))
+    .map((t) => ({
+      id: t.id,
+      name: typeof t.title === 'string' && t.title ? ticketTitle(t.title) : '',
+      href: ticketUrl(t.id),
+    }));
+  return items.length ? capped('tickets', '', items) : null;
+}
+
+// ── the pieces the tester covers ────────────────────────────────────────────
+// When a snapshot recorded the tester's coverage (see collect/testing.mjs), the
+// tile's headline is pieces COVERED — cumulative state, not weekly output, so
+// there is no done-this-week diff to run and no label to carry: the unit line
+// ("of 720 pieces covered") has already said what the chips are. Rows arrive
+// most-tested first from the collector, so the cap keeps the most meaningful.
+//
+// An empty roster is still a measurement: the tile says 0 covered, with no
+// strip. That is different from no roster at all, which is "coverage was not
+// measured" and falls back to build progress — see the TILES entry.
+const coveredRows = (ws) => (Array.isArray(ws?.roster) ? ws.roster : null);
+
+// Accessor (not a stored field) so every already-committed snapshot keeps
+// working, and so the delta compares like with like: a week that did not
+// measure coverage yields null here, never a PR count in disguise.
+const coveredCount = (snap) => {
+  const rows = coveredRows(snap.testing);
+  return rows ? rows.length : null;
+};
+
+function coveredStrip(ws) {
+  const rows = coveredRows(ws) ?? [];
+  return rows.length ? capped('pieces', '', rows.map(toChip)) : null;
 }
 
 // key, title, the metric the big number shows, and how to phrase it. A box is a
@@ -169,14 +249,31 @@ const TILES = [
       ? `of ${ws.catalogPieces} have AI actions`
       : `of ${ws.totalPieces} merged`),
     strip: pieceStrip, done: ['merged'] },
-  { key: 'testing', title: 'Piece testing', path: 'testing.prsMerged',
-    unit: (ws) => `${plural(ws.prsMerged, 'PR')} shipped`,
-    strip: (ws) => prStrip(ws.shipped) },
-  // No strip: tickets are not pieces. Who closed them is the one piece of detail
-  // management does read, so it folds into this box as a single line rather than
-  // into a table of its own.
+  // Two headlines, chosen by what the snapshot measured. With coverage recorded
+  // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
+  // drops to the note line; without it — every older snapshot, and any week the
+  // tester was unreachable — the tile is build progress exactly as it always
+  // was. `pathFor` picks per week, and hands deltaFor the same accessor it
+  // hands `value`, so a delta can never compare a coverage count against a PR
+  // count across the changeover: coveredCount is null on unmeasured weeks, and
+  // a null side yields no delta at all.
+  { key: 'testing', title: 'Piece testing',
+    pathFor: (ws) => (coveredRows(ws) ? coveredCount : 'testing.prsMerged'),
+    unit: (ws) => (coveredRows(ws)
+      ? (typeof ws.catalogPieces === 'number'
+        ? `of ${ws.catalogPieces} pieces covered`
+        : `${plural(coveredRows(ws).length, 'piece')} covered`)
+      : `${plural(ws.prsMerged, 'PR')} shipped`),
+    strip: (ws) => (coveredRows(ws) ? coveredStrip(ws) : prStrip(ws.shipped)),
+    note: (ws) => (coveredRows(ws)
+      ? `${ws.prsMerged} ${plural(ws.prsMerged, 'PR')} merged · ${ws.commits} ${plural(ws.commits, 'commit')} this week`
+      : '') },
+  // Tickets are not pieces, so the strip is ids and titles, each linking to the
+  // ticket itself. Who closed them is the one line of detail management does
+  // read, so it stays folded into this box rather than becoming a table.
   { key: 'tickets', title: 'Tickets solved', path: 'tickets.total',
-    unit: () => 'closed this week', perPerson: perPersonLine },
+    unit: () => 'closed this week', perPerson: perPersonLine,
+    strip: (ws) => ticketStrip(ws) },
 ];
 
 // ── decisions ───────────────────────────────────────────────────────────────
@@ -321,10 +418,23 @@ function pieceStrip(ws, spec, weeks, selected) {
 // missing, and a second copy of that name is the filler this page has none of.
 const NOT_MEASURED = 'not measured this week';
 
+// ── the note line ───────────────────────────────────────────────────────────
+// One sentence of prose under a tile's number: the "what actually happened"
+// that no derived count can say. Curated per week in weekly/data/notes.json —
+// display layer, never the archive, so a note can be written or fixed after
+// the week is sealed — and passed in by the caller because this module does no
+// I/O. A tile with no curated note falls back to whatever its spec derives
+// (today only piece testing derives one), and to nothing at all.
+//
+// Collapsed to one line before it renders: the note shares the page's height
+// budget, and a pasted paragraph would spend it.
+const curatedNote = (v) =>
+  (typeof v === 'string' && v.trim() ? v.trim().replace(/\s+/g, ' ') : null);
+
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
 // unused: the newest entry in the archive already is the newest complete week,
 // and reading a clock here would break purity.
-export function buildView(archive, { weekId } = {}) {
+export function buildView(archive, { weekId, notes } = {}) {
   const weeks = archive?.weeks ?? [];
   if (!weeks.length) return { empty: true, weeks: [] };
 
@@ -343,15 +453,19 @@ export function buildView(archive, { weekId } = {}) {
       // nothing to distinguish for this reader between "not collected" and
       // "collected and failed".
       return { key: spec.key, title: spec.title, status: 'no-data', reason: NOT_MEASURED,
-               value: null, delta: null, unit: '', strip: null, perPerson: '' };
+               value: null, delta: null, unit: '', strip: null, perPerson: '', note: '' };
     }
+    // Resolved per week when the spec asks (pathFor), so value and delta always
+    // share one metric — see the piece-testing entry in TILES.
+    const path = spec.pathFor ? spec.pathFor(ws) : spec.path;
     return {
       key: spec.key, title: spec.title, status: 'ok', reason: '',
-      value: pick(selected, spec.path),
-      delta: deltaFor(weeks, selected.week, spec.path),
+      value: pick(selected, path),
+      delta: deltaFor(weeks, selected.week, path),
       unit: spec.unit(ws),
       strip: spec.strip?.(ws, spec, weeks, selected) ?? null,
       perPerson: spec.perPerson?.(ws) ?? '',
+      note: curatedNote(notes?.[selected.week]?.[spec.key]) ?? spec.note?.(ws) ?? '',
     };
   });
 

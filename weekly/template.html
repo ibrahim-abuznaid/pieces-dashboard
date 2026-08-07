@@ -75,8 +75,9 @@
   .delta .arrow { font-size: 10px; }
   .delta.up { color: var(--good-text); } .delta.down { color: var(--sev-high); }
   .delta.flat { color: var(--text-muted); }
-  /* The per-person line in the tickets box — the only line of detail left under
-     any number on this page. */
+  /* The one-line details a number may carry: who closed the tickets, and the
+     curated week note (see weekly/data/notes.json). The view collapses a note
+     to a single sentence — this class buys no more room than that. */
   .note { color: var(--text-secondary); font-size: 12.5px; margin-top: 8px; }
   /* Degraded state gets a non-colour cue too: a dashed edge and the word "No data". */
   .tile.is-nodata { border-style: dashed; }
@@ -118,6 +119,21 @@
                    border-radius: 999px; padding: 2px 9px 2px 3px; }
   ul.strip .chip .nm { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   ul.strip .chip.more { color: var(--text-secondary); padding-left: 9px; }
+  /* A chip that names a PR or a ticket LINKS to it. The anchor is the chip's
+     whole inner surface — the li gives up its padding to it — so the click
+     target is the pill, not a word inside it. Affordance arrives on hover and
+     focus (underline) rather than at rest: a row of underlined chips reads as
+     noise, and the pointer cursor plus the tooltip already say "this opens".
+     The one thing a link chip must not change is the chip GEOMETRY: same
+     nowrap, same half-row clamp, same ellipsis — see the strip comment above. */
+  ul.strip .chip.lnk { padding: 0; }
+  ul.strip .chip.lnk a { display: inline-flex; align-items: center; gap: 6px; min-width: 0;
+                         max-width: 100%; color: inherit; text-decoration: none; padding: 2px 9px; }
+  ul.strip .chip.lnk a:hover .nm, ul.strip .chip.lnk a:focus-visible .nm { text-decoration: underline; }
+  ul.strip .chip.lnk a:focus-visible { outline: 2px solid var(--s-progress); outline-offset: 1px; border-radius: 999px; }
+  /* The ticket id: the stable half of a ticket chip, so it never ellipsizes —
+     the title does. Muted, because the id is an address, not the news. */
+  ul.strip .chip .tid { color: var(--text-secondary); font-size: 11px; font-weight: 650; flex: none; }
   /* The initial sits UNDERNEATH the logo. A logo that 404s — or a page opened
      with no network at all — removes the img and reveals the letter, so a piece
      never degrades to a broken-image icon.
@@ -187,19 +203,40 @@ const initial = (name) => esc(([...String(name)][0] ?? '·').toUpperCase());
 const iconHtml = (p) => `<span class="ic" aria-hidden="true"><b class="init">${initial(p.name)}</b>${
   p.logo ? `<img src="${esc(p.logo)}" alt="" width="16" height="16" onerror="this.remove()">` : ''}</span>`;
 
+// One chip. Its parts are all optional and all view-built: an icon only on
+// pieces strips, an id badge only on tickets, and the name whenever there is
+// one. The name is its own element so the CSS can ellipsize it inside a chip
+// that is clamped to half a row — the whole string stays here either way.
+//
+// A chip with an `href` wraps the lot in an anchor to the artifact itself —
+// the ticket in Linear, the PR on GitHub — opened in its own tab, because this
+// page is the hub the reader comes back to. No tooltip carries the long form:
+// the whole display string is already in the markup (the ellipsis is CSS), and
+// the artifact itself is one click away. Every part is escaped, and the view
+// has already refused any href that is not https — this string lands verbatim
+// in the DOM.
+function chipHtml(s, it) {
+  const body = `${s.kind === 'pieces' ? iconHtml(it) : ''}${
+    it.id ? `<span class="tid">${esc(it.id)}</span>` : ''}${
+    it.name ? `<span class="nm">${esc(it.name)}</span>` : ''}`;
+  return it.href
+    ? `<li class="chip lnk"><a href="${esc(it.href)}" target="_blank" rel="noopener">${body}</a></li>`
+    : `<li class="chip">${body}</li>`;
+}
+
 // The pieces the number refers to, in the same box as the number. `label` is
 // built in the view and is the honest part: "Done this week" only when there was
 // a real preceding week to diff against, "Done in total" otherwise. A strip with
-// a label and no chips is a week that moved nothing — that says itself.
+// a label and no chips is a week that moved nothing — that says itself. A strip
+// with chips and NO label is one whose unit line already named its contents
+// ("closed this week", "pieces covered") — the view sends label: '' and no
+// heading renders, because a heading that repeats the previous line is filler.
 function stripHtml(s) {
   if (!s) return '';
-  // The name is its own element so the CSS can ellipsize it inside a chip that
-  // is clamped to half a row — the whole string stays here either way.
-  const chips = s.items.map((it) =>
-    `<li class="chip">${s.kind === 'pieces' ? iconHtml(it) : ''}<span class="nm">${esc(it.name)}</span></li>`).join('');
+  const chips = s.items.map((it) => chipHtml(s, it)).join('');
   // Capped in the view: a big week must not push the page past one screen.
   const more = s.more ? `<li class="chip more">+${num(s.more)} more</li>` : '';
-  return `<div class="striplab">${esc(s.label)}</div>${
+  return `${s.label ? `<div class="striplab">${esc(s.label)}</div>` : ''}${
     s.items.length ? `<ul class="strip">${chips}${more}</ul>` : ''}`;
 }
 
@@ -216,6 +253,7 @@ function tileHtml(t) {
   return `<div class="tile"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${deltaHtml(t.delta)}</div>
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
+    ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}
     ${stripHtml(t.strip)}</div>`;
 }
 

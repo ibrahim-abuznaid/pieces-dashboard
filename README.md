@@ -45,15 +45,32 @@ blob, so grepping the served HTML for a week id proves nothing. `verify-weekly.m
 executes the page's scripts in a `node:vm` sandbox.
 
 The page is written for a **project manager**: the week, four numbers, the pieces behind each number, and
-anything that needs a decision. Engineering caveats are recorded here rather than on the page.
+anything that needs a decision. Closed tickets and shipped PRs render as chips that **link to the artifact
+itself** (the ticket in Linear, the PR on GitHub). Engineering caveats are recorded here rather than on the page.
 
-### Known limitation — piece testing is build progress, not piece health
+### Curated week notes
 
-The `Piece testing` number counts **merged PRs on `piece-tester-web`** (with commits collected alongside it).
-It says nothing about how many pieces pass or fail. Run results live in a local SQLite DB that the repo's
-export script does not dump, so pass/fail counts are not reachable yet: unlocking them needs a
-**stats endpoint on `piece-tester-web`**, or a committed `health.json`. Until then do not read that box as
-"pieces tested" — see `weekly/collect/testing.mjs`.
+`weekly/data/notes.json` maps *week → workstream → one short sentence* rendered under that tile's number —
+the "what actually happened" no derived count can say. It is display layer, **not** the archive: weeks.json
+stays immutable, while a note can be written (or fixed) after the week is sealed with one edit and a push.
+The view collapses a note to a single line; write one sentence, not a paragraph.
+
+### Piece testing — coverage when reachable, build progress otherwise
+
+When a snapshot is taken with **`PIECE_TESTER_URL`** set, the collector reads the running tester's
+`/api/coverage` and the box leads with **pieces covered** — pieces with at least one test plan — listing them
+as chips, with build progress (PRs merged, commits) on the note line. The address is deployment detail and
+stays out of this public repo: put it in the gitignored `.env.local` (sourced by `refresh-weekly.sh`), e.g.
+`export PIECE_TESTER_URL=http://<tester-host>:4000`. Snapshots only ever run locally, so CI never needs it.
+
+Without the URL — every older week, and any week the server is unreachable — the box counts
+**merged PRs on `piece-tester-web`** with their titles as chips: build progress, exactly as before. A
+coverage miss is recorded as `coverageError` in the snapshot and warned at snapshot time, never rendered.
+
+Neither headline is piece **health**: pass/fail run results are still not collected, and unlocking them needs
+a **stats endpoint** read the same way (the coverage endpoint already reports per-piece health — rendering it
+is a deliberate later step, not a data gap). Do not read that box as "pieces passing" — see
+`weekly/collect/testing.mjs`.
 
 ## Claiming work (the 3-stage model)
 
@@ -78,5 +95,10 @@ npm run build    # writes dist/ — open dist/index.html
 
 ## Public-data policy
 
-This repo is public. Never commit real names/locations, Linear ticket titles, bounty or velocity data, or secrets.
-GitHub handles and bare `PIE-###` ids are the ceiling.
+This repo is public. Never commit real names/locations, bounty or velocity data, or secrets.
+The ceiling is: GitHub handles, bare ticket ids (`PIE-###`), and **ticket titles** — which the weekly page
+shows shortened of their routing tags, each linking to the ticket in Linear (where the detail stays, behind
+Linear's own login). Ids and titles were raised to the ceiling deliberately in Aug 2026 so the "Tickets
+solved" box is a clickable list rather than a bare count. Nothing beyond an id and a title lands here — no
+descriptions, no comments, no customer data — and a title that itself names a customer or a person must be
+reworded in Linear before the Saturday snapshot (or hand-dropped from `weeks.json`).

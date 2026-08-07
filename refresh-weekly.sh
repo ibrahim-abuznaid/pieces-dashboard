@@ -21,6 +21,12 @@ DASHBOARD="${PIECES_TEAM_DASHBOARD:-/home/ibrahim/AP_work/Activepieces_v/pieces-
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TODAY="$(date +%F)"
 
+# Local-only settings the snapshot needs but the repo must not carry —
+# PIECE_TESTER_URL above all: the tester's address is deployment detail, and
+# this repo is public. Optional on purpose: without the file the coverage half
+# of the testing collector is simply off and the snapshot still lands.
+if [ -f "$REPO/.env.local" ]; then . "$REPO/.env.local"; fi
+
 log()  { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 fail() { log "ERROR line $1 — aborting"; }
 trap 'fail "$LINENO"' ERR
