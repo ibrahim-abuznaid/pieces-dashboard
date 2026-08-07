@@ -58,7 +58,7 @@ function mount(weeks, hash = '', opts = {}) {
     sandbox.location.hash = to;
     for (const [type, fn] of listeners) if (type === 'hashchange') fn();
   };
-  return { nodes, doc, focused, go, hash: () => sandbox.location.hash };
+  return { nodes, doc, focused, go, hash: () => sandbox.location.hash, sandbox };
 }
 
 const renderDom = (weeks, hash = '', opts = {}) => mount(weeks, hash, opts).nodes.app.innerHTML;
@@ -624,15 +624,49 @@ test('a week that moved nothing says so instead of re-listing finished work', ()
 
 // Derived from STRIP_CAP, not hardcoded: this assertion went stale the moment
 // the cap changed, while the view tests that derive from the constant did not.
-test('an overflowing strip is capped and says how many it did not show', () => {
+//
+// The overflow is IN the page now — every chip past the cap renders `hidden`,
+// and "+N more" is the button that reveals them — so what these assert is the
+// landing state: exactly STRIP_CAP chips visible, the remainder hidden, and
+// the button announcing itself collapsed.
+test('an overflowing strip lands capped, with the remainder hidden behind the button', () => {
   const over = 3;
   const many = Array.from({ length: STRIP_CAP + over }, (_, i) =>
     ({ name: `Piece ${i}`, actions: 20 - i, triggers: 0, stage: 'live', tier: 'P1', logo: LOGO(`p${i}`) }));
   const tile = tileOf(renderDom([osLogoWeek('2026-W31', many)]), 'outputSchema');
-  assert.match(tile, new RegExp(`\\+${over} more`));
+  // Visible chips only: `class="chip"` exactly — hidden overflow is `chip ext`.
   assert.equal([...tile.matchAll(/<li class="chip"/g)].length, STRIP_CAP);
   assert.match(tile, /<span class="nm">Piece 0<\/span><\/li>/);
-  assert.doesNotMatch(tile, new RegExp(`>Piece ${STRIP_CAP + over - 1}<`));
+  // The whole remainder is present, each hidden until asked for.
+  assert.equal([...tile.matchAll(/<li class="chip ext" hidden>/g)].length, over);
+  assert.match(tile, new RegExp(`<li class="chip ext" hidden>.*?>Piece ${STRIP_CAP + over - 1}<`));
+  // The button starts collapsed and remembers its own label for collapsing back.
+  assert.match(tile, new RegExp(
+    `<button type="button" aria-expanded="false" data-more="\\+${over} more" onclick="toggleStrip\\(this\\)">\\+${over} more</button>`));
+});
+
+// The toggle itself, driven the way a reader drives it: expanded shows every
+// chip and offers "Show less"; collapsing restores the landing state.
+test('the "+N more" button reveals the overflow and collapses it back', () => {
+  const { sandbox } = mount([osLogoWeek('2026-W31', Array.from({ length: STRIP_CAP + 2 }, (_, i) =>
+    ({ name: `Piece ${i}`, actions: 9, triggers: 0, stage: 'live', tier: 'P1', logo: null })))]);
+  const hidden = [{ hidden: true }, { hidden: true }];
+  const btn = {
+    attrs: { 'aria-expanded': 'false' },
+    dataset: { more: '+2 more' },
+    textContent: '+2 more',
+    getAttribute(k) { return this.attrs[k]; },
+    setAttribute(k, v) { this.attrs[k] = v; },
+    closest: () => ({ querySelectorAll: () => hidden }),
+  };
+  sandbox.toggleStrip(btn);
+  assert.deepEqual(hidden, [{ hidden: false }, { hidden: false }]);
+  assert.equal(btn.attrs['aria-expanded'], 'true');
+  assert.equal(btn.textContent, 'Show less');
+  sandbox.toggleStrip(btn);
+  assert.deepEqual(hidden, [{ hidden: true }, { hidden: true }]);
+  assert.equal(btn.attrs['aria-expanded'], 'false');
+  assert.equal(btn.textContent, '+2 more');
 });
 
 test('a strip that fits shows no "+N more"', () =>

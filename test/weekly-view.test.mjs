@@ -554,9 +554,9 @@ test('each box carries its own diff', () => {
     { outputSchema: withOsRoster(OS_PRIOR),
       aiActions: withAiRoster([{ name: 'google-sheets', actions: 37, stage: 'pr-open' }]) },
     { outputSchema: withOsRoster(OS_ROSTER), aiActions: withAiRoster(AI_ROSTER) });
-  assert.deepEqual(stripOf(v, 'outputSchema'), { kind: 'pieces', label: 'Done this week', more: 0,
+  assert.deepEqual(stripOf(v, 'outputSchema'), { kind: 'pieces', label: 'Done this week', more: 0, rest: [],
     items: [{ name: 'Notion', logo: null }, { name: 'Slack', logo: null }] });
-  assert.deepEqual(stripOf(v, 'aiActions'), { kind: 'pieces', label: 'Done this week', more: 0,
+  assert.deepEqual(stripOf(v, 'aiActions'), { kind: 'pieces', label: 'Done this week', more: 0, rest: [],
     items: [{ name: 'google-sheets', logo: null }] });
 });
 
@@ -600,7 +600,7 @@ const OS_LOGOS_PRIOR = OS_LOGOS.map((r) =>
 
 test('with nothing to diff against, the strip is every done piece, labelled the total', () =>
   assert.deepEqual(stripOf(oneWeek({ outputSchema: withOsRoster(OS_LOGOS) }), 'outputSchema'), {
-    kind: 'pieces', label: 'Done in total', more: 0,
+    kind: 'pieces', label: 'Done in total', more: 0, rest: [],
     items: [{ name: 'ClickUp', logo: LOGO('clickup') },
             { name: 'Slack', logo: LOGO('slack') },
             { name: 'Notion', logo: null }],
@@ -609,7 +609,7 @@ test('with nothing to diff against, the strip is every done piece, labelled the 
 test('with a consecutive prior week the strip is only what newly landed, labelled the week', () =>
   assert.deepEqual(stripOf(twoWeeks({ outputSchema: withOsRoster(OS_LOGOS_PRIOR) },
                                     { outputSchema: withOsRoster(OS_LOGOS) }), 'outputSchema'), {
-    kind: 'pieces', label: 'Done this week', more: 0,
+    kind: 'pieces', label: 'Done this week', more: 0, rest: [],
     items: [{ name: 'Notion', logo: null }, { name: 'Slack', logo: LOGO('slack') }],
   }));
 
@@ -665,7 +665,7 @@ test('the AI-actions strip shows merged pieces only — not the PRs still open',
 
 test("the testing tile's strip is the titles of the PRs it shipped", () =>
   assert.deepEqual(stripOf(buildView(archive), 'testing'),
-    { kind: 'prs', label: 'Shipped', items: [{ name: 't' }], more: 0 }));
+    { kind: 'prs', label: 'Shipped', items: [{ name: 't' }], rest: [], more: 0 }));
 
 test('the testing strip is capped like any other', () => {
   const shipped = Array.from({ length: STRIP_CAP + 1 }, (_, i) => ({ number: i, title: `pr ${i}`, url: 'u' }));
@@ -686,7 +686,7 @@ test('a testing week that shipped no PRs carries no strip', () =>
 // chip verbatim.
 test('the tickets strip is one linked chip per closed ticket', () =>
   assert.deepEqual(stripOf(buildView(archive), 'tickets'),
-    { kind: 'tickets', label: '', more: 0,
+    { kind: 'tickets', label: '', more: 0, rest: [],
       items: [{ id: 'PIE-101', name: 'x', href: 'https://linear.app/activepieces/issue/PIE-101' }] }));
 
 // The id goes into a URL, so junk must cost the chip, never become a dead or
@@ -1044,7 +1044,7 @@ test('with coverage measured the headline is pieces covered, of the catalog', ()
 
 test('the covered strip is label-less chips, display names and logos intact', () =>
   assert.deepEqual(stripOf(oneWeek({ testing: testingCovered() }), 'testing'),
-    { kind: 'pieces', label: '', more: 0,
+    { kind: 'pieces', label: '', more: 0, rest: [],
       items: [{ name: 'Zendesk', logo: null }, { name: 'Slack', logo: LOGO('slack') }] }));
 
 test('build progress moves to the note line under the coverage headline', () =>
@@ -1123,3 +1123,18 @@ test('a degraded tile carries no note, even a curated one', () => {
   const v = buildView(a, { notes: { '2026-W31': { tickets: 'should not render' } } });
   assert.equal(v.tiles.find((t) => t.key === 'tickets').note, '');
 });
+
+// ── the overflow rides along ────────────────────────────────────────────────
+// `items` is what a fresh page shows; `rest` is everything past the cap, in
+// the same order, so the "+N more" button can reveal the WHOLE list — the two
+// always partition the strip, and `more` is the count they must agree on.
+test('a strip carries its whole overflow in rest, in order, agreeing with more', () => {
+  const many = Array.from({ length: STRIP_CAP + 3 }, (_, i) =>
+    ({ name: `Piece ${i}`, actions: 20 - i, triggers: 0, stage: 'live', tier: 'P1', logo: null }));
+  const s = stripOf(oneWeek({ outputSchema: withOsRoster(many) }), 'outputSchema');
+  assert.deepEqual(s.rest.map((i) => i.name), ['Piece 5', 'Piece 6', 'Piece 7']);
+  assert.equal(s.rest.length, s.more);
+});
+
+test('a strip inside the cap has an empty rest', () =>
+  assert.deepEqual(stripOf(buildView(archive), 'tickets').rest, []));

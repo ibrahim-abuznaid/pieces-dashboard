@@ -76,15 +76,19 @@ function perPersonLine(ws) {
 // The pieces behind a number, inside the box that carries the number, so the
 // reader never holds a figure in their head and scrolls for the list it means.
 //
-// CAPPED: a big week must not push the page past one screen, so the overflow is
-// counted rather than listed. Capped here rather than in the template because
-// the count is part of the view model a test can read.
+// CAPPED, not truncated: a big week must not push the page past one screen, so
+// the strip OPENS at five chips — but the overflow rides along in `rest`, and
+// the "+N more" chip is a button that reveals it in place. The page a reader
+// lands on always fits the screen; a page a reader deliberately expanded is
+// allowed to scroll, because that height was asked for. Capped here rather
+// than in the template because the split is part of the view model a test can
+// read, and `more` stays the count `rest` must agree with.
 //
-// Five, measured rather than chosen. A strip's height is ROWS of chips, and the
-// page's CSS guarantees two chips per row whatever the names are (a chip is one
-// line and at most half a row wide — see template.html), so the cap is what
-// decides how many rows a box can grow to: five plus the "+N more" chip is six
-// chips, three rows, a 202px box.
+// Five, measured rather than chosen. A COLLAPSED strip's height is ROWS of
+// chips, and the page's CSS guarantees two chips per row whatever the names
+// are (a chip is one line and at most half a row wide — see template.html), so
+// the cap is what decides how many rows a box can grow to: five plus the
+// "+N more" chip is six chips, three rows, a 202px box.
 //
 // Measured in headless Chrome at 1366x768, which is 681px of viewport. The
 // tallest legitimate week — two weeks recorded, every strip at the cap plus
@@ -93,7 +97,8 @@ function perPersonLine(ws) {
 export const STRIP_CAP = 5;
 
 const capped = (kind, label, items) => ({
-  kind, label, items: items.slice(0, STRIP_CAP), more: Math.max(0, items.length - STRIP_CAP),
+  kind, label, items: items.slice(0, STRIP_CAP), rest: items.slice(STRIP_CAP),
+  more: Math.max(0, items.length - STRIP_CAP),
 });
 
 // ── a PR title, for a reader outside the repo ───────────────────────────────
@@ -393,7 +398,7 @@ function pieceStrip(ws, spec, weeks, selected) {
   // measured".
   return landed.length
     ? capped('pieces', 'Done this week', landed.map(toChip))
-    : { kind: 'pieces', label: 'Nothing new this week', items: [], more: 0 };
+    : { kind: 'pieces', label: 'Nothing new this week', items: [], rest: [], more: 0 };
 }
 
 // ── a box with no number ────────────────────────────────────────────────────

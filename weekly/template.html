@@ -118,7 +118,14 @@
                    background: var(--page); border: 1px solid var(--border);
                    border-radius: 999px; padding: 2px 9px 2px 3px; }
   ul.strip .chip .nm { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-  ul.strip .chip.more { color: var(--text-secondary); padding-left: 9px; }
+  /* The "+N more" chip holds a real <button> (it expands the strip), so the li
+     hands its padding to the button — the whole pill is the hit target, exactly
+     as a link chip hands its surface to its <a>. */
+  ul.strip .chip.more { color: var(--text-secondary); padding: 0; }
+  ul.strip .chip.more button { font: inherit; color: inherit; background: none; border: 0;
+                               padding: 2px 9px; cursor: pointer; border-radius: 999px; }
+  ul.strip .chip.more button:hover { text-decoration: underline; }
+  ul.strip .chip.more button:focus-visible { outline: 2px solid var(--s-progress); outline-offset: 1px; }
   /* A chip that names a PR or a ticket LINKS to it. The anchor is the chip's
      whole inner surface — the li gives up its padding to it — so the click
      target is the pill, not a word inside it. Affordance arrives on hover and
@@ -215,13 +222,30 @@ const iconHtml = (p) => `<span class="ic" aria-hidden="true"><b class="init">${i
 // the artifact itself is one click away. Every part is escaped, and the view
 // has already refused any href that is not https — this string lands verbatim
 // in the DOM.
-function chipHtml(s, it) {
+// `hidden` marks an overflow chip: present in the DOM with everything a
+// visible chip has, revealed by the strip's "+N more" button. The `ext` class
+// exists so the toggle can find exactly these chips and nothing else.
+function chipHtml(s, it, hidden = false) {
   const body = `${s.kind === 'pieces' ? iconHtml(it) : ''}${
     it.id ? `<span class="tid">${esc(it.id)}</span>` : ''}${
     it.name ? `<span class="nm">${esc(it.name)}</span>` : ''}`;
+  const cls = `chip${it.href ? ' lnk' : ''}${hidden ? ' ext' : ''}`;
+  const attr = hidden ? ' hidden' : '';
   return it.href
-    ? `<li class="chip lnk"><a href="${esc(it.href)}" target="_blank" rel="noopener">${body}</a></li>`
-    : `<li class="chip">${body}</li>`;
+    ? `<li class="${cls}"${attr}><a href="${esc(it.href)}" target="_blank" rel="noopener">${body}</a></li>`
+    : `<li class="${cls}"${attr}>${body}</li>`;
+}
+
+// The "+N more" chip is a BUTTON: it reveals the strip's overflow chips in
+// place and turns into "Show less". The page a reader lands on always fits one
+// screen; a page the reader expanded is allowed to scroll, because they asked
+// for that height. State lives in the DOM (aria-expanded + [hidden]), so a
+// week switch re-renders collapsed — the default view is the guaranteed one.
+function toggleStrip(btn) {
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  for (const li of btn.closest('ul').querySelectorAll('.ext')) li.hidden = open;
+  btn.setAttribute('aria-expanded', String(!open));
+  btn.textContent = open ? btn.dataset.more : 'Show less';
 }
 
 // The pieces the number refers to, in the same box as the number. `label` is
@@ -234,10 +258,14 @@ function chipHtml(s, it) {
 function stripHtml(s) {
   if (!s) return '';
   const chips = s.items.map((it) => chipHtml(s, it)).join('');
-  // Capped in the view: a big week must not push the page past one screen.
-  const more = s.more ? `<li class="chip more">+${num(s.more)} more</li>` : '';
+  // Split in the view: `items` is what a fresh page shows (a big week must not
+  // push the landing view past one screen), `rest` is the whole remainder,
+  // rendered hidden and one button-press away.
+  const rest = (s.rest ?? []).map((it) => chipHtml(s, it, true)).join('');
+  const more = s.more ? `<li class="chip more"><button type="button" aria-expanded="false" data-more="+${
+    num(s.more)} more" onclick="toggleStrip(this)">+${num(s.more)} more</button></li>` : '';
   return `${s.label ? `<div class="striplab">${esc(s.label)}</div>` : ''}${
-    s.items.length ? `<ul class="strip">${chips}${more}</ul>` : ''}`;
+    s.items.length ? `<ul class="strip">${chips}${rest}${more}</ul>` : ''}`;
 }
 
 // A box is a number, its unit, and the pieces behind it. `perPerson` is the one

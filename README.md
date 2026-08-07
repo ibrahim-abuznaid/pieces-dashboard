@@ -46,7 +46,9 @@ executes the page's scripts in a `node:vm` sandbox.
 
 The page is written for a **project manager**: the week, four numbers, the pieces behind each number, and
 anything that needs a decision. Closed tickets and shipped PRs render as chips that **link to the artifact
-itself** (the ticket in Linear, the PR on GitHub). Engineering caveats are recorded here rather than on the page.
+itself** (the ticket in Linear, the PR on GitHub). Every strip opens at 5 chips so the landing view fits one
+screen; **"+N more" is a button** that expands the full list in place (the whole roster is in the page,
+hidden). Engineering caveats are recorded here rather than on the page.
 
 ### Curated week notes
 
