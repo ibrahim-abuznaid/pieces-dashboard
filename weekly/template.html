@@ -118,6 +118,12 @@
                    background: var(--page); border: 1px solid var(--border);
                    border-radius: 999px; padding: 2px 9px 2px 3px; }
   ul.strip .chip .nm { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  /* Load-bearing, not belt-and-braces: the [hidden] attribute hides via the
+     BROWSER'S `display: none`, and the `display: inline-flex` two rules up is
+     an author declaration, which beats any UA rule — so without this line an
+     overflow chip renders despite being hidden, and the strip shows all N
+     chips WITH a "+N more" button under them. */
+  ul.strip .chip[hidden] { display: none; }
   /* The "+N more" chip holds a real <button> (it expands the strip), so the li
      hands its padding to the button — the whole pill is the hit target, exactly
      as a link chip hands its surface to its <a>. */

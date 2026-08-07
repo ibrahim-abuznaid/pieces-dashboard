@@ -1223,3 +1223,13 @@ test('the committed archive renders linked ticket chips', () => {
     assert.match(tile, new RegExp(`<span class="tid">${t.id}</span>`));
   }
 });
+
+// Painting invariant, so it is asserted on the stylesheet: `[hidden]` hides via
+// the BROWSER'S `display: none`, and the strip's own `display: inline-flex` on
+// .chip is an author declaration, which beats any UA rule. Without an explicit
+// author `display: none` for hidden chips, the overflow renders fully visible
+// with a "+N more" button under it — which is exactly how this shipped broken.
+test('a hidden overflow chip is actually display:none, not just marked hidden', () => {
+  const css = pageCss(render([snap('2026-W31')]).html);
+  assert.equal(declarationsFor(css, 'ul.strip .chip[hidden]').display, 'none');
+});
