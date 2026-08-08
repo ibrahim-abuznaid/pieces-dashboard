@@ -24,11 +24,12 @@ const snap = (week, over = {}) => ({
   decisions: [], ...over,
 });
 
-function render(weeks, { notes } = {}) {
+function render(weeks, { notes, updates } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'weekly-'));
   mkdirSync(join(dir, 'data'), { recursive: true });
   writeFileSync(join(dir, 'data/weeks.json'), JSON.stringify({ weeks }));
   if (notes) writeFileSync(join(dir, 'data/notes.json'), JSON.stringify(notes));
+  if (updates) writeFileSync(join(dir, 'data/updates.json'), JSON.stringify(updates));
   const outDir = join(dir, 'out');
   const { html } = buildAll({ archiveDir: join(dir, 'data'), outDir });
   return { html, outDir };
@@ -1232,4 +1233,98 @@ test('the committed archive renders linked ticket chips', () => {
 test('a hidden overflow chip is actually display:none, not just marked hidden', () => {
   const css = pageCss(render([snap('2026-W31')]).html);
   assert.equal(declarationsFor(css, 'ul.strip .chip[hidden]').display, 'none');
+});
+
+// ── the UI-improvements band ────────────────────────────────────────────────
+// Curated pieces-related UI work, out of weekly/data/updates.json — same
+// display-layer contract as notes.json, rendered as a full-width band AFTER
+// "Needs you": the one block that asks for an action is the last thing allowed
+// to fall below the fold, so on an overflowing week the updates give way to the
+// asks, never the other way round.
+
+const UPDATES = { '2026-W31': {
+  note: 'Piece-selector descriptions went live on cloud.',
+  items: [
+    { label: '#14437 selector descriptions', href: 'https://github.com/activepieces/activepieces/pull/14437' },
+    { label: 'a fix with no link' },
+  ],
+} };
+
+const plainBand = (dom) => {
+  const start = dom.indexOf('<div class="band plain">');
+  return start === -1 ? '' : dom.slice(start, dom.indexOf('<footer', start));
+};
+
+test('a curated update renders as a band: heading, note, linked chips', () => {
+  const band = plainBand(renderDom([snap('2026-W31')], '', { updates: UPDATES }));
+  assert.match(band, /<h2>UI improvements<\/h2>/);
+  assert.match(band, /Piece-selector descriptions went live on cloud\./);
+  assert.match(band,
+    /<a href="https:\/\/github\.com\/activepieces\/activepieces\/pull\/14437" target="_blank" rel="noopener">/);
+  assert.deepEqual(chipNames(band), ['#14437 selector descriptions', 'a fix with no link']);
+});
+
+test('a week with no curated update renders no UI-improvements band', () => {
+  assert.doesNotMatch(renderDom([snap('2026-W31')]), /UI improvements/);
+  assert.doesNotMatch(
+    renderDom([snap('2026-W31')], '', { updates: { '2026-W30': { note: 'other week' } } }),
+    /UI improvements/, "another week's entry must not render here");
+});
+
+test('the band sits after the asks — updates never push "Needs you" down', () => {
+  const dom = renderDom([snap('2026-W31', { decisions: ['6 pieces merged but not live — needs a cloud release'] })],
+    '', { updates: UPDATES });
+  const asks = dom.indexOf('Needs you');
+  const band = dom.indexOf('UI improvements');
+  assert.ok(asks !== -1 && band !== -1 && asks < band,
+    `expected "Needs you" (${asks}) to render before "UI improvements" (${band})`);
+});
+
+test('a hostile update note and label are escaped on their way to the DOM', () => {
+  const dom = renderDom([snap('2026-W31')], '', { updates: { '2026-W31': {
+    note: '<script>alert(1)</script>', items: [{ label: '<img src=x onerror=alert(1)>' }],
+  } } });
+  assert.doesNotMatch(dom, /<script>alert/);
+  assert.match(dom, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+  assert.doesNotMatch(dom, /<img src=x/);
+});
+
+test('a non-https update href renders a plain, unlinked chip', () => {
+  const band = plainBand(renderDom([snap('2026-W31')], '', { updates: { '2026-W31': {
+    items: [{ label: 'sneaky', href: 'javascript:alert(1)' }],
+  } } }));
+  assert.doesNotMatch(band, /<a /);
+  assert.doesNotMatch(band, /javascript:/);
+  assert.deepEqual(chipNames(band), ['sneaky']);
+});
+
+// The band's share of the one-screen budget: full-width, so the half-row clamp
+// still guarantees two chips per row, and the open cap of 3 plus "+N more" is
+// two rows at worst — the band cannot grow with the length of the list.
+test('the band opens at three chips, hides the overflow, and stays inside two rows', () => {
+  const items = Array.from({ length: 7 }, (_, i) => ({ label: `fix ${i}`, href: `https://x/${i}` }));
+  const band = plainBand(renderDom([snap('2026-W31')], '', { updates: { '2026-W31': { items } } }));
+  assert.equal((band.match(/<li class="chip lnk">/g) ?? []).length, 3);
+  assert.equal((band.match(/<li class="chip lnk ext" hidden>/g) ?? []).length, 4);
+  assert.match(band, /\+4 more/);
+  assert.ok(Math.ceil((3 + 1) / CHIPS_PER_ROW) <= 2, 'the open cap plus "+N more" must fit two rows');
+});
+
+test('the plain band is the neutral variant — no urgency borrowed from "Needs you"', () => {
+  const css = pageCss(render([snap('2026-W31')]).html);
+  assert.equal(declarationsFor(css, '.band.plain')['border-color'], 'var(--border)');
+  assert.equal(declarationsFor(css, '.band.plain h2').color, 'var(--text-secondary)');
+});
+
+// The committed curation itself stays renderable: every archived week that
+// updates.json names must produce its band when the page is opened on it.
+test('the committed updates.json renders its band for the weeks it names', () => {
+  const updates = JSON.parse(readFileSync(new URL('../weekly/data/updates.json', import.meta.url), 'utf8'));
+  const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
+  const recorded = Object.keys(updates).filter((w) => archive.weeks.some((x) => x.week === w));
+  if (!recorded.length) return; // curating no archived week is not a wiring failure
+  for (const w of recorded) {
+    assert.match(renderDom(archive.weeks, `#${w}`, { updates }), /<h2>UI improvements<\/h2>/,
+      `week ${w} is curated in updates.json but renders no band`);
+  }
 });

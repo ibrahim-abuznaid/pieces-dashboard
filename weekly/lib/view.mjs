@@ -96,9 +96,9 @@ function perPersonLine(ws) {
 // five and 691px at six. See the one-screen tests in test/weekly-render.test.mjs.
 export const STRIP_CAP = 5;
 
-const capped = (kind, label, items) => ({
-  kind, label, items: items.slice(0, STRIP_CAP), rest: items.slice(STRIP_CAP),
-  more: Math.max(0, items.length - STRIP_CAP),
+const capped = (kind, label, items, cap = STRIP_CAP) => ({
+  kind, label, items: items.slice(0, cap), rest: items.slice(cap),
+  more: Math.max(0, items.length - cap),
 });
 
 // ── a PR title, for a reader outside the repo ───────────────────────────────
@@ -436,10 +436,42 @@ const NOT_MEASURED = 'not measured this week';
 const curatedNote = (v) =>
   (typeof v === 'string' && v.trim() ? v.trim().replace(/\s+/g, ' ') : null);
 
+// ── the UI-improvements band ────────────────────────────────────────────────
+// Pieces-related UI work — the piece-selector descriptions project, builder
+// fixes around pieces — is real weekly output with no derived number behind it:
+// what counts as "pieces-related UI work" is the team's judgment, and half of it
+// ships from outside the tickets collector's people list. So the band is CURATED,
+// exactly like the note line: weekly/data/updates.json maps week → { note, items },
+// display layer, never the archive, editable after the week is sealed.
+//
+// Items become ordinary strip chips (name + optional link, no icon) through the
+// same capped() split the tiles use, so "+N more" behaves identically. The open
+// cap is 3, not the tiles' 5: the band is full-width, the half-row clamp
+// guarantees two chips per row, so 3 plus "+N more" is at most two rows — the
+// band stays ~100px and the landing view keeps the one-screen budget.
+//
+// Shape errors degrade per entry rather than failing the build: an item without
+// a usable label is dropped, and a week with neither a note nor a usable item
+// renders no band at all — absence, not an empty box.
+const BAND_CAP = 3;
+
+function uiUpdatesFor(entry) {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return null;
+  const note = curatedNote(entry.note);
+  const items = (Array.isArray(entry.items) ? entry.items : [])
+    .filter((it) => it && typeof it === 'object' && curatedNote(it.label))
+    .map((it) => {
+      const href = httpsHref(it.href);          // same rule as PR chips: https or unlinked
+      return { name: curatedNote(it.label), ...(href ? { href } : {}) };
+    });
+  if (!note && !items.length) return null;
+  return { note: note ?? '', strip: items.length ? capped('updates', '', items, BAND_CAP) : null };
+}
+
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
 // unused: the newest entry in the archive already is the newest complete week,
 // and reading a clock here would break purity.
-export function buildView(archive, { weekId, notes } = {}) {
+export function buildView(archive, { weekId, notes, updates } = {}) {
   const weeks = archive?.weeks ?? [];
   if (!weeks.length) return { empty: true, weeks: [] };
 
@@ -488,5 +520,6 @@ export function buildView(archive, { weekId, notes } = {}) {
     // Said once, in the caption, rather than stamped on all four tiles.
     noPriorWeek: tiles.every((tile) => tile.delta === null),
     decisions: (selected.decisions ?? []).filter(isAsk),
+    uiUpdates: uiUpdatesFor(updates?.[selected.week]),
   };
 }

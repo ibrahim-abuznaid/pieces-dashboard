@@ -13,23 +13,25 @@ import { buildView } from './lib/view.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
-// Curated one-line notes, keyed week → workstream (see notes.json itself).
+// Curated files: notes.json (week → workstream → one sentence) and
+// updates.json (week → the UI-improvements band — see view.mjs).
 // Display layer on purpose: weeks.json is immutable once appended, but a
-// sentence of prose gets written — or fixed — after the fact, so it lives in a
-// file a person edits and CI merely renders. Malformed JSON here should fail
+// sentence of prose gets written — or fixed — after the fact, so both live in
+// files a person edits and CI merely renders. Malformed JSON here should fail
 // the build loudly, not publish a page with every note silently gone.
-const readNotes = (dir) => {
-  const path = join(dir, 'notes.json');
+const readCurated = (dir, file) => {
+  const path = join(dir, file);
   return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {};
 };
 
 export function buildAll({ archiveDir = join(HERE, 'data'), outDir = join(HERE, '../dist/weekly') } = {}) {
   const archive = readArchive(join(archiveDir, 'weeks.json'));
-  const notes = readNotes(archiveDir);
+  const notes = readCurated(archiveDir, 'notes.json');
+  const updates = readCurated(archiveDir, 'updates.json');
   // Precompute one view per week so the client only ever does a lookup — no
   // view logic is duplicated in the template.
   const views = {};
-  for (const w of archive.weeks) views[w.week] = buildView(archive, { weekId: w.week, notes });
+  for (const w of archive.weeks) views[w.week] = buildView(archive, { weekId: w.week, notes, updates });
   const latest = archive.weeks.at(-1)?.week ?? null;
   const data = latest ? { views, default: latest } : { views: {}, default: null };
 

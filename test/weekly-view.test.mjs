@@ -243,9 +243,10 @@ test('a range that crosses a month names both months', () =>
     'Jul 27 – Aug 2'));
 
 // ── nothing the page does not render ───────────────────────────────────────
-// The page is a week header, four boxes and an ask. This is the whole contract
-// between the view and the template: a field computed but never rendered is how
-// the next reader gets misled about what the page shows.
+// The page is a week header, four boxes, an ask, and the UI-improvements band.
+// This is the whole contract between the view and the template: a field
+// computed but never rendered is how the next reader gets misled about what
+// the page shows.
 //
 // `start`/`end` are the exception, deliberately: they are the counting window
 // itself, published in `dist/weekly/summary.json` for machine readers, and
@@ -253,7 +254,8 @@ test('a range that crosses a month names both months', () =>
 
 test('the view carries exactly the fields the page renders', () =>
   assert.deepEqual(Object.keys(buildView(archive)).sort(),
-    ['builtAt', 'decisions', 'end', 'noPriorWeek', 'range', 'start', 'tiles', 'title', 'week', 'weeks']));
+    ['builtAt', 'decisions', 'end', 'noPriorWeek', 'range', 'start', 'tiles', 'title',
+     'uiUpdates', 'week', 'weeks']));
 
 // The lede restated the numbers in prose above the boxes that already carry
 // them. Two rounds of editing it did not make the page clearer, so it is gone.
@@ -1138,3 +1140,70 @@ test('a strip carries its whole overflow in rest, in order, agreeing with more',
 
 test('a strip inside the cap has an empty rest', () =>
   assert.deepEqual(stripOf(buildView(archive), 'tickets').rest, []));
+
+// ── the UI-improvements band ────────────────────────────────────────────────
+// Curated per week in weekly/data/updates.json — pieces-related UI work has no
+// honest derived number behind it, so the band is prose plus linked chips,
+// display layer like the note line. What the view owes the page is threading
+// (right week, nothing leaking across weeks) and shape hygiene: updates.json is
+// hand-edited, so every malformed shape has to degrade to "no band", never to a
+// broken one.
+
+test('a curated update reaches its week as a note plus linked chips', () => {
+  const v = buildView(archive, { updates: { '2026-W31': {
+    note: '  Selector descriptions\n live  ',
+    items: [{ label: ' #14437 selector  descriptions ', href: 'https://x/pull/14437' }],
+  } } });
+  assert.equal(v.uiUpdates.note, 'Selector descriptions live');
+  assert.deepEqual(v.uiUpdates.strip.items,
+    [{ name: '#14437 selector descriptions', href: 'https://x/pull/14437' }]);
+  assert.equal(v.uiUpdates.strip.more, 0);
+});
+
+test('a week with no curated update carries no band at all', () => {
+  assert.equal(buildView(archive).uiUpdates, null);
+  const v = buildView(archive, { updates: { '2026-W30': { note: 'last week' } } });
+  assert.equal(v.uiUpdates, null, "another week's entry must not leak into this one");
+});
+
+test('an update can be a note alone, or items alone', () => {
+  const noteOnly = buildView(archive, { updates: { '2026-W31': { note: 'Live on cloud' } } });
+  assert.equal(noteOnly.uiUpdates.note, 'Live on cloud');
+  assert.equal(noteOnly.uiUpdates.strip, null);
+  const itemsOnly = buildView(archive, { updates: { '2026-W31': { items: [{ label: 'a fix' }] } } });
+  assert.equal(itemsOnly.uiUpdates.note, '');
+  assert.deepEqual(itemsOnly.uiUpdates.strip.items, [{ name: 'a fix' }]);
+});
+
+test('malformed update shapes degrade to no band, not a broken one', () => {
+  for (const entry of [null, 42, 'prose', ['x'], {}, { note: '  ' }, { items: 'nope' },
+    { items: [{ href: 'https://x' }, { label: '   ' }, null] }]) {
+    assert.equal(buildView(archive, { updates: { '2026-W31': entry } }).uiUpdates, null,
+      `entry ${JSON.stringify(entry)} should render no band`);
+  }
+});
+
+test('an item without a usable label is dropped; one without an href stays a plain chip', () => {
+  const v = buildView(archive, { updates: { '2026-W31': {
+    items: [{ label: 'kept', href: '' }, { label: 12, href: 'https://x' }, { label: 'also kept' }],
+  } } });
+  assert.deepEqual(v.uiUpdates.strip.items, [{ name: 'kept' }, { name: 'also kept' }]);
+});
+
+// Three, not the tiles' five: the band is full-width and sits under four boxes
+// that already spend the height budget, so it opens at two rows worst case —
+// see the render tests for the row arithmetic.
+test('the band opens at three chips and carries the rest behind "+N more"', () => {
+  const items = Array.from({ length: 5 }, (_, i) => ({ label: `fix ${i}` }));
+  const s = buildView(archive, { updates: { '2026-W31': { items } } }).uiUpdates.strip;
+  assert.deepEqual(s.items.map((i) => i.name), ['fix 0', 'fix 1', 'fix 2']);
+  assert.deepEqual(s.rest.map((i) => i.name), ['fix 3', 'fix 4']);
+  assert.equal(s.more, 2);
+});
+
+test('an update href that is not https is dropped — the chip stays, unlinked', () => {
+  const v = buildView(archive, { updates: { '2026-W31': {
+    items: [{ label: 'sneaky', href: 'javascript:alert(1)' }],
+  } } });
+  assert.deepEqual(v.uiUpdates.strip.items, [{ name: 'sneaky' }]);
+});

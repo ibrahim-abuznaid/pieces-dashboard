@@ -57,6 +57,17 @@ the "what actually happened" no derived count can say. It is display layer, **no
 stays immutable, while a note can be written (or fixed) after the week is sealed with one edit and a push.
 The view collapses a note to a single line; write one sentence, not a paragraph.
 
+### UI improvements band
+
+`weekly/data/updates.json` maps *week → `{ note, items: [{label, href}] }`* and renders as a full-width
+"UI improvements" band under the tiles: pieces-related UI work shipped that week — the piece-selector
+descriptions project, builder fixes around pieces — with each item a chip linking to its PR or ticket.
+**Curated, not derived**: what counts as "pieces-related UI work" is the team's judgment and much of it
+ships from outside the team's own handles, so no collector could classify it honestly. Same rules as
+notes.json — display layer, weeks.json untouched, editable after the week is sealed with one edit and a
+push. A week with no entry renders no band. The band opens at 3 chips ("+N more" expands in place) so the
+landing view keeps fitting one screen.
+
 ### Piece testing — coverage when reachable, build progress otherwise
 
 When a snapshot is taken with **`PIECE_TESTER_URL`** set, the collector reads the running tester's

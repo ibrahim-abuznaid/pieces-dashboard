@@ -1,0 +1,24 @@
+{
+  "2026-W31": {
+    "note": "Piece selector now shows action/trigger descriptions before you pick a step.",
+    "items": [
+      {
+        "label": "#14437 show action/trigger descriptions in the piece selector",
+        "href": "https://github.com/activepieces/activepieces/pull/14437"
+      }
+    ]
+  },
+  "2026-W32": {
+    "note": "Piece-selector action/trigger descriptions went live on cloud.",
+    "items": [
+      {
+        "label": "#14657 disabled pieces hidden from the AI & Agents builder tab",
+        "href": "https://github.com/activepieces/activepieces/pull/14657"
+      },
+      {
+        "label": "#14666 Platform Admin shows all piece sets (pagination)",
+        "href": "https://github.com/activepieces/activepieces/pull/14666"
+      }
+    ]
+  }
+}
