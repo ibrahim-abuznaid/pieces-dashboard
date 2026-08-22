@@ -20,5 +20,42 @@
         "href": "https://github.com/activepieces/activepieces/pull/14666"
       }
     ]
+  },
+  "2026-W34": {
+    "note": "Both piece-UI projects landed: the property-UI redesign framework merged, action badges widened to Read / Search / Write / Destructive, and the tag backfill covered its first 183 pieces.",
+    "items": [
+      {
+        "label": "#14501 property-UI framework merged: widgets, groups, essential/Advanced split",
+        "href": "https://github.com/activepieces/activepieces/pull/14501"
+      },
+      {
+        "label": "#14852 action badges widened to Read / Search / Write / Destructive",
+        "href": "https://github.com/activepieces/activepieces/pull/14852"
+      },
+      {
+        "label": "#14966 classification tags backfilled across 82 pieces",
+        "href": "https://github.com/activepieces/activepieces/pull/14966"
+      },
+      {
+        "label": "#14978 classification backfill: next 100 pieces by usage",
+        "href": "https://github.com/activepieces/activepieces/pull/14978"
+      },
+      {
+        "label": "#14913 Gmail fully tagged: 30 classifications across actions and triggers",
+        "href": "https://github.com/activepieces/activepieces/pull/14913"
+      },
+      {
+        "label": "#14915 custom API call actions gain classification, default Write",
+        "href": "https://github.com/activepieces/activepieces/pull/14915"
+      },
+      {
+        "label": "#14943 Gmail property-UI redesign pilot (in review)",
+        "href": "https://github.com/activepieces/activepieces/pull/14943"
+      },
+      {
+        "label": "#14970 Telegram Bot property-UI pilot (in review)",
+        "href": "https://github.com/activepieces/activepieces/pull/14970"
+      }
+    ]
   }
 }

@@ -1,5 +1,9 @@
 {
   "2026-W31": {
     "testing": "Shipped the piece health board and needs-attention inbox; scheduled-run history now persists."
+  },
+  "2026-W34": {
+    "outputSchema": "Microsoft Outlook, Dropbox and HubSpot schemas are in review (#14925) — Odai's first rollout pieces.",
+    "tickets": "Oracle DB's broken bundle (GIT-1772) and the npm-publish E404 blocking new pieces (PIE-436) both got fixes merged."
   }
 }
