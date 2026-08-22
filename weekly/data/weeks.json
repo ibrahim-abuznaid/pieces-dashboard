@@ -1908,6 +1908,791 @@
         "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
       },
       "decisions": []
+    },
+    {
+      "week": "2026-W34",
+      "start": "2026-08-15",
+      "end": "2026-08-21",
+      "builtAt": "2026-08-22",
+      "outputSchema": {
+        "status": "ok",
+        "live": 49,
+        "mergedNotLive": 0,
+        "review": 5,
+        "todo": 706,
+        "totalPieces": 760,
+        "roster": [
+          {
+            "folder": "clickup",
+            "name": "ClickUp",
+            "actions": 31,
+            "triggers": 30,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/clickup.png"
+          },
+          {
+            "folder": "slack",
+            "name": "Slack",
+            "actions": 28,
+            "triggers": 14,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "Google Sheets",
+            "actions": 27,
+            "triggers": 4,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png"
+          },
+          {
+            "folder": "resend",
+            "name": "Resend",
+            "actions": 22,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/resend.png"
+          },
+          {
+            "folder": "telegram-bot",
+            "name": "Telegram Bot",
+            "actions": 20,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
+          },
+          {
+            "folder": "github",
+            "name": "GitHub",
+            "actions": 19,
+            "triggers": 14,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/github.png"
+          },
+          {
+            "folder": "stripe",
+            "name": "Stripe",
+            "actions": 19,
+            "triggers": 13,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/stripe.png"
+          },
+          {
+            "folder": "youtrack",
+            "name": "YouTrack",
+            "actions": 19,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/youtrack.png"
+          },
+          {
+            "folder": "google-drive",
+            "name": "Google Drive",
+            "actions": 17,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png"
+          },
+          {
+            "folder": "discord",
+            "name": "Discord",
+            "actions": 16,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/discord.png"
+          },
+          {
+            "folder": "airtable",
+            "name": "Airtable",
+            "actions": 15,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/airtable.png"
+          },
+          {
+            "folder": "notion",
+            "name": "Notion",
+            "actions": 15,
+            "triggers": 4,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png"
+          },
+          {
+            "folder": "date-helper",
+            "name": "Date Helper",
+            "actions": 9,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/date-helper.svg"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "Google Calendar",
+            "actions": 9,
+            "triggers": 7,
+            "stage": "live",
+            "tier": "P3",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
+          },
+          {
+            "folder": "supabase",
+            "name": "Supabase",
+            "actions": 9,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/supabase.png"
+          },
+          {
+            "folder": "tables",
+            "name": "Tables",
+            "actions": 9,
+            "triggers": 3,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/tables.svg"
+          },
+          {
+            "folder": "trello",
+            "name": "Trello",
+            "actions": 9,
+            "triggers": 3,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/trello.png"
+          },
+          {
+            "folder": "cody",
+            "name": "Cody",
+            "actions": 7,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/cody.png"
+          },
+          {
+            "folder": "gmail",
+            "name": "Gmail",
+            "actions": 7,
+            "triggers": 4,
+            "stage": "live",
+            "tier": "P1",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
+          },
+          {
+            "folder": "google-gemini",
+            "name": "Google Gemini",
+            "actions": 7,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-gemini.png"
+          },
+          {
+            "folder": "mongodb",
+            "name": "MongoDB",
+            "actions": 7,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/mongodb.png"
+          },
+          {
+            "folder": "ai",
+            "name": "AI",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "review",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg"
+          },
+          {
+            "folder": "apify",
+            "name": "Apify",
+            "actions": 6,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/apify.png"
+          },
+          {
+            "folder": "firecrawl",
+            "name": "Firecrawl",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
+          },
+          {
+            "folder": "google-docs",
+            "name": "Google Docs",
+            "actions": 6,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
+          },
+          {
+            "folder": "math-helper",
+            "name": "Math Helper",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/math-helper.svg"
+          },
+          {
+            "folder": "microsoft-sql-server",
+            "name": "Microsoft SQL Server",
+            "actions": 6,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sql-server.png"
+          },
+          {
+            "folder": "mysql",
+            "name": "MySQL",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/mysql.png"
+          },
+          {
+            "folder": "pinterest",
+            "name": "Pinterest",
+            "actions": 6,
+            "triggers": 3,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/pinterest.png"
+          },
+          {
+            "folder": "postgres",
+            "name": "Postgres",
+            "actions": 6,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/postgres.png"
+          },
+          {
+            "folder": "senja",
+            "name": "Senja",
+            "actions": 6,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/senja.png"
+          },
+          {
+            "folder": "store",
+            "name": "Storage",
+            "actions": 6,
+            "triggers": 0,
+            "stage": "review",
+            "tier": "P3",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/store.svg"
+          },
+          {
+            "folder": "bluesky",
+            "name": "Bluesky",
+            "actions": 5,
+            "triggers": 4,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/bluesky.png"
+          },
+          {
+            "folder": "todoist",
+            "name": "Todoist",
+            "actions": 5,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/todoist.png"
+          },
+          {
+            "folder": "wordpress",
+            "name": "WordPress",
+            "actions": 5,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/wordpress.png"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "Google Contacts",
+            "actions": 4,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png"
+          },
+          {
+            "folder": "groq",
+            "name": "Groq",
+            "actions": 4,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/groq.png"
+          },
+          {
+            "folder": "imap",
+            "name": "IMAP",
+            "actions": 4,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/imap.png"
+          },
+          {
+            "folder": "prompthub",
+            "name": "PromptHub",
+            "actions": 4,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/prompthub.png"
+          },
+          {
+            "folder": "serp-api",
+            "name": "SerpApi",
+            "actions": 4,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/serp-api.png"
+          },
+          {
+            "folder": "claude",
+            "name": "Anthropic Claude",
+            "actions": 3,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/claude.png"
+          },
+          {
+            "folder": "csv",
+            "name": "CSV",
+            "actions": 3,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/csv.svg"
+          },
+          {
+            "folder": "linkedin",
+            "name": "LinkedIn",
+            "actions": 3,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png"
+          },
+          {
+            "folder": "reoon-verifier",
+            "name": "Reoon Email Verifier",
+            "actions": 3,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/reoon-verifier.png"
+          },
+          {
+            "folder": "subflows",
+            "name": "Sub Flows",
+            "actions": 3,
+            "triggers": 1,
+            "stage": "review",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/subflows.svg"
+          },
+          {
+            "folder": "delay",
+            "name": "Delay",
+            "actions": 2,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/delay.svg"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "Google Tasks",
+            "actions": 2,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png"
+          },
+          {
+            "folder": "http",
+            "name": "HTTP",
+            "actions": 2,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P3",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
+          },
+          {
+            "folder": "open-router",
+            "name": "OpenRouter",
+            "actions": 2,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/open-router.png"
+          },
+          {
+            "folder": "webhook",
+            "name": "Webhook",
+            "actions": 2,
+            "triggers": 1,
+            "stage": "review",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/webhooks.svg"
+          },
+          {
+            "folder": "google-forms",
+            "name": "Google Forms",
+            "actions": 1,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png"
+          },
+          {
+            "folder": "forms",
+            "name": "Human Input",
+            "actions": 1,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/human-input.svg"
+          },
+          {
+            "folder": "manual-trigger",
+            "name": "Manual Trigger",
+            "actions": 0,
+            "triggers": 1,
+            "stage": "review",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/manual-trigger.svg"
+          },
+          {
+            "folder": "rss",
+            "name": "RSS Feed",
+            "actions": 0,
+            "triggers": 2,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/rss.png"
+          }
+        ]
+      },
+      "aiActions": {
+        "status": "ok",
+        "merged": 23,
+        "prOpen": 0,
+        "assigned": 3,
+        "held": 2,
+        "totalPieces": 28,
+        "catalogPieces": 760,
+        "blockersOpen": 30,
+        "roster": [
+          {
+            "name": "stripe",
+            "actions": 75,
+            "stage": "merged",
+            "displayName": "Stripe",
+            "logo": "https://cdn.activepieces.com/pieces/stripe.png"
+          },
+          {
+            "name": "github",
+            "actions": 72,
+            "stage": "merged",
+            "displayName": "GitHub",
+            "logo": "https://cdn.activepieces.com/pieces/github.png"
+          },
+          {
+            "name": "clickup",
+            "actions": 59,
+            "stage": "merged",
+            "displayName": "ClickUp",
+            "logo": "https://cdn.activepieces.com/pieces/clickup.png"
+          },
+          {
+            "name": "trello",
+            "actions": 46,
+            "stage": "merged",
+            "displayName": "Trello",
+            "logo": "https://cdn.activepieces.com/pieces/trello.png"
+          },
+          {
+            "name": "discord",
+            "actions": 45,
+            "stage": "merged",
+            "displayName": "Discord",
+            "logo": "https://cdn.activepieces.com/pieces/discord.png"
+          },
+          {
+            "name": "slack",
+            "actions": 44,
+            "stage": "merged",
+            "displayName": "Slack",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png"
+          },
+          {
+            "name": "todoist",
+            "actions": 42,
+            "stage": "merged",
+            "displayName": "Todoist",
+            "logo": "https://cdn.activepieces.com/pieces/todoist.png"
+          },
+          {
+            "name": "google-docs",
+            "actions": 37,
+            "stage": "assigned",
+            "displayName": "Google Docs",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
+          },
+          {
+            "name": "google-drive",
+            "actions": 36,
+            "stage": "merged",
+            "displayName": "Google Drive",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png"
+          },
+          {
+            "name": "resend",
+            "actions": 36,
+            "stage": "held",
+            "displayName": "Resend",
+            "logo": "https://cdn.activepieces.com/pieces/resend.png"
+          },
+          {
+            "name": "google-sheets",
+            "actions": 34,
+            "stage": "merged",
+            "displayName": "Google Sheets",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png"
+          },
+          {
+            "name": "apify",
+            "actions": 32,
+            "stage": "merged",
+            "displayName": "Apify",
+            "logo": "https://cdn.activepieces.com/pieces/apify.png"
+          },
+          {
+            "name": "notion",
+            "actions": 22,
+            "stage": "merged",
+            "displayName": "Notion",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png"
+          },
+          {
+            "name": "telegram-bot",
+            "actions": 21,
+            "stage": "merged",
+            "displayName": "Telegram Bot",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
+          },
+          {
+            "name": "sendinblue",
+            "actions": 20,
+            "stage": "held",
+            "displayName": "Brevo",
+            "logo": "https://cdn.activepieces.com/pieces/brevo.png"
+          },
+          {
+            "name": "gmail",
+            "actions": 19,
+            "stage": "assigned",
+            "displayName": "Gmail",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
+          },
+          {
+            "name": "airtable",
+            "actions": 18,
+            "stage": "merged",
+            "displayName": "Airtable",
+            "logo": "https://cdn.activepieces.com/pieces/airtable.png"
+          },
+          {
+            "name": "cody",
+            "actions": 18,
+            "stage": "merged",
+            "displayName": "Cody",
+            "logo": "https://cdn.activepieces.com/pieces/cody.png"
+          },
+          {
+            "name": "serp-api",
+            "actions": 17,
+            "stage": "merged",
+            "displayName": "SerpApi",
+            "logo": "https://cdn.activepieces.com/pieces/serp-api.png"
+          },
+          {
+            "name": "google-calendar",
+            "actions": 16,
+            "stage": "assigned",
+            "displayName": "Google Calendar",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
+          },
+          {
+            "name": "firecrawl",
+            "actions": 15,
+            "stage": "merged",
+            "displayName": "Firecrawl",
+            "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
+          },
+          {
+            "name": "pubrio",
+            "actions": 14,
+            "stage": "merged",
+            "displayName": "Pubrio",
+            "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
+          },
+          {
+            "name": "google-tasks",
+            "actions": 9,
+            "stage": "merged",
+            "displayName": "Google Tasks",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png"
+          },
+          {
+            "name": "senja",
+            "actions": 5,
+            "stage": "merged",
+            "displayName": "Senja",
+            "logo": "https://cdn.activepieces.com/pieces/senja.png"
+          },
+          {
+            "name": "quizell",
+            "actions": 4,
+            "stage": "merged",
+            "displayName": "Quizell",
+            "logo": "https://cdn.activepieces.com/pieces/quizell.png"
+          },
+          {
+            "name": "google-forms",
+            "actions": 3,
+            "stage": "merged",
+            "displayName": "Google Forms",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png"
+          },
+          {
+            "name": "reoon-verifier",
+            "actions": 3,
+            "stage": "merged",
+            "displayName": "Reoon Email Verifier",
+            "logo": "https://cdn.activepieces.com/pieces/reoon-verifier.png"
+          },
+          {
+            "name": "prompthub",
+            "actions": 1,
+            "stage": "merged",
+            "displayName": "PromptHub",
+            "logo": "https://cdn.activepieces.com/pieces/prompthub.png"
+          }
+        ]
+      },
+      "testing": {
+        "status": "ok",
+        "prsMerged": 5,
+        "commits": 18,
+        "shipped": [
+          {
+            "number": 18,
+            "title": "feat(triggers): add 'Fix with AI' for trigger plans + user-instructio…",
+            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/18"
+          },
+          {
+            "number": 17,
+            "title": "fix(triggers): resolve trigger_test assertions against captured samples",
+            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/17"
+          },
+          {
+            "number": 16,
+            "title": "secure the API: session login, secret masking, and CORS   lockdown",
+            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/16"
+          },
+          {
+            "number": 15,
+            "title": "feat(plans): guard stale test plans on connection change, block, don't fail",
+            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/15"
+          },
+          {
+            "number": 14,
+            "title": " feat(connections): block runs on broken imported connections instead of failing the piece",
+            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/14"
+          }
+        ]
+      },
+      "tickets": {
+        "status": "ok",
+        "total": 4,
+        "byPerson": {
+          "kishan": 3,
+          "sanket": 1
+        },
+        "prsMerged": {
+          "kishan": 2,
+          "sanket": 0
+        },
+        "reviews": {
+          "kishan": 7,
+          "sanket": 3
+        },
+        "shipped": [
+          {
+            "id": "GIT-1772",
+            "title": "[BUG] Oracle DB piece 0.1.11/0.1.12 bundle missing oracle-runner.js — every new connection fails \"Oracle runner exited (code 1)\"",
+            "assignee": "sanket",
+            "team": "GIT"
+          },
+          {
+            "id": "GIT-1775",
+            "title": "[BUG] Approval piece tells users to switch to Manual Task, a feature that no longer exists",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "PIE-436",
+            "title": "Release Pieces can't create new npm packages — `piece-ringcentral@0.0.1` fails with E404",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "GIT-1759",
+            "title": "[BUG] Jira Cloud polling triggers permanently skip updates missing from the poll that advances the watermark",
+            "assignee": "kishan",
+            "team": "GIT"
+          }
+        ]
+      },
+      "decisions": []
     }
   ]
 }
