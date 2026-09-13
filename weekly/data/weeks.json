@@ -486,7 +486,15 @@
       },
       "decisions": [
         "6 pieces merged but not live — needs a cloud release"
-      ]
+      ],
+      "uiImprovements": {
+        "status": "ok",
+        "merged": 0,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 765,
+        "roster": []
+      }
     },
     {
       "week": "2026-W32",
@@ -1211,7 +1219,15 @@
           }
         ]
       },
-      "decisions": []
+      "decisions": [],
+      "uiImprovements": {
+        "status": "ok",
+        "merged": 0,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 765,
+        "roster": []
+      }
     },
     {
       "week": "2026-W33",
@@ -1907,7 +1923,15 @@
         "status": "no-data",
         "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
       },
-      "decisions": []
+      "decisions": [],
+      "uiImprovements": {
+        "status": "ok",
+        "merged": 0,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 765,
+        "roster": []
+      }
     },
     {
       "week": "2026-W34",
@@ -2692,7 +2716,40 @@
           }
         ]
       },
-      "decisions": []
+      "decisions": [],
+      "uiImprovements": {
+        "status": "ok",
+        "merged": 0,
+        "review": 3,
+        "assigned": 0,
+        "totalPieces": 765,
+        "roster": [
+          {
+            "folder": "telegram-bot",
+            "name": "telegram-bot",
+            "displayName": "Telegram Bot",
+            "actions": 21,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
+          },
+          {
+            "folder": "gmail",
+            "name": "gmail",
+            "displayName": "Gmail",
+            "actions": 15,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
+          },
+          {
+            "folder": "quickbooks-desktop-conductor",
+            "name": "quickbooks-desktop-conductor",
+            "displayName": "QuickBooks Desktop (via Conductor)",
+            "actions": 10,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/quickbooks.png"
+          }
+        ]
+      }
     },
     {
       "week": "2026-W36",
@@ -3748,7 +3805,64 @@
       },
       "decisions": [
         "2 pieces merged but not live — needs a cloud release"
-      ]
+      ],
+      "uiImprovements": {
+        "status": "ok",
+        "merged": 3,
+        "review": 3,
+        "assigned": 0,
+        "totalPieces": 765,
+        "roster": [
+          {
+            "folder": "whatsscale",
+            "name": "whatsscale",
+            "displayName": "WhatsScale",
+            "actions": 46,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/whatsscale.png"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png"
+          },
+          {
+            "folder": "telegram-bot",
+            "name": "telegram-bot",
+            "displayName": "Telegram Bot",
+            "actions": 21,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
+          },
+          {
+            "folder": "gmail",
+            "name": "gmail",
+            "displayName": "Gmail",
+            "actions": 15,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
+          },
+          {
+            "folder": "quickbooks-desktop-conductor",
+            "name": "quickbooks-desktop-conductor",
+            "displayName": "QuickBooks Desktop (via Conductor)",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/quickbooks.png"
+          },
+          {
+            "folder": "http",
+            "name": "http",
+            "displayName": "HTTP",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
+          }
+        ]
+      }
     },
     {
       "week": "2026-W37",
@@ -4870,7 +4984,72 @@
       },
       "decisions": [
         "2 pieces merged but not live — needs a cloud release"
-      ]
+      ],
+      "uiImprovements": {
+        "status": "ok",
+        "merged": 5,
+        "review": 2,
+        "assigned": 0,
+        "totalPieces": 765,
+        "roster": [
+          {
+            "folder": "whatsscale",
+            "name": "whatsscale",
+            "displayName": "WhatsScale",
+            "actions": 46,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/whatsscale.png"
+          },
+          {
+            "folder": "sage-accounting",
+            "name": "sage-accounting",
+            "displayName": "Sage Accounting",
+            "actions": 38,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/sage-accounting.png"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png"
+          },
+          {
+            "folder": "telegram-bot",
+            "name": "telegram-bot",
+            "displayName": "Telegram Bot",
+            "actions": 21,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
+          },
+          {
+            "folder": "gmail",
+            "name": "gmail",
+            "displayName": "Gmail",
+            "actions": 15,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png"
+          },
+          {
+            "folder": "quickbooks-desktop-conductor",
+            "name": "quickbooks-desktop-conductor",
+            "displayName": "QuickBooks Desktop (via Conductor)",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/quickbooks.png"
+          },
+          {
+            "folder": "http",
+            "name": "http",
+            "displayName": "HTTP",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
+          }
+        ]
+      }
     }
   ]
 }
