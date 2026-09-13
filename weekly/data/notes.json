@@ -1,9 +1,20 @@
 {
   "2026-W31": {
-    "testing": "Shipped the piece health board and needs-attention inbox; scheduled-run history now persists."
+    "testing": "Shipped the piece health board and needs-attention inbox; scheduled-run history now persists.",
+    "uiImprovements": "Piece selector now shows action/trigger descriptions before you pick a step (#14437)."
+  },
+  "2026-W32": {
+    "uiImprovements": "Piece-selector action/trigger descriptions went live on cloud; disabled pieces are now hidden from the AI & Agents tab (#14657)."
   },
   "2026-W34": {
     "outputSchema": "Microsoft Outlook, Dropbox and HubSpot schemas are in review (#14925) — Odai's first rollout pieces.",
-    "tickets": "Oracle DB's broken bundle (GIT-1772) and the npm-publish E404 blocking new pieces (PIE-436) both got fixes merged."
+    "tickets": "Oracle DB's broken bundle (GIT-1772) and the npm-publish E404 blocking new pieces (PIE-436) both got fixes merged.",
+    "uiImprovements": "The property-UI framework merged (#14501) — opt-in per piece, so no piece carries it yet."
+  },
+  "2026-W36": {
+    "uiImprovements": "First two retrofits landed: the HTTP request form (#15188) and Google Sheets' 39 advanced props (#15200)."
+  },
+  "2026-W37": {
+    "uiImprovements": "WhatsScale and Sage Accounting shipped grouped from the start; both pilots (Gmail #14943, Telegram Bot #14970) are still in review."
   }
 }

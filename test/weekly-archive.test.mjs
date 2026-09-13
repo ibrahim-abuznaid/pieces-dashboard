@@ -10,6 +10,7 @@ const ok = (over = {}) => ({
   week: '2026-W31', start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
+  uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
@@ -169,6 +170,47 @@ test('a non-numeric catalogPieces is rejected', () =>
 
 test('a null catalogPieces is rejected', () =>
   assert.throws(() => validateSnapshot(withCatalog(null)), /aiActions\.catalogPieces must be a number/));
+
+// --- uiImprovements.live (optional cloud measurement) -------------------------
+// The one field the schema treats differently from its workstream's siblings,
+// and the reason is the backfill: `merged`, `review` and `assigned` all follow
+// from PR timestamps, which GitHub keeps forever, so the six weeks archived
+// before this workstream existed could be reconstructed exactly. Cloud state
+// cannot — it is only ever knowable now — so a reconstructed week records no
+// `live` at all, and that shape has to validate. A present value is subtracted
+// from `merged` to produce an ask, so a non-number still has to fail here.
+
+const withUiLive = (live) => ok({
+  uiImprovements: { status: 'ok', merged: 5, review: 2, assigned: 0, totalPieces: 765, live },
+});
+
+test('a reconstructed week with no cloud measurement validates', () => {
+  const snap = ok({ uiImprovements: { status: 'ok', merged: 3, review: 3, assigned: 0, totalPieces: 765 } });
+  assert.equal(snap.uiImprovements.live, undefined);
+  validateSnapshot(snap);
+});
+
+test('a numeric live validates', () => validateSnapshot(withUiLive(5)));
+
+test('a zero live validates — nothing has reached cloud yet is a real reading', () =>
+  validateSnapshot(withUiLive(0)));
+
+test('a non-numeric live is rejected', () =>
+  assert.throws(() => validateSnapshot(withUiLive('5')), /uiImprovements\.live must be a number/));
+
+test('a null live is rejected — absence says "not measured", null says nothing', () =>
+  assert.throws(() => validateSnapshot(withUiLive(null)), /uiImprovements\.live must be a number/));
+
+// The counts that a backfill CAN reconstruct stay mandatory: absence there is a
+// collector that failed, and a missing number must not read as zero pieces.
+test('the reconstructable uiImprovements counts stay required', () => {
+  for (const f of ['merged', 'review', 'assigned', 'totalPieces']) {
+    const ws = { status: 'ok', merged: 5, review: 2, assigned: 0, totalPieces: 765 };
+    delete ws[f];
+    assert.throws(() => validateSnapshot(ok({ uiImprovements: ws })),
+      new RegExp(`uiImprovements\\.${f} must be a number`));
+  }
+});
 
 // --- logo (optional per-row logo URL) ----------------------------------------
 // OPTIONAL for the same reason as `roster` and `catalogPieces`: the snapshot

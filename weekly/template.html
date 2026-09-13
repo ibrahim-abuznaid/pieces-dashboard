@@ -11,7 +11,7 @@
      literals — so light and dark both follow the design system.
 
      dataviz rules encoded here:
-     · The 4 workstreams are a KPI ROW of stat tiles (value + delta pill + the
+     · The 5 workstreams are a KPI ROW of stat tiles (value + delta pill + the
        pieces behind the number), not a chart. One number each is the whole
        story, and there is no chart anywhere on this page: the trend sparkline
        and its caption were the two tallest blocks in a page whose acceptance
@@ -65,6 +65,30 @@
   .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
   @media (max-width: 640px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
   .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+  /* The fifth box spans both columns — an odd tile left in a two-column grid
+     would sit beside a hole, and the hole reads as a box that failed to render.
+     It is last, which is also where the full-width UI-improvements band used to
+     be: same place, same width, now with a number in it.
+
+     Its strip label goes INLINE with the chips rather than above them. That is
+     the page's height budget, not decoration: the box costs 123px with a note
+     and 149px with a note and a chip row (Chrome, 1366x768, 2026-09-13), against
+     the ~120px band it replaced, and folding the label onto the chip row is 20px
+     of that. It only works because the box is full width — at half width the
+     label and a chip would not share a line. The committed archive's heaviest
+     weeks do scroll, and did before this box existed; see the re-measurement
+     note in test/weekly-render.test.mjs for what that budget now buys. */
+  .tile.wide { grid-column: 1 / -1; }
+  /* Label and chips share one baseline row. The ul is a flex ITEM with a
+     definite width (`flex: 1`), which is the load-bearing part: a chip's
+     `max-width: calc(50% - 3px)` is a percentage of its strip, and an
+     inline-flex strip is only as wide as the chips inside it — so half of it is
+     half a chip, and `Sage Accounting` ellipsized to `Sage Accou…` in a box with
+     400px to spare. Filling the row restores the clamp to what it means
+     everywhere else on the page: half of the space actually available. */
+  .tile.wide .stripline { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; }
+  .tile.wide .striplab { margin-top: 0; white-space: nowrap; }
+  .tile.wide ul.strip { flex: 1; margin-top: 0; }
   .tile h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
              color: var(--text-muted); margin: 0 0 8px; font-weight: 600; }
   /* Proportional figures on purpose — tabular-nums makes a display-size number look loose. */
@@ -170,14 +194,6 @@
   .band ul { margin: 0; padding-left: 0; list-style: none; }
   .band li { margin: 3px 0; font-size: 13.5px; }
   .band .mark { color: var(--sev-high); font-weight: 600; }
-  /* The UI-improvements band: same shape, none of the urgency — updates are an
-     inventory, not an ask, so the red stays reserved for "Needs you". Its note
-     sits flush under the heading (the heading's own margin is the gap), and the
-     chip strip keeps the spacing `.band ul` above would otherwise zero out. */
-  .band.plain { border-color: var(--border); }
-  .band.plain h2 { color: var(--text-secondary); }
-  .band.plain .note { margin-top: 0; }
-  .band.plain ul.strip { margin-top: 8px; }
 
   /* Nothing below the boxes but the links to the pages that hold the detail.
      There are no tables, sections or rosters on this page: everything a project
@@ -284,19 +300,22 @@ function stripHtml(s) {
 
 // A box is a number, its unit, and the pieces behind it. `perPerson` is the one
 // line of detail any box carries — who closed the tickets — and it is empty on
-// the other three. A degraded tile keeps the em dash in the number slot so the
-// KPI row still scans as a row of four, and carries no strip: only its reason.
+// the other four. A degraded tile keeps the em dash in the number slot so the
+// KPI row still scans as a full row, and carries no strip: only its reason —
+// including when it is the wide one, which keeps its width either way so the
+// grid cannot reflow around a collector that failed.
 function tileHtml(t) {
+  const wide = t.wide ? ' wide' : '';
   if (t.status !== 'ok') {
-    return `<div class="tile is-nodata"><h2>${esc(t.title)}</h2>
+    return `<div class="tile${wide} is-nodata"><h2>${esc(t.title)}</h2>
       <div><span class="big">—</span></div>
       <div class="nodata"><b>No data</b> — ${esc(t.reason)}</div></div>`;
   }
-  return `<div class="tile"><h2>${esc(t.title)}</h2>
+  return `<div class="tile${wide}"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${deltaHtml(t.delta)}</div>
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
     ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}
-    ${stripHtml(t.strip)}</div>`;
+    ${t.wide ? `<div class="stripline">${stripHtml(t.strip)}</div>` : stripHtml(t.strip)}</div>`;
 }
 
 function render(view) {
@@ -326,9 +345,6 @@ function render(view) {
     <div class="tiles">${view.tiles.map(tileHtml).join('')}</div>
     ${view.decisions.length ? `<div class="band"><h2>Needs you</h2><ul>${
       view.decisions.map((d) => `<li><span class="mark" aria-hidden="true">→</span> ${esc(d)}</li>`).join('')}</ul></div>` : ''}
-    ${view.uiUpdates ? `<div class="band plain"><h2>UI improvements</h2>${
-      view.uiUpdates.note ? `<div class="note">${esc(view.uiUpdates.note)}</div>` : ''}${
-      stripHtml(view.uiUpdates.strip)}</div>` : ''}
     <footer>Full detail: <a href="../output-schema/">outputSchema</a> ·
       <a href="../ai-actions/">AI-actions</a> · <a href="../">overview</a></footer>`;
 

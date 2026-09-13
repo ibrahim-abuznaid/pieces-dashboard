@@ -11,6 +11,7 @@ const readIf = (p) => (existsSync(join(ROOT, p)) ? JSON.parse(readFileSync(join(
 
 const nums = new Set();
 for (const p of readIf('ai-actions/pieces.json')?.pieces ?? []) if (p.pr) nums.add(p.pr);
+for (const p of readIf('ui-improvements/pieces.json')?.pieces ?? []) if (p.pr) nums.add(p.pr);
 for (const ov of Object.values(readIf('output-schema/overrides.json')?.pieces ?? {})) if (ov.pr) nums.add(ov.pr);
 for (const ov of Object.values(readIf('ai-actions/overrides.json')?.pieces ?? {})) if (ov.pr) nums.add(ov.pr);
 
@@ -26,6 +27,12 @@ for (const n of [...nums].sort((a, b) => a - b)) {
   }
   prs[n] = {
     state: pr.merged_at ? 'MERGED' : pr.state.toUpperCase(), // OPEN | CLOSED | MERGED
+    // The two dates a stage changed on. `state` is only ever NOW, so a
+    // question about a past week — which pieces had landed by the end of
+    // W36, which were sitting in review — can only be answered from these:
+    // see scripts/backfill-ui-improvements.mjs, which reconstructs six
+    // already-archived weeks from them rather than guessing.
+    createdAt: pr.created_at,
     mergedAt: pr.merged_at,
     title: pr.title,
     url: pr.html_url,

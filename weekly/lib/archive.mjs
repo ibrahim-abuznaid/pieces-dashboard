@@ -11,8 +11,23 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const REQUIRED = {
   outputSchema: ['live', 'mergedNotLive', 'review', 'todo', 'totalPieces'],
   aiActions: ['merged', 'prOpen', 'assigned', 'held', 'totalPieces', 'blockersOpen'],
+  // `live` is NOT required here, and that is the one asymmetry with
+  // outputSchema above. Every field listed is derivable from PR dates alone,
+  // which is what let the six already-archived weeks be reconstructed
+  // (scripts/backfill-ui-improvements.mjs); cloud state is only ever knowable
+  // NOW, so a past week that records `merged` and omits `live` is the honest
+  // shape and has to validate. See OPTIONAL_NUMBERS.
+  uiImprovements: ['merged', 'review', 'assigned', 'totalPieces'],
   testing: ['prsMerged', 'commits'],
   tickets: ['total'],
+};
+
+// Counts a workstream MAY carry. Required where listed above, rejected when
+// present and not a number — the page divides by one of these and subtracts
+// another, so a string or a null has to fail here rather than render as
+// "of undefined pieces" or a NaN delta.
+const OPTIONAL_NUMBERS = {
+  uiImprovements: ['live'],
 };
 
 // The three optional string fields a roster row may carry. All three are optional
@@ -73,6 +88,16 @@ function validateCatalogPieces(key, ws) {
   }
 }
 
+function validateOptionalNumbers(key, ws) {
+  for (const f of OPTIONAL_NUMBERS[key] ?? []) {
+    if (ws[f] === undefined) continue;
+    if (typeof ws[f] !== 'number') {
+      throw new Error(`${key}.${f} must be a number when present, got ${
+        ws[f] === null ? 'null' : typeof ws[f]}`);
+    }
+  }
+}
+
 export function validateSnapshot(snap) {
   if (!snap || typeof snap !== 'object') throw new Error('snapshot must be an object');
   if (!WEEK_RE.test(snap.week ?? '')) throw new Error(`bad week id: ${snap.week}`);
@@ -87,6 +112,7 @@ export function validateSnapshot(snap) {
     if (!ws || typeof ws !== 'object') throw new Error(`missing workstream: ${key}`);
     validateRoster(key, ws);
     validateCatalogPieces(key, ws);
+    validateOptionalNumbers(key, ws);
     if (ws.status === 'no-data') {
       if (typeof ws.reason !== 'string' || !ws.reason) throw new Error(`${key}: no-data needs a reason`);
       continue;

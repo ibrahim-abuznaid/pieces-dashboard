@@ -7,6 +7,7 @@ import { validateSnapshot } from '../weekly/lib/archive.mjs';
 const collectors = (over = {}) => ({
   outputSchema: () => ({ status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 }),
   aiActions: () => ({ status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 }),
+  uiImprovements: () => ({ status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 }),
   testing: () => ({ status: 'ok', prsMerged: 1, commits: 4, shipped: [] }),
   tickets: () => ({ status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
                     prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] }),
@@ -43,6 +44,7 @@ test('deriveDecisions asks for the cloud release, in plain words', () => {
   const lines = deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 6, review: 0 },
     aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, live: 5 },
     tickets: { status: 'ok' }, testing: { status: 'ok' },
   });
   assert.deepEqual(lines, ['6 pieces merged but not live — needs a cloud release']);
@@ -52,15 +54,38 @@ test('the cloud-release ask agrees in number', () => {
   const lines = deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 1, review: 0 },
     aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, live: 5 },
     tickets: { status: 'ok' }, testing: { status: 'ok' },
   });
   assert.deepEqual(lines, ['1 piece merged but not live — needs a cloud release']);
+});
+
+// The same ask, for the second rollout that ships metadata through the cloud
+// registry. Derived from merged − live rather than stored, so it cannot
+// disagree with the tile: a week that recorded no cloud state asks for nothing.
+test('the property-UI rollout asks for the cloud release on the same terms', () => {
+  assert.deepEqual(deriveDecisions({
+    outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
+    aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, live: 4 },
+    tickets: { status: 'ok' }, testing: { status: 'ok' },
+  }), ['1 piece with the new property UI merged but not live — needs a cloud release']);
+});
+
+test('a week that never measured cloud state asks nothing of it', () => {
+  assert.deepEqual(deriveDecisions({
+    outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
+    aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, review: 2, assigned: 0, totalPieces: 765 },
+    tickets: { status: 'ok' }, testing: { status: 'ok' },
+  }), []);
 });
 
 test('PRs in review and open blockers are status, not decisions', () => {
   const lines = deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 0, review: 8 },
     aiActions: { status: 'ok', prOpen: 24, blockersOpen: 30 },
+    uiImprovements: { status: 'ok', merged: 5, live: 5 },
     tickets: { status: 'ok' }, testing: { status: 'ok' },
   });
   assert.deepEqual(lines, []);
@@ -70,6 +95,7 @@ test('a degraded workstream is not a decision line — its tile already says so'
   const lines = deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
     aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'no-data', reason: 'build output missing' },
     testing: { status: 'no-data', reason: 'gh unreachable' },
     tickets: { status: 'no-data', reason: 'Linear refresh pending' },
   });
@@ -80,6 +106,7 @@ test('a clean week produces no decision lines', () => {
   assert.deepEqual(deriveDecisions({
     outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
     aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, live: 5 },
     testing: { status: 'ok' }, tickets: { status: 'ok' },
   }), []);
 });

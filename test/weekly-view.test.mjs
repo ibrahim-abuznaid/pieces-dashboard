@@ -7,6 +7,7 @@ const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
+  uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [{ number: 5, title: 't', url: 'u' }] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 },
@@ -41,9 +42,18 @@ test('an empty archive is flagged rather than crashing', () =>
 test('picker lists weeks newest first', () =>
   assert.deepEqual(buildView(archive).weeks, ['2026-W31', '2026-W30']));
 
-test('always four tiles in fixed order', () =>
+test('always five tiles in fixed order', () =>
   assert.deepEqual(buildView(archive).tiles.map((t) => t.key),
-    ['outputSchema', 'aiActions', 'testing', 'tickets']));
+    ['outputSchema', 'aiActions', 'testing', 'tickets', 'uiImprovements']));
+
+// Exactly one, and last. The wide box spans both grid columns, so a second one
+// would leave an odd tile beside a hole — and anywhere but last it would split
+// a row pair. It is also where the full-width UI-improvements band used to sit.
+test('the UI-improvements tile is the only wide one, and it comes last', () => {
+  const tiles = buildView(archive).tiles;
+  assert.deepEqual(tiles.filter((t) => t.wide).map((t) => t.key), ['uiImprovements']);
+  assert.equal(tiles.at(-1).key, 'uiImprovements');
+});
 
 // The headline for outputSchema is MERGED work — live + merged-not-live — not
 // just what reached cloud. Counting only `live` reports 9 when 15 pieces are
@@ -182,7 +192,7 @@ test('only the tickets tile carries a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value']);
+      ['delta', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value', 'wide']);
   }
 });
 
@@ -255,7 +265,7 @@ test('a range that crosses a month names both months', () =>
 test('the view carries exactly the fields the page renders', () =>
   assert.deepEqual(Object.keys(buildView(archive)).sort(),
     ['builtAt', 'decisions', 'end', 'noPriorWeek', 'range', 'start', 'tiles', 'title',
-     'uiUpdates', 'week', 'weeks']));
+     'week', 'weeks']));
 
 // The lede restated the numbers in prose above the boxes that already carry
 // them. Two rounds of editing it did not make the page clearer, so it is gone.
@@ -314,7 +324,8 @@ test('noPriorWeek is false once any tile has a delta', () =>
 test('a prior week that reported nothing still leaves nothing to compare', () => {
   const degraded = { status: 'no-data', reason: 'x' };
   const a = { weeks: [
-    snap('2026-W30', { outputSchema: degraded, aiActions: degraded, testing: degraded, tickets: degraded }),
+    snap('2026-W30', { outputSchema: degraded, aiActions: degraded, uiImprovements: degraded,
+                       testing: degraded, tickets: degraded }),
     snap('2026-W31'),
   ] };
   assert.equal(buildView(a).noPriorWeek, true);
@@ -1141,69 +1152,78 @@ test('a strip carries its whole overflow in rest, in order, agreeing with more',
 test('a strip inside the cap has an empty rest', () =>
   assert.deepEqual(stripOf(buildView(archive), 'tickets').rest, []));
 
-// ── the UI-improvements band ────────────────────────────────────────────────
-// Curated per week in weekly/data/updates.json — pieces-related UI work has no
-// honest derived number behind it, so the band is prose plus linked chips,
-// display layer like the note line. What the view owes the page is threading
-// (right week, nothing leaking across weeks) and shape hygiene: updates.json is
-// hand-edited, so every malformed shape has to degrade to "no band", never to a
-// broken one.
+// ── the UI-improvements tile ────────────────────────────────────────────────
+// This workstream used to be a curated band of prose, because "pieces-related
+// UI work" had no derived number behind it. It has one now — the property-UI
+// rollout, counted against the whole catalog — so what the view owes the page is
+// the same contract the other two rollouts get: a headline that is MERGED work,
+// a strip that never overstates a week, and prose only in the note line.
 
-test('a curated update reaches its week as a note plus linked chips', () => {
-  const v = buildView(archive, { updates: { '2026-W31': {
-    note: '  Selector descriptions\n live  ',
-    items: [{ label: ' #14437 selector  descriptions ', href: 'https://x/pull/14437' }],
-  } } });
-  assert.equal(v.uiUpdates.note, 'Selector descriptions live');
-  assert.deepEqual(v.uiUpdates.strip.items,
-    [{ name: '#14437 selector descriptions', href: 'https://x/pull/14437' }]);
-  assert.equal(v.uiUpdates.strip.more, 0);
+const uiTile = (a, week) => buildView(a, week).tiles.find((t) => t.key === 'uiImprovements');
+
+test('the UI-improvements tile leads with merged work, against the whole catalog', () => {
+  const t = uiTile(archive);
+  assert.equal(t.value, 5);
+  assert.equal(t.unit, 'of 765 pieces');
 });
 
-test('a week with no curated update carries no band at all', () => {
-  assert.equal(buildView(archive).uiUpdates, null);
-  const v = buildView(archive, { updates: { '2026-W30': { note: 'last week' } } });
-  assert.equal(v.uiUpdates, null, "another week's entry must not leak into this one");
+// `merged` is STORED, not derived from live + something — unlike outputSchema's
+// headline. A week reconstructed from PR dates records `merged` and cannot know
+// `live`, so a view that derived the headline would report those weeks as zero.
+test('a week that recorded no cloud state still reports its merged count', () => {
+  const noLive = { status: 'ok', merged: 3, review: 3, assigned: 0, totalPieces: 765 };
+  const a = { weeks: [snap('2026-W30', { uiImprovements: noLive }), snap('2026-W31')] };
+  assert.equal(uiTile(a, { weekId: '2026-W30' }).value, 3);
+  assert.equal(uiTile(a, { weekId: '2026-W31' }).delta, 2);
 });
 
-test('an update can be a note alone, or items alone', () => {
-  const noteOnly = buildView(archive, { updates: { '2026-W31': { note: 'Live on cloud' } } });
-  assert.equal(noteOnly.uiUpdates.note, 'Live on cloud');
-  assert.equal(noteOnly.uiUpdates.strip, null);
-  const itemsOnly = buildView(archive, { updates: { '2026-W31': { items: [{ label: 'a fix' }] } } });
-  assert.equal(itemsOnly.uiUpdates.note, '');
-  assert.deepEqual(itemsOnly.uiUpdates.strip.items, [{ name: 'a fix' }]);
+// Both stages are finished work: `live` is on cloud, `merged` is landed in the
+// repo and waiting on a release train. A strip that showed only `live` would
+// drop pieces the team finished, which is the overstatement-in-reverse this
+// page guards against just as hard.
+test('the strip counts both landed stages and leaves the unlanded ones out', () => {
+  const roster = [
+    { folder: 'whatsscale', name: 'whatsscale', displayName: 'WhatsScale', actions: 46, stage: 'live' },
+    { folder: 'google-sheets', name: 'google-sheets', displayName: 'Google Sheets', actions: 31, stage: 'merged' },
+    { folder: 'gmail', name: 'gmail', displayName: 'Gmail', actions: 15, stage: 'review' },
+    { folder: 'supabase', name: 'supabase', displayName: 'Supabase', actions: 10, stage: 'planned' },
+  ];
+  const a = { weeks: [snap('2026-W31', {
+    uiImprovements: { status: 'ok', merged: 2, live: 1, review: 1, assigned: 0, totalPieces: 765, roster },
+  })] };
+  const strip = uiTile(a).strip;
+  assert.equal(strip.label, 'Done in total');
+  assert.deepEqual(strip.items.map((i) => i.name), ['WhatsScale', 'Google Sheets']);
 });
 
-test('malformed update shapes degrade to no band, not a broken one', () => {
-  for (const entry of [null, 42, 'prose', ['x'], {}, { note: '  ' }, { items: 'nope' },
-    { items: [{ href: 'https://x' }, { label: '   ' }, null] }]) {
-    assert.equal(buildView(archive, { updates: { '2026-W31': entry } }).uiUpdates, null,
-      `entry ${JSON.stringify(entry)} should render no band`);
-  }
+// The diff keys on `folder`, so a piece that merged last week must not be
+// re-reported as this week's work — and one that crossed the line must be.
+test('only the pieces that landed this week are claimed for it', () => {
+  const row = (folder, displayName, actions, stage) =>
+    ({ folder, name: folder, displayName, actions, stage });
+  const week = (w, roster, merged) => snap(w, {
+    uiImprovements: { status: 'ok', merged, live: merged, review: 0, assigned: 0, totalPieces: 765, roster },
+  });
+  const a = { weeks: [
+    week('2026-W30', [row('http', 'HTTP', 2, 'live')], 1),
+    week('2026-W31', [row('http', 'HTTP', 2, 'live'), row('whatsscale', 'WhatsScale', 46, 'live')], 2),
+  ] };
+  const strip = uiTile(a).strip;
+  assert.equal(strip.label, 'Done this week');
+  assert.deepEqual(strip.items.map((i) => i.name), ['WhatsScale']);
 });
 
-test('an item without a usable label is dropped; one without an href stays a plain chip', () => {
-  const v = buildView(archive, { updates: { '2026-W31': {
-    items: [{ label: 'kept', href: '' }, { label: 12, href: 'https://x' }, { label: 'also kept' }],
-  } } });
-  assert.deepEqual(v.uiUpdates.strip.items, [{ name: 'kept' }, { name: 'also kept' }]);
+// The prose the retired band carried moved here, keyed by the workstream like
+// every other curated note.
+test('the curated note reaches the tile', () => {
+  const notes = { '2026-W31': { uiImprovements: '  Two  pilots\n still in review ' } };
+  assert.equal(uiTile(archive, { notes }).note, 'Two pilots still in review');
 });
 
-// Three, not the tiles' five: the band is full-width and sits under four boxes
-// that already spend the height budget, so it opens at two rows worst case —
-// see the render tests for the row arithmetic.
-test('the band opens at three chips and carries the rest behind "+N more"', () => {
-  const items = Array.from({ length: 5 }, (_, i) => ({ label: `fix ${i}` }));
-  const s = buildView(archive, { updates: { '2026-W31': { items } } }).uiUpdates.strip;
-  assert.deepEqual(s.items.map((i) => i.name), ['fix 0', 'fix 1', 'fix 2']);
-  assert.deepEqual(s.rest.map((i) => i.name), ['fix 3', 'fix 4']);
-  assert.equal(s.more, 2);
-});
-
-test('an update href that is not https is dropped — the chip stays, unlinked', () => {
-  const v = buildView(archive, { updates: { '2026-W31': {
-    items: [{ label: 'sneaky', href: 'javascript:alert(1)' }],
-  } } });
-  assert.deepEqual(v.uiUpdates.strip.items, [{ name: 'sneaky' }]);
+// The band is gone, not renamed: nothing on the view should still be carrying
+// an updates payload for the page to render.
+test('the view no longer assembles a UI-improvements band', () => {
+  const v = buildView(archive, { updates: { '2026-W31': { note: 'stale', items: [{ label: 'x' }] } } });
+  assert.equal(v.uiUpdates, undefined);
+  assert.doesNotMatch(JSON.stringify(v), /stale/);
 });

@@ -18,18 +18,18 @@ const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
+  uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
   decisions: [], ...over,
 });
 
-function render(weeks, { notes, updates } = {}) {
+function render(weeks, { notes } = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'weekly-'));
   mkdirSync(join(dir, 'data'), { recursive: true });
   writeFileSync(join(dir, 'data/weeks.json'), JSON.stringify({ weeks }));
   if (notes) writeFileSync(join(dir, 'data/notes.json'), JSON.stringify(notes));
-  if (updates) writeFileSync(join(dir, 'data/updates.json'), JSON.stringify(updates));
   const outDir = join(dir, 'out');
   const { html } = buildAll({ archiveDir: join(dir, 'data'), outDir });
   return { html, outDir };
@@ -85,7 +85,7 @@ test('writes summary.json for the selected week', () => {
   const { outDir } = render([snap('2026-W31')]);
   const summary = JSON.parse(readFileSync(join(outDir, 'summary.json'), 'utf8'));
   assert.equal(summary.week, '2026-W31');
-  assert.equal(summary.tiles.length, 4);
+  assert.equal(summary.tiles.length, 5);
 });
 
 test('an empty archive renders a placeholder rather than throwing', () => {
@@ -139,6 +139,8 @@ const withRosters = (over = {}) => snap('2026-W31', {
     ] },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
     roster: [{ name: 'google-sheets', actions: 37, stage: 'merged' }] },
+  uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765,
+    roster: [{ folder: 'whatsscale', name: 'whatsscale', displayName: 'WhatsScale', actions: 46, stage: 'live' }] },
   ...over,
 });
 
@@ -158,9 +160,9 @@ test('the DOM-lite harness actually renders the page body', () => {
 
 const at = (dom, needle) => dom.indexOf(needle);
 
-test('the page is a header, four boxes and nothing structural besides', () => {
+test('the page is a header, five boxes and nothing structural besides', () => {
   const dom = renderDom([withRosters()]);
-  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 4);
+  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 5);
   assert.doesNotMatch(dom, /<section/, 'the roster and detail sections are gone');
   assert.doesNotMatch(dom, /<table|<tr|<td|<th/, 'nothing on this page is a table any more');
   assert.doesNotMatch(dom, /<details|<summary/, 'no collapsible per-piece detail');
@@ -977,7 +979,25 @@ test('the logo fill is an opaque token in every theme', () => {
 // Removing it took the same week to 796px, which still scrolled: the strip was
 // the other unbounded block, because a chip could wrap inside itself. Chips are
 // one line and half a row wide now, and the cap is 5 — see the chip tests below.
-// The same week measures 662px, the committed archive 575px.
+// The same week measures 662px, and the archive as committed in August, 575px.
+//
+// RE-MEASURED 2026-09-13, same viewport, after the fifth box (UI improvements)
+// replaced the curated band: the six committed weeks span 584–781px, and the
+// week a reader lands on is 781px. It scrolls, by ~100px.
+//
+// Recorded rather than quietly dropped, because two different things are true.
+// The archive had ALREADY outgrown the criterion before this box existed — the
+// same six weeks measured 476–741px on the build before it, so the two heaviest
+// weeks scrolled either way; the page was tuned when the archive held two light
+// weeks, and weeks get heavier as the team ships more per week. And the box
+// itself is cheap: 97px bare, 123px with a note, 149px with a note and a chip
+// row, against the ~120px band it replaced. What is left to give back is not whitespace or a
+// cap — it is a WEEK'S CONTENT, four boxes' worth of chips and two asks, and
+// that is the reader's call to make, not a margin to shave.
+//
+// So the budget below stays exactly where it was tuned: it is what stops the
+// page drifting further, and every px it guards is one the content does not
+// have to give up.
 //
 // No test here can measure pixels without a browser, so what these pin is the
 // structure the measurement established: the blocks that are gone stay gone, no
@@ -1133,6 +1153,11 @@ const sidesY = (shorthand) => {
 // only fits while its furniture stays inside what is left. 64px of dead space
 // under the footer was a third of that budget on its own.
 //
+// The fifth box added content, not furniture — it shares the same grid gap the
+// other four already pay for — so the number below is unchanged and still the
+// figure it was tuned to. See the re-measurement note above for where the page
+// actually stands.
+//
 // 98px is what the tallest week measured at: it leaves 31px spare, which is one
 // more "Needs you" line (26px). Loosen this and the page stops fitting for a
 // week with two asks — the one part of the page that asks for an action is the
@@ -1235,96 +1260,73 @@ test('a hidden overflow chip is actually display:none, not just marked hidden', 
   assert.equal(declarationsFor(css, 'ul.strip .chip[hidden]').display, 'none');
 });
 
-// ── the UI-improvements band ────────────────────────────────────────────────
-// Curated pieces-related UI work, out of weekly/data/updates.json — same
-// display-layer contract as notes.json, rendered as a full-width band AFTER
-// "Needs you": the one block that asks for an action is the last thing allowed
-// to fall below the fold, so on an overflowing week the updates give way to the
-// asks, never the other way round.
+// ── the UI-improvements tile ────────────────────────────────────────────────
+// The fifth box replaced the curated band that used to sit here. It renders
+// through the same tileHtml as the other four — that is the point of the change
+// — so what these pin is the part that is NOT shared: it spans both columns, and
+// it spends less height doing it than the four narrow boxes do.
 
-const UPDATES = { '2026-W31': {
-  note: 'Piece-selector descriptions went live on cloud.',
-  items: [
-    { label: '#14437 selector descriptions', href: 'https://github.com/activepieces/activepieces/pull/14437' },
-    { label: 'a fix with no link' },
-  ],
-} };
-
-const plainBand = (dom) => {
-  const start = dom.indexOf('<div class="band plain">');
-  return start === -1 ? '' : dom.slice(start, dom.indexOf('<footer', start));
+const wideTile = (dom) => {
+  const start = dom.indexOf('<div class="tile wide');
+  return start === -1 ? '' : dom.slice(start, dom.indexOf('</div>', dom.indexOf('class="strip"', start) + 1));
 };
 
-test('a curated update renders as a band: heading, note, linked chips', () => {
-  const band = plainBand(renderDom([snap('2026-W31')], '', { updates: UPDATES }));
-  assert.match(band, /<h2>UI improvements<\/h2>/);
-  assert.match(band, /Piece-selector descriptions went live on cloud\./);
-  assert.match(band,
-    /<a href="https:\/\/github\.com\/activepieces\/activepieces\/pull\/14437" target="_blank" rel="noopener">/);
-  assert.deepEqual(chipNames(band), ['#14437 selector descriptions', 'a fix with no link']);
+test('UI improvements renders as a stat box, not as a band', () => {
+  const dom = renderDom([withRosters()]);
+  assert.doesNotMatch(dom, /class="band plain"/, 'the curated band is gone');
+  const tile = wideTile(dom);
+  assert.match(tile, /<h2>UI improvements<\/h2>/);
+  assert.match(tile, /<span class="big">5<\/span>/);
+  assert.match(tile, /of 765 pieces/);
 });
 
-test('a week with no curated update renders no UI-improvements band', () => {
-  assert.doesNotMatch(renderDom([snap('2026-W31')]), /UI improvements/);
-  assert.doesNotMatch(
-    renderDom([snap('2026-W31')], '', { updates: { '2026-W30': { note: 'other week' } } }),
-    /UI improvements/, "another week's entry must not render here");
-});
-
-test('the band sits after the asks — updates never push "Needs you" down', () => {
-  const dom = renderDom([snap('2026-W31', { decisions: ['6 pieces merged but not live — needs a cloud release'] })],
-    '', { updates: UPDATES });
-  const asks = dom.indexOf('Needs you');
-  const band = dom.indexOf('UI improvements');
-  assert.ok(asks !== -1 && band !== -1 && asks < band,
-    `expected "Needs you" (${asks}) to render before "UI improvements" (${band})`);
-});
-
-test('a hostile update note and label are escaped on their way to the DOM', () => {
-  const dom = renderDom([snap('2026-W31')], '', { updates: { '2026-W31': {
-    note: '<script>alert(1)</script>', items: [{ label: '<img src=x onerror=alert(1)>' }],
-  } } });
-  assert.doesNotMatch(dom, /<script>alert/);
-  assert.match(dom, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
-  assert.doesNotMatch(dom, /<img src=x/);
-});
-
-test('a non-https update href renders a plain, unlinked chip', () => {
-  const band = plainBand(renderDom([snap('2026-W31')], '', { updates: { '2026-W31': {
-    items: [{ label: 'sneaky', href: 'javascript:alert(1)' }],
-  } } }));
-  assert.doesNotMatch(band, /<a /);
-  assert.doesNotMatch(band, /javascript:/);
-  assert.deepEqual(chipNames(band), ['sneaky']);
-});
-
-// The band's share of the one-screen budget: full-width, so the half-row clamp
-// still guarantees two chips per row, and the open cap of 3 plus "+N more" is
-// two rows at worst — the band cannot grow with the length of the list.
-test('the band opens at three chips, hides the overflow, and stays inside two rows', () => {
-  const items = Array.from({ length: 7 }, (_, i) => ({ label: `fix ${i}`, href: `https://x/${i}` }));
-  const band = plainBand(renderDom([snap('2026-W31')], '', { updates: { '2026-W31': { items } } }));
-  assert.equal((band.match(/<li class="chip lnk">/g) ?? []).length, 3);
-  assert.equal((band.match(/<li class="chip lnk ext" hidden>/g) ?? []).length, 4);
-  assert.match(band, /\+4 more/);
-  assert.ok(Math.ceil((3 + 1) / CHIPS_PER_ROW) <= 2, 'the open cap plus "+N more" must fit two rows');
-});
-
-test('the plain band is the neutral variant — no urgency borrowed from "Needs you"', () => {
+test('the wide box spans the whole grid — no hole beside it', () => {
   const css = pageCss(render([snap('2026-W31')]).html);
-  assert.equal(declarationsFor(css, '.band.plain')['border-color'], 'var(--border)');
-  assert.equal(declarationsFor(css, '.band.plain h2').color, 'var(--text-secondary)');
+  assert.equal(declarationsFor(css, '.tile.wide')['grid-column'], '1 / -1');
 });
 
-// The committed curation itself stays renderable: every archived week that
-// updates.json names must produce its band when the page is opened on it.
-test('the committed updates.json renders its band for the weeks it names', () => {
-  const updates = JSON.parse(readFileSync(new URL('../weekly/data/updates.json', import.meta.url), 'utf8'));
+// The label folds onto the chip row instead of sitting above it. Worth 20px of
+// the one-screen budget, and only safe because the box is full width — see the
+// page-height test below.
+test('the wide box puts its strip label inline with the chips', () => {
+  const dom = renderDom([withRosters()]);
+  assert.match(dom, /<div class="stripline"><div class="striplab">/);
+  const css = pageCss(render([snap('2026-W31')]).html);
+  assert.equal(declarationsFor(css, '.tile.wide .stripline').display, 'flex');
+  assert.equal(declarationsFor(css, '.tile.wide ul.strip')['margin-top'], '0');
+});
+
+// The clamp that keeps a chip to half a row is a PERCENTAGE of the strip, so
+// the strip has to have a width of its own. Left to shrink-wrap its chips it
+// made half-a-chip the limit, and a two-chip strip ellipsized both of them in a
+// box with 400px unused.
+test('the wide strip fills its row so the half-row clamp means half the row', () => {
+  const css = pageCss(render([snap('2026-W31')]).html);
+  assert.equal(declarationsFor(css, '.tile.wide ul.strip').flex, '1');
+});
+
+// A degraded fifth box keeps its width. Losing it would drop the box into a
+// half-width slot beside a hole — a collector failure reflowing the layout is
+// exactly what the fixed tile order exists to prevent.
+test('a degraded UI-improvements box stays wide', () => {
+  const dom = renderDom([snap('2026-W31', {
+    uiImprovements: { status: 'no-data', reason: 'summary.json missing' },
+  })]);
+  assert.match(dom, /<div class="tile wide is-nodata">/);
+  assert.match(dom, /not measured this week/);
+});
+
+// The prose the band carried is committed in notes.json now. Every week that
+// names it must still put it on the page.
+test('the committed notes.json renders its UI-improvements note for the weeks it names', () => {
+  const notes = JSON.parse(readFileSync(new URL('../weekly/data/notes.json', import.meta.url), 'utf8'));
   const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
-  const recorded = Object.keys(updates).filter((w) => archive.weeks.some((x) => x.week === w));
-  if (!recorded.length) return; // curating no archived week is not a wiring failure
-  for (const w of recorded) {
-    assert.match(renderDom(archive.weeks, `#${w}`, { updates }), /<h2>UI improvements<\/h2>/,
-      `week ${w} is curated in updates.json but renders no band`);
+  const named = Object.entries(notes).filter(([w, n]) => n.uiImprovements
+    && archive.weeks.some((x) => x.week === w));
+  assert.ok(named.length, 'notes.json should still carry the migrated band prose');
+  for (const [w, n] of named) {
+    const dom = renderDom(archive.weeks, `#${w}`, { notes });
+    assert.ok(dom.includes(escaped(n.uiImprovements)),
+      `week ${w} is curated in notes.json but its note does not reach the page`);
   }
 });

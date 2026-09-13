@@ -1,0 +1,44 @@
+{
+  "_comment": "Pieces claimed for the property-UI rollout (the new step-settings UI: propertyGroups, advanced, the widget set). No status field — stage derives from `pr` + data/pr-states.json + what the cloud catalog actually publishes. A piece that is live on cloud without a row here still counts; the build prints a WARN so it gets one.",
+  "pieces": [
+    {
+      "slug": "quickbooks-desktop-conductor",
+      "pr": 14981,
+      "note": "Authored with grouped props from the start — 3 grouped actions, not a retrofit."
+    },
+    {
+      "slug": "http",
+      "pr": 15188,
+      "note": "Send HTTP request: the step form split into a group plus 6 advanced props."
+    },
+    {
+      "slug": "google-sheets",
+      "pr": 15200,
+      "note": "39 advanced props across 28 actions and triggers — the largest retrofit so far."
+    },
+    {
+      "slug": "whatsscale",
+      "pr": 15010,
+      "note": "18 grouped actions, shipped alongside the piece's AI actions and output schemas."
+    },
+    {
+      "slug": "sage-accounting",
+      "pr": 15351,
+      "note": "New piece, authored grouped: 7 grouped actions and 10 advanced props."
+    },
+    {
+      "slug": "gmail",
+      "pr": 14943,
+      "note": "Pilot 1 of 3. Ahmad's worktree work, opened 2026-08-20."
+    },
+    {
+      "slug": "telegram-bot",
+      "pr": 14970,
+      "note": "Pilot 2 of 3."
+    },
+    {
+      "slug": "supabase",
+      "note": "Pilot 3 of 3 — named in #14276, no PR and no owner yet."
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import { readArchive, appendWeek, writeArchive } from './lib/archive.mjs';
 import { plural } from './lib/view.mjs';
 import { collectOutputSchema } from './collect/output-schema.mjs';
 import { collectAiActions } from './collect/ai-actions.mjs';
+import { collectUiImprovements } from './collect/ui-improvements.mjs';
 import { collectTesting } from './collect/testing.mjs';
 import { collectTickets } from './collect/tickets.mjs';
 
@@ -22,7 +23,7 @@ const ARCHIVE = join(ROOT, 'weekly/data/weeks.json');
 const TEAM_DASHBOARD = process.env.PIECES_TEAM_DASHBOARD
   ?? '/home/ibrahim/AP_work/Activepieces_v/pieces-team/dashboard';
 
-const WORKSTREAMS = ['outputSchema', 'aiActions', 'testing', 'tickets'];
+const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'testing', 'tickets'];
 
 export function buildSnapshot({ weekId, today, collectors }) {
   const { start, end } = windowForWeekId(weekId);
@@ -52,6 +53,19 @@ export function deriveDecisions(snap) {
   if (os?.status === 'ok' && os.mergedNotLive > 0) {
     const n = os.mergedNotLive;
     lines.push(`${n} ${plural(n, 'piece')} merged but not live — needs a cloud release`);
+  }
+  // The same ask, for the same reason, about the other rollout that ships
+  // metadata through the cloud registry. Derived rather than stored: the
+  // collector records `merged` and `live`, and a third count on disk is one
+  // more number that can disagree with the two it came from.
+  // `typeof`, not arithmetic: a week with no cloud measurement leaves `live`
+  // absent, and `5 - undefined > 0` is false only because NaN comparisons are.
+  // Asking the question explicitly is what keeps that an intention rather than
+  // a coincidence one refactor away from becoming an ask nobody can act on.
+  const ui = snap.uiImprovements;
+  if (ui?.status === 'ok' && typeof ui.live === 'number' && ui.merged - ui.live > 0) {
+    const n = ui.merged - ui.live;
+    lines.push(`${n} ${plural(n, 'piece')} with the new property UI merged but not live — needs a cloud release`);
   }
   return lines;
 }
@@ -128,6 +142,7 @@ export function main(argv) {
     collectors: {
       outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
       aiActions: () => collectAiActions({ readJson: readRepoJson }),
+      uiImprovements: () => collectUiImprovements({ readJson: readRepoJson }),
       testing: () => collectTesting({ window, gh, curl, testerUrl: process.env.PIECE_TESTER_URL }),
       tickets: () => collectTickets({
         window, weekId, readJson: readTeamJson,

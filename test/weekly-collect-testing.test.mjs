@@ -141,7 +141,7 @@ test('a coverage roster validates as a snapshot workstream', () => {
   const noData = { status: 'no-data', reason: 'not collected in this test' };
   validateSnapshot({
     week: '2026-W31', start: WINDOW.start, end: WINDOW.end, builtAt: '2026-08-01',
-    decisions: [], outputSchema: noData, aiActions: noData, tickets: noData,
+    decisions: [], outputSchema: noData, aiActions: noData, uiImprovements: noData, tickets: noData,
     testing: withCoverage(),
   });
 });

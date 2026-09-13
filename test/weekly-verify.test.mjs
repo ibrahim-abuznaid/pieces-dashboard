@@ -18,6 +18,7 @@ const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
+  uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5 }, prsMerged: {}, reviews: {}, shipped: [] },
   decisions: [], ...over,

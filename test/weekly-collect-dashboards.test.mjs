@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { collectOutputSchema } from '../weekly/collect/output-schema.mjs';
 import { collectAiActions } from '../weekly/collect/ai-actions.mjs';
+import { collectUiImprovements } from '../weekly/collect/ui-improvements.mjs';
 import { validateSnapshot } from '../weekly/lib/archive.mjs';
 
 const OS_SUMMARY = {
@@ -81,6 +82,38 @@ const aiRead = (over = {}) => reader({
   'dist/ai-actions/summary.json': AI_SUMMARY,
   'dist/ai-actions/pieces.json': AI_PIECES,
   'dist/output-schema/pieces.json': OS_PIECES,
+  ...over,
+});
+
+// The property-UI rollout publishes its own build output, already joined
+// against the catalog — so unlike the two above it needs no second file to
+// resolve names and logos, and its roster is the whole detail behind the count.
+const UI_SUMMARY = {
+  generated: '2026-09-13', prFetched: '2026-09-13',
+  totals: { pieces: 765, claimed: 8 },
+  status: { live: 5, merged: 0, review: 2, assigned: 0, planned: 1 },
+  merged: 5,
+};
+
+const UI_PIECES = {
+  generated: '2026-09-13',
+  pieces: [
+    { folder: 'whatsscale', displayName: 'WhatsScale', logoUrl: 'https://cdn.activepieces.com/pieces/whatsscale.png',
+      steps: 46, grouped: 18, advanced: 0, stage: 'live', pr: 15010 },
+    { folder: 'google-sheets', displayName: 'Google Sheets', logoUrl: 'https://cdn.activepieces.com/pieces/google-sheets.png',
+      steps: 31, grouped: 0, advanced: 39, stage: 'live', pr: 15200 },
+    { folder: 'gmail', displayName: 'Gmail', logoUrl: 'https://cdn.activepieces.com/pieces/gmail.png',
+      steps: 15, grouped: 0, advanced: 0, stage: 'review', pr: 14943 },
+    // No catalog row upstream, so the build published no name and no logo. The
+    // collector must keep the row on its folder rather than drop it.
+    { folder: 'supabase', displayName: null, logoUrl: null,
+      steps: 10, grouped: 0, advanced: 0, stage: 'planned', pr: null },
+  ],
+};
+
+const uiRead = (over = {}) => reader({
+  'dist/ui-improvements/summary.json': UI_SUMMARY,
+  'dist/ui-improvements/pieces.json': UI_PIECES,
   ...over,
 });
 
@@ -532,6 +565,7 @@ test('what the collectors emit — including an unresolved logo — passes valid
     week: '2026-W31', start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01', decisions: [],
     outputSchema: collectOutputSchema({ readJson: osRead() }),
     aiActions: collectAiActions({ readJson: aiRead() }),
+    uiImprovements: collectUiImprovements({ readJson: uiRead() }),
     testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
     tickets: { status: 'ok', total: 11 },
   };
@@ -539,5 +573,87 @@ test('what the collectors emit — including an unresolved logo — passes valid
   assert.ok(snap.aiActions.roster.some((r) => typeof r.displayName === 'string'), 'and the resolved name path');
   assert.ok(snap.aiActions.roster.some((r) => !('displayName' in r)), 'and the unresolved name path');
   assert.ok(snap.outputSchema.roster.every((r) => typeof r.logo === 'string'));
+  assert.ok(snap.uiImprovements.roster.some((r) => r.logo === null && r.displayName === null),
+    'and the UI roster\'s own unresolved row');
   validateSnapshot(snap);
 });
+
+// ── the property-UI rollout ─────────────────────────────────────────────────
+
+test('the UI-improvements collector reports merged work and the cloud subset', () => {
+  const ws = collectUiImprovements({ readJson: uiRead() });
+  assert.equal(ws.status, 'ok');
+  assert.equal(ws.merged, 5);
+  assert.equal(ws.live, 5);
+  assert.equal(ws.review, 2);
+  assert.equal(ws.assigned, 0);
+  assert.equal(ws.totalPieces, 765);
+});
+
+// The denominator is the CATALOG, not the eight pieces anyone has claimed.
+// "5 of 8" would read as a rollout two thirds done; it is 5 of 765.
+test('the UI-improvements denominator is the whole catalog', () =>
+  assert.equal(collectUiImprovements({ readJson: uiRead() }).totalPieces, 765));
+
+test('the UI roster keys on folder and carries the published name beside it', () => {
+  const { roster } = collectUiImprovements({ readJson: uiRead() });
+  assert.deepEqual(roster.map((r) => r.name), ['whatsscale', 'google-sheets', 'gmail', 'supabase']);
+  assert.deepEqual(roster.map((r) => r.folder), ['whatsscale', 'google-sheets', 'gmail', 'supabase']);
+  assert.equal(roster[0].displayName, 'WhatsScale');
+  assert.equal(roster[0].actions, 46);
+  assert.equal(roster[0].stage, 'live');
+});
+
+// The build omits `live` when the cloud half was never measured — a coverage
+// file written before the fields existed, or a build that skipped the fetch. The
+// collector has to carry that absence through rather than turn it into a 0: the
+// page subtracts `live` from `merged` to ask for a cloud release, and a zero
+// here would invent five pieces' worth of an ask nobody can act on.
+test('an unmeasured cloud half stays absent, it does not become zero', () => {
+  const { status, ...noLive } = UI_SUMMARY;
+  const ws = collectUiImprovements({ readJson: uiRead({
+    'dist/ui-improvements/summary.json': { ...noLive, status: { ...status, live: undefined } },
+  }) });
+  assert.equal(ws.status, 'ok');
+  assert.equal(ws.merged, 5);
+  assert.equal('live' in ws, false);
+  validateSnapshot({
+    week: '2026-W31', start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01', decisions: [],
+    outputSchema: collectOutputSchema({ readJson: osRead() }),
+    aiActions: collectAiActions({ readJson: aiRead() }),
+    uiImprovements: ws,
+    testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
+    tickets: { status: 'ok', total: 11 },
+  });
+});
+
+// Same contract as the other two: losing the per-piece file costs the list, not
+// the numbers — and a missing summary is a reason, never a zero.
+test('a missing UI roster file costs the list and keeps the counts', () => {
+  const ws = collectUiImprovements({ readJson: reader({ 'dist/ui-improvements/summary.json': UI_SUMMARY }) });
+  assert.equal(ws.status, 'ok');
+  assert.equal(ws.merged, 5);
+  assert.deepEqual(ws.roster, []);
+});
+
+test('a junk UI roster row costs the list, not the week', () => {
+  const ws = collectUiImprovements({ readJson: uiRead({
+    'dist/ui-improvements/pieces.json': { pieces: [{ folder: 'gmail', steps: 'lots' }] },
+  }) });
+  assert.equal(ws.merged, 5);
+  assert.deepEqual(ws.roster, []);
+});
+
+for (const [what, files] of [
+  ['a missing summary', {}],
+  ['a summary with no status block', { 'dist/ui-improvements/summary.json': { merged: 5 } }],
+  ['a non-numeric count', { 'dist/ui-improvements/summary.json': { ...UI_SUMMARY, merged: '5' } }],
+]) {
+  test(`${what} is a UI-improvements no-data reason, never a zero`, () => {
+    const ws = collectUiImprovements({ readJson: reader(files) });
+    assert.equal(ws.status, 'no-data');
+    assert.equal(ws.merged, undefined);
+    assert.match(ws.reason, /UI-improvements summary unavailable/);
+    assert.match(ws.reason, /npm run fetch && npm run build/);
+  });
+}

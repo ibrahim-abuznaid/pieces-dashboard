@@ -3,12 +3,12 @@
 // clock, so the whole page shape is unit-testable.
 //
 // The reader is a project manager, which sets the whole scope: a week header,
-// four numbers, the pieces behind each number, and an ask when there is one.
+// five numbers, the pieces behind each number, and an ask when there is one.
 // Nothing else is built here — a field computed but never rendered is how the
 // next reader gets misled about what the page actually shows.
 //
 // Two invariants the page depends on:
-//   1. `tiles` is ALWAYS length 4 in a fixed order, even when workstreams are
+//   1. `tiles` is ALWAYS length 5 in a fixed order, even when workstreams are
 //      degraded — the layout must not reflow because a collector failed.
 //   2. A degraded workstream renders as "unknown", never as 0. `value` and
 //      `delta` both go empty and the box says it was not measured — see
@@ -279,6 +279,25 @@ const TILES = [
   { key: 'tickets', title: 'Tickets solved', path: 'tickets.total',
     unit: () => 'closed this week', perPerson: perPersonLine,
     strip: (ws) => ticketStrip(ws) },
+  // The property-UI rollout: pieces carrying the new step-settings UI — grouped
+  // props, the essential/Advanced split, the widget set.
+  //
+  // MERGED is the headline for the same reason outputSchema's is: `live` also
+  // waits on a cloud release train the team does not control, so leading with it
+  // would report the release queue rather than the week's work. Stored rather
+  // than derived from the two counts (as mergedSchemas does above), because a
+  // week reconstructed from PR dates knows `merged` and cannot know `live` —
+  // see the backfill note in ../lib/archive.mjs.
+  //
+  // WIDE, and the only tile that is. It took the full-width UI-improvements
+  // BAND's place at the foot of the page — the band was curated prose, which is
+  // what a workstream gets while it has no number — so a reader who knew where
+  // to look for this still finds it there, now carrying the same kind of number
+  // as the other rollouts. The prose did not die with the band: it moved to
+  // weekly/data/notes.json and renders as this tile's note line.
+  { key: 'uiImprovements', title: 'UI improvements', path: 'uiImprovements.merged',
+    unit: (ws) => `of ${ws.totalPieces} pieces`,
+    strip: pieceStrip, done: ['live', 'merged'], wide: true },
 ];
 
 // ── decisions ───────────────────────────────────────────────────────────────
@@ -436,42 +455,10 @@ const NOT_MEASURED = 'not measured this week';
 const curatedNote = (v) =>
   (typeof v === 'string' && v.trim() ? v.trim().replace(/\s+/g, ' ') : null);
 
-// ── the UI-improvements band ────────────────────────────────────────────────
-// Pieces-related UI work — the piece-selector descriptions project, builder
-// fixes around pieces — is real weekly output with no derived number behind it:
-// what counts as "pieces-related UI work" is the team's judgment, and half of it
-// ships from outside the tickets collector's people list. So the band is CURATED,
-// exactly like the note line: weekly/data/updates.json maps week → { note, items },
-// display layer, never the archive, editable after the week is sealed.
-//
-// Items become ordinary strip chips (name + optional link, no icon) through the
-// same capped() split the tiles use, so "+N more" behaves identically. The open
-// cap is 3, not the tiles' 5: the band is full-width, the half-row clamp
-// guarantees two chips per row, so 3 plus "+N more" is at most two rows — the
-// band stays ~100px and the landing view keeps the one-screen budget.
-//
-// Shape errors degrade per entry rather than failing the build: an item without
-// a usable label is dropped, and a week with neither a note nor a usable item
-// renders no band at all — absence, not an empty box.
-const BAND_CAP = 3;
-
-function uiUpdatesFor(entry) {
-  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return null;
-  const note = curatedNote(entry.note);
-  const items = (Array.isArray(entry.items) ? entry.items : [])
-    .filter((it) => it && typeof it === 'object' && curatedNote(it.label))
-    .map((it) => {
-      const href = httpsHref(it.href);          // same rule as PR chips: https or unlinked
-      return { name: curatedNote(it.label), ...(href ? { href } : {}) };
-    });
-  if (!note && !items.length) return null;
-  return { note: note ?? '', strip: items.length ? capped('updates', '', items, BAND_CAP) : null };
-}
-
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
 // unused: the newest entry in the archive already is the newest complete week,
 // and reading a clock here would break purity.
-export function buildView(archive, { weekId, notes, updates } = {}) {
+export function buildView(archive, { weekId, notes } = {}) {
   const weeks = archive?.weeks ?? [];
   if (!weeks.length) return { empty: true, weeks: [] };
 
@@ -489,14 +476,15 @@ export function buildView(archive, { weekId, notes, updates } = {}) {
       // A workstream absent from the snapshot altogether lands here too — there is
       // nothing to distinguish for this reader between "not collected" and
       // "collected and failed".
-      return { key: spec.key, title: spec.title, status: 'no-data', reason: NOT_MEASURED,
+      return { key: spec.key, title: spec.title, wide: spec.wide === true,
+               status: 'no-data', reason: NOT_MEASURED,
                value: null, delta: null, unit: '', strip: null, perPerson: '', note: '' };
     }
     // Resolved per week when the spec asks (pathFor), so value and delta always
     // share one metric — see the piece-testing entry in TILES.
     const path = spec.pathFor ? spec.pathFor(ws) : spec.path;
     return {
-      key: spec.key, title: spec.title, status: 'ok', reason: '',
+      key: spec.key, title: spec.title, wide: spec.wide === true, status: 'ok', reason: '',
       value: pick(selected, path),
       delta: deltaFor(weeks, selected.week, path),
       unit: spec.unit(ws),
@@ -520,6 +508,5 @@ export function buildView(archive, { weekId, notes, updates } = {}) {
     // Said once, in the caption, rather than stamped on all four tiles.
     noPriorWeek: tiles.every((tile) => tile.delta === null),
     decisions: (selected.decisions ?? []).filter(isAsk),
-    uiUpdates: uiUpdatesFor(updates?.[selected.week]),
   };
 }

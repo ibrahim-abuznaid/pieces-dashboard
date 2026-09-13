@@ -7,7 +7,7 @@ Live site: **https://ibrahim-abuznaid.github.io/pieces-dashboard/**
 | [/](https://ibrahim-abuznaid.github.io/pieces-dashboard/) | Combined KPIs + stage funnels |
 | [/output-schema/](https://ibrahim-abuznaid.github.io/pieces-dashboard/output-schema/) | `outputSchema` rollout across the published piece catalog (computed from the cloud API + upstream repo) |
 | [/ai-actions/](https://ibrahim-abuznaid.github.io/pieces-dashboard/ai-actions/) | `audience:'ai'` agent-atomics coverage + blockers |
-| [/weekly/](https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/) | One week of team progress across all four workstreams, with an archive of past weeks |
+| [/weekly/](https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/) | One week of team progress across all five workstreams, with an archive of past weeks |
 
 ## How it stays fresh
 
@@ -18,7 +18,7 @@ fetch live data (Activepieces cloud API, upstream repo tree, GitHub PR states) �
 ## Weekly progress page
 
 [/weekly/](https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/) shows one week of team progress
-across the four workstreams. The counting window is the **7 days ending Friday** (Sat 00:00 → Fri 23:59 UTC).
+across the five workstreams. The counting window is the **7 days ending Friday** (Sat 00:00 → Fri 23:59 UTC).
 
 Snapshots are appended **locally, never in CI**: the Saturday job runs `npm run snapshot`, which writes one
 week into `weekly/data/weeks.json` — and that file **is** committed. CI only renders what is already
@@ -44,7 +44,7 @@ Both read the page the way a reader gets it: the DOM is built client-side from a
 blob, so grepping the served HTML for a week id proves nothing. `verify-weekly.mjs` parses that blob and
 executes the page's scripts in a `node:vm` sandbox.
 
-The page is written for a **project manager**: the week, four numbers, the pieces behind each number, and
+The page is written for a **project manager**: the week, five numbers, the pieces behind each number, and
 anything that needs a decision. Closed tickets and shipped PRs render as chips that **link to the artifact
 itself** (the ticket in Linear, the PR on GitHub). Every strip opens at 5 chips so the landing view fits one
 screen; **"+N more" is a button** that expands the full list in place (the whole roster is in the page,
@@ -57,16 +57,32 @@ the "what actually happened" no derived count can say. It is display layer, **no
 stays immutable, while a note can be written (or fixed) after the week is sealed with one edit and a push.
 The view collapses a note to a single line; write one sentence, not a paragraph.
 
-### UI improvements band
+### UI improvements — the property-UI rollout
 
-`weekly/data/updates.json` maps *week → `{ note, items: [{label, href}] }`* and renders as a full-width
-"UI improvements" band under the tiles: pieces-related UI work shipped that week — the piece-selector
-descriptions project, builder fixes around pieces — with each item a chip linking to its PR or ticket.
-**Curated, not derived**: what counts as "pieces-related UI work" is the team's judgment and much of it
-ships from outside the team's own handles, so no collector could classify it honestly. Same rules as
-notes.json — display layer, weeks.json untouched, editable after the week is sealed with one edit and a
-push. A week with no entry renders no band. The band opens at 3 chips ("+N more" expands in place) so the
-landing view keeps fitting one screen.
+The fifth box counts pieces carrying the new step-settings UI (grouped props, the essential/Advanced split,
+the widget set) against the **whole 765-piece catalog**. It is full width and sits last, where the curated
+"UI improvements" band used to be; the band's prose lives on in `notes.json` as this tile's note line.
+
+Two halves, and the difference matters:
+
+- **merged** — the adoption landed in the repo. Derived from the claim's PR state, so it is true the moment
+  a PR merges. This is the headline, for the same reason outputSchema's headline is merged work.
+- **live** — the cloud catalog actually publishes the metadata, measured straight off it. Only true after a
+  release train the team does not control, so it rides along as detail and drives the "merged but not live"
+  ask. Cloud ingestion **does** carry `propertyGroups` and `advanced` (verified 2026-09-13 — it was an open
+  question in the team's `ui-improvements/README.md`).
+
+Claims live in `ui-improvements/pieces.json` (*slug + PR number*), one JSON edit and a push, exactly like
+`ai-actions/pieces.json`. The build counts a piece the cloud publishes even without a claim row, and prints
+a `WARN` naming it so the list catches up. The shared **Custom API Call** action is excluded everywhere: one
+generic form injected into ~500 pieces gained four `advanced` props in
+[#15248](https://github.com/activepieces/activepieces/pull/15248), and counting it would report 10 pieces as
+adopters of work nobody on the team did.
+
+The six weeks archived before the workstream existed were reconstructed by `scripts/backfill-ui-improvements.mjs`
+from PR `createdAt`/`mergedAt` — permanent timestamps, so "how many had merged by Friday 2026-09-04" has one
+correct answer that does not drift. Those weeks record no `live`: cloud state is only ever knowable now, and
+the archive makes the field optional so a reconstructed week can stay silent rather than guess.
 
 ### Piece testing — coverage when reachable, build progress otherwise
 

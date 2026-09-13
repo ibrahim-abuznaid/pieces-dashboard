@@ -17,10 +17,22 @@ jq -r '.[].name' data/cloud-catalog.json | xargs -P10 -n1 sh -c '
   if [ -z "$m" ]; then m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/$n" || echo ""); fi
   if [ -z "$m" ]; then printf "{\"name\":\"%s\",\"error\":true}\n" "$n"; else
     # printf, not echo: dash echo mangles the \n escapes inside JSON strings
+    # `custom_api_call` is EXCLUDED from the two ui* counts and from nothing else.
+    # It is one shared action injected into ~500 pieces from pieces-common, and
+    # #15248 gave its form four `advanced` props — so counting it would report 10
+    # pieces as having adopted the new property UI when what they share is one
+    # generic form nobody on this team authored. The outputSchema counts above
+    # deliberately keep it: a schema on the shared action is still a schema that
+    # piece publishes.
     printf "%s" "$m" | jq -c "{name:.name, version:.version,
       totalActions: ((.actions // {})|length), totalTriggers: ((.triggers // {})|length),
       actionsWithSchema: ([(.actions // {})|to_entries[]|select(.value.outputSchema != null)]|length),
-      triggersWithSchema: ([(.triggers // {})|to_entries[]|select(.value.outputSchema != null)]|length)}"
+      triggersWithSchema: ([(.triggers // {})|to_entries[]|select(.value.outputSchema != null)]|length),
+      uiGrouped: ([((.actions // {})|to_entries[]), ((.triggers // {})|to_entries[])]
+        |map(select(.key != \"custom_api_call\"))|map(select(.value.propertyGroups != null))|length),
+      uiAdvanced: ([((.actions // {})|to_entries[]), ((.triggers // {})|to_entries[])]
+        |map(select(.key != \"custom_api_call\"))
+        |map((.value.props // {})|to_entries|map(select(.value.advanced == true))|length)|add // 0)}"
   fi' _ > data/.coverage.jsonl
 jq -s '.' data/.coverage.jsonl > data/cloud-coverage.json && rm data/.coverage.jsonl
 echo "  $(jq length data/cloud-coverage.json) fetched, $(jq '[.[]|select(.error)]|length' data/cloud-coverage.json) errors"
