@@ -1,36 +1,6 @@
 {
   "fetched": "2026-09-18",
   "prs": {
-    "13926": {
-      "state": "CLOSED",
-      "createdAt": "2026-06-26T06:59:27Z",
-      "mergedAt": null,
-      "title": "feat(google-docs): add agent atomics for AI agents",
-      "url": "https://github.com/activepieces/activepieces/pull/13926",
-      "assignees": [
-        "kishanprmr"
-      ]
-    },
-    "13929": {
-      "state": "CLOSED",
-      "createdAt": "2026-06-26T10:04:30Z",
-      "mergedAt": null,
-      "title": "feat(google-calendar): add agent atomics for AI agents",
-      "url": "https://github.com/activepieces/activepieces/pull/13929",
-      "assignees": [
-        "kishanprmr"
-      ]
-    },
-    "13930": {
-      "state": "CLOSED",
-      "createdAt": "2026-06-26T10:09:18Z",
-      "mergedAt": null,
-      "title": "feat(gmail): add agent atomics for AI agents (read/draft/thread surface)",
-      "url": "https://github.com/activepieces/activepieces/pull/13930",
-      "assignees": [
-        "sanket-a11y"
-      ]
-    },
     "13937": {
       "state": "MERGED",
       "createdAt": "2026-06-26T13:12:34Z",
@@ -160,6 +130,30 @@
       "assignees": [
         "kishanprmr"
       ]
+    },
+    "14519": {
+      "state": "MERGED",
+      "createdAt": "2026-07-31T05:21:49Z",
+      "mergedAt": "2026-07-31T05:45:19Z",
+      "title": "feat(google-docs): add agent atomics for AI agents",
+      "url": "https://github.com/activepieces/activepieces/pull/14519",
+      "assignees": []
+    },
+    "14520": {
+      "state": "MERGED",
+      "createdAt": "2026-07-31T06:54:43Z",
+      "mergedAt": "2026-07-31T07:30:41Z",
+      "title": "feat(google-calendar): add agent atomics for AI agents",
+      "url": "https://github.com/activepieces/activepieces/pull/14520",
+      "assignees": []
+    },
+    "14565": {
+      "state": "MERGED",
+      "createdAt": "2026-08-03T11:18:26Z",
+      "mergedAt": "2026-08-03T11:47:10Z",
+      "title": "feat(gmail): add agent atomics for AI agents (read/draft/thread surface)",
+      "url": "https://github.com/activepieces/activepieces/pull/14565",
+      "assignees": []
     },
     "14943": {
       "state": "OPEN",

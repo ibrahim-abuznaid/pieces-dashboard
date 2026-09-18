@@ -15,7 +15,7 @@ const { categories, blockers } = read('blockers.json');
 const overrides = read('overrides.json');
 const prData = read('../data/pr-states.json');
 
-const problems = validateAiData({ pieces, categories, blockers });
+const problems = validateAiData({ pieces, categories, blockers, prStates: prData.prs });
 if (problems.length) { console.error('✗ ' + problems.join('\n✗ ')); process.exit(1); }
 
 const enriched = pieces.map((p) => {

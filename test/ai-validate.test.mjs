@@ -36,3 +36,29 @@ test('unknown blocker category / bad severity / duplicate ids flagged', () => {
   const msgs = validateAiData(d).join(' ');
   assert.match(msgs, /unknown cat/); assert.match(msgs, /sev/); assert.match(msgs, /duplicate/);
 });
+
+// The stale-pointer bug that reported three finished pieces as `assigned` for
+// six weeks: the PR number still resolved, so nothing else in the pipeline
+// could tell "superseded" from "claimed, not started".
+test('a claim pointing at a closed, unmerged PR is flagged', () => {
+  const d = good();
+  const msgs = validateAiData({ ...d, prStates: { 1: { state: 'CLOSED' } } }).join(' ');
+  assert.match(msgs, /pr #1 closed without merging/);
+  assert.match(msgs, /superseding PR|held reason/);
+});
+test('merged and open PRs are not flagged, and no prStates skips the check', () => {
+  const d = good();
+  for (const state of ['MERGED', 'OPEN']) {
+    assert.deepEqual(validateAiData({ ...d, prStates: { 1: { state } } }), []);
+  }
+  assert.deepEqual(validateAiData(d), []);                    // pure call, no PR states
+  assert.deepEqual(validateAiData({ ...d, prStates: {} }), []); // number not fetched
+});
+test('the real curated data has no claim on a closed PR', () => {
+  const problems = validateAiData({
+    ...read('ai-actions/blockers.json'),
+    pieces: read('ai-actions/pieces.json').pieces,
+    prStates: read('data/pr-states.json').prs,
+  });
+  assert.deepEqual(problems, []);
+});

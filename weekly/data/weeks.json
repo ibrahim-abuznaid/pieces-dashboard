@@ -224,8 +224,8 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 2,
-        "prOpen": 24,
+        "merged": 14,
+        "prOpen": 12,
         "assigned": 0,
         "held": 2,
         "totalPieces": 28,
@@ -235,14 +235,14 @@
           {
             "name": "stripe",
             "actions": 75,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Stripe",
             "logo": "https://cdn.activepieces.com/pieces/stripe.png"
           },
           {
             "name": "github",
             "actions": 72,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "GitHub",
             "logo": "https://cdn.activepieces.com/pieces/github.png"
           },
@@ -256,7 +256,7 @@
           {
             "name": "trello",
             "actions": 46,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Trello",
             "logo": "https://cdn.activepieces.com/pieces/trello.png"
           },
@@ -270,28 +270,28 @@
           {
             "name": "slack",
             "actions": 44,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Slack",
             "logo": "https://cdn.activepieces.com/pieces/slack.png"
           },
           {
             "name": "todoist",
             "actions": 42,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Todoist",
             "logo": "https://cdn.activepieces.com/pieces/todoist.png"
           },
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Google Docs",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
           {
             "name": "google-drive",
             "actions": 36,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Google Drive",
             "logo": "https://cdn.activepieces.com/pieces/google-drive.png"
           },
@@ -347,28 +347,28 @@
           {
             "name": "airtable",
             "actions": 18,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Airtable",
             "logo": "https://cdn.activepieces.com/pieces/airtable.png"
           },
           {
             "name": "cody",
             "actions": 18,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Cody",
             "logo": "https://cdn.activepieces.com/pieces/cody.png"
           },
           {
             "name": "serp-api",
             "actions": 17,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "SerpApi",
             "logo": "https://cdn.activepieces.com/pieces/serp-api.png"
           },
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Google Calendar",
             "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
@@ -389,7 +389,7 @@
           {
             "name": "google-tasks",
             "actions": 9,
-            "stage": "pr-open",
+            "stage": "merged",
             "displayName": "Google Tasks",
             "logo": "https://cdn.activepieces.com/pieces/google-tasks.png"
           },
@@ -891,9 +891,9 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 23,
+        "merged": 26,
         "prOpen": 0,
-        "assigned": 3,
+        "assigned": 0,
         "held": 2,
         "totalPieces": 28,
         "catalogPieces": 757,
@@ -951,7 +951,7 @@
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Docs",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
@@ -1007,7 +1007,7 @@
           {
             "name": "gmail",
             "actions": 19,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Gmail",
             "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
@@ -1035,7 +1035,7 @@
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Calendar",
             "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
@@ -1696,9 +1696,9 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 23,
+        "merged": 26,
         "prOpen": 0,
-        "assigned": 3,
+        "assigned": 0,
         "held": 2,
         "totalPieces": 28,
         "catalogPieces": 759,
@@ -1756,7 +1756,7 @@
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Docs",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
@@ -1812,7 +1812,7 @@
           {
             "name": "gmail",
             "actions": 19,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Gmail",
             "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
@@ -1840,7 +1840,7 @@
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Calendar",
             "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
@@ -2436,9 +2436,9 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 23,
+        "merged": 26,
         "prOpen": 0,
-        "assigned": 3,
+        "assigned": 0,
         "held": 2,
         "totalPieces": 28,
         "catalogPieces": 760,
@@ -2496,7 +2496,7 @@
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Docs",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
@@ -2552,7 +2552,7 @@
           {
             "name": "gmail",
             "actions": 19,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Gmail",
             "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
@@ -2580,7 +2580,7 @@
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Calendar",
             "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
@@ -3506,9 +3506,9 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 23,
+        "merged": 26,
         "prOpen": 0,
-        "assigned": 3,
+        "assigned": 0,
         "held": 2,
         "totalPieces": 28,
         "catalogPieces": 763,
@@ -3566,7 +3566,7 @@
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Docs",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
@@ -3622,7 +3622,7 @@
           {
             "name": "gmail",
             "actions": 19,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Gmail",
             "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
@@ -3650,7 +3650,7 @@
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Calendar",
             "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },
@@ -4691,9 +4691,9 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 23,
+        "merged": 26,
         "prOpen": 0,
-        "assigned": 3,
+        "assigned": 0,
         "held": 2,
         "totalPieces": 28,
         "catalogPieces": 765,
@@ -4751,7 +4751,7 @@
           {
             "name": "google-docs",
             "actions": 37,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Docs",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
           },
@@ -4807,7 +4807,7 @@
           {
             "name": "gmail",
             "actions": 19,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Gmail",
             "logo": "https://cdn.activepieces.com/pieces/gmail.png"
           },
@@ -4835,7 +4835,7 @@
           {
             "name": "google-calendar",
             "actions": 16,
-            "stage": "assigned",
+            "stage": "merged",
             "displayName": "Google Calendar",
             "logo": "https://cdn.activepieces.com/pieces/google-calendar.png"
           },

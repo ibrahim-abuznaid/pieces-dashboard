@@ -28,6 +28,23 @@ rewrite past weeks every morning.
 `weeks.json` is append-only and past weeks are immutable — re-snapshotting an existing week fails unless you
 pass `--force-week`.
 
+**Deliberate rewrites of archived weeks** are the one exception, and each is done by a script kept in
+`scripts/` rather than by hand, restating only fields that permanent PR timestamps decide — never a count
+that was only knowable at the time (`catalogPieces`, `blockersOpen`, cloud `live`, display fields):
+
+- `backfill-ui-improvements.mjs` — added the `uiImprovements` block to the six weeks archived before that
+  workstream existed.
+- `backfill-ai-actions.mjs` — **run 2026-09-18, rewriting `aiActions` in W31–W37.** Three claims pointed at
+  PRs that closed unmerged and were re-opened under new numbers (#13926→#14519, #13929→#14520,
+  #13930→#14565). The recorded number still resolved, so the daily refresh stayed green while the *pointer*
+  was stale and `deriveStage()` fell back to the closed PRs' assignees: W32–W37 each read `merged 23 /
+  assigned 3` for six weeks when the true state was `merged 26 / assigned 0`, all three having merged by
+  2026-08-03. The same pass corrected W31 (`merged 2` → `merged 14`), which was snapshotted on 2026-08-05
+  off a `dist/` built from PR states fetched a week earlier. Two guards now make this loud rather than
+  silent: `scripts/fetch-pr-states.mjs` warns on any claim whose PR closed unmerged and names the merged PR
+  sharing its title, and `ai-actions/validate.mjs` fails the build outright — a closed PR is never a resting
+  state, it is either superseded (repoint the claim) or abandoned (give it a `held` reason).
+
 ### Verification
 
 Neither job ends at "I pushed it". After the push, `refresh-weekly.sh` waits for the **Refresh & deploy** run

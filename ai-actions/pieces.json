@@ -5,7 +5,7 @@
       "slug": "google-docs",
       "atomics": 37,
       "v": "0.4.5",
-      "pr": 13926,
+      "pr": 14519,
       "t2v": 35,
       "t2t": 37,
       "note": "2 Tier-1-only (replace_image, unmerge_table_cells). Greptile addressed."
@@ -14,7 +14,7 @@
       "slug": "google-calendar",
       "atomics": 16,
       "v": "0.9.5",
-      "pr": 13929,
+      "pr": 14520,
       "t2v": 16,
       "t2t": 16,
       "note": "15 scope-gated calendar/ACL tools deferred (need Google app verification)."
@@ -23,7 +23,7 @@
       "slug": "gmail",
       "atomics": 19,
       "v": "0.12.7",
-      "pr": 13930,
+      "pr": 14565,
       "t2v": 18,
       "t2t": 19,
       "note": "Tier A only. get_attachment Tier-1-only. Tier B (11) deferred — scope re-consent."
