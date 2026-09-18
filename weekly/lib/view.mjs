@@ -236,6 +236,29 @@ function coveredStrip(ws) {
 //
 // `strip` is the pieces the number refers to — see pieceStrip below — and `done`
 // is which of a workstream's stages count as finished for it.
+//
+// `review` is the queue BEHIND the number: work whose PR is OPEN, counted
+// separately and never added in. Read that literally — it is the only thing the
+// pill may ever mean, and exactly two collectors measure it. Both derive it from
+// a live GitHub PR state via deriveStage() → 'pr-open' (see lib/stages.mjs);
+// they disagree only on what to call it, because the two builds were written
+// against different trackers and the page does not rename a stored field to
+// tidy up a spec table.
+//
+// outputSchema is the trap, and it is why this comment is long. That collector
+// also publishes a `review`, and it counts something else entirely: pieces
+// FLAGGED FOR A HUMAN DECISION — webhook, forms, store, tables, subflows, whose
+// payload is caller-defined, so the open question is whether a schema is
+// possible at all, not whether someone has reviewed a diff. It is a sibling of
+// `skip`, it has no PR behind it, and it has sat at the same handful of pieces
+// for six weeks. Rendering it as "+5 in review" claims five pieces are one
+// approval from landing when nobody has written a line of them. That tile
+// therefore names no path here — the honest reading is that this rollout cannot
+// see its open PRs today, and a wrong number is worse than a missing one.
+//
+// Tickets and piece testing name no path either, for the plainer reason that a
+// ticket is open or closed and the tester's coverage is a piece it has run.
+// All three report null rather than an empty queue nobody is measuring.
 const TILES = [
   // Done = MERGED, so both `live` and `merged-not-live`: the work landed either
   // way; `live` merely also caught a cloud release the team does not control, so
@@ -253,6 +276,9 @@ const TILES = [
     unit: (ws) => (typeof ws.catalogPieces === 'number'
       ? `of ${ws.catalogPieces} have AI actions`
       : `of ${ws.totalPieces} merged`),
+    // Named `prOpen` here and `review` on the rollout below; both are the same
+    // derived 'pr-open' stage — see the note above the table.
+    review: 'aiActions.prOpen',
     strip: pieceStrip, done: ['merged'] },
   // Two headlines, chosen by what the snapshot measured. With coverage recorded
   // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
@@ -297,6 +323,7 @@ const TILES = [
   // weekly/data/notes.json and renders as this tile's note line.
   { key: 'uiImprovements', title: 'UI improvements', path: 'uiImprovements.merged',
     unit: (ws) => `of ${ws.totalPieces} pieces`,
+    review: 'uiImprovements.review',
     strip: pieceStrip, done: ['live', 'merged'], wide: true },
 ];
 
@@ -478,7 +505,7 @@ export function buildView(archive, { weekId, notes } = {}) {
       // "collected and failed".
       return { key: spec.key, title: spec.title, wide: spec.wide === true,
                status: 'no-data', reason: NOT_MEASURED,
-               value: null, delta: null, unit: '', strip: null, perPerson: '', note: '' };
+               value: null, delta: null, inReview: null, unit: '', strip: null, perPerson: '', note: '' };
     }
     // Resolved per week when the spec asks (pathFor), so value and delta always
     // share one metric — see the piece-testing entry in TILES.
@@ -487,6 +514,11 @@ export function buildView(archive, { weekId, notes } = {}) {
       key: spec.key, title: spec.title, wide: spec.wide === true, status: 'ok', reason: '',
       value: pick(selected, path),
       delta: deltaFor(weeks, selected.week, path),
+      // `pick` is what keeps a real 0 apart from a count the snapshot never
+      // took: it yields the number when there is one and null otherwise, so a
+      // week written before a collector recorded its queue reports no queue
+      // rather than an empty one. Whether a 0 draws is the template's call.
+      inReview: spec.review ? pick(selected, spec.review) : null,
       unit: spec.unit(ws),
       strip: spec.strip?.(ws, spec, weeks, selected) ?? null,
       perPerson: spec.perPerson?.(ws) ?? '',

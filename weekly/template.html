@@ -99,6 +99,14 @@
   .delta .arrow { font-size: 10px; }
   .delta.up { color: var(--good-text); } .delta.down { color: var(--sev-high); }
   .delta.flat { color: var(--text-muted); }
+  /* Work in flight. Same pill geometry as the delta so the number line reads as
+     one row, deliberately quieter so it never competes with the headline: muted
+     text and a DASHED edge, which is also the cue that survives without colour —
+     the same rule the delta follows with its glyph, and the one the degraded
+     tile follows with its border. It is not a gain, so it is never green. */
+  .inreview { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+              border: 1px dashed var(--border); color: var(--text-muted);
+              margin-left: 8px; vertical-align: 3px; white-space: nowrap; }
   /* The one-line details a number may carry: who closed the tickets, and the
      curated week note (see weekly/data/notes.json). The view collapses a note
      to a single sentence — this class buys no more room than that. */
@@ -304,6 +312,20 @@ function stripHtml(s) {
 // KPI row still scans as a full row, and carries no strip: only its reason —
 // including when it is the wide one, which keeps its width either way so the
 // grid cannot reflow around a collector that failed.
+// The queue behind the headline. Null is a workstream that stages nothing
+// through review, 0 is a queue that is genuinely empty, and BOTH draw nothing:
+// a pill reading "+0 in review" costs a reader a glance to learn there is
+// nothing behind it. The distinction is kept in the view because it is true
+// there, not because this line needs it — see `inReview` in lib/view.mjs.
+//
+// The "+" is not arithmetic and must not invite it. It marks the count as
+// ADDITIONAL to the number on its left — that one landed, this one has not — so
+// that a second figure on a tile cannot be read as a correction to the first.
+function inReviewHtml(n) {
+  if (typeof n !== 'number' || n <= 0) return '';
+  return `<span class="inreview">+${num(n)} in review</span>`;
+}
+
 function tileHtml(t) {
   const wide = t.wide ? ' wide' : '';
   if (t.status !== 'ok') {
@@ -312,7 +334,7 @@ function tileHtml(t) {
       <div class="nodata"><b>No data</b> — ${esc(t.reason)}</div></div>`;
   }
   return `<div class="tile${wide}"><h2>${esc(t.title)}</h2>
-    <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${deltaHtml(t.delta)}</div>
+    <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${inReviewHtml(t.inReview)}${deltaHtml(t.delta)}</div>
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
     ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}
     ${t.wide ? `<div class="stripline">${stripHtml(t.strip)}</div>` : stripHtml(t.strip)}</div>`;

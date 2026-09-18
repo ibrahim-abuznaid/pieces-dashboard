@@ -311,7 +311,11 @@ test('counts above one keep the plural', () =>
 test('no box carries a sub-line under its number', () => {
   const dom = renderDom([withRosters()]);
   assert.doesNotMatch(dom, /live on cloud · /);
-  assert.doesNotMatch(dom, /in review/);
+  // "in review" is the review PILL now — the number line, not a sub-line (see
+  // the review-pill tests below). It was also the tail of the old outputSchema
+  // sub-line, so this narrows to where a sub-line would put it rather than
+  // banning the words: the ban was on the LINE, never on the phrase.
+  assert.doesNotMatch(dom, /class="note">[^<]*in review/);
   assert.doesNotMatch(dom, /tracked · /);
   assert.doesNotMatch(dom, /blockers?</);
   assert.doesNotMatch(dom, /\d+ commits?</);
@@ -1329,4 +1333,77 @@ test('the committed notes.json renders its UI-improvements note for the weeks it
     assert.ok(dom.includes(escaped(n.uiImprovements)),
       `week ${w} is curated in notes.json but its note does not reach the page`);
   }
+});
+
+// ── the review pill ─────────────────────────────────────────────────────────
+// Work in flight, drawn beside the work that landed. Its own pill rather than a
+// second sentence under the number: the box's height budget is what retired the
+// sub-lines in the first place (see the measurements above), and the number line
+// is the one row on a tile that had room left.
+//
+// NEUTRAL, never the delta pill's green. A queue is not progress — it is the
+// same work counted before it arrives — and colouring it as a gain is how a
+// reader ends up adding it to the headline.
+test('a staged rollout draws its review queue beside the number', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')]), 'UI improvements');
+  assert.match(tile, /class="inreview"/);
+  assert.match(tile, /\+2 in review/);
+});
+
+test('the review pill is not styled as a gain', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')]), 'UI improvements');
+  assert.doesNotMatch(tile, /class="inreview up"/);
+});
+
+// The pill names no noun. The unit line it sits beside has just said what is
+// being counted ("of 765 pieces"), so repeating "pieces" spends the width the
+// two-column tiles do not have — and buys a pluralisation bug for nothing.
+test('the review pill does not repeat the unit line\'s noun', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')]), 'UI improvements');
+  assert.match(tile, /class="inreview">\+2 in review</);
+  assert.doesNotMatch(tile, /\d+ pieces in review/);
+});
+
+// The whole point of the correction: the outputSchema box records a `review`
+// count that means "flagged for a human decision", not "PR awaiting review", so
+// it must reach the page under no wording at all. The fixture has 8 of them.
+test('the outputSchema box never draws a review pill', () => {
+  const tile = tileOf(renderDom([snap('2026-W31')]), 'outputSchema');
+  assert.doesNotMatch(tile, /in review/);
+  assert.doesNotMatch(tile, /class="inreview"/);
+});
+
+// An empty queue draws nothing. "+0 in review" is a pill that costs a reader a
+// glance to learn there is nothing behind it, and the tile's own number already
+// says everything measured landed.
+test('an empty review queue draws no pill', () => {
+  const empty = { status: 'ok', merged: 2, prOpen: 0, assigned: 0, held: 2, totalPieces: 28 };
+  const tile = tileOf(renderDom([snap('2026-W31', { aiActions: empty })]), 'AI-actions');
+  assert.doesNotMatch(tile, /in review/);
+});
+
+// The two boxes that stage nothing through review never grow a pill, whatever
+// the snapshot happens to carry.
+test('piece testing and tickets carry no review pill', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  for (const title of ['Piece testing', 'Tickets solved']) {
+    assert.doesNotMatch(tileOf(dom, title), /in review/, `${title} grew a review pill`);
+  }
+});
+
+test('a degraded tile draws no review pill', () => {
+  const tile = tileOf(renderDom([snap('2026-W31', { uiImprovements: { status: 'no-data', reason: 'x' } })]), 'UI improvements');
+  assert.doesNotMatch(tile, /in review/);
+});
+
+// The pill sits on the number line, between the unit and the week-over-week
+// delta: merged, what it is out of, what is behind it, then the move. Asserted
+// because the order is the sentence — a queue drawn after the delta reads as
+// part of the comparison rather than as the state it actually is.
+test('the pill sits between the unit and the delta', () => {
+  const tile = tileOf(renderDom([
+    snap('2026-W30', { uiImprovements: { status: 'ok', merged: 3, live: 3, review: 2, assigned: 0, totalPieces: 765 } }),
+    snap('2026-W31'),
+  ]), 'UI improvements');
+  assert.match(tile, /class="unit"[\s\S]*class="inreview"[\s\S]*class="delta/);
 });

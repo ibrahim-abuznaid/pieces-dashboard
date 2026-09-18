@@ -192,7 +192,7 @@ test('only the tickets tile carries a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value', 'wide']);
+      ['delta', 'inReview', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value', 'wide']);
   }
 });
 
@@ -1227,3 +1227,58 @@ test('the view no longer assembles a UI-improvements band', () => {
   assert.equal(v.uiUpdates, undefined);
   assert.doesNotMatch(JSON.stringify(v), /stale/);
 });
+
+// ── the review queue ────────────────────────────────────────────────────────
+// Every tile's headline counts what LANDED, which on its own reports a week
+// spent waiting on review as a week of nothing. `inReview` is the queue behind
+// that number: pieces whose PR is open and which no reader can find in `merged`.
+//
+// It is a SECOND number on the tile, never folded into the first. Merged and
+// in-review are different claims — one is delivered, one is in flight — and a
+// page that adds them together is the overclaim this page exists to avoid.
+const inReviewOf = (v) => Object.fromEntries(v.tiles.map((t) => [t.key, t.inReview]));
+
+test('only the rollouts that can see an open PR carry a review queue', () =>
+  assert.deepEqual(inReviewOf(buildView(archive)), {
+    aiActions: 24, uiImprovements: 2, outputSchema: null, testing: null, tickets: null }));
+
+// The one that reads a snapshot field and still must not: outputSchema records a
+// `review` count of its own, and it counts pieces FLAGGED FOR A DECISION — the
+// caller-defined payloads (webhook, forms, store, tables) where the open question
+// is whether a schema is possible at all. No PR sits behind any of them. The
+// fixture carries 8 of them precisely so a future edit that wires the field up
+// fails here rather than shipping "+8 in review" over work nobody has started.
+test('the outputSchema decision-flag count is never read as a review queue', () => {
+  const tile = buildView(archive).tiles.find((t) => t.key === 'outputSchema');
+  assert.equal(tile.inReview, null);
+  assert.equal(snap('2026-W31').outputSchema.review, 8, 'fixture must keep a non-zero flag count for this to prove anything');
+});
+
+// Piece testing and tickets are null rather than 0 on purpose. Neither stages
+// work through review — a ticket is open or closed, and the tester's coverage is
+// a piece it has run — so a 0 there would publish a queue nobody is measuring,
+// which is the same failure as a missing collector reading as "nothing to do".
+test('a workstream with no review stage reports null, not an empty queue', () => {
+  const v = buildView(archive);
+  for (const key of ['testing', 'tickets', 'outputSchema']) {
+    assert.equal(v.tiles.find((t) => t.key === key).inReview, null, `${key} invented a review queue`);
+  }
+});
+
+// A real 0 stays a 0 in the model. The AI-actions rollout has genuinely emptied
+// its queue for five weeks running, and collapsing that to null here would make
+// it indistinguishable from piece testing, which never had one.
+test('an emptied review queue is a zero, not a null', () =>
+  assert.equal(oneWeek({ aiActions: { status: 'ok', merged: 2, prOpen: 0, assigned: 0, held: 2, totalPieces: 28 } })
+    .tiles.find((t) => t.key === 'aiActions').inReview, 0));
+
+// Whether that 0 DRAWS is the template's decision, not this module's — the same
+// split as the no-data wording, which is phrased on render so the weeks already
+// sealed in the archive read clean too.
+test('a snapshot that never recorded a review count yields null rather than zero', () =>
+  assert.equal(oneWeek({ uiImprovements: { status: 'ok', merged: 5, live: 5, assigned: 0, totalPieces: 765 } })
+    .tiles.find((t) => t.key === 'uiImprovements').inReview, null));
+
+test('a degraded workstream carries no review queue either', () =>
+  assert.equal(oneWeek({ uiImprovements: { status: 'no-data', reason: 'build missing' } })
+    .tiles.find((t) => t.key === 'uiImprovements').inReview, null));
