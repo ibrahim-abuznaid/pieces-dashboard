@@ -27,6 +27,11 @@
       "note": "New piece, authored grouped: 7 grouped actions and 10 advanced props."
     },
     {
+      "slug": "google-calendar",
+      "pr": 15406,
+      "note": "Retrofit: 11 advanced props across 2 actions and 3 triggers — the essential/Advanced split, no propertyGroups."
+    },
+    {
       "slug": "gmail",
       "pr": 14943,
       "note": "Pilot 1 of 3. Ahmad's worktree work, opened 2026-08-20."

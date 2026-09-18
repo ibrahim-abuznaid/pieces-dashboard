@@ -1,5 +1,5 @@
 {
-  "fetched": "2026-09-13",
+  "fetched": "2026-09-18",
   "prs": {
     "13926": {
       "state": "CLOSED",
@@ -223,6 +223,14 @@
       "mergedAt": "2026-09-10T12:31:38Z",
       "title": "feat(sage-accounting): add Sage Accounting piece",
       "url": "https://github.com/activepieces/activepieces/pull/15351",
+      "assignees": []
+    },
+    "15406": {
+      "state": "MERGED",
+      "createdAt": "2026-09-09T15:37:57Z",
+      "mergedAt": "2026-09-17T13:07:48Z",
+      "title": "feat(google-calendar): improve the step forms",
+      "url": "https://github.com/activepieces/activepieces/pull/15406",
       "assignees": []
     }
   }

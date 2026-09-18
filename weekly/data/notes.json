@@ -16,5 +16,9 @@
   },
   "2026-W37": {
     "uiImprovements": "WhatsScale and Sage Accounting shipped grouped from the start; both pilots (Gmail #14943, Telegram Bot #14970) are still in review."
+  },
+  "2026-W38": {
+    "uiImprovements": "Google Calendar took the essential/Advanced split (#15406) — the sixth piece to land it; both pilots, Gmail #14943 and Telegram Bot #14970, are still in review.",
+    "aiActions": "The tracked wave did not move, but five pieces outside it gained agent atomics this week: Sendinblue, Resend, HubSpot, Gmail and Brevo."
   }
 }
