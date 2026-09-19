@@ -494,6 +494,26 @@
         "assigned": 0,
         "totalPieces": 765,
         "roster": []
+      },
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 11,
+        "piecePrs": 10,
+        "byPerson": {
+          "kishan": 9,
+          "sanket": 2,
+          "odai": 0,
+          "talal": 0
+        },
+        "reviews": 25,
+        "reviewsByPerson": {
+          "kishan": 15,
+          "sanket": 10,
+          "odai": 0,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": []
       }
     },
     {
@@ -1227,6 +1247,26 @@
         "assigned": 0,
         "totalPieces": 765,
         "roster": []
+      },
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 11,
+        "piecePrs": 8,
+        "byPerson": {
+          "kishan": 10,
+          "sanket": 0,
+          "odai": 1,
+          "talal": 0
+        },
+        "reviews": 18,
+        "reviewsByPerson": {
+          "kishan": 11,
+          "sanket": 7,
+          "odai": 0,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": []
       }
     },
     {
@@ -1931,6 +1971,26 @@
         "assigned": 0,
         "totalPieces": 765,
         "roster": []
+      },
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 11,
+        "piecePrs": 8,
+        "byPerson": {
+          "kishan": 6,
+          "sanket": 0,
+          "odai": 5,
+          "talal": 0
+        },
+        "reviews": 10,
+        "reviewsByPerson": {
+          "kishan": 4,
+          "sanket": 4,
+          "odai": 2,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": []
       }
     },
     {
@@ -2749,6 +2809,26 @@
             "logo": "https://cdn.activepieces.com/pieces/quickbooks.png"
           }
         ]
+      },
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 3,
+        "piecePrs": 2,
+        "byPerson": {
+          "kishan": 2,
+          "sanket": 0,
+          "odai": 1,
+          "talal": 0
+        },
+        "reviews": 11,
+        "reviewsByPerson": {
+          "kishan": 8,
+          "sanket": 2,
+          "odai": 1,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": []
       }
     },
     {
@@ -3862,6 +3942,26 @@
             "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
           }
         ]
+      },
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 14,
+        "piecePrs": 13,
+        "byPerson": {
+          "kishan": 7,
+          "sanket": 0,
+          "odai": 5,
+          "talal": 2
+        },
+        "reviews": 18,
+        "reviewsByPerson": {
+          "kishan": 9,
+          "sanket": 7,
+          "odai": 2,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": []
       }
     },
     {
@@ -5047,6 +5147,48 @@
             "actions": 2,
             "stage": "merged",
             "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
+          }
+        ]
+      },
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 11,
+        "piecePrs": 11,
+        "byPerson": {
+          "kishan": 6,
+          "sanket": 0,
+          "odai": 4,
+          "talal": 1
+        },
+        "reviews": 8,
+        "reviewsByPerson": {
+          "kishan": 3,
+          "sanket": 2,
+          "odai": 3,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": [
+          {
+            "number": 15459,
+            "title": "fix(kimai): activity dropdown ignores project, migrate auth to Bearer token",
+            "url": "https://github.com/activepieces/activepieces/pull/15459",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15457,
+            "title": "fix(talkable): move site_slug out of the GET body",
+            "url": "https://github.com/activepieces/activepieces/pull/15457",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15458,
+            "title": "fix(truelayer): move mandate funds params out of the GET body",
+            "url": "https://github.com/activepieces/activepieces/pull/15458",
+            "author": "kishan",
+            "kind": "mixed"
           }
         ]
       }
@@ -6266,6 +6408,297 @@
             "title": "fix(batch-setup): use v2 planner for actions so plans don't stall as …",
             "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/37"
           }
+        ],
+        "catalogPieces": 764,
+        "roster": [
+          {
+            "name": "clickup",
+            "folder": "clickup",
+            "displayName": "ClickUp",
+            "logo": "https://cdn.activepieces.com/pieces/clickup.png",
+            "actions": 35,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-excel-365",
+            "folder": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "actions": 28,
+            "stage": "covered"
+          },
+          {
+            "name": "slack",
+            "folder": "slack",
+            "displayName": "Slack",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "actions": 28,
+            "stage": "covered"
+          },
+          {
+            "name": "google-sheets",
+            "folder": "google-sheets",
+            "displayName": "Google Sheets",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "actions": 24,
+            "stage": "covered"
+          },
+          {
+            "name": "airtable",
+            "folder": "airtable",
+            "displayName": "Airtable",
+            "logo": "https://cdn.activepieces.com/pieces/airtable.png",
+            "actions": 16,
+            "stage": "covered"
+          },
+          {
+            "name": "google-drive",
+            "folder": "google-drive",
+            "displayName": "Google Drive",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "actions": 15,
+            "stage": "covered"
+          },
+          {
+            "name": "google-calendar",
+            "folder": "google-calendar",
+            "displayName": "Google Calendar",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "actions": 14,
+            "stage": "covered"
+          },
+          {
+            "name": "linear",
+            "folder": "linear",
+            "displayName": "Linear",
+            "logo": "https://cdn.activepieces.com/pieces/linear.png",
+            "actions": 13,
+            "stage": "covered"
+          },
+          {
+            "name": "gmail",
+            "folder": "gmail",
+            "displayName": "Gmail",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png",
+            "actions": 11,
+            "stage": "covered"
+          },
+          {
+            "name": "zendesk",
+            "folder": "zendesk",
+            "displayName": "Zendesk",
+            "logo": "https://cdn.activepieces.com/pieces/zendesk.png",
+            "actions": 11,
+            "stage": "covered"
+          },
+          {
+            "name": "pinterest",
+            "folder": "pinterest",
+            "displayName": "Pinterest",
+            "logo": "https://cdn.activepieces.com/pieces/pinterest.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "bluesky",
+            "folder": "bluesky",
+            "displayName": "Bluesky",
+            "logo": "https://cdn.activepieces.com/pieces/bluesky.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "trello",
+            "folder": "trello",
+            "displayName": "Trello",
+            "logo": "https://cdn.activepieces.com/pieces/trello.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "cloudinary",
+            "folder": "cloudinary",
+            "displayName": "Cloudinary",
+            "logo": "https://cdn.activepieces.com/pieces/cloudinary.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "mistral-ai",
+            "folder": "mistral-ai",
+            "displayName": "Mistral AI",
+            "logo": "https://cdn.activepieces.com/pieces/mistral-ai.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "ai",
+            "folder": "ai",
+            "displayName": "AI",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "firecrawl",
+            "folder": "firecrawl",
+            "displayName": "Firecrawl",
+            "logo": "https://cdn.activepieces.com/pieces/firecrawl.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "google-docs",
+            "folder": "google-docs",
+            "displayName": "Google Docs",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "google-gemini",
+            "folder": "google-gemini",
+            "displayName": "Google Gemini",
+            "logo": "https://cdn.activepieces.com/pieces/google-gemini.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "nocodb",
+            "folder": "nocodb",
+            "displayName": "NocoDB",
+            "logo": "https://cdn.activepieces.com/pieces/nocodb.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "socialkit",
+            "folder": "socialkit",
+            "displayName": "Socialkit",
+            "logo": "https://cdn.activepieces.com/pieces/socialkit.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "telegram-bot",
+            "folder": "telegram-bot",
+            "displayName": "Telegram Bot",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "google-contacts",
+            "folder": "google-contacts",
+            "displayName": "Google Contacts",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "claude",
+            "folder": "claude",
+            "displayName": "Anthropic Claude",
+            "logo": "https://cdn.activepieces.com/pieces/claude.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "google-tasks",
+            "folder": "google-tasks",
+            "displayName": "Google Tasks",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "http",
+            "folder": "http",
+            "displayName": "HTTP",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "bonjoro",
+            "folder": "bonjoro",
+            "displayName": "Bonjoro",
+            "logo": "https://cdn.activepieces.com/pieces/bonjoro.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "cal-com",
+            "folder": "cal-com",
+            "displayName": "Cal.com",
+            "logo": "https://cdn.activepieces.com/pieces/cal.com.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "delay",
+            "folder": "delay",
+            "displayName": "Delay",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/delay.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "groq",
+            "folder": "groq",
+            "displayName": "Groq",
+            "logo": "https://cdn.activepieces.com/pieces/groq.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "json",
+            "folder": "json",
+            "displayName": "JSON",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/json-helper.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "linkedin",
+            "folder": "linkedin",
+            "displayName": "LinkedIn",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "open-router",
+            "folder": "open-router",
+            "displayName": "OpenRouter",
+            "logo": "https://cdn.activepieces.com/pieces/open-router.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "presentation",
+            "folder": "presentation",
+            "displayName": "Presenton",
+            "logo": "https://cdn.activepieces.com/pieces/presenton.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "supabase",
+            "folder": "supabase",
+            "displayName": "Supabase",
+            "logo": "https://cdn.activepieces.com/pieces/supabase.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "tally",
+            "folder": "tally",
+            "displayName": "Tally",
+            "logo": "https://cdn.activepieces.com/pieces/tally.png",
+            "actions": 1,
+            "stage": "covered"
+          }
         ]
       },
       "tickets": {
@@ -6331,7 +6764,147 @@
       },
       "decisions": [
         "1 piece merged but not live — needs a cloud release"
-      ]
+      ],
+      "shipping": {
+        "status": "ok",
+        "prsMerged": 17,
+        "piecePrs": 17,
+        "byPerson": {
+          "kishan": 8,
+          "sanket": 1,
+          "odai": 4,
+          "talal": 4
+        },
+        "reviews": 12,
+        "reviewsByPerson": {
+          "kishan": 6,
+          "sanket": 4,
+          "odai": 2,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": [
+          {
+            "number": 15471,
+            "title": "feat(pinterest): improve the step forms",
+            "url": "https://github.com/activepieces/activepieces/pull/15471",
+            "author": "talal",
+            "kind": "pieces"
+          },
+          {
+            "number": 15611,
+            "title": "chore(aws-bedrock): bump piece version to 0.3.1",
+            "url": "https://github.com/activepieces/activepieces/pull/15611",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 15405,
+            "title": "feat(manual-trigger): rewrite the step copy",
+            "url": "https://github.com/activepieces/activepieces/pull/15405",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 15502,
+            "title": "feat(brevo): add contact and list AI atomics with output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/15502",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 15406,
+            "title": "feat(google-calendar): improve the step forms",
+            "url": "https://github.com/activepieces/activepieces/pull/15406",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 15472,
+            "title": "feat(slack): step form",
+            "url": "https://github.com/activepieces/activepieces/pull/15472",
+            "author": "talal",
+            "kind": "pieces"
+          },
+          {
+            "number": 15582,
+            "title": "feat(resend): manage broadcast details and content with AI",
+            "url": "https://github.com/activepieces/activepieces/pull/15582",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15602,
+            "title": "fix(clickup):  task comments and message reactions",
+            "url": "https://github.com/activepieces/activepieces/pull/15602",
+            "author": "sanket",
+            "kind": "mixed"
+          },
+          {
+            "number": 15599,
+            "title": "feat(sendinblue): add 31 agent-facing atomics",
+            "url": "https://github.com/activepieces/activepieces/pull/15599",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15555,
+            "title": "feat(resend): add AI-ready actions for templates, segments, topics, webhooks and contact properties",
+            "url": "https://github.com/activepieces/activepieces/pull/15555",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15425,
+            "title": "feat(floqer): add the Floqer piece",
+            "url": "https://github.com/activepieces/activepieces/pull/15425",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 15542,
+            "title": "feat(hubspot): resolve ids, log notes and tasks, and search records for agents",
+            "url": "https://github.com/activepieces/activepieces/pull/15542",
+            "author": "odai",
+            "kind": "pieces"
+          },
+          {
+            "number": 15360,
+            "title": "feat(slack): send a message to multiple users in parallel",
+            "url": "https://github.com/activepieces/activepieces/pull/15360",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 15519,
+            "title": "fix(pieces): declare remaining runtime deps for datadog and scrapeless",
+            "url": "https://github.com/activepieces/activepieces/pull/15519",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15398,
+            "title": "fix(pieces): hide body input for GET/HEAD requests",
+            "url": "https://github.com/activepieces/activepieces/pull/15398",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 15512,
+            "title": "feat(gmail): add AI actions for the gmail.modify scope (label, trash, archive)",
+            "url": "https://github.com/activepieces/activepieces/pull/15512",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 15460,
+            "title": "fix(bubble): Get Thing returns the single item instead of the whole list",
+            "url": "https://github.com/activepieces/activepieces/pull/15460",
+            "author": "kishan",
+            "kind": "pieces"
+          }
+        ]
+      }
     }
   ]
 }

@@ -64,13 +64,25 @@ const mergedSchemas = (snap) => {
 // name lowercased, so a leading capital is the whole transform.
 const titled = (key) => key.charAt(0).toUpperCase() + key.slice(1);
 
-function perPersonLine(ws) {
-  const entries = Object.entries(ws.byPerson ?? {});
+//
+// Every person the map names, ZEROS INCLUDED. Dropping them would shorten the
+// line on a four-person roster, and it would also destroy the guarantee above:
+// a reader seeing "Kishan 5" beside a total of 5 could no longer tell whether
+// Sanket did nothing or is not being counted at all, which is exactly the
+// failure this function was written to make impossible. Who had a quiet week is
+// information; a line that silently omits people is not.
+//
+// `total` is passed rather than read off the workstream because three tiles now
+// share this and they keep their totals under three different names.
+function personLine(byPerson, total) {
+  const entries = Object.entries(byPerson ?? {});
   if (!entries.length) return '';
   if (entries.some(([, n]) => typeof n !== 'number' || !Number.isFinite(n))) return '';
-  if (entries.reduce((sum, [, n]) => sum + n, 0) !== ws.total) return '';
+  if (entries.reduce((sum, [, n]) => sum + n, 0) !== total) return '';
   return entries.map(([key, n]) => `${titled(key)} ${n}`).join(' · ');
 }
+
+const perPersonLine = (ws) => personLine(ws.byPerson, ws.total);
 
 // ── the pieces strip ────────────────────────────────────────────────────────
 // The pieces behind a number, inside the box that carries the number, so the
@@ -269,6 +281,66 @@ function coveredStrip(ws) {
 // reports null rather than an empty queue nobody is measuring — a 0 would claim
 // the queue was looked at and found empty.
 const TILES = [
+  // ── what the team did with the week ───────────────────────────────────────
+  // These two lead, and that is the point of adding them. The page opened on
+  // three rollout tiles and a ticket count for six weeks, so a week in which
+  // the team merged fourteen PRs and gave twenty reviews could render as
+  // "outputSchema 86, unchanged" -- rollouts move in months, and a weekly page
+  // led by them reports mostly nothing, mostly forever.
+  //
+  // Counted across the whole team, not the piece rollouts: a bugfix in a piece
+  // nobody is retrofitting is still the week's work.
+  { key: 'prsMerged', ws: 'shipping', title: 'PRs merged', path: 'shipping.prsMerged',
+    unit: () => 'into activepieces',
+    perPerson: (ws) => personLine(ws.byPerson, ws.prsMerged),
+    // Said only when it says something: on a week where every PR touched a
+    // piece this line would repeat the headline back to the reader.
+    note: (ws) => (typeof ws.piecePrs === 'number' && ws.piecePrs < ws.prsMerged
+      ? `${ws.piecePrs} of them touched a piece` : ''),
+    strip: (ws) => prStrip(ws.shipped) },
+  // Tickets are not pieces, so the strip is ids and titles, each linking to the
+  // ticket itself. Who closed them is the one line of detail management does
+  // read, so it stays folded into this box rather than becoming a table.
+  //
+  // The only queue on the page that is not a PR. `closed this week` is a
+  // WINDOWED count and `inReview` is a standing one, which is the one place the
+  // pill's "+" earns its keep twice over: it already says "additional to", and
+  // here it also says "not from the same seven days". Nothing in review is
+  // closed, so the two still cannot double-count a ticket.
+  { key: 'tickets', title: 'Tickets solved', path: 'tickets.total',
+    unit: () => 'closed this week', review: 'tickets.inReview',
+    perPerson: perPersonLine, strip: (ws) => ticketStrip(ws) },
+  // Reviewing is most of what a maintainer does on a busy week and none of what
+  // the page used to show: 269 of them in six months, invisible. No strip --
+  // GitHub's search API cannot resolve a review below the week it happened in,
+  // which is also why the internal pull stamps these `approx` and why there is
+  // no list of individual reviews to link to.
+  { key: 'reviews', ws: 'shipping', title: 'Reviews given', path: 'shipping.reviews',
+    unit: () => 'on other people\'s PRs',
+    perPerson: (ws) => personLine(ws.reviewsByPerson, ws.reviews) },
+  // Two headlines, chosen by what the snapshot measured. With coverage recorded
+  // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
+  // drops to the note line; without it — every older snapshot, and any week the
+  // tester was unreachable — the tile is build progress exactly as it always
+  // was. `pathFor` picks per week, and hands deltaFor the same accessor it
+  // hands `value`, so a delta can never compare a coverage count against a PR
+  // count across the changeover: coveredCount is null on unmeasured weeks, and
+  // a null side yields no delta at all.
+  { key: 'testing', title: 'Piece testing',
+    pathFor: (ws) => (coveredRows(ws) ? coveredCount : 'testing.prsMerged'),
+    unit: (ws) => (coveredRows(ws)
+      ? (typeof ws.catalogPieces === 'number'
+        ? `of ${ws.catalogPieces} pieces covered`
+        : `${plural(coveredRows(ws).length, 'piece')} covered`)
+      : `${plural(ws.prsMerged, 'PR')} shipped`),
+    strip: (ws) => (coveredRows(ws) ? coveredStrip(ws) : prStrip(ws.shipped)),
+    note: (ws) => (coveredRows(ws)
+      ? `${ws.prsMerged} ${plural(ws.prsMerged, 'PR')} merged · ${ws.commits} ${plural(ws.commits, 'commit')} this week`
+      : '') },
+  // ── the rollouts ──────────────────────────────────────────────────────────
+  // Below the week's work, because that is the order they matter in to someone
+  // opening this on a Monday. Nothing was dropped to make room.
+  //
   // Done = MERGED, so both `live` and `merged-not-live`: the work landed either
   // way; `live` merely also caught a cloud release the team does not control, so
   // counting only `live` under-reports delivery by whatever is queued behind it.
@@ -300,29 +372,6 @@ const TILES = [
   // hands `value`, so a delta can never compare a coverage count against a PR
   // count across the changeover: coveredCount is null on unmeasured weeks, and
   // a null side yields no delta at all.
-  { key: 'testing', title: 'Piece testing',
-    pathFor: (ws) => (coveredRows(ws) ? coveredCount : 'testing.prsMerged'),
-    unit: (ws) => (coveredRows(ws)
-      ? (typeof ws.catalogPieces === 'number'
-        ? `of ${ws.catalogPieces} pieces covered`
-        : `${plural(coveredRows(ws).length, 'piece')} covered`)
-      : `${plural(ws.prsMerged, 'PR')} shipped`),
-    strip: (ws) => (coveredRows(ws) ? coveredStrip(ws) : prStrip(ws.shipped)),
-    note: (ws) => (coveredRows(ws)
-      ? `${ws.prsMerged} ${plural(ws.prsMerged, 'PR')} merged · ${ws.commits} ${plural(ws.commits, 'commit')} this week`
-      : '') },
-  // Tickets are not pieces, so the strip is ids and titles, each linking to the
-  // ticket itself. Who closed them is the one line of detail management does
-  // read, so it stays folded into this box rather than becoming a table.
-  //
-  // The only queue on the page that is not a PR. `closed this week` is a
-  // WINDOWED count and `inReview` is a standing one, which is the one place the
-  // pill's "+" earns its keep twice over: it already says "additional to", and
-  // here it also says "not from the same seven days". Nothing in review is
-  // closed, so the two still cannot double-count a ticket.
-  { key: 'tickets', title: 'Tickets solved', path: 'tickets.total',
-    unit: () => 'closed this week', review: 'tickets.inReview',
-    perPerson: perPersonLine, strip: (ws) => ticketStrip(ws) },
   // The property-UI rollout: pieces carrying the new step-settings UI — grouped
   // props, the essential/Advanced split, the widget set.
   //
@@ -514,7 +563,12 @@ export function buildView(archive, { weekId, notes } = {}) {
   const list = weeks.map((w) => w.week).reverse();
 
   const tiles = TILES.map((spec) => {
-    const ws = selected[spec.key];
+    // `ws` defaults to `key` and differs only where two tiles read one
+    // collector: PRs merged and Reviews given are both `shipping`, because they
+    // come from one file, one freshness gate and one roster. Splitting them
+    // into two collectors to satisfy a naming convention would have duplicated
+    // all three.
+    const ws = selected[spec.ws ?? spec.key];
     if (ws?.status !== 'ok') {
       // No strip on a degraded tile: that the number is missing is the only honest
       // content it has, and a stale list beside it would read as this week's work.

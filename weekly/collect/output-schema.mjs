@@ -80,6 +80,27 @@ export function readCatalogIndex(readJson) {
   return index;
 }
 
+// The size of the WHOLE piece catalog. This build is the one place that walks
+// every piece, so this is where the number lives and every tile that needs a
+// catalog denominator reads it from here -- the AI-actions tile because its own
+// `pieces` is the 28 it tracks, and the piece-testing tile because its own row
+// count is the TESTER's piece list, which ran three ahead of the catalog on
+// 2026-09-19 and put two different totals on one page.
+//
+// OPTIONAL on the same terms as a roster: a missing or malformed summary yields
+// undefined and the field is omitted, so a tile falls back to wording that
+// claims no denominator rather than inventing one. A denominator is detail --
+// never a reason to turn a measurable week into no-data.
+export function readCatalogPieces(readJson) {
+  try {
+    // typeof, not truthiness: a catalog of 0 is a real (if alarming) reading.
+    const { totals } = readJson('dist/output-schema/summary.json');
+    return typeof totals?.pieces === 'number' ? totals.pieces : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 // The roster is DETAIL behind the tile, so it degrades on its own: a missing or
 // malformed pieces.json costs the per-piece list, never the headline numbers.
 function readRoster(readJson) {

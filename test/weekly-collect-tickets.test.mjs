@@ -13,7 +13,7 @@ const LINEAR = {
     { person: 'kishan', team: 'GIT', completed: 37, inProgress: 0, inReview: 1, todo: 1 },
     { person: 'sanket', team: 'Pieces', completed: 9, inProgress: 0, inReview: 2, todo: 3 },
     { person: 'sanket', team: 'GIT', completed: 13, inProgress: 0, inReview: 3, todo: 0 },
-    { person: 'ibrahim', team: 'Pieces', completed: 2, inProgress: 0, inReview: 9, todo: 0 },
+    { person: 'ahmad', team: 'Pieces', completed: 2, inProgress: 0, inReview: 9, todo: 0 },
   ],
   events: [
     { d: '2026-07-27', p: 'kishan', t: 'Pieces' },
@@ -51,23 +51,23 @@ test('counts completions inside the window, per person', () => {
   const out = collectTickets({ window: WINDOW, weekId: WEEK, readJson: read(), linearRefreshPending: false });
   assert.equal(out.status, 'ok');
   assert.equal(out.total, 4);
-  assert.deepEqual(out.byPerson, { kishan: 2, sanket: 2 });
+  assert.deepEqual(out.byPerson, { kishan: 2, sanket: 2, odai: 0, talal: 0 });
 });
 
 test('merged PRs counted per person inside the window', () => {
   const out = collectTickets({ window: WINDOW, weekId: WEEK, readJson: read(), linearRefreshPending: false });
-  assert.deepEqual(out.prsMerged, { kishan: 2, sanket: 1 });
+  assert.deepEqual(out.prsMerged, { kishan: 2, sanket: 1, odai: 0, talal: 0 });
 });
 
 test('reviews come from the weekly bucket keyed by the Monday of the week', () => {
   const out = collectTickets({ window: WINDOW, weekId: WEEK, readJson: read(), linearRefreshPending: false });
-  assert.deepEqual(out.reviews, { kishan: 12, sanket: 9 });
+  assert.deepEqual(out.reviews, { kishan: 12, sanket: 9, odai: 0, talal: 0 });
 });
 
 test('a missing weekly review bucket yields zeros, not a crash', () => {
   const gh = { ...GITHUB, reviews: { ...GITHUB.reviews, weekly: [] } };
   const out = collectTickets({ window: WINDOW, weekId: WEEK, readJson: read({ 'github.json': gh }), linearRefreshPending: false });
-  assert.deepEqual(out.reviews, { kishan: 0, sanket: 0 });
+  assert.deepEqual(out.reviews, { kishan: 0, sanket: 0, odai: 0, talal: 0 });
 });
 
 test('shipped lists only completed issues inside the window', () => {
@@ -137,7 +137,7 @@ test('an empty week is a real zero, not no-data', () => {
   });
   assert.equal(out.status, 'ok');
   assert.equal(out.total, 0);
-  assert.deepEqual(out.byPerson, { kishan: 0, sanket: 0 });
+  assert.deepEqual(out.byPerson, { kishan: 0, sanket: 0, odai: 0, talal: 0 });
 });
 
 // ── the review queue ────────────────────────────────────────────────────────
@@ -153,7 +153,11 @@ test('tickets in review are summed across both boards', () => {
 // on a third person precisely so a number that swallowed the whole workspace
 // fails here rather than on the page, where nobody could tell 10 from 19.
 test('only the people the tile reports on are counted', () => {
-  const summary = [{ person: 'odai', team: 'Pieces', inReview: 7 }];
+  // Someone outside the roster entirely — Ahmad authors the step-settings work
+  // upstream but is not on this team's people list, so his queue is not this
+  // tile's queue. `odai` was the outsider here until 2026-09-19, when he joined
+  // the roster and this test started passing for the wrong reason.
+  const summary = [{ person: 'ahmad', team: 'Pieces', inReview: 7 }];
   const out = collectTickets({ window: WINDOW, weekId: WEEK, linearRefreshPending: false,
     readJson: read({ 'linear.json': { ...LINEAR, summary } }) });
   assert.equal(out.inReview, null, 'a queue belonging to nobody this tile names is not this tile\'s queue');

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { buildView, plural, prTitle, ticketTitle, STRIP_CAP } from '../weekly/lib/view.mjs';
 import { collectTickets } from '../weekly/collect/tickets.mjs';
 
+const tileOf = (v, key) => v.tiles.find((t) => t.key === key);
+
 const snap = (week, over = {}) => ({
   week, start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
@@ -12,6 +14,10 @@ const snap = (week, over = {}) => ({
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 },
              shipped: [{ id: 'PIE-101', title: 'x', assignee: 'kishan', team: 'Pieces' }] },
+  shipping: { status: 'ok', prsMerged: 7, piecePrs: 5,
+              byPerson: { kishan: 3, sanket: 4, odai: 0, talal: 0 },
+              reviews: 21, reviewsByPerson: { kishan: 12, sanket: 9, odai: 0, talal: 0 },
+              reviewsApprox: true, shipped: [{ number: 9, title: 'feat(slack): x', url: 'https://g/9' }] },
   decisions: ['6 outputSchema pieces merged but not cloud-live'],
   ...over,
 });
@@ -33,7 +39,7 @@ test('an unknown weekId falls back to the newest', () =>
 test('a malformed weekId falls back to the newest instead of throwing', () => {
   assert.doesNotThrow(() => buildView(archive, { weekId: 'not-a-week' }));
   assert.equal(buildView(archive, { weekId: 'not-a-week' }).week, '2026-W31');
-  assert.equal(buildView(archive, { weekId: 'not-a-week' }).tiles[0].delta, 2);
+  assert.equal(tileOf(buildView(archive, { weekId: 'not-a-week' }), 'outputSchema').delta, 2);
 });
 
 test('an empty archive is flagged rather than crashing', () =>
@@ -42,9 +48,19 @@ test('an empty archive is flagged rather than crashing', () =>
 test('picker lists weeks newest first', () =>
   assert.deepEqual(buildView(archive).weeks, ['2026-W31', '2026-W30']));
 
-test('always five tiles in fixed order', () =>
+// Seven, and the order is the argument. The week's own work leads -- PRs,
+// tickets, reviews, testing -- and the three rollouts follow it, because a page
+// that opens on numbers which move in months reports nothing most weeks.
+test('always seven tiles in fixed order, the week before the rollouts', () =>
   assert.deepEqual(buildView(archive).tiles.map((t) => t.key),
-    ['outputSchema', 'aiActions', 'testing', 'tickets', 'uiImprovements']));
+    ['prsMerged', 'tickets', 'reviews', 'testing', 'outputSchema', 'aiActions', 'uiImprovements']));
+
+// Six small boxes fill three clean rows of the two-column grid before the wide
+// one spans the foot. Five would leave a half-empty row and a hole beside it.
+test('the small tiles come in pairs so no row is left half-empty', () => {
+  const small = buildView(archive).tiles.filter((t) => !t.wide);
+  assert.equal(small.length % 2, 0, `${small.length} small tiles leaves a hole in a 2-column grid`);
+});
 
 // Exactly one, and last. The wide box spans both grid columns, so a second one
 // would leave an odd tile beside a hole — and anywhere but last it would split
@@ -60,13 +76,13 @@ test('the UI-improvements tile is the only wide one, and it comes last', () => {
 // done, blaming the team for a release train it does not own. The metric is
 // derived at read time, so no snapshot needed rewriting for this.
 test('the outputSchema tile leads with merged, not with cloud-live', () => {
-  const tile = buildView(archive).tiles[0];
+  const tile = tileOf(buildView(archive), 'outputSchema');
   assert.equal(tile.value, 15);                 // 9 live + 6 merged-not-live
   assert.equal(tile.unit, 'of 756 merged');
 });
 
 test('the outputSchema delta follows the same derived merged metric', () => {
-  const tile = buildView(archive).tiles[0];
+  const tile = tileOf(buildView(archive), 'outputSchema');
   assert.equal(tile.delta, 2);                  // 13 merged last week → 15
 });
 
@@ -186,8 +202,12 @@ test('every person the tickets collector records is named on the page', () => {
   }
 });
 
-test('only the tickets tile carries a per-person line', () =>
-  assert.deepEqual(buildView(archive).tiles.filter((t) => t.perPerson).map((t) => t.key), ['tickets']));
+// The three boxes that count what PEOPLE did. The rollouts count pieces, which
+// belong to the catalog rather than to anyone, so a per-person line under one of
+// them would be inventing an owner.
+test('only the tiles that count people carry a per-person line', () =>
+  assert.deepEqual(buildView(archive).tiles.filter((t) => t.perPerson).map((t) => t.key),
+    ['prsMerged', 'tickets', 'reviews']));
 
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
@@ -236,10 +256,15 @@ test('no view field carries the piece-testing caveat any more', () => {
 
 // The per-person TABLE is gone, so the columns only it read — PRs merged and
 // reviews — must not be left computed and unrendered.
+// The table is gone; the numbers it held are not. They are tiles now, so this
+// checks for the STRUCTURE rather than for the words -- the old regex banned
+// "prsMerged" and "reviews" outright, which stopped being a statement about
+// tables the moment either became a tile of its own.
 test('the view no longer builds a per-person table', () => {
   const v = buildView(archive);
   assert.equal(v.people, undefined);
-  assert.doesNotMatch(JSON.stringify(v), /prsMerged|reviews/);
+  assert.equal(v.perPersonTable, undefined);
+  assert.equal(v.rosters, undefined);
 });
 
 test('the heading names the team and the week number', () =>
@@ -325,7 +350,7 @@ test('a prior week that reported nothing still leaves nothing to compare', () =>
   const degraded = { status: 'no-data', reason: 'x' };
   const a = { weeks: [
     snap('2026-W30', { outputSchema: degraded, aiActions: degraded, uiImprovements: degraded,
-                       testing: degraded, tickets: degraded }),
+                       testing: degraded, tickets: degraded, shipping: degraded }),
     snap('2026-W31'),
   ] };
   assert.equal(buildView(a).noPriorWeek, true);
@@ -1240,7 +1265,10 @@ const inReviewOf = (v) => Object.fromEntries(v.tiles.map((t) => [t.key, t.inRevi
 
 test('only the workstreams that measure a queue carry one', () =>
   assert.deepEqual(inReviewOf(buildView(archive)), {
-    aiActions: 24, uiImprovements: 2, outputSchema: null, testing: null, tickets: null }));
+    aiActions: 24, uiImprovements: 2, outputSchema: null, testing: null, tickets: null,
+    // Neither counts anything that waits on a reviewer: a merged PR has landed,
+    // and a review given is over.
+    prsMerged: null, reviews: null }));
 
 // The one that reads a snapshot field and still must not: outputSchema records a
 // `review` count of its own, and it counts pieces FLAGGED FOR A DECISION — the

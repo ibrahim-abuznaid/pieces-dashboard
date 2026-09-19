@@ -18,13 +18,14 @@ import { collectAiActions } from './collect/ai-actions.mjs';
 import { collectUiImprovements } from './collect/ui-improvements.mjs';
 import { collectTesting } from './collect/testing.mjs';
 import { collectTickets } from './collect/tickets.mjs';
+import { collectShipping } from './collect/shipping.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ARCHIVE = join(ROOT, 'weekly/data/weeks.json');
 const TEAM_DASHBOARD = process.env.PIECES_TEAM_DASHBOARD
   ?? '/home/ibrahim/AP_work/Activepieces_v/pieces-team/dashboard';
 
-const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'testing', 'tickets'];
+const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'testing', 'tickets', 'shipping'];
 
 export function buildSnapshot({ weekId, today, collectors }) {
   const { start, end } = windowForWeekId(weekId);
@@ -197,11 +198,17 @@ export function main(argv) {
         outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
         aiActions: () => collectAiActions({ readJson: readRepoJson }),
         uiImprovements: () => collectUiImprovements({ readJson: readRepoJson }),
-        testing: () => collectTesting({ window, gh, curl, testerUrl }),
+        testing: () => collectTesting({ window, gh, curl, testerUrl, readJson: readRepoJson }),
         tickets: () => collectTickets({
           window, weekId, readJson: readTeamJson,
           linearRefreshPending: existsSync(join(TEAM_DASHBOARD, 'NEEDS-LINEAR-REFRESH')),
         }),
+        // No NEEDS-LINEAR-REFRESH gate: that marker means the LINEAR half of
+        // the internal refresh failed, and nothing here comes from Linear. A
+        // GitHub-sourced tile going dark because a Linear query timed out would
+        // be a self-inflicted outage; github.json carries its own stamp and the
+        // collector checks it.
+        shipping: () => collectShipping({ window, weekId, readJson: readTeamJson }),
       },
     });
   } finally {

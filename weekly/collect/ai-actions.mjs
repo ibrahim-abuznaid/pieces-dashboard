@@ -2,7 +2,7 @@
 // Reads the existing AI-actions build output. A missing file or a missing
 // `stages` block is a no-data reason, never a zero — a silent 0 would read as
 // "no progress this week" when it means "we could not measure".
-import { readCatalogIndex } from './output-schema.mjs';
+import { readCatalogIndex, readCatalogPieces } from './output-schema.mjs';
 
 const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 
@@ -46,27 +46,6 @@ function readRoster(readJson, catalog) {
       .sort((a, b) => b.actions - a.actions || a.name.localeCompare(b.name));
   } catch {
     return [];
-  }
-}
-
-// The size of the WHOLE piece catalog, which is not something this initiative
-// knows: `pieces` in the AI-actions summary is the 28 pieces the initiative
-// tracks, and reporting "2 of 28" overstates catalog coverage ~27x to anyone
-// reading the tile as progress. The catalog count lives in the outputSchema
-// build, the one place that walks every piece.
-//
-// OPTIONAL, on the same terms as `roster`: if that summary is missing or its
-// count is not a number we return undefined and the field is omitted, so the
-// tile falls back to the tracked-count wording instead of implying a catalog
-// denominator this week never measured. A denominator is detail — never a
-// reason to turn a measurable week into no-data.
-function readCatalogPieces(readJson) {
-  try {
-    // typeof, not truthiness: a catalog of 0 is a real (if alarming) reading.
-    const { totals } = readJson('dist/output-schema/summary.json');
-    return typeof totals?.pieces === 'number' ? totals.pieces : undefined;
-  } catch {
-    return undefined;
   }
 }
 

@@ -3,9 +3,7 @@
 // files, NOT from a fresh Linear query — the Linear MCP is not reachable
 // headless, and refresh.sh already solves that. One Linear pipeline, not two.
 import { mondayOfWeekId } from '../../lib/isoweek.mjs';
-
-const PEOPLE = ['kishan', 'sanket'];
-const zeroed = () => Object.fromEntries(PEOPLE.map((p) => [p, 0]));
+import { PEOPLE, zeroed } from './people.mjs';
 const inWindow = (day, { start, end }) => Boolean(day) && day >= start && day <= end;
 
 // The queue the headline cannot show. `total` counts tickets CLOSED inside the

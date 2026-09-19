@@ -82,13 +82,18 @@ const COVERAGE = JSON.stringify([
     logo_url: 'https://cdn.activepieces.com/pieces/github.png', plan_count: 0, covered: true },
 ]);
 
-const withCoverage = (raw = COVERAGE, url = 'http://tester.internal:4000') =>
-  collectTesting({ window: WINDOW, gh: fakeGh(), curl: () => raw, testerUrl: url });
+// The catalog's size comes from the outputSchema build, NOT from the number of
+// rows the tester returned — the tester keeps its own piece list and the two
+// disagreed by three on the day this was wired.
+const catalogRead = (pieces = 764) => () => ({ totals: { pieces } });
+
+const withCoverage = (raw = COVERAGE, url = 'http://tester.internal:4000', readJson = catalogRead()) =>
+  collectTesting({ window: WINDOW, gh: fakeGh(), curl: () => raw, testerUrl: url, readJson });
 
 test('coverage becomes a roster of pieces with plans, most-planned first', () => {
   const out = withCoverage();
   assert.equal(out.status, 'ok');
-  assert.equal(out.catalogPieces, 3);
+  assert.equal(out.catalogPieces, 764);
   assert.deepEqual(out.roster, [
     { name: 'zendesk', folder: 'zendesk', displayName: 'Zendesk', logo: null, actions: 12, stage: 'covered' },
     { name: 'slack', folder: 'slack', displayName: 'Slack',
@@ -144,4 +149,22 @@ test('a coverage roster validates as a snapshot workstream', () => {
     decisions: [], outputSchema: noData, aiActions: noData, uiImprovements: noData, tickets: noData,
     testing: withCoverage(),
   });
+});
+
+// ── the denominator ─────────────────────────────────────────────────────────
+// Every box that says "of N pieces" has to mean the same N. The tester's row
+// count is its own piece list: 767 against a 764-piece catalog on the day the
+// coverage half first ran, which would have put two totals on one page.
+test('the denominator is the catalog, not the number of rows the tester returned', () => {
+  const out = withCoverage(COVERAGE, 'http://tester.internal:4000', catalogRead(764));
+  assert.equal(out.catalogPieces, 764);
+  assert.equal(JSON.parse(COVERAGE).length, 3, 'the fixture must differ from the catalog for this to prove anything');
+});
+
+// Without a catalog there is no denominator to claim, and the view renders
+// "N pieces covered" instead of inventing one. Coverage itself still lands.
+test('an unavailable catalog omits the denominator rather than falling back to the tester', () => {
+  const out = withCoverage(COVERAGE, 'http://tester.internal:4000', () => { throw new Error('ENOENT'); });
+  assert.ok(!('catalogPieces' in out), 'a missing catalog must not leave a stale or invented denominator');
+  assert.equal(out.roster.length, 2, 'coverage still lands without a denominator');
 });

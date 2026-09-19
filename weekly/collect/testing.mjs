@@ -11,6 +11,8 @@
 // (they only ever run locally; see snapshot.mjs). Unset means the coverage
 // half of this collector is simply off, and the tile reports build progress
 // exactly as before.
+import { readCatalogPieces } from './output-schema.mjs';
+
 export const REPO = 'ibrahim-abuznaid/piece-tester-web';
 
 const dayOf = (iso) => String(iso).slice(0, 10);
@@ -30,14 +32,27 @@ const orNull = (v) => (typeof v === 'string' && v ? v : null);
 // wildcard schedule sets it on the entire catalog at once — a page reporting
 // "720 covered" off the back of that would be the overstatement this dashboard
 // exists to avoid. Plans are per-piece work someone actually did.
-function coverageFrom(raw) {
+// `catalogPieces` is the CATALOG's size, not this endpoint's row count.
+//
+// The tester keeps its own list of pieces and it does not have to agree with the
+// published catalog -- on 2026-09-19 it held 767 rows against a 764-piece
+// catalog, which put "36 of 767 pieces covered" on a page where every other box
+// counted against 764. Both numbers were defensible and that is exactly the
+// problem: a reader cannot tell two denominators apart from one denominator and
+// a bug. Every tile that says "of N pieces" now reads N from the same place.
+//
+// Undefined when the catalog is unavailable, which the view renders as
+// "N pieces covered" with no denominator at all -- a smaller claim, and a true
+// one, rather than quietly falling back to the tester's own count.
+function coverageFrom(raw, readJson) {
   const rows = JSON.parse(raw);
   if (!Array.isArray(rows)) throw new Error('coverage endpoint did not return an array');
   const covered = rows
     .filter((r) => typeof r?.piece_name === 'string' && r.piece_name && Number(r.plan_count) > 0)
     .sort((a, b) => Number(b.plan_count) - Number(a.plan_count));
+  const catalogPieces = readJson ? readCatalogPieces(readJson) : undefined;
   return {
-    catalogPieces: rows.length,
+    ...(catalogPieces === undefined ? {} : { catalogPieces }),
     roster: covered.map((r) => ({
       name: slugOf(r.piece_name),
       folder: slugOf(r.piece_name),
@@ -49,7 +64,7 @@ function coverageFrom(raw) {
   };
 }
 
-export function collectTesting({ window, gh, curl, testerUrl }) {
+export function collectTesting({ window, gh, curl, testerUrl, readJson }) {
   let base;
   try {
     const prs = JSON.parse(gh(['pr', 'list', '--repo', REPO, '--state', 'merged',
@@ -69,7 +84,7 @@ export function collectTesting({ window, gh, curl, testerUrl }) {
 
   if (!testerUrl || !curl) return base;
   try {
-    return { ...base, ...coverageFrom(curl(`${testerUrl.replace(/\/$/, '')}/api/coverage`)) };
+    return { ...base, ...coverageFrom(curl(`${testerUrl.replace(/\/$/, '')}/api/coverage`), readJson) };
   } catch (err) {
     // Coverage degrades ALONE: PRs and commits were measured, so the workstream
     // stays ok and the miss is recorded where the operator looks — the snapshot

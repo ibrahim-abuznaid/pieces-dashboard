@@ -22,6 +22,10 @@ const snap = (week, over = {}) => ({
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
+  shipping: { status: 'ok', prsMerged: 7, piecePrs: 5,
+              byPerson: { kishan: 3, sanket: 4, odai: 0, talal: 0 },
+              reviews: 21, reviewsByPerson: { kishan: 12, sanket: 9, odai: 0, talal: 0 },
+              reviewsApprox: true, shipped: [{ number: 9, title: 'feat(slack): x', url: 'https://g/9' }] },
   decisions: [], ...over,
 });
 
@@ -85,7 +89,7 @@ test('writes summary.json for the selected week', () => {
   const { outDir } = render([snap('2026-W31')]);
   const summary = JSON.parse(readFileSync(join(outDir, 'summary.json'), 'utf8'));
   assert.equal(summary.week, '2026-W31');
-  assert.equal(summary.tiles.length, 5);
+  assert.equal(summary.tiles.length, 7);
 });
 
 test('an empty archive renders a placeholder rather than throwing', () => {
@@ -160,9 +164,9 @@ test('the DOM-lite harness actually renders the page body', () => {
 
 const at = (dom, needle) => dom.indexOf(needle);
 
-test('the page is a header, five boxes and nothing structural besides', () => {
+test('the page is a header, seven boxes and nothing structural besides', () => {
   const dom = renderDom([withRosters()]);
-  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 5);
+  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 7);
   assert.doesNotMatch(dom, /<section/, 'the roster and detail sections are gone');
   assert.doesNotMatch(dom, /<table|<tr|<td|<th/, 'nothing on this page is a table any more');
   assert.doesNotMatch(dom, /<details|<summary/, 'no collapsible per-piece detail');
@@ -319,11 +323,17 @@ test('no box carries a sub-line under its number', () => {
   assert.doesNotMatch(dom, /tracked · /);
   assert.doesNotMatch(dom, /blockers?</);
   assert.doesNotMatch(dom, /\d+ commits?</);
-  assert.equal([...dom.matchAll(/class="note"/g)].length, 1, 'only the per-person line remains');
+  // Three per-person lines (PRs, tickets, reviews) and the PR box's "N of them
+  // touched a piece", which is the one note that earns its place: it splits the
+  // headline rather than restating it.
+  assert.equal([...dom.matchAll(/class="note"/g)].length, 4, 'only per-person lines and the piece split remain');
 });
 
-test('the per-person line is gone entirely when tickets did not report', () => {
-  const dom = renderDom([withRosters({ tickets: { status: 'no-data', reason: 'Linear refresh pending' } })]);
+test('a box that did not report carries no per-person line', () => {
+  const dom = renderDom([withRosters({
+    tickets: { status: 'no-data', reason: 'Linear refresh pending' },
+    shipping: { status: 'no-data', reason: 'GitHub data stale' },
+  })]);
   assert.doesNotMatch(dom, /class="note"/);
 });
 
@@ -420,11 +430,18 @@ test('a piece that is not done is not named anywhere on the page', () => {
   assert.doesNotMatch(dom, /Jira/);
 });
 
-test('the per-person table is gone, folded into the tickets box as one line', () => {
+// The TABLE is gone. Two of its three columns came back as boxes of their own
+// on 2026-09-19, so this no longer bans their names -- "PRs merged" and
+// "Reviews given" are tile headings now. What it still bans is the table: the
+// "Per person" heading, the Engineer column, and any <tr>/<td> on the page
+// (asserted structurally above).
+test('the per-person table is gone; its numbers came back as boxes', () => {
   const dom = renderDom([snap('2026-W31')]);
   assert.doesNotMatch(dom, /Per person/);
-  assert.doesNotMatch(dom, /PRs merged|Reviews|Engineer/);
-  assert.match(dom, /Kishan 5 · Sanket 6/);
+  assert.doesNotMatch(dom, /Engineer/);
+  assert.match(dom, /Kishan 5 · Sanket 6/, 'the tickets line still reads as one line');
+  assert.match(dom, />PRs merged</, 'PRs merged is a tile heading');
+  assert.match(dom, />Reviews given</, 'reviews are a tile heading');
 });
 
 // The tickets table stays gone; what replaced it is a strip of linked CHIPS —
@@ -894,12 +911,20 @@ test('a shipped title that is only a prefix is never rendered as an empty chip',
 // Real data, not a fixture: the week the site is serving right now, out of the
 // committed archive. The snapshot keeps the subject verbatim — that is the record
 // of what shipped — so this is also the check that the two never got confused.
+// Reads the REAL committed archive, not a fixture, so a rewrite of the stored
+// titles is caught as well as a rendering regression.
+//
+// It used to read the Piece testing box. That box shows a COVERAGE roster the
+// moment the tester is reachable -- piece names, no PR titles -- so once the
+// tester password landed on 2026-09-19 there were no prefixed titles left in it
+// to strip. The path did not go away: the PRs merged box renders the same
+// `prStrip`, over seventeen conventional-commit titles rather than one.
 test('the week in the committed archive reaches the page without its prefix', () => {
   const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
   const week = archive.weeks.at(-1);
-  const prefixed = (week.testing.shipped ?? []).filter((pr) => prTitle(pr.title) !== pr.title);
+  const prefixed = (week.shipping.shipped ?? []).filter((pr) => prTitle(pr.title) !== pr.title);
   assert.ok(prefixed.length, 'the committed archive no longer exercises the prefix path');
-  const tile = tileOf(renderDom([week]), 'Piece testing');
+  const tile = tileOf(renderDom([week]), 'PRs merged');
   for (const pr of prefixed) {
     const prefix = pr.title.slice(0, pr.title.indexOf(':') + 1);          // 'feat(health):'
     assert.ok(!tile.includes(prefix), `the page still shows "${prefix}"`);
