@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deriveStage, assigneesOf } from '../lib/stages.mjs';
+import { claimedPr } from '../lib/discover.mjs';
 import { renderPage } from '../lib/render.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,11 @@ const repoSchemas = read('data/repo-schemas.json');
 const repoSchemaFiles = new Set(read('data/repo-schema-files.json'));
 const overrides = read('overrides.json');
 const prStates = read('../data/pr-states.json').prs;
+// In-flight claims DISCOVERED from open PRs (scripts/fetch-pr-states.mjs), so a
+// piece whose PR nobody wrote down still reaches the page. Optional by design:
+// a checkout that has not fetched yet builds on the curated claims alone, which
+// is exactly what this build did before discovery existed.
+const discovered = (() => { try { return read('../data/discovered-claims.json'); } catch { return {}; } })();
 const DIST = join(ROOT, '../dist/output-schema');
 mkdirSync(DIST, { recursive: true });
 
@@ -43,7 +49,7 @@ const pieces = catalog.map((p) => {
   const repoSchema = repoSchemas.pieces[folder]
     ?? (repoSchemaFiles.has(folder) ? { repoVersion: null, wiredRepo: null } : undefined);
   const ov = overrides.pieces?.[folder] ?? {};
-  const claim = { assignee: ov.assignee ?? null, pr: ov.pr ?? null };
+  const claim = { assignee: ov.assignee ?? null, pr: claimedPr(ov.pr ?? null, discovered.outputSchema, folder) };
 
   let status;
   if (ov.status === 'in-progress') status = 'in-progress';

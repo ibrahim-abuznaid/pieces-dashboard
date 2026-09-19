@@ -1,0 +1,26 @@
+{
+  "fetched": "2026-09-19",
+  "outputSchema": {
+    "airtable": 15624,
+    "instagram-business": 15618,
+    "whatsapp": 15585,
+    "pinterest": 15539,
+    "trello": 15539,
+    "flow-helper": 15390,
+    "google-gemini": 15389,
+    "firecrawl": 15258
+  },
+  "uiImprovements": {
+    "discord": 15531,
+    "open-router": 15484,
+    "airtable": 15483,
+    "notion": 15397,
+    "google-docs": 15298,
+    "outseta": 15216,
+    "telegram-bot": 14970,
+    "gmail": 14943
+  },
+  "aiActions": {
+    "trello": 15539
+  }
+}

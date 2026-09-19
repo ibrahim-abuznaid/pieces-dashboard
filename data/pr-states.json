@@ -1,5 +1,5 @@
 {
-  "fetched": "2026-09-18",
+  "fetched": "2026-09-19",
   "prs": {
     "13937": {
       "state": "MERGED",
@@ -211,6 +211,30 @@
         "Talaljaber"
       ]
     },
+    "15216": {
+      "state": "OPEN",
+      "createdAt": "2026-09-02T13:29:37Z",
+      "mergedAt": null,
+      "title": "feat(outseta): expose subscription quantity and expiration date, add found=false lookups",
+      "url": "https://github.com/activepieces/activepieces/pull/15216",
+      "assignees": []
+    },
+    "15258": {
+      "state": "OPEN",
+      "createdAt": "2026-09-04T07:51:57Z",
+      "mergedAt": null,
+      "title": "feat(firecrawl): capture browser action outputs & add storeInCache toggle",
+      "url": "https://github.com/activepieces/activepieces/pull/15258",
+      "assignees": []
+    },
+    "15298": {
+      "state": "OPEN",
+      "createdAt": "2026-09-06T15:02:11Z",
+      "mergedAt": null,
+      "title": "feat(google-docs): improve the step forms",
+      "url": "https://github.com/activepieces/activepieces/pull/15298",
+      "assignees": []
+    },
     "15351": {
       "state": "MERGED",
       "createdAt": "2026-09-08T08:48:54Z",
@@ -219,12 +243,98 @@
       "url": "https://github.com/activepieces/activepieces/pull/15351",
       "assignees": []
     },
+    "15389": {
+      "state": "OPEN",
+      "createdAt": "2026-09-09T07:16:20Z",
+      "mergedAt": null,
+      "title": "feat(google-gemini): add agent atomics for image, models, embeddings, tokens",
+      "url": "https://github.com/activepieces/activepieces/pull/15389",
+      "assignees": []
+    },
+    "15390": {
+      "state": "OPEN",
+      "createdAt": "2026-09-09T09:07:34Z",
+      "mergedAt": null,
+      "title": "feat(flow-helper): add Create Waitpoint + Wait for Resume actions",
+      "url": "https://github.com/activepieces/activepieces/pull/15390",
+      "assignees": []
+    },
+    "15397": {
+      "state": "OPEN",
+      "createdAt": "2026-09-09T12:30:32Z",
+      "mergedAt": null,
+      "title": "feat(notion): improve the step forms",
+      "url": "https://github.com/activepieces/activepieces/pull/15397",
+      "assignees": []
+    },
     "15406": {
       "state": "MERGED",
       "createdAt": "2026-09-09T15:37:57Z",
       "mergedAt": "2026-09-17T13:07:48Z",
       "title": "feat(google-calendar): improve the step forms",
       "url": "https://github.com/activepieces/activepieces/pull/15406",
+      "assignees": []
+    },
+    "15483": {
+      "state": "OPEN",
+      "createdAt": "2026-09-12T17:30:33Z",
+      "mergedAt": null,
+      "title": "feat(airtable): clearer setup forms and working record lookups",
+      "url": "https://github.com/activepieces/activepieces/pull/15483",
+      "assignees": []
+    },
+    "15484": {
+      "state": "OPEN",
+      "createdAt": "2026-09-12T17:34:15Z",
+      "mergedAt": null,
+      "title": "feat(OpenRouter): step form",
+      "url": "https://github.com/activepieces/activepieces/pull/15484",
+      "assignees": []
+    },
+    "15531": {
+      "state": "OPEN",
+      "createdAt": "2026-09-14T13:19:51Z",
+      "mergedAt": null,
+      "title": "feat(discord): step form",
+      "url": "https://github.com/activepieces/activepieces/pull/15531",
+      "assignees": []
+    },
+    "15539": {
+      "state": "OPEN",
+      "createdAt": "2026-09-14T16:01:58Z",
+      "mergedAt": null,
+      "title": "feat(pinterest,trello): expand board, pin, card and custom field actions for agents",
+      "url": "https://github.com/activepieces/activepieces/pull/15539",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15585": {
+      "state": "OPEN",
+      "createdAt": "2026-09-16T13:49:12Z",
+      "mergedAt": null,
+      "title": "feat(whatsapp): 19 new actions, 4 webhook triggers, output schemas and Graph v23.0",
+      "url": "https://github.com/activepieces/activepieces/pull/15585",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15618": {
+      "state": "OPEN",
+      "createdAt": "2026-09-17T20:50:06Z",
+      "mergedAt": null,
+      "title": "feat(instagram-business): revive on Graph v23.0 with 27 verified actions",
+      "url": "https://github.com/activepieces/activepieces/pull/15618",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15624": {
+      "state": "OPEN",
+      "createdAt": "2026-09-18T13:05:44Z",
+      "mergedAt": null,
+      "title": "feat(airtable): choose which fields Update Record writes, drop the \"(Agent)\" suffix",
+      "url": "https://github.com/activepieces/activepieces/pull/15624",
       "assignees": []
     }
   }

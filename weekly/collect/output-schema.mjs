@@ -120,6 +120,17 @@ export function collectOutputSchema({ readJson }) {
       live: num(s.status.live, 'status.live'),
       mergedNotLive: num(s.status['merged-not-live'], 'status.merged-not-live'),
       review: num(s.status.review, 'status.review'),
+      // The rollout's REAL review queue, and a different field from `review`
+      // above in every sense: this one is pieces whose adoption is sitting in an
+      // open PR, derived through deriveStage() off a live GitHub state, and it
+      // is what the weekly tile's pill reads. `review` next to it counts pieces
+      // flagged for a human DECISION and has no PR behind any of them -- see the
+      // note above the TILES table in ../lib/view.mjs.
+      //
+      // Soft, unlike its neighbours: `stages` postdates the rest of this block,
+      // so a summary.json built before it existed reports no queue rather than
+      // failing the whole collector over detail.
+      prOpen: typeof s.stages?.prOpen === 'number' ? s.stages.prOpen : null,
       todo: num(s.status.todo, 'status.todo'),
       totalPieces: num(s.totals?.pieces, 'totals.pieces'),
       roster: readRoster(readJson),

@@ -1367,10 +1367,19 @@ test('the review pill does not repeat the unit line\'s noun', () => {
 // The whole point of the correction: the outputSchema box records a `review`
 // count that means "flagged for a human decision", not "PR awaiting review", so
 // it must reach the page under no wording at all. The fixture has 8 of them.
-test('the outputSchema box never draws a review pill', () => {
+test('the outputSchema box never draws its decision-flag count as a review pill', () => {
   const tile = tileOf(renderDom([snap('2026-W31')]), 'outputSchema');
   assert.doesNotMatch(tile, /in review/);
   assert.doesNotMatch(tile, /class="inreview"/);
+});
+
+// The real queue does draw. The fixture carries 8 decision flags and 2 open PRs,
+// so a pill reading "+8" is the exact failure this pair of tests exists to catch.
+test('the outputSchema box draws its open-PR queue', () => {
+  const os = { status: 'ok', live: 9, mergedNotLive: 6, review: 8, prOpen: 2, todo: 733, totalPieces: 756, roster: [] };
+  const tile = tileOf(renderDom([snap('2026-W31', { outputSchema: os })]), 'outputSchema');
+  assert.match(tile, /class="inreview">\+2 in review</);
+  assert.doesNotMatch(tile, /\+8 in review/);
 });
 
 // An empty queue draws nothing. "+0 in review" is a pill that costs a reader a

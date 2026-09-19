@@ -249,26 +249,34 @@ function coveredStrip(ws) {
 // a diff — a different instrument, the same reading.
 //
 // outputSchema is the trap, and it is why this comment is long. That collector
-// also publishes a `review`, and it counts something else entirely: pieces
-// FLAGGED FOR A HUMAN DECISION — webhook, forms, store, tables, subflows, whose
-// payload is caller-defined, so the open question is whether a schema is
-// possible at all, not whether someone has reviewed a diff. It is a sibling of
-// `skip`, it has no PR behind it, and it has sat at the same handful of pieces
-// for six weeks. Rendering it as "+5 in review" claims five pieces are one
-// approval from landing when nobody has written a line of them. That tile
-// therefore names no path here — the honest reading is that this rollout cannot
-// see its open PRs today, and a wrong number is worse than a missing one.
+// publishes TWO fields and only one of them belongs here. `outputSchema.review`
+// counts pieces FLAGGED FOR A HUMAN DECISION — webhook, forms, store, tables,
+// subflows, whose payload is caller-defined, so the open question is whether a
+// schema is possible at all, not whether someone has reviewed a diff. It is a
+// sibling of `skip`, no PR sits behind it, and it has not moved in six weeks.
+// Rendering it as "+5 in review" claims five pieces are one approval from
+// landing when nobody has written a line of them.
 //
-// Piece testing names no path either, for the plainer reason that the tester's
-// coverage is a piece it has RUN: nothing waits on a reviewer for that number to
-// move. It and outputSchema report null rather than an empty queue nobody is
-// measuring — a 0 would claim the queue was looked at and found empty.
+// `outputSchema.prOpen` is the real queue, and the path the tile names below.
+// Same deriveStage() → 'pr-open' as the other two rollouts. It read 0 for as
+// long as this tile existed — not because nothing was in flight, but because a
+// PR only became visible once somebody typed its number into a claims file, and
+// for eight pieces nobody had. lib/discover.mjs now finds them in the diff,
+// which is what finally made the field worth rendering.
+//
+// Piece testing names no path, for the plainer reason that the tester's coverage
+// is a piece it has RUN: nothing waits on a reviewer for that number to move. It
+// reports null rather than an empty queue nobody is measuring — a 0 would claim
+// the queue was looked at and found empty.
 const TILES = [
   // Done = MERGED, so both `live` and `merged-not-live`: the work landed either
   // way; `live` merely also caught a cloud release the team does not control, so
   // counting only `live` under-reports delivery by whatever is queued behind it.
   { key: 'outputSchema', title: 'outputSchema', path: mergedSchemas,
     unit: (ws) => `of ${ws.totalPieces} merged`,
+    // `prOpen`, never `review` — the two are unrelated and one of them is a
+    // trap. Read the note above before touching this line.
+    review: 'outputSchema.prOpen',
     strip: pieceStrip, done: ['live', 'merged-not-live'] },
   // `totalPieces` here is only the 28 pieces the initiative TRACKS, so
   // "2 of 28 merged" reads as ~7% catalog coverage when the real figure is

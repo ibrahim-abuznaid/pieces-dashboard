@@ -1254,6 +1254,14 @@ test('the outputSchema decision-flag count is never read as a review queue', () 
   assert.equal(snap('2026-W31').outputSchema.review, 8, 'fixture must keep a non-zero flag count for this to prove anything');
 });
 
+// The field that IS the queue, on the same tile, with the trap sitting beside it
+// at a different value. 8 must never render; 2 must.
+test('the outputSchema queue reads prOpen, and only prOpen', () => {
+  const tile = oneWeek({ outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, prOpen: 2, todo: 733, totalPieces: 756 } })
+    .tiles.find((t) => t.key === 'outputSchema');
+  assert.equal(tile.inReview, 2);
+});
+
 // Piece testing is null rather than 0 on purpose. It stages nothing through
 // review — its coverage is a piece the tester has RUN — so a 0 there would
 // publish a queue nobody is measuring, which is the same failure as a missing

@@ -20,6 +20,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deriveStage, assigneesOf } from '../lib/stages.mjs';
+import { claimedPr } from '../lib/discover.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
@@ -28,6 +29,11 @@ const { pieces: claims } = read('pieces.json');
 const catalog = read('../output-schema/data/cloud-catalog.json');
 const coverage = read('../output-schema/data/cloud-coverage.json');
 const prData = read('../data/pr-states.json');
+// In-flight claims DISCOVERED from open PRs (scripts/fetch-pr-states.mjs), so a
+// piece whose PR nobody wrote down still reaches the page. Optional by design:
+// a checkout that has not fetched yet builds on the curated claims alone, which
+// is exactly what this build did before discovery existed.
+const discovered = (() => { try { return read('../data/discovered-claims.json'); } catch { return {}; } })();
 
 const DIST = join(ROOT, '../dist/ui-improvements');
 
@@ -104,7 +110,19 @@ const rowFor = (claim) => {
   };
 };
 
-const rows = claims.map(rowFor);
+const discoveredUi = discovered.uiImprovements ?? {};
+const rows = claims.map((c) => rowFor({ ...c, pr: claimedPr(c.pr ?? null, discoveredUi, c.slug) }));
+
+// A piece whose retrofit is sitting in an open PR nobody claimed. No WARN and
+// no ask: unlike the cloud-detected rows below, there is nothing for a human to
+// go and do -- the PR is open, the stage is right, and when it merges the cloud
+// measurement takes over. A row here is how the review queue stops reading as 0
+// while five step-form PRs are in flight.
+const curatedSlugs = new Set(claims.map((c) => c.slug));
+for (const [slug, pr] of Object.entries(discoveredUi)) {
+  if (curatedSlugs.has(slug)) continue;
+  rows.push(rowFor({ slug, pr }));
+}
 
 // A piece can reach cloud with the new UI without ever passing through this
 // file — it arrives inside a piece's own PR (WhatsScale, Sage Accounting), or a

@@ -133,9 +133,33 @@ const OS_ROSTER = [
 
 test('collectOutputSchema maps the real summary shape', () => {
   assert.deepEqual(collectOutputSchema({ readJson: () => OS_SUMMARY }), {
-    status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756, roster: [],
+    status: 'ok', live: 9, mergedNotLive: 6, review: 8, prOpen: null, todo: 733, totalPieces: 756, roster: [],
   });
 });
+
+// The rollout's real review queue: pieces whose adoption is sitting in an open
+// PR, derived through deriveStage(). Not to be confused with `review` beside it,
+// which counts pieces flagged for a human decision and has no PR behind it — the
+// fixture keeps both non-zero and different so a swap cannot pass.
+test('collectOutputSchema carries the open-PR queue separately from the decision flag', () => {
+  const out = collectOutputSchema({ readJson: () => ({ ...OS_SUMMARY, stages: { assigned: 0, prOpen: 2, merged: 1, live: 9 } }) });
+  assert.equal(out.prOpen, 2);
+  assert.equal(out.review, 8);
+});
+
+// `stages` postdates the rest of the summary. A build from before it existed
+// must report no queue, not a zero, and must not degrade the whole tile over it.
+test('a summary with no stages block reports no queue rather than failing', () => {
+  for (const summary of [OS_SUMMARY, { ...OS_SUMMARY, stages: {} }, { ...OS_SUMMARY, stages: { prOpen: 'two' } }]) {
+    const out = collectOutputSchema({ readJson: () => summary });
+    assert.equal(out.status, 'ok');
+    assert.equal(out.prOpen, null);
+  }
+});
+
+// A queue that emptied is a real 0 and stays one.
+test('an emptied open-PR queue survives as zero', () =>
+  assert.equal(collectOutputSchema({ readJson: () => ({ ...OS_SUMMARY, stages: { prOpen: 0 } }) }).prOpen, 0));
 
 test('collectOutputSchema degrades to no-data with the reason when the file is missing', () => {
   const out = collectOutputSchema({ readJson: () => { throw new Error('ENOENT: no such file'); } });
@@ -191,7 +215,7 @@ test('a non-numeric totals.pieces degrades instead of flowing through untyped', 
 
 test('collectOutputSchema carries an in-flight roster, sorted by actions desc then name', () => {
   assert.deepEqual(collectOutputSchema({ readJson: osRead() }), {
-    status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756,
+    status: 'ok', live: 9, mergedNotLive: 6, review: 8, prOpen: null, todo: 733, totalPieces: 756,
     roster: OS_ROSTER,
   });
 });

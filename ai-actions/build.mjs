@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deriveStage, assigneesOf } from '../lib/stages.mjs';
+import { claimedPr } from '../lib/discover.mjs';
 import { renderPage } from '../lib/render.mjs';
 import { validateAiData } from './validate.mjs';
 
@@ -14,13 +15,18 @@ const { pieces } = read('pieces.json');
 const { categories, blockers } = read('blockers.json');
 const overrides = read('overrides.json');
 const prData = read('../data/pr-states.json');
+// In-flight claims DISCOVERED from open PRs (scripts/fetch-pr-states.mjs), so a
+// piece whose PR nobody wrote down still reaches the page. Optional by design:
+// a checkout that has not fetched yet builds on the curated claims alone, which
+// is exactly what this build did before discovery existed.
+const discovered = (() => { try { return read('../data/discovered-claims.json'); } catch { return {}; } })();
 
 const problems = validateAiData({ pieces, categories, blockers, prStates: prData.prs });
 if (problems.length) { console.error('✗ ' + problems.join('\n✗ ')); process.exit(1); }
 
 const enriched = pieces.map((p) => {
   const ov = overrides.pieces?.[p.slug] ?? {};
-  const claim = { assignee: ov.assignee ?? null, pr: p.pr ?? ov.pr ?? null };
+  const claim = { assignee: ov.assignee ?? null, pr: claimedPr(p.pr ?? ov.pr ?? null, discovered.aiActions, p.slug) };
   return {
     ...p,
     pr: claim.pr,

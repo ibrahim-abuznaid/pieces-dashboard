@@ -5061,6 +5061,7 @@
         "live": 85,
         "mergedNotLive": 1,
         "review": 5,
+        "prOpen": 2,
         "todo": 673,
         "totalPieces": 764,
         "roster": [
@@ -6097,10 +6098,18 @@
         "status": "ok",
         "merged": 10,
         "live": 10,
-        "review": 2,
+        "review": 8,
         "assigned": 0,
         "totalPieces": 764,
         "roster": [
+          {
+            "folder": "outseta",
+            "name": "outseta",
+            "displayName": "Outseta",
+            "actions": 50,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/outseta.png"
+          },
           {
             "folder": "whatsscale",
             "name": "whatsscale",
@@ -6140,6 +6149,30 @@
             "actions": 21,
             "stage": "review",
             "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png"
+          },
+          {
+            "folder": "notion",
+            "name": "notion",
+            "displayName": "Notion",
+            "actions": 19,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png"
+          },
+          {
+            "folder": "discord",
+            "name": "discord",
+            "displayName": "Discord",
+            "actions": 18,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/discord.png"
+          },
+          {
+            "folder": "airtable",
+            "name": "airtable",
+            "displayName": "Airtable",
+            "actions": 17,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/airtable.png"
           },
           {
             "folder": "google-calendar",
@@ -6190,6 +6223,14 @@
             "logo": "https://cdn.activepieces.com/pieces/pinterest.png"
           },
           {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png"
+          },
+          {
             "folder": "customer-io",
             "name": "customer-io",
             "displayName": "customer.io",
@@ -6204,6 +6245,14 @@
             "actions": 2,
             "stage": "live",
             "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg"
+          },
+          {
+            "folder": "open-router",
+            "name": "open-router",
+            "displayName": "OpenRouter",
+            "actions": 2,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/open-router.png"
           }
         ]
       },

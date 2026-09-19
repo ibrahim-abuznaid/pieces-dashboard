@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { discoverClaims, ROLLOUTS } from '../lib/discover.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readIf = (p) => (existsSync(join(ROOT, p)) ? JSON.parse(readFileSync(join(ROOT, p), 'utf8')) : null);
@@ -17,6 +18,69 @@ for (const p of readIf('ai-actions/pieces.json')?.pieces ?? []) ref(p.pr, p.slug
 for (const p of readIf('ui-improvements/pieces.json')?.pieces ?? []) ref(p.pr, p.slug);
 for (const [slug, ov] of Object.entries(readIf('output-schema/overrides.json')?.pieces ?? {})) ref(ov.pr, slug);
 for (const [slug, ov] of Object.entries(readIf('ai-actions/overrides.json')?.pieces ?? {})) ref(ov.pr, slug);
+
+const REPO = 'activepieces/activepieces';
+const gh = (args) => JSON.parse(execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
+
+// Work IN FLIGHT is discovered, not declared. See lib/discover.mjs for why; the
+// short version is that a PR nobody wrote into a claims file used to be a PR the
+// page could not see, and an unseen queue renders as an empty one.
+//
+// Two passes, because the cheap call cannot answer the question. `gh pr list`
+// returns file PATHS, which is enough to find the piece PRs and nothing like
+// enough to tell which rollout one is doing -- `propertyGroups` and `aiMetadata`
+// live in the diff. So: list every open PR once, keep the ones touching a piece
+// directory, and pull the patch only for those. About 30 of 139 today.
+//
+// The limit is deliberately far above the real number: `gh pr list` silently
+// truncates, and a truncated list does not fail, it just quietly stops finding
+// the oldest open PRs -- which are exactly the ones most likely to have been
+// forgotten.
+//
+// BEST EFFORT as a whole. Discovery is an improvement on the claims files, not
+// a dependency of them: if GitHub search is down or a patch will not fetch, the
+// build still runs on the curated claims, which is what it did before this
+// existed. A hard failure here would take out the daily refresh over work that
+// is only ever additive.
+function discover() {
+  const aiWave = (readIf('ai-actions/pieces.json')?.pieces ?? []).map((p) => p.slug);
+  let open = [];
+  try {
+    open = gh(['pr', 'list', '--repo', REPO, '--state', 'open', '--limit', '500',
+      '--json', 'number,files']);
+  } catch (e) {
+    console.warn(`⚠ open-PR discovery skipped (${e.message}) — in-flight counts fall back to the claims files`);
+    return Object.fromEntries(ROLLOUTS.map((r) => [r, {}]));
+  }
+  const piecePrs = open.filter((pr) => (pr.files ?? [])
+    .some((f) => f.path?.startsWith('packages/pieces/community/')));
+
+  const withPatches = [];
+  for (const pr of piecePrs) {
+    try {
+      // `filename`, not `path`: the two gh surfaces disagree on the key, and
+      // lib/discover.mjs reads the REST one.
+      const files = gh(['api', '--paginate', `repos/${REPO}/pulls/${pr.number}/files?per_page=100`]);
+      withPatches.push({ number: pr.number, files });
+    } catch (e) {
+      console.warn(`⚠ PR #${pr.number}: files unavailable (${e.message}) — not classified`);
+    }
+  }
+  const found = discoverClaims(withPatches, { aiWave });
+  const total = ROLLOUTS.reduce((a, r) => a + Object.keys(found[r]).length, 0);
+  console.log(`✓ discovered ${total} in-flight claims across ${withPatches.length} open piece PRs`);
+  return found;
+}
+
+const discovered = discover();
+writeFileSync(join(ROOT, 'data/discovered-claims.json'),
+  JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), ...discovered }, null, 2) + '\n');
+
+// Discovered numbers need their state fetched like any other: the builds read
+// stage off data/pr-states.json, not off the fact that a PR was found.
+for (const rollout of ROLLOUTS) {
+  for (const [slug, pr] of Object.entries(discovered[rollout])) ref(pr, slug);
+}
 
 const prs = {};
 for (const n of [...nums.keys()].sort((a, b) => a - b)) {
