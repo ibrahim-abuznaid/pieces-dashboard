@@ -21,10 +21,12 @@ DASHBOARD="${PIECES_TEAM_DASHBOARD:-/home/ibrahim/AP_work/Activepieces_v/pieces-
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TODAY="$(date +%F)"
 
-# Local-only settings the snapshot needs but the repo must not carry —
-# PIECE_TESTER_URL above all: the tester's address is deployment detail, and
-# this repo is public. Optional on purpose: without the file the coverage half
-# of the testing collector is simply off and the snapshot still lands.
+# Local-only settings the snapshot needs but the repo must not carry:
+# PIECE_TESTER_URL and PIECE_TESTER_PASSWORD. The tester's address is deployment
+# detail and its password is a secret, and this repo is public. BOTH are needed
+# for coverage — the tester mounts requireAuth in front of every /api route, so
+# the URL alone buys a 401. Optional on purpose: without the file the coverage
+# half of the testing collector is simply off and the snapshot still lands.
 if [ -f "$REPO/.env.local" ]; then . "$REPO/.env.local"; fi
 
 log()  { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }

@@ -1,7 +1,10 @@
 // test/weekly-snapshot.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSnapshot, deriveDecisions, parseArgs } from '../weekly/snapshot.mjs';
+import { buildSnapshot, deriveDecisions, parseArgs, testerClient } from '../weekly/snapshot.mjs';
+import { existsSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { validateSnapshot } from '../weekly/lib/archive.mjs';
 
 const collectors = (over = {}) => ({
@@ -144,3 +147,84 @@ test('parseArgs accepts a legitimate 53rd week', () =>
 
 test('parseArgs rejects an unrecognised argument instead of silently defaulting', () =>
   assert.throws(() => parseArgs(['--week', '2026-W31']), /unknown argument/));
+
+// ── the tester client ───────────────────────────────────────────────────────
+// The piece tester mounts requireAuth in front of every /api route, so the
+// coverage endpoint needs a session. The login lives here rather than in the
+// collector so that collect/testing.mjs stays a "GET this URL" consumer.
+const JAR = join(tmpdir(), 'pieces-dashboard-test.cookies');
+const recorder = (fail = null) => {
+  const calls = [];
+  const exec = (cmd, args, opts) => {
+    calls.push({ cmd, args, input: opts?.input });
+    if (fail && args.join(' ').includes(fail)) throw new Error('boom');
+    return '[]';
+  };
+  return { calls, exec };
+};
+
+test('no password means no login — the collector gets a plain GET', () => {
+  const { calls, exec } = recorder();
+  const { curl } = testerClient({ baseUrl: 'http://tester.example', password: '', exec, jarPath: JAR });
+  curl('http://tester.example/api/coverage');
+  assert.equal(calls.length, 1, 'a login was attempted with no password to send');
+  assert.ok(!calls[0].args.includes('-b'));
+});
+
+test('an unset tester URL means no login either', () => {
+  const { calls, exec } = recorder();
+  testerClient({ baseUrl: undefined, password: 'hunter2', exec, jarPath: JAR });
+  assert.equal(calls.length, 0);
+});
+
+test('a password buys a session cookie, and every later GET carries it', () => {
+  const { calls, exec } = recorder();
+  const { curl } = testerClient({ baseUrl: 'http://tester.example/', password: 'hunter2', exec, jarPath: JAR });
+  curl('http://tester.example/api/coverage');
+
+  const [login, get] = calls;
+  assert.ok(login.args.includes('/api/auth/login') || login.args.some((a) => a.endsWith('/api/auth/login')),
+    'the first call must be the login');
+  assert.ok(login.args.includes('-c') && login.args.includes(JAR), 'login must write the jar');
+  assert.ok(get.args.includes('-b') && get.args.includes(JAR), 'the coverage GET must read the jar');
+});
+
+// A trailing slash on the configured URL must not produce //api/auth/login.
+test('the login URL is joined cleanly', () => {
+  const { calls, exec } = recorder();
+  testerClient({ baseUrl: 'http://tester.example/', password: 'hunter2', exec, jarPath: JAR });
+  assert.ok(calls[0].args.includes('http://tester.example/api/auth/login'));
+});
+
+// argv is world-readable in `ps` for the life of the call, and a snapshot runs
+// under cron beside whatever else is on that machine.
+test('the password goes in on stdin, never in the arguments', () => {
+  const { calls, exec } = recorder();
+  testerClient({ baseUrl: 'http://tester.example', password: 'hunter2', exec, jarPath: JAR });
+  assert.equal(calls[0].input, JSON.stringify({ password: 'hunter2' }));
+  assert.ok(!calls[0].args.some((a) => String(a).includes('hunter2')), 'password leaked into argv');
+});
+
+// A wrong or expired secret costs the coverage half and nothing else: the
+// collector 401s on the plain curl and degrades to build progress, which is
+// what it already does when the tester is simply unreachable.
+test('a failed login degrades instead of taking the snapshot down', () => {
+  const warned = [];
+  const { calls, exec } = recorder('/api/auth/login');
+  const { curl } = testerClient({ baseUrl: 'http://tester.example', password: 'wrong', exec,
+    jarPath: JAR, warn: (m) => warned.push(m) });
+  curl('http://tester.example/api/coverage');
+  assert.equal(warned.length, 1);
+  assert.doesNotMatch(warned[0], /wrong/, 'the warning must not carry the password');
+  assert.ok(!calls[1].args.includes('-b'), 'a failed login must not leave a jar in play');
+});
+
+// The jar holds a live 7-day session for a host this repo deliberately does not
+// name. It does not outlive the process that made it.
+test('cleanup removes the cookie jar', () => {
+  const { exec } = recorder();
+  writeFileSync(JAR, 'session');
+  const { cleanup } = testerClient({ baseUrl: 'http://tester.example', password: 'hunter2', exec, jarPath: JAR });
+  cleanup();
+  assert.equal(existsSync(JAR), false);
+});

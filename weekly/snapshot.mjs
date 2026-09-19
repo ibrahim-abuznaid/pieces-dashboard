@@ -3,7 +3,8 @@
 // LOCAL ONLY. Appends one immutable week to weekly/data/weeks.json, which is
 // committed. CI must never run this: CI rebuilds daily, so recomputing here
 // would rewrite history. CI only runs weekly/build.mjs.
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -123,6 +124,49 @@ export function parseArgs(argv) {
   return { today, weekId, force: argv.includes('--force-week') };
 }
 
+// The tester is not an open endpoint. server/src/index.ts mounts `requireAuth`
+// in front of everything under /api, so a bare GET of /api/coverage 401s -- which
+// is what the coverage half of the testing collector had been doing unnoticed,
+// reading as "tester unreachable". Auth is one shared password exchanged for a
+// session cookie, so: log in once here, keep the cookie for the life of this
+// process, and hand the collector the same `curl(url)` it already takes. The
+// collector stays a pure "GET this URL" consumer and knows nothing about login.
+//
+// The password goes in on STDIN, never in argv: a snapshot can run under cron
+// beside anything else on this machine, and an argument is world-readable in
+// `ps` for as long as the call takes.
+//
+// FAILING to log in is not fatal and does not stop the snapshot. Whether the
+// secret is absent, wrong, or the host is down, the collector gets the plain
+// curl, that call 401s or times out, and coverage degrades alone -- PRs and
+// commits are still measured, and the reason lands in `coverageError` where the
+// operator already looks. One missing secret must never cost the whole week.
+export function testerClient({ baseUrl, password, exec, warn = console.warn,
+                               jarPath = join(tmpdir(), `pieces-dashboard-tester-${process.pid}.cookies`) }) {
+  const plain = (url) => exec('curl', ['-fsS', '--max-time', '30', url],
+    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+  if (!baseUrl || !password) return { curl: plain, cleanup: () => {} };
+
+  const cleanup = () => { try { rmSync(jarPath, { force: true }); } catch { /* best effort */ } };
+  try {
+    exec('curl', ['-fsS', '--max-time', '30', '-c', jarPath, '-X', 'POST',
+      '-H', 'Content-Type: application/json', '--data-binary', '@-',
+      `${baseUrl.replace(/\/$/, '')}/api/auth/login`],
+    { encoding: 'utf8', input: JSON.stringify({ password }) });
+  } catch (err) {
+    // The message, never the password: curl echoes the request body on some
+    // failures and this line ends up in a log file the operator keeps.
+    warn(`⚠ tester login failed (${err.message}) — coverage will degrade`);
+    cleanup();
+    return { curl: plain, cleanup: () => {} };
+  }
+  return {
+    curl: (url) => exec('curl', ['-fsS', '--max-time', '30', '-b', jarPath, url],
+      { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }),
+    cleanup,
+  };
+}
+
 export function main(argv) {
   const { today, weekId, force } = parseArgs(argv);
   const window = windowForWeekId(weekId);
@@ -130,26 +174,37 @@ export function main(argv) {
   const readRepoJson = (rel) => JSON.parse(readFileSync(join(ROOT, rel), 'utf8'));
   const readTeamJson = (name) => JSON.parse(readFileSync(join(TEAM_DASHBOARD, 'data', name), 'utf8'));
   const gh = (args) => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
-  // The tester's address is deployment detail, kept out of this public repo:
-  // it reaches the collector only through the environment of the (local-only)
-  // machine that takes snapshots. `-f` turns HTTP errors into exit codes so a
-  // 500 degrades the coverage half instead of parsing an error page as JSON.
-  const curl = (url) => execFileSync('curl', ['-fsS', '--max-time', '30', url],
-    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
-
-  const snap = buildSnapshot({
-    weekId, today,
-    collectors: {
-      outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
-      aiActions: () => collectAiActions({ readJson: readRepoJson }),
-      uiImprovements: () => collectUiImprovements({ readJson: readRepoJson }),
-      testing: () => collectTesting({ window, gh, curl, testerUrl: process.env.PIECE_TESTER_URL }),
-      tickets: () => collectTickets({
-        window, weekId, readJson: readTeamJson,
-        linearRefreshPending: existsSync(join(TEAM_DASHBOARD, 'NEEDS-LINEAR-REFRESH')),
-      }),
-    },
+  // The tester's address and password are deployment detail, kept out of this
+  // public repo: they reach the collector only through the environment of the
+  // (local-only) machine that takes snapshots. `-f` turns HTTP errors into exit
+  // codes so a 500 degrades the coverage half instead of parsing an error page
+  // as JSON — and so a 401 is a failure rather than a page of login HTML
+  // arriving where a coverage array was expected.
+  const testerUrl = process.env.PIECE_TESTER_URL;
+  const { curl, cleanup } = testerClient({
+    baseUrl: testerUrl, password: process.env.PIECE_TESTER_PASSWORD, exec: execFileSync,
   });
+
+  let snap;
+  try {
+    snap = buildSnapshot({
+      weekId, today,
+      collectors: {
+        outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
+        aiActions: () => collectAiActions({ readJson: readRepoJson }),
+        uiImprovements: () => collectUiImprovements({ readJson: readRepoJson }),
+        testing: () => collectTesting({ window, gh, curl, testerUrl }),
+        tickets: () => collectTickets({
+          window, weekId, readJson: readTeamJson,
+          linearRefreshPending: existsSync(join(TEAM_DASHBOARD, 'NEEDS-LINEAR-REFRESH')),
+        }),
+      },
+    });
+  } finally {
+    // The jar outlives nothing: it holds a live 7-day session for a host whose
+    // address this repo deliberately does not carry.
+    cleanup();
+  }
 
   writeArchive(ARCHIVE, appendWeek(readArchive(ARCHIVE), snap, { force }));
   const degraded = WORKSTREAMS.filter((k) => snap[k].status === 'no-data');
