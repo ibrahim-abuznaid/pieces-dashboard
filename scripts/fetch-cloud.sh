@@ -19,9 +19,24 @@ echo "2/3 per-piece cloud metadata (outputSchema coverage)…"
 # also substitute the name into every {} inside the jq program below.
 jq -r '.[].name' data/cloud-catalog.json | xargs -P10 -n1 sh -c '
   n="$1"
-  m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/$n" || echo "")
-  if [ -z "$m" ]; then m=$(curl -sf --max-time 30 "https://cloud.activepieces.com/api/v1/pieces/$n" || echo ""); fi
-  if [ -z "$m" ]; then printf "{\"name\":\"%s\",\"error\":true}\n" "$n"; else
+  # Retried on EMPTINESS was not enough. On 2026-09-19 the API returned a body
+  # truncated mid-string at exactly 4096 bytes: non-empty, so the old guard
+  # passed it straight to jq, which died with "Unfinished string at EOF" and
+  # took the whole fetch down with exit 123. A partial read is the normal shape
+  # of a dropped connection, so the check has to be "does this parse", not "is
+  # this there".
+  #
+  # --retry covers the transport; the parse check covers a body that arrived
+  # looking fine and was not. Three curl attempts inside each of two rounds.
+  fetch_one() {
+    curl -sf --retry 3 --retry-delay 1 --retry-all-errors --max-time 30 \
+      "https://cloud.activepieces.com/api/v1/pieces/$1" 2>/dev/null || echo ""
+  }
+  valid() { [ -n "$1" ] && printf "%s" "$1" | jq -e . >/dev/null 2>&1; }
+
+  m=$(fetch_one "$n")
+  valid "$m" || m=$(fetch_one "$n")
+  if ! valid "$m"; then printf "{\"name\":\"%s\",\"error\":true}\n" "$n"; else
     # printf, not echo: dash echo mangles the \n escapes inside JSON strings
     # `custom_api_call` is EXCLUDED from the two ui* counts and from nothing else.
     # It is one shared action injected into ~500 pieces from pieces-common, and

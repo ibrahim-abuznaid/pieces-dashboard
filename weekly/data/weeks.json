@@ -6703,21 +6703,33 @@
       },
       "tickets": {
         "status": "ok",
-        "total": 7,
-        "inReview": 10,
+        "total": 13,
+        "inReview": 15,
         "byPerson": {
           "kishan": 6,
-          "sanket": 1
+          "sanket": 1,
+          "odai": 6,
+          "talal": 0
         },
         "prsMerged": {
           "kishan": 8,
-          "sanket": 1
+          "sanket": 1,
+          "odai": 4,
+          "talal": 4
         },
         "reviews": {
           "kishan": 6,
-          "sanket": 4
+          "sanket": 4,
+          "odai": 2,
+          "talal": 0
         },
         "shipped": [
+          {
+            "id": "PIE-507",
+            "title": "Add Brevo contact and list AI atomics with output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
           {
             "id": "PIE-486",
             "title": "clickup failing (bad_request)",
@@ -6743,21 +6755,9 @@
             "team": "GIT"
           },
           {
-            "id": "PIE-514",
-            "title": "Node form-data bodies aren't transmitted by the dev FetchHttpClient",
-            "assignee": "kishan",
-            "team": "Pieces"
-          },
-          {
-            "id": "PIE-511",
-            "title": "Add AI actions for Gmail piece leveraging new gmail.modify scope",
-            "assignee": "kishan",
-            "team": "Pieces"
-          },
-          {
-            "id": "GIT-1880",
-            "title": "Google Drive: batch List Files folder queries instead of one API call per folder",
-            "assignee": "kishan",
+            "id": "GIT-1861",
+            "title": "[Feature]: New piece — Floqer (API key auth, core actions, segment-change trigger)",
+            "assignee": "odai",
             "team": "GIT"
           }
         ]
