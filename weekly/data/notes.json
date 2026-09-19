@@ -18,7 +18,7 @@
     "uiImprovements": "WhatsScale and Sage Accounting shipped grouped from the start; both pilots (Gmail #14943, Telegram Bot #14970) are still in review."
   },
   "2026-W38": {
-    "uiImprovements": "Google Calendar took the essential/Advanced split (#15406) — the sixth piece to land it; both pilots, Gmail #14943 and Telegram Bot #14970, are still in review.",
+    "uiImprovements": "Google Calendar took the essential/Advanced split (#15406) — the sixth piece to land it. The queue behind it is eight, not the two pilots: Talal has five step-form PRs open (Discord, OpenRouter, Airtable, Notion, Google Docs) alongside Gmail #14943 and Telegram Bot #14970.",
     "aiActions": "The tracked wave did not move, but five pieces outside it gained agent atomics this week: Sendinblue, Resend, HubSpot, Gmail and Brevo."
   }
 }
