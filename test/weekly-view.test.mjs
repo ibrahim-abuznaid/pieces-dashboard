@@ -1238,7 +1238,7 @@ test('the view no longer assembles a UI-improvements band', () => {
 // page that adds them together is the overclaim this page exists to avoid.
 const inReviewOf = (v) => Object.fromEntries(v.tiles.map((t) => [t.key, t.inReview]));
 
-test('only the rollouts that can see an open PR carry a review queue', () =>
+test('only the workstreams that measure a queue carry one', () =>
   assert.deepEqual(inReviewOf(buildView(archive)), {
     aiActions: 24, uiImprovements: 2, outputSchema: null, testing: null, tickets: null }));
 
@@ -1254,16 +1254,31 @@ test('the outputSchema decision-flag count is never read as a review queue', () 
   assert.equal(snap('2026-W31').outputSchema.review, 8, 'fixture must keep a non-zero flag count for this to prove anything');
 });
 
-// Piece testing and tickets are null rather than 0 on purpose. Neither stages
-// work through review — a ticket is open or closed, and the tester's coverage is
-// a piece it has run — so a 0 there would publish a queue nobody is measuring,
-// which is the same failure as a missing collector reading as "nothing to do".
+// Piece testing is null rather than 0 on purpose. It stages nothing through
+// review — its coverage is a piece the tester has RUN — so a 0 there would
+// publish a queue nobody is measuring, which is the same failure as a missing
+// collector reading as "nothing to do".
 test('a workstream with no review stage reports null, not an empty queue', () => {
   const v = buildView(archive);
-  for (const key of ['testing', 'tickets', 'outputSchema']) {
+  for (const key of ['testing', 'outputSchema']) {
     assert.equal(v.tiles.find((t) => t.key === key).inReview, null, `${key} invented a review queue`);
   }
 });
+
+// Tickets DO stage through review, and not via a PR: Linear carries an explicit
+// `In Review` state on both boards the tile counts, so the queue is read off the
+// board. `closed this week` is windowed and this is a standing count — which is
+// why it is a second number and never folded into the first.
+test('the ticket queue comes off the Linear board, not a PR', () =>
+  assert.equal(oneWeek({ tickets: { status: 'ok', total: 7, inReview: 10,
+    byPerson: { kishan: 6, sanket: 1 }, prsMerged: { kishan: 0, sanket: 0 },
+    reviews: { kishan: 0, sanket: 0 }, shipped: [] } })
+    .tiles.find((t) => t.key === 'tickets').inReview, 10));
+
+// Every week sealed before the collector recorded it. Null, not 0 — the archive
+// must not be retrofitted with a queue nobody counted.
+test('an archived week that never counted its ticket queue reports null', () =>
+  assert.equal(buildView(archive).tiles.find((t) => t.key === 'tickets').inReview, null));
 
 // A real 0 stays a 0 in the model. The AI-actions rollout has genuinely emptied
 // its queue for five weeks running, and collapsing that to null here would make

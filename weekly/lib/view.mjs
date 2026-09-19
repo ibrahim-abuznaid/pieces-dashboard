@@ -237,13 +237,16 @@ function coveredStrip(ws) {
 // `strip` is the pieces the number refers to — see pieceStrip below — and `done`
 // is which of a workstream's stages count as finished for it.
 //
-// `review` is the queue BEHIND the number: work whose PR is OPEN, counted
-// separately and never added in. Read that literally — it is the only thing the
-// pill may ever mean, and exactly two collectors measure it. Both derive it from
-// a live GitHub PR state via deriveStage() → 'pr-open' (see lib/stages.mjs);
-// they disagree only on what to call it, because the two builds were written
-// against different trackers and the page does not rename a stored field to
-// tidy up a spec table.
+// `review` is the queue BEHIND the number: work that is FINISHED BUT NOT LANDED,
+// counted separately and never added in. Read that literally — it is the only
+// thing the pill may ever mean — and note that it is a claim about work, not
+// about a PR. Three collectors measure it, by two roads. uiImprovements.review
+// and aiActions.prOpen are both deriveStage() → 'pr-open' (see lib/stages.mjs),
+// read off a live GitHub PR state; they disagree only on what to call it,
+// because the two builds were written against different trackers and the page
+// does not rename a stored field to tidy up a spec table. tickets.inReview is
+// Linear's own `In Review` state, read off the board rather than inferred from
+// a diff — a different instrument, the same reading.
 //
 // outputSchema is the trap, and it is why this comment is long. That collector
 // also publishes a `review`, and it counts something else entirely: pieces
@@ -256,9 +259,10 @@ function coveredStrip(ws) {
 // therefore names no path here — the honest reading is that this rollout cannot
 // see its open PRs today, and a wrong number is worse than a missing one.
 //
-// Tickets and piece testing name no path either, for the plainer reason that a
-// ticket is open or closed and the tester's coverage is a piece it has run.
-// All three report null rather than an empty queue nobody is measuring.
+// Piece testing names no path either, for the plainer reason that the tester's
+// coverage is a piece it has RUN: nothing waits on a reviewer for that number to
+// move. It and outputSchema report null rather than an empty queue nobody is
+// measuring — a 0 would claim the queue was looked at and found empty.
 const TILES = [
   // Done = MERGED, so both `live` and `merged-not-live`: the work landed either
   // way; `live` merely also caught a cloud release the team does not control, so
@@ -302,9 +306,15 @@ const TILES = [
   // Tickets are not pieces, so the strip is ids and titles, each linking to the
   // ticket itself. Who closed them is the one line of detail management does
   // read, so it stays folded into this box rather than becoming a table.
+  //
+  // The only queue on the page that is not a PR. `closed this week` is a
+  // WINDOWED count and `inReview` is a standing one, which is the one place the
+  // pill's "+" earns its keep twice over: it already says "additional to", and
+  // here it also says "not from the same seven days". Nothing in review is
+  // closed, so the two still cannot double-count a ticket.
   { key: 'tickets', title: 'Tickets solved', path: 'tickets.total',
-    unit: () => 'closed this week', perPerson: perPersonLine,
-    strip: (ws) => ticketStrip(ws) },
+    unit: () => 'closed this week', review: 'tickets.inReview',
+    perPerson: perPersonLine, strip: (ws) => ticketStrip(ws) },
   // The property-UI rollout: pieces carrying the new step-settings UI — grouped
   // props, the essential/Advanced split, the widget set.
   //

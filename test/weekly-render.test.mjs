@@ -1382,14 +1382,25 @@ test('an empty review queue draws no pill', () => {
   assert.doesNotMatch(tile, /in review/);
 });
 
-// The two boxes that stage nothing through review never grow a pill, whatever
+// Piece testing stages nothing through review, so it never grows a pill whatever
 // the snapshot happens to carry.
-test('piece testing and tickets carry no review pill', () => {
-  const dom = renderDom([snap('2026-W31')]);
-  for (const title of ['Piece testing', 'Tickets solved']) {
-    assert.doesNotMatch(tileOf(dom, title), /in review/, `${title} grew a review pill`);
-  }
+test('piece testing carries no review pill', () =>
+  assert.doesNotMatch(tileOf(renderDom([snap('2026-W31')]), 'Piece testing'), /in review/));
+
+// Tickets do, and the pill is the whole point of the box: "7 closed this week"
+// on its own reports a week spent waiting on reviewers as a week of seven, and
+// says nothing about the ten that are done and stuck.
+test('the tickets box draws the queue waiting on a reviewer', () => {
+  const tickets = { status: 'ok', total: 7, inReview: 10, byPerson: { kishan: 6, sanket: 1 },
+    prsMerged: { kishan: 0, sanket: 0 }, reviews: { kishan: 0, sanket: 0 }, shipped: [] };
+  const tile = tileOf(renderDom([snap('2026-W31', { tickets })]), 'Tickets solved');
+  assert.match(tile, /class="inreview">\+10 in review</);
 });
+
+// An archived week collected before the field existed. The pill is absent, not
+// "+0 in review" over a queue nobody counted.
+test('a week that never counted its ticket queue draws no pill', () =>
+  assert.doesNotMatch(tileOf(renderDom([snap('2026-W31')]), 'Tickets solved'), /in review/));
 
 test('a degraded tile draws no review pill', () => {
   const tile = tileOf(renderDom([snap('2026-W31', { uiImprovements: { status: 'no-data', reason: 'x' } })]), 'UI improvements');

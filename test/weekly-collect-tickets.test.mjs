@@ -8,6 +8,13 @@ const WEEK = '2026-W31';   // Monday = 2026-07-27
 
 const LINEAR = {
   stamp: '2026-07-31',
+  summary: [
+    { person: 'kishan', team: 'Pieces', completed: 34, inProgress: 1, inReview: 4, todo: 6 },
+    { person: 'kishan', team: 'GIT', completed: 37, inProgress: 0, inReview: 1, todo: 1 },
+    { person: 'sanket', team: 'Pieces', completed: 9, inProgress: 0, inReview: 2, todo: 3 },
+    { person: 'sanket', team: 'GIT', completed: 13, inProgress: 0, inReview: 3, todo: 0 },
+    { person: 'ibrahim', team: 'Pieces', completed: 2, inProgress: 0, inReview: 9, todo: 0 },
+  ],
   events: [
     { d: '2026-07-27', p: 'kishan', t: 'Pieces' },
     { d: '2026-07-30', p: 'kishan', t: 'GIT' },
@@ -131,4 +138,45 @@ test('an empty week is a real zero, not no-data', () => {
   assert.equal(out.status, 'ok');
   assert.equal(out.total, 0);
   assert.deepEqual(out.byPerson, { kishan: 0, sanket: 0 });
+});
+
+// ── the review queue ────────────────────────────────────────────────────────
+// Closed-this-week is the headline and it cannot see work that is done but not
+// landed. Linear can: both boards carry an `In Review` state, and the internal
+// dashboard's per-person summary already counts it.
+test('tickets in review are summed across both boards', () => {
+  const out = collectTickets({ window: WINDOW, weekId: WEEK, readJson: read(), linearRefreshPending: false });
+  assert.equal(out.inReview, 10);
+});
+
+// Scoped to the same two people the box names underneath. The fixture parks 9
+// on a third person precisely so a number that swallowed the whole workspace
+// fails here rather than on the page, where nobody could tell 10 from 19.
+test('only the people the tile reports on are counted', () => {
+  const summary = [{ person: 'odai', team: 'Pieces', inReview: 7 }];
+  const out = collectTickets({ window: WINDOW, weekId: WEEK, linearRefreshPending: false,
+    readJson: read({ 'linear.json': { ...LINEAR, summary } }) });
+  assert.equal(out.inReview, null, 'a queue belonging to nobody this tile names is not this tile\'s queue');
+});
+
+// A queue that was looked at and found empty is a 0 and must survive as one —
+// it is the honest answer to "what is waiting?", and the view keeps it apart
+// from the null below.
+test('an empty queue is zero, not null', () => {
+  const summary = [{ person: 'kishan', team: 'Pieces', inReview: 0 }, { person: 'sanket', team: 'GIT', inReview: 0 }];
+  const out = collectTickets({ window: WINDOW, weekId: WEEK, linearRefreshPending: false,
+    readJson: read({ 'linear.json': { ...LINEAR, summary } }) });
+  assert.equal(out.inReview, 0);
+});
+
+// The refresh that writes linear.json predates this field, and every archived
+// week was collected without it. A missing or malformed summary is "not
+// measured", never "nothing in review".
+test('a file with no usable summary reports no queue rather than an empty one', () => {
+  for (const summary of [undefined, null, {}, 'four', [{ person: 'kishan', inReview: 'four' }]]) {
+    const out = collectTickets({ window: WINDOW, weekId: WEEK, linearRefreshPending: false,
+      readJson: read({ 'linear.json': { ...LINEAR, summary } }) });
+    assert.equal(out.status, 'ok', 'the queue is detail — losing it must not degrade the tile');
+    assert.equal(out.inReview, null, `summary ${JSON.stringify(summary)} should yield null`);
+  }
 });
