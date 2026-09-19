@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { isoWeekId, mondayOfWeekId, latestCompleteWeek, windowForWeekId } from '../lib/isoweek.mjs';
+import { isoWeekId, mondayOfWeekId, latestSealedWeek, windowForWeekId } from '../lib/isoweek.mjs';
 import { readArchive, appendWeek, writeArchive } from './lib/archive.mjs';
 // One grammar for the whole product: the decision lines this file writes end up
 // in the same band as everything view.mjs phrases, so they share the helper.
@@ -120,7 +120,11 @@ export function parseArgs(argv) {
     ? new Date().toISOString().slice(0, 10)
     : requireDate(rawToday, 'today');
   const rawWeek = arg('week');
-  const weekId = rawWeek === undefined ? latestCompleteWeek(today) : requireWeekId(rawWeek);
+  // SEALED, not merely complete — the job runs daily now, so the default has to
+  // be right on a Friday too. refresh-weekly.sh resolves the same week the same
+  // way; the two disagreeing by a day would be a silent off-by-one nobody sees
+  // until a week is written with a day still left in it.
+  const weekId = rawWeek === undefined ? latestSealedWeek(today) : requireWeekId(rawWeek);
   return { today, weekId, force: argv.includes('--force-week') };
 }
 

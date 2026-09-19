@@ -5,7 +5,13 @@ set -euo pipefail
 cd "$(dirname "$0")/../output-schema"
 
 echo "1/3 cloud catalog…"
-curl -sf "https://cloud.activepieces.com/api/v1/pieces" > data/cloud-catalog.json
+# --retry, because this single unprotected call cost a week. On 2026-08-29 it
+# blipped at 09:00:06, `set -e` took the whole job down, nothing retried, and
+# W35 does not exist -- every collector here reads NOW-state, so a week missed
+# is a week gone. --retry-all-errors covers the transient 5xx as well as the
+# connection failures that --retry alone handles.
+curl -sf --retry 3 --retry-delay 2 --retry-all-errors --max-time 120 \
+  "https://cloud.activepieces.com/api/v1/pieces" > data/cloud-catalog.json
 echo "  $(jq length data/cloud-catalog.json) pieces"
 
 echo "2/3 per-piece cloud metadata (outputSchema coverage)…"
@@ -43,8 +49,14 @@ if [ "$ERRS" -gt 0 ]; then
 fi
 
 echo "3/3 upstream repo tree (pieces + output-schemas.ts files)…"
-gh api "repos/activepieces/activepieces/git/trees/main?recursive=1" --paginate \
-  | jq -r '.tree[].path' > data/.tree.txt
+# Same exposure as the catalog above: one call, no retry, and the whole job
+# rides on it. gh retries 5xx itself but not a dropped connection.
+for attempt in 1 2 3; do
+  gh api "repos/activepieces/activepieces/git/trees/main?recursive=1" --paginate \
+    | jq -r '.tree[].path' > data/.tree.txt && break
+  echo "  tree fetch attempt $attempt failed — retrying" >&2; sleep 2
+done
+[ -s data/.tree.txt ] || { echo "✗ repo tree fetch failed after 3 attempts" >&2; exit 1; }
 grep -E '^packages/pieces/community/[^/]+$' data/.tree.txt \
   | sed 's|packages/pieces/community/||' | jq -R -s 'split("\n")|map(select(length>0))' > data/repo-pieces.json
 echo "  $(jq length data/repo-pieces.json) repo pieces"

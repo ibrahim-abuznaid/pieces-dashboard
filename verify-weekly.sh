@@ -22,7 +22,25 @@ cd "$REPO"
 
 command -v node >/dev/null || { echo "✗ node not on PATH — check the PATH line in $0"; exit 1; }
 
-# exec so the node exit code is this script's exit code: non-zero is what makes
-# cron mail the output. "$@" passes through --url/--attempts for a human running
-# it by hand against a different build.
-exec node verify-weekly.mjs "$@"
+# Not exec: the check has to be able to say something when it fails. Cron's exit
+# code used to be the whole alarm, and on a laptop that is local mail nobody
+# reads -- which is how a missing W35 went unnoticed for three weeks.
+#
+# Alicent is the assistant's local inbox and the CLI is the cron-safe door into
+# it (the MCP endpoint wants a bearer token this script must not carry).
+# Alerting is best-effort by construction: a stopped daemon must not turn a
+# healthy check into a failing one, nor a failing one into a crash.
+#
+# "$@" passes through --url/--attempts for a human running it by hand against a
+# different build.
+ALICENT="${ALICENT_BIN:-/home/ibrahim/AP_work/Activepieces_v/Alicent/.venv/bin/alicent}"
+
+if node verify-weekly.mjs "$@"; then exit 0; fi
+
+if [ -x "$ALICENT" ]; then
+  "$ALICENT" report --kind error --project pieces-dashboard --urgency high \
+    --summary "the weekly page failed its daily health check" \
+    --body "verify-weekly.sh is red. Causes it checks for: the archive stopped validating, the newest snapshot is more than 8 days old (a Saturday that never landed), a NEEDS-LINEAR-REFRESH marker is sitting in the team dashboard, or the live page is not serving. Detail in $REPO/verify-weekly.log." \
+    >/dev/null 2>&1 || true
+fi
+exit 1

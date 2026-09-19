@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
-# refresh-weekly.sh — the single Saturday job (09:00 +03).
+# refresh-weekly.sh — the snapshot job. DAILY at 09:00 +03, not weekly.
+#
+# Daily because a week cannot be re-collected. Every collector here reads
+# NOW-state, so a run that dies takes its week with it permanently -- which is
+# exactly what happened to W35: the Saturday job started at 09:00:01, one
+# unretried curl to the cloud catalog blipped six seconds later, `set -e` ended
+# the run, and nothing ever tried again. One attempt per week meant one
+# five-second network failure per week was enough to lose it.
+#
+# The guard below makes a re-run free (54ms to decide there is nothing to do),
+# so six of every seven runs are no-ops and the seventh is the one that works.
+# A week now survives any six consecutive failures instead of none.
 #
 # Order matters: the tickets collector reads the internal dashboard's data
 # files, and the outputSchema/AI-actions collectors read dist/, which is
@@ -30,7 +41,32 @@ TODAY="$(date +%F)"
 if [ -f "$REPO/.env.local" ]; then . "$REPO/.env.local"; fi
 
 log()  { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
-fail() { log "ERROR line $1 — aborting"; }
+
+# Where a failure actually reaches Ibrahim.
+#
+# This used to be cron's exit code and nothing else, which on a laptop means
+# local mail nobody has ever read. W35 died at 09:00:12 on a Saturday and the
+# first anyone knew of it was a hole in the archive found three weeks later.
+#
+# Alicent is his assistant's local inbox; she triages within minutes. The CLI is
+# the cron-safe door into it -- the MCP endpoint needs a bearer token and this
+# script must not carry one.
+#
+# NEVER fatal, and never inside the ERR trap's blast radius: an alerting path
+# that can itself abort the job is worse than no alerting at all. Absent binary,
+# stopped daemon, bad argument -- all swallowed.
+ALICENT="${ALICENT_BIN:-/home/ibrahim/AP_work/Activepieces_v/Alicent/.venv/bin/alicent}"
+alert() {
+  [ -x "$ALICENT" ] || return 0
+  "$ALICENT" report --kind error --project pieces-dashboard --urgency high \
+    --summary "$1" --body "${2:-}" >/dev/null 2>&1 || true
+}
+
+fail() {
+  log "ERROR line $1 — aborting"
+  alert "weekly snapshot aborted at line $1 (week ${WEEK:-unresolved})" \
+    "refresh-weekly.sh died before publishing. Log: ${REPO:-.}/refresh-weekly.log — the job retries tomorrow; a week is only lost if every day until next Saturday also fails."
+}
 trap 'fail "$LINENO"' ERR
 
 cd "$REPO"
@@ -51,7 +87,10 @@ fi
 # outcome, not a failure: without this guard a re-run burns the internal
 # refresh plus a ~3-minute fetch before discovering it has nothing to do,
 # and exits non-zero so cron mails it as an error.
-WEEK="$(node -e 'import("./lib/isoweek.mjs").then(m=>console.log(m.latestCompleteWeek(process.argv[1])))' "$TODAY")"
+# SEALED, not merely complete: this job runs every day now, so it has to be
+# right on a Friday too -- and `latestCompleteWeek` counts the current Friday as
+# done, which would seal a week at 09:00 with a working day still to go in it.
+WEEK="$(node -e 'import("./lib/isoweek.mjs").then(m=>console.log(m.latestSealedWeek(process.argv[1])))' "$TODAY")"
 if node -e 'const{readArchive}=await import("./weekly/lib/archive.mjs");process.exit(readArchive("weekly/data/weeks.json").weeks.some(w=>w.week===process.argv[1])?0:1)' "$WEEK"; then
   log "$WEEK already snapshotted — nothing to do (use --force-week deliberately to replace it)"
   exit 0
@@ -103,10 +142,19 @@ log "pushed $WEEK as $SHA"
 # own verdict line with the run URL, and the trap's "ERROR line N" would land
 # after it and bury the one line that says what happened.
 log "5/6 waiting for the 'Refresh & deploy' run for $SHA"
-node verify-weekly.mjs --await-run="$SHA" || exit 1
+# `|| ...` handles the failure, so the ERR trap does NOT fire here and these two
+# steps would otherwise exit in silence -- the half of the job that exists
+# purely to prove the work landed, failing invisibly.
+node verify-weekly.mjs --await-run="$SHA" || {
+  alert "$WEEK pushed but CI did not go green" "Commit $SHA is on main and the archive has the week, but the deploy run failed. The page is serving the previous build."
+  exit 1
+}
 
 # CI green is not the same as published: the run can succeed while Pages serves
 # the previous build for a little longer, and only the live page can settle
 # whether a reader would see this week. --live retries for that lag.
 log "6/6 asserting the live page serves $WEEK"
-node verify-weekly.mjs --live="$WEEK" || exit 1
+node verify-weekly.mjs --live="$WEEK" || {
+  alert "$WEEK is committed and CI is green, but the live page does not serve it" "Pages deployed something other than $SHA, or is still serving a cached build. Check https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/"
+  exit 1
+}
