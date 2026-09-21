@@ -1,11 +1,10 @@
 {
-  "fetched": "2026-09-19",
+  "fetched": "2026-09-21",
   "outputSchema": {
+    "dropbox": 15661,
     "airtable": 15624,
     "instagram-business": 15618,
     "whatsapp": 15585,
-    "pinterest": 15539,
-    "trello": 15539,
     "flow-helper": 15390,
     "google-gemini": 15389,
     "firecrawl": 15258
@@ -20,7 +19,5 @@
     "telegram-bot": 14970,
     "gmail": 14943
   },
-  "aiActions": {
-    "trello": 15539
-  }
+  "aiActions": {}
 }

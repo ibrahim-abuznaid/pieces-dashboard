@@ -1,5 +1,5 @@
 {
-  "fetched": "2026-09-19",
+  "fetched": "2026-09-21",
   "prs": {
     "13937": {
       "state": "MERGED",
@@ -219,6 +219,14 @@
       "url": "https://github.com/activepieces/activepieces/pull/15216",
       "assignees": []
     },
+    "15244": {
+      "state": "MERGED",
+      "createdAt": "2026-09-03T10:29:34Z",
+      "mergedAt": "2026-09-03T11:02:52Z",
+      "title": "feat(pieces-tally): add agent atomics",
+      "url": "https://github.com/activepieces/activepieces/pull/15244",
+      "assignees": []
+    },
     "15258": {
       "state": "OPEN",
       "createdAt": "2026-09-04T07:51:57Z",
@@ -291,6 +299,16 @@
       "url": "https://github.com/activepieces/activepieces/pull/15484",
       "assignees": []
     },
+    "15502": {
+      "state": "MERGED",
+      "createdAt": "2026-09-13T15:33:54Z",
+      "mergedAt": "2026-09-17T13:11:05Z",
+      "title": "feat(brevo): add contact and list AI atomics with output schemas",
+      "url": "https://github.com/activepieces/activepieces/pull/15502",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
     "15531": {
       "state": "OPEN",
       "createdAt": "2026-09-14T13:19:51Z",
@@ -300,13 +318,33 @@
       "assignees": []
     },
     "15539": {
-      "state": "OPEN",
+      "state": "MERGED",
       "createdAt": "2026-09-14T16:01:58Z",
-      "mergedAt": null,
+      "mergedAt": "2026-09-20T12:19:58Z",
       "title": "feat(pinterest,trello): expand board, pin, card and custom field actions for agents",
       "url": "https://github.com/activepieces/activepieces/pull/15539",
       "assignees": [
         "OdaiAhmed99"
+      ]
+    },
+    "15542": {
+      "state": "MERGED",
+      "createdAt": "2026-09-14T18:06:00Z",
+      "mergedAt": "2026-09-15T04:23:36Z",
+      "title": "feat(hubspot): resolve ids, log notes and tasks, and search records for agents",
+      "url": "https://github.com/activepieces/activepieces/pull/15542",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15582": {
+      "state": "MERGED",
+      "createdAt": "2026-09-16T11:01:22Z",
+      "mergedAt": "2026-09-17T09:54:22Z",
+      "title": "feat(resend): manage broadcast details and content with AI",
+      "url": "https://github.com/activepieces/activepieces/pull/15582",
+      "assignees": [
+        "kishanprmr"
       ]
     },
     "15585": {
@@ -336,6 +374,16 @@
       "title": "feat(airtable): choose which fields Update Record writes, drop the \"(Agent)\" suffix",
       "url": "https://github.com/activepieces/activepieces/pull/15624",
       "assignees": []
+    },
+    "15661": {
+      "state": "OPEN",
+      "createdAt": "2026-09-20T20:41:54Z",
+      "mergedAt": null,
+      "title": "feat(dropbox): add AI-ready atomic actions for files and batch jobs",
+      "url": "https://github.com/activepieces/activepieces/pull/15661",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
     }
   }
 }

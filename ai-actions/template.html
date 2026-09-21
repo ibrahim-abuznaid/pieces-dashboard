@@ -95,9 +95,9 @@ function bindTip(el, htmlFn) {
 const t2pct = S.t2t ? (S.t2v / S.t2t * 100).toFixed(0) : '0';
 document.getElementById('tiles').innerHTML = [
   { label: 'Pieces covered', value: `${S.pieces}`, foot: `${S.stages.held} held outside PRs` },
-  { label: 'AI atomics shipped', value: `${S.atomics}`, foot: 'audience:\'ai\' actions authored' },
+  { label: 'AI atomics shipped', value: `${S.atomics}`, foot: 'audience:\'ai\' actions on main' },
   { label: 'PRs', value: `${S.prsOpen} <small>open</small> · ${S.prsMerged} <small>merged</small>`, foot: 'upstream activepieces PRs' },
-  { label: 'Tier-2 live-verified', value: `${S.t2v} <small>/ ${S.t2t}</small>`, foot: `${t2pct}% verified against live vendors` },
+  { label: 'Tier-2 live-verified', value: `${S.t2v} <small>/ ${S.t2t}</small>`, foot: `${t2pct}% verified against live vendors (our rollout only)` },
   { label: 'Open blockers', value: `${S.blockersOpen}`, foot: `${S.blockersDone} resolved` },
 ].map((t) => `<div class="tile"><div class="label">${t.label}</div><div class="value">${t.value}</div><div class="foot">${t.foot}</div></div>`).join('');
 
@@ -153,7 +153,7 @@ function renderPieces() {
       <td>${esc(p.slug)}</td><td class="num">${p.atomics}</td><td class="mono">${esc(p.v ?? '')}</td>
       <td>${prLink(p.pr)}</td><td>${stageChip(p.stage)}</td>
       <td>${p.assignees?.length ? p.assignees.map(esc).join(', ') : (p.stage !== 'merged' ? `<a href="${claimUrl(p.slug)}" title="Claim ${esc(p.slug)} — pre-filled issue, a bot applies it">claim</a>` : '<span class="muted">—</span>')}</td>
-      <td class="num">${p.t2shared ? `<span class="muted">w/ ${esc(p.t2shared)}</span>` : `${p.t2v}/${p.t2t}`}</td>
+      <td class="num">${p.t2shared ? `<span class="muted">w/ ${esc(p.t2shared)}</span>` : (p.t2t == null ? '<span class="muted" title="Tier-2 not run by our harness">&mdash;</span>' : `${p.t2v}/${p.t2t}`)}</td>
       <td class="muted">${esc(p.held ?? p.note ?? '')}</td></tr>`).join('') + '</tbody>';
 }
 
