@@ -225,9 +225,9 @@
       "aiActions": {
         "status": "ok",
         "merged": 14,
-        "prOpen": 12,
+        "prOpen": 10,
         "assigned": 0,
-        "held": 2,
+        "held": 4,
         "totalPieces": 28,
         "catalogPieces": 756,
         "blockersOpen": 30,
@@ -382,7 +382,7 @@
           {
             "name": "pubrio",
             "actions": 14,
-            "stage": "pr-open",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -403,7 +403,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "pr-open",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
@@ -911,10 +911,10 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 26,
+        "merged": 24,
         "prOpen": 0,
         "assigned": 0,
-        "held": 2,
+        "held": 4,
         "totalPieces": 28,
         "catalogPieces": 757,
         "blockersOpen": 30,
@@ -1069,7 +1069,7 @@
           {
             "name": "pubrio",
             "actions": 14,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -1090,7 +1090,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
@@ -1736,10 +1736,10 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 26,
+        "merged": 24,
         "prOpen": 0,
         "assigned": 0,
-        "held": 2,
+        "held": 4,
         "totalPieces": 28,
         "catalogPieces": 759,
         "blockersOpen": 30,
@@ -1894,7 +1894,7 @@
           {
             "name": "pubrio",
             "actions": 14,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -1915,7 +1915,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
@@ -2496,10 +2496,10 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 26,
+        "merged": 24,
         "prOpen": 0,
         "assigned": 0,
-        "held": 2,
+        "held": 4,
         "totalPieces": 28,
         "catalogPieces": 760,
         "blockersOpen": 30,
@@ -2654,7 +2654,7 @@
           {
             "name": "pubrio",
             "actions": 14,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -2675,7 +2675,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
@@ -3586,11 +3586,11 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 26,
-        "prOpen": 0,
+        "merged": 25,
+        "prOpen": 1,
         "assigned": 0,
-        "held": 2,
-        "totalPieces": 28,
+        "held": 4,
+        "totalPieces": 30,
         "catalogPieces": 763,
         "blockersOpen": 30,
         "roster": [
@@ -3679,6 +3679,13 @@
             "logo": "https://cdn.activepieces.com/pieces/apify.png"
           },
           {
+            "name": "tally",
+            "actions": 24,
+            "stage": "merged",
+            "displayName": "Tally",
+            "logo": "https://cdn.activepieces.com/pieces/tally.png"
+          },
+          {
             "name": "notion",
             "actions": 22,
             "stage": "merged",
@@ -3742,9 +3749,16 @@
             "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
           },
           {
+            "name": "whatsscale",
+            "actions": 15,
+            "stage": "pr-open",
+            "displayName": "WhatsScale",
+            "logo": "https://cdn.activepieces.com/pieces/whatsscale.png"
+          },
+          {
             "name": "pubrio",
             "actions": 14,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -3765,7 +3779,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
@@ -4794,8 +4808,8 @@
         "merged": 26,
         "prOpen": 0,
         "assigned": 0,
-        "held": 2,
-        "totalPieces": 28,
+        "held": 4,
+        "totalPieces": 30,
         "catalogPieces": 765,
         "blockersOpen": 30,
         "roster": [
@@ -4884,6 +4898,13 @@
             "logo": "https://cdn.activepieces.com/pieces/apify.png"
           },
           {
+            "name": "tally",
+            "actions": 24,
+            "stage": "merged",
+            "displayName": "Tally",
+            "logo": "https://cdn.activepieces.com/pieces/tally.png"
+          },
+          {
             "name": "notion",
             "actions": 22,
             "stage": "merged",
@@ -4947,9 +4968,16 @@
             "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
           },
           {
+            "name": "whatsscale",
+            "actions": 15,
+            "stage": "merged",
+            "displayName": "WhatsScale",
+            "logo": "https://cdn.activepieces.com/pieces/whatsscale.png"
+          },
+          {
             "name": "pubrio",
             "actions": 14,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -4970,7 +4998,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
@@ -6030,11 +6058,11 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 26,
-        "prOpen": 0,
+        "merged": 29,
+        "prOpen": 1,
         "assigned": 0,
         "held": 2,
-        "totalPieces": 28,
+        "totalPieces": 32,
         "catalogPieces": 764,
         "blockersOpen": 30,
         "roster": [
@@ -6104,7 +6132,7 @@
           {
             "name": "resend",
             "actions": 36,
-            "stage": "held",
+            "stage": "merged",
             "displayName": "Resend",
             "logo": "https://cdn.activepieces.com/pieces/resend.png"
           },
@@ -6123,6 +6151,20 @@
             "logo": "https://cdn.activepieces.com/pieces/apify.png"
           },
           {
+            "name": "pinterest",
+            "actions": 29,
+            "stage": "pr-open",
+            "displayName": "Pinterest",
+            "logo": "https://cdn.activepieces.com/pieces/pinterest.png"
+          },
+          {
+            "name": "tally",
+            "actions": 24,
+            "stage": "merged",
+            "displayName": "Tally",
+            "logo": "https://cdn.activepieces.com/pieces/tally.png"
+          },
+          {
             "name": "notion",
             "actions": 22,
             "stage": "merged",
@@ -6139,7 +6181,7 @@
           {
             "name": "sendinblue",
             "actions": 20,
-            "stage": "held",
+            "stage": "merged",
             "displayName": "Brevo",
             "logo": "https://cdn.activepieces.com/pieces/brevo.png"
           },
@@ -6186,9 +6228,16 @@
             "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
           },
           {
+            "name": "whatsscale",
+            "actions": 15,
+            "stage": "merged",
+            "displayName": "WhatsScale",
+            "logo": "https://cdn.activepieces.com/pieces/whatsscale.png"
+          },
+          {
             "name": "pubrio",
             "actions": 14,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Pubrio",
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
@@ -6200,6 +6249,13 @@
             "logo": "https://cdn.activepieces.com/pieces/google-tasks.png"
           },
           {
+            "name": "hubspot",
+            "actions": 9,
+            "stage": "merged",
+            "displayName": "HubSpot",
+            "logo": "https://cdn.activepieces.com/pieces/hubspot.png"
+          },
+          {
             "name": "senja",
             "actions": 5,
             "stage": "merged",
@@ -6209,7 +6265,7 @@
           {
             "name": "quizell",
             "actions": 4,
-            "stage": "merged",
+            "stage": "held",
             "displayName": "Quizell",
             "logo": "https://cdn.activepieces.com/pieces/quizell.png"
           },
