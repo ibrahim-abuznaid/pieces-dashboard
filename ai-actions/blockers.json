@@ -94,6 +94,19 @@
       "fix": "On an Enterprise workspace, invite a guest, capture the guest id, then add → remove against a throwaway task."
     },
     {
+      "id": "pipedrive-mail",
+      "cat": "plan",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "pipedrive"
+      ],
+      "affected": 9,
+      "title": "pipedrive mail — threads / messages (9 atomics, parked for future work)",
+      "why": "The Pipedrive Mailbox API needs a synced email account, and email sync requires a paid Pipedrive plan. The sandbox has no mailbox, so only empty lists and not-found paths could be verified and no output schemas could be written. The 9 atomics are held back from the PIE-532 release and kept on branch parked/pie-532-pipedrive-mail. They also need the mail:full scope on the shared Activepieces OAuth app.",
+      "fix": "Connect a test mailbox on a paid Pipedrive account (Settings → Email sync), restore the parked branch, Tier-2 all 9 (list/get/update/delete mail threads; list thread, deal, person and organization mail messages; get mail message) and write their outputSchemas from the captures."
+    },
+    {
       "id": "resend-key",
       "cat": "scope",
       "sev": "high",
@@ -443,6 +456,71 @@
       "title": "Deferred-dependency table in PROGRESS",
       "why": "The deferral chain (output-shape, engineCoupling, error-envelope, Phase 4) is load-bearing and external, with no consolidated table.",
       "fix": "Add a dependency table to PROGRESS with PR# / owner / ETA; gate the consuming phases."
+    },
+    {
+      "id": "asana-paid",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "asana"
+      ],
+      "affected": 27,
+      "title": "asana paid-plan features — 27 atomics (search, dependencies, custom fields, goals, portfolios, allocations, time tracking, custom types, templates)",
+      "why": "These endpoints return 402 Payment Required on a free Asana workspace (search, task dependencies, custom fields, goals and time periods, portfolios, allocations, time tracking) or need an object that can only be created on a paid plan. They are built, reviewed and covered by mocked tests, but were not live-tested, and 23 of them have no outputSchema because their entity was never captured. 9 more atomics that change workspace/team membership or users were skipped for safety because the only test workspace is a shared company org.",
+      "fix": "Request an Asana developer sandbox with Advanced/Enterprise features (Asana grants these on request), connect it on the dev stack, run Tier-2 on the 27 plan-gated atomics plus the 9 safety-skipped membership/user atomics, and write the missing outputSchemas from the captures."
+    },
+    {
+      "id": "shopify-legacy-auth",
+      "cat": "scope",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "shopify"
+      ],
+      "affected": 245,
+      "title": "shopify — legacy Admin token can no longer be created (245 atomics waiting on the new auth)",
+      "why": "Since 2026-01-01 Shopify no longer lets merchants create legacy custom apps, so new users cannot get the Admin API token the piece asks for, and the test store can only be reached with a Dev Dashboard app (client credentials, 24h tokens). The 245 Shopify atomics (5 stacked waves) are built and reviewed but not live-tested or schematized until the new auth is merged.",
+      "fix": "Merge the Dev Dashboard client-credentials auth (PIE-537, PR #15755, keeps the Admin Token auth for existing connections), rebase the 5 waves, then Tier-2 each wave on the Dev Dashboard connection and write the outputSchemas from the captures."
+    },
+    {
+      "id": "shopify-pcd",
+      "cat": "scope",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "shopify"
+      ],
+      "affected": "orders/customers",
+      "title": "shopify protected customer data — customer, order and orders-webhook endpoints",
+      "why": "Shopify blocks customer and order REST/GraphQL fields and orders/* webhook topics for apps without protected-customer-data access (\"This app is not approved to access REST endpoints with protected customer data\"). Confirmed live on the dev store: get_customers and the new_order trigger fail; products, locations and products/update webhooks work.",
+      "fix": "In the Dev Dashboard app, request Protected customer data access (and the name/email/phone/address fields), release a version, reinstall on the dev store, then Tier-2 the W1 orders/customers atomics and the order triggers."
+    },
+    {
+      "id": "shopify-exemption-plan",
+      "cat": "plan",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "shopify"
+      ],
+      "affected": 11,
+      "title": "shopify theme writes + Plus / Payments-only features — 11 atomics",
+      "why": "Theme create/update/delete/publish and theme-file upsert/delete need write_themes plus a Shopify exemption; disputes, Shop Pay receipts, catalogs and web-presence delete need Shopify Payments, Plus/B2B or Markets features a free development store doesn't have.",
+      "fix": "Request the theme-modification exemption for the test app and use a Plus sandbox / a store with Shopify Payments to Tier-2 these atomics; until then they ship built and reviewed but not live-tested."
+    },
+    {
+      "id": "webflow-v1",
+      "cat": "scope",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "webflow"
+      ],
+      "affected": "piece skipped",
+      "title": "webflow — piece still on the retired v1 API; shared OAuth app lacks v2 scopes",
+      "why": "The webflow piece calls the v1 endpoints (api.webflow.com/collections/...) and requests only webhooks:write and forms:read. Composio's 59 Webflow tools are v2, so AI atomics need a v2 migration and new scopes on the shared Activepieces OAuth app (the same class of platform blocker as the Pipedrive mail/goals scopes). Webflow was skipped from the batch for this reason.",
+      "fix": "Migrate the piece to the v2 API, register the v2 scopes (cms, sites, pages, ecommerce, forms, webhooks) on the shared OAuth app, then plan the AI atomics against the v2 toolkit."
     }
   ]
 }
