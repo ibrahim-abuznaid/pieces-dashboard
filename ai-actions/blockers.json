@@ -458,6 +458,19 @@
       "fix": "Connect a paid Typeform account with seats + file uploads, then add member management to Update Workspace and author + Tier-2 the 2 response-file atomics."
     },
     {
+      "id": "mistral-batch",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "mistral-ai"
+      ],
+      "affected": 3,
+      "title": "mistral-ai create / get / cancel batch job — 3 atomics",
+      "why": "402 \"You do not have access to this service. You can enable billing via the console.\" — Mistral batch inference needs billing enabled; the free-trial key can't create a job, so get / cancel have no job id to act on. list_batch_jobs passes (empty list). Output schemas for all 4 batch atomics were authored from the OpenAPI BatchJob shape, not a captured run.",
+      "fix": "Seed a connection with a billing-enabled Mistral key, run create_batch_job with 2 inline <code>/v1/moderations</code> requests (cheapest), then get_batch_job → cancel_batch_job, and confirm the captured output matches the spec-based schema. Endpoints <code>POST /v1/batch/jobs</code>, <code>GET /v1/batch/jobs/{job_id}</code>, <code>POST /v1/batch/jobs/{job_id}/cancel</code>."
+    },
+    {
       "id": "typeform-search",
       "cat": "vendorui",
       "sev": "low",
