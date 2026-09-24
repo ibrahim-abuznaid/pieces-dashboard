@@ -30,7 +30,7 @@
       "id": "fw-formdata",
       "cat": "framework",
       "sev": "high",
-      "done": false,
+      "done": true,
       "pieces": [
         "slack",
         "trello",
@@ -39,7 +39,7 @@
       "affected": "several",
       "title": "node form-data bodies aren't transmitted by the dev FetchHttpClient",
       "why": "Multipart / form-data request bodies arrive empty (dataSize:0) over fetch-http-client.ts — native fetch + a node form-data stream, no Content-Length. Confirmed framework-wide (the human discord_send_message fails identically; the diff vs upstream/main is comment-only). Blocks any atomic that posts a file via form-data.",
-      "fix": "Fix the framework HTTP client to transmit node form-data (set Content-Length / use a compatible body), or verify affected atomics in a real flow where a prior step produces the file. discord_send_message already works around it (JSON for text, payload_json for files)."
+      "fix": "Fixed upstream in #15367 (merged 2026-09-08): fetch-http-client.ts now buffers known-length form-data via getBuffer(), so undici sends Content-Length instead of chunked. Unblocks file-posting atomics (slack upload_file, trello attachments) for re-verification."
     },
     {
       "id": "slack-usergroups",
@@ -97,14 +97,14 @@
       "id": "resend-key",
       "cat": "scope",
       "sev": "high",
-      "done": false,
+      "done": true,
       "pieces": [
         "resend"
       ],
       "affected": 34,
       "title": "resend — entire piece held (34 of 36 atomics)",
       "why": "The seeded Resend connection uses a send-only restricted API key → every read/management atomic returns 401 'restricted to only send emails'. Only send_email + send_batch_emails verified (2/36). Code is sound (Tier-1 green).",
-      "fix": "Create a full-access Resend API key, reconnect the connection, then re-run the resend Tier-2 leg (scratchpad/wf-tier2-waveA.js). Audiences/Contacts/Segments/Templates/Broadcasts also need a paid plan."
+      "fix": "Reconnected with a new full-access Resend API key — the piece is no longer held on the send-only key."
     },
     {
       "id": "gmail-tierb",
@@ -292,14 +292,14 @@
       "id": "brevo-key",
       "cat": "scope",
       "sev": "high",
-      "done": false,
+      "done": true,
       "pieces": [
         "sendinblue"
       ],
       "affected": 20,
       "title": "Brevo (sendinblue) — entire piece held (20 atomics)",
       "why": "The seeded Brevo connection's API key returns 401 'Key not found' (revoked / invalid / expired) on every call → 0/20 verifiable. Auth wiring is correct (api-key header transmitted, confirmed in the request body that reached Brevo) and the code is Tier-1 green; the actions surface a clean 'Brevo authentication failed' message. Same class as the resend key blocker.",
-      "fix": "Create / re-seed a valid Brevo project API key, reconnect the connection, then re-run the sendinblue Tier-2 leg (<code>scratchpad/wf-tier2-w3.js</code>). 6 of the 20 (SMS + CRM-companies) also need those Brevo add-ons enabled."
+      "fix": "Reconnected with a new valid Brevo API key — the piece is no longer held on the dead key."
     },
     {
       "id": "stripe-disputes-payouts",
@@ -378,6 +378,97 @@
       "title": "quizell get_customer_by_id / create_customer_lead / update_customer_record",
       "why": "create/update need a quiz_id with no in-piece resolver (no list-quizzes-by-customer style endpoint), and the sandbox test account has no existing customer to fetch by id — none are verifiable as authored. Demoted to audience:'human' (2026-06-30 Greptile pass).",
       "fix": "Capture a real quiz_id from the Quizell UI/API and a seeded customer record, then Tier-2 all 3 before considering an 'ai' twin."
+    },
+    {
+      "id": "fb-appreview",
+      "cat": "scope",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "facebook-pages"
+      ],
+      "affected": 10,
+      "title": "facebook-pages comments / engagement / insights — 10 atomics (Meta App Review)",
+      "why": "Our Meta app has only Standard Access for pages_read_user_content (Get Page Tagged Posts, Get Comments, Get Comment), pages_manage_engagement (Create / Update / Delete Comment, Like / Unlike Post or Comment) and read_insights (Get Page / Post Insights). Standard Access only works for users with a role on the app, so these would fail for Cloud customers. Get Comments / Get Comment tested live → (#200) Missing Permissions once a post has a real comment. Held out of #15728, which ships the 16 atomics that work on the current scopes.",
+      "fix": "Get Advanced Access for the three scopes through Meta App Review, then author + Tier-2 the 10 atomics."
+    },
+    {
+      "id": "calendly-paid",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "calendly"
+      ],
+      "affected": 9,
+      "title": "calendly scheduling / contacts / notetaker — 9 atomics",
+      "why": "Need a paid Calendly plan (Standard+); the test account is Free. Book Meeting for Invitee (<code>POST /invitees</code>), Create / Update / Delete / Get / List Contacts, List / Get Meeting Recap, Get Meeting Transcript. Held out of #15731.",
+      "fix": "Connect a Calendly account on Standard or above, then author + Tier-2 the 9."
+    },
+    {
+      "id": "calendly-teams",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "calendly"
+      ],
+      "affected": 8,
+      "title": "calendly groups / routing forms — 8 atomics",
+      "why": "Teams / Enterprise features. On Free the lists come back empty and List Group Relationships returns 403. List / Get Group, List / Get Group Relationship, List / Get Routing Form, List / Get Routing Form Submission. Held out of #15731.",
+      "fix": "Connect a Calendly account on Teams or above, seed a group + routing form, then author + Tier-2 the 8."
+    },
+    {
+      "id": "calendly-noshow",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "calendly"
+      ],
+      "affected": 3,
+      "title": "calendly invitee no-show — mark / get / undo",
+      "why": "Calendly only allows marking a no-show after the meeting has started, so it needs a booking already in the past. Not tested yet.",
+      "fix": "Book a meeting, let its start time pass, then run mark → get → undo no-show against that invitee."
+    },
+    {
+      "id": "tidycal-plan",
+      "cat": "plan",
+      "sev": "high",
+      "done": false,
+      "pieces": [
+        "tidycal"
+      ],
+      "affected": "all",
+      "title": "tidycal — entire piece blocked (API is paid-only)",
+      "why": "TidyCal's API is only available on paid TidyCal plans and the test account can't use it, so no atomics can be built or tested live.",
+      "fix": "Get a TidyCal account on a paid plan, then audit + author + Tier-2 the piece."
+    },
+    {
+      "id": "typeform-paid",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "typeform"
+      ],
+      "affected": 3,
+      "title": "typeform workspace members / response files — 3 atomics",
+      "why": "Test account is on Free. Adding / removing workspace members returns 402 PaidSeatLimitReached, so Update Workspace ships as rename-only. File-upload questions need a paid plan, so there are no files to download (single file, or all files as a ZIP). Held out of #15734.",
+      "fix": "Connect a paid Typeform account with seats + file uploads, then add member management to Update Workspace and author + Tier-2 the 2 response-file atomics."
+    },
+    {
+      "id": "typeform-search",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "typeform"
+      ],
+      "affected": 1,
+      "title": "typeform search_responses",
+      "why": "<code>POST /forms/{id}/responses/search</code>: answer filters returned wrong results on the Free account (email equals matched every response, choice any_of matched none); response-id and timestamp filters worked. Held out of #15734.",
+      "fix": "Retest the answer filters, ideally on a paid account, before shipping."
     },
     {
       "id": "arch-mcp",
