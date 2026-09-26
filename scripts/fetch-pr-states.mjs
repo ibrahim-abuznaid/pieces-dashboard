@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { discoverClaims, ROLLOUTS } from '../lib/discover.mjs';
+import { reviewVerdict } from '../lib/reviews.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readIf = (p) => (existsSync(join(ROOT, p)) ? JSON.parse(readFileSync(join(ROOT, p), 'utf8')) : null);
@@ -28,8 +29,8 @@ const gh = (args) => JSON.parse(execFileSync('gh', args, { encoding: 'utf8', max
 //
 // Two passes, because the cheap call cannot answer the question. `gh pr list`
 // returns file PATHS, which is enough to find the piece PRs and nothing like
-// enough to tell which rollout one is doing -- `propertyGroups` and `aiMetadata`
-// live in the diff. So: list every open PR once, keep the ones touching a piece
+// enough to tell which rollout one is doing -- `propertyGroups` and
+// `audience: 'ai'` live in the diff. So: list every open PR once, keep the ones touching a piece
 // directory, and pull the patch only for those. About 30 of 139 today.
 //
 // The limit is deliberately far above the real number: `gh pr list` silently
@@ -43,11 +44,10 @@ const gh = (args) => JSON.parse(execFileSync('gh', args, { encoding: 'utf8', max
 // existed. A hard failure here would take out the daily refresh over work that
 // is only ever additive.
 function discover() {
-  const aiWave = (readIf('ai-actions/pieces.json')?.pieces ?? []).map((p) => p.slug);
   let open = [];
   try {
     open = gh(['pr', 'list', '--repo', REPO, '--state', 'open', '--limit', '500',
-      '--json', 'number,files']);
+      '--json', 'number,files,baseRefName']);
   } catch (e) {
     console.warn(`⚠ open-PR discovery skipped (${e.message}) — in-flight counts fall back to the claims files`);
     return Object.fromEntries(ROLLOUTS.map((r) => [r, {}]));
@@ -61,12 +61,12 @@ function discover() {
       // `filename`, not `path`: the two gh surfaces disagree on the key, and
       // lib/discover.mjs reads the REST one.
       const files = gh(['api', '--paginate', `repos/${REPO}/pulls/${pr.number}/files?per_page=100`]);
-      withPatches.push({ number: pr.number, files });
+      withPatches.push({ number: pr.number, base: pr.baseRefName ?? null, files });
     } catch (e) {
       console.warn(`⚠ PR #${pr.number}: files unavailable (${e.message}) — not classified`);
     }
   }
-  const found = discoverClaims(withPatches, { aiWave });
+  const found = discoverClaims(withPatches);
   const total = ROLLOUTS.reduce((a, r) => a + Object.keys(found[r]).length, 0);
   console.log(`✓ discovered ${total} in-flight claims across ${withPatches.length} open piece PRs`);
   return found;
@@ -92,8 +92,20 @@ for (const n of [...nums.keys()].sort((a, b) => a - b)) {
   } catch (e) {
     throw new Error(`PR #${n} fetch failed (check the number in overrides/pieces.json, gh auth, rate limits): ${e.message}`);
   }
+  const state = pr.merged_at ? 'MERGED' : pr.state.toUpperCase(); // OPEN | CLOSED | MERGED
+  // Approval only means something while the PR is open: merged is already done,
+  // closed is not happening. See lib/reviews.mjs.
+  let verdict = { approved: false, approvedAt: null };
+  if (state === 'OPEN') {
+    try {
+      verdict = reviewVerdict(JSON.parse(execFileSync('gh', ['api', '--paginate',
+        `repos/activepieces/activepieces/pulls/${n}/reviews?per_page=100`], { encoding: 'utf8' })));
+    } catch (e) {
+      throw new Error(`PR #${n} reviews fetch failed: ${e.message}`);
+    }
+  }
   prs[n] = {
-    state: pr.merged_at ? 'MERGED' : pr.state.toUpperCase(), // OPEN | CLOSED | MERGED
+    state,
     // The two dates a stage changed on. `state` is only ever NOW, so a
     // question about a past week — which pieces had landed by the end of
     // W36, which were sitting in review — can only be answered from these:
@@ -103,6 +115,12 @@ for (const n of [...nums.keys()].sort((a, b) => a - b)) {
     mergedAt: pr.merged_at,
     title: pr.title,
     url: pr.html_url,
+    // The branch it merged INTO. A stacked PR (#15758 targets
+    // feat/asana-ai-actions-a) reads MERGED the day it lands on its parent,
+    // which says nothing about main; lib/ai-roster.mjs needs to tell the two apart.
+    base: pr.base?.ref ?? null,
+    approved: verdict.approved,
+    approvedAt: verdict.approvedAt,
     assignees: (pr.assignees ?? []).map((a) => a.login),
   };
 }

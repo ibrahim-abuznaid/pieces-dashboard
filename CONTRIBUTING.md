@@ -45,7 +45,10 @@ overrides entry (AI-actions PRs already work this way).
 
 ## Curated AI-actions facts
 
-Atomics counts, Tier-2 results, notes, held reasons → `ai-actions/pieces.json`.
+You do **not** need a row for a piece to count. Any piece with an `audience: 'ai'` action on upstream main is
+counted as merged, with main's own atomics count, and any open PR that adds one is counted as in review — one
+row per piece the PR carries. A row in `ai-actions/pieces.json` only adds what the code can't say:
+Tier-2 results, notes, held reasons, the PR a rollout piece shipped in.
 Blockers → `ai-actions/blockers.json` (set `"done": true` when resolved).
 `node --test` validates all of it — a typo fails CI, nothing breaks silently.
 

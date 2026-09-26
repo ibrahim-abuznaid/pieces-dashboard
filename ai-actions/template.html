@@ -50,7 +50,7 @@
   </section>
 
   <footer>
-    Sources: curated <code>ai-actions/pieces.json</code> + <code>blockers.json</code>, PR states via GitHub API (auto-refreshed daily). Claim work per <code>CONTRIBUTING.md</code>. Related Linear: PIE-364 · PIE-365 · PIE-366 (outputSchema on these atomics — separate track).
+    Sources: <code>audience:'ai'</code> actions read off upstream main (merged, every piece), open PR diffs (in review), curated <code>ai-actions/pieces.json</code> + <code>blockers.json</code> (notes, Tier-2, held), PR states via GitHub API (auto-refreshed daily). Claim work per <code>CONTRIBUTING.md</code>. Related Linear: PIE-364 · PIE-365 · PIE-366 (outputSchema on these atomics — separate track).
   </footer>
 </div>
 <div id="tip" role="tooltip"></div>
@@ -62,6 +62,7 @@ const STAGES = [
   { k: 'held',     label: 'Held (no PR)', color: 'var(--s-review)' },
   { k: 'assigned', label: 'Assigned',     color: 'var(--st-assigned)' },
   { k: 'pr-open',  label: 'PR open',      color: 'var(--s-progress)' },
+  { k: 'approved', label: 'Approved',     color: 'var(--s-merged)' },
   { k: 'merged',   label: 'Merged',       color: 'var(--s-live)' },
 ];
 const stageOf = (k) => STAGES.find((s) => s.k === k);
@@ -96,7 +97,7 @@ const t2pct = S.t2t ? (S.t2v / S.t2t * 100).toFixed(0) : '0';
 document.getElementById('tiles').innerHTML = [
   { label: 'Pieces covered', value: `${S.pieces}`, foot: `${S.stages.held} held outside PRs` },
   { label: 'AI atomics shipped', value: `${S.atomics}`, foot: 'audience:\'ai\' actions on main' },
-  { label: 'PRs', value: `${S.prsOpen} <small>open</small> · ${S.prsMerged} <small>merged</small>`, foot: 'upstream activepieces PRs' },
+  { label: 'PRs', value: `${S.prsOpen} <small>open</small> · ${S.prsMerged} <small>merged</small>`, foot: 'open = every PR adding agent atomics; merged = PRs named on the curated roster' },
   { label: 'Tier-2 live-verified', value: `${S.t2v} <small>/ ${S.t2t}</small>`, foot: `${t2pct}% verified against live vendors (our rollout only)` },
   { label: 'Open blockers', value: `${S.blockersOpen}`, foot: `${S.blockersDone} resolved` },
 ].map((t) => `<div class="tile"><div class="label">${t.label}</div><div class="value">${t.value}</div><div class="foot">${t.foot}</div></div>`).join('');
@@ -104,7 +105,7 @@ document.getElementById('tiles').innerHTML = [
 // ------- stage funnel (piece counts per stage)
 const fn = document.getElementById('funnel');
 for (const s of STAGES) {
-  const n = S.stages[{ held: 'held', assigned: 'assigned', 'pr-open': 'prOpen', merged: 'merged' }[s.k]];
+  const n = S.stages[{ held: 'held', assigned: 'assigned', 'pr-open': 'prOpen', approved: 'approved', merged: 'merged' }[s.k] ?? 0];
   if (!n) continue;
   const seg = document.createElement('div');
   seg.className = 'seg'; seg.style.background = s.color; seg.style.flex = `${n} 0 0`; seg.style.borderRadius = '4px';
@@ -113,7 +114,7 @@ for (const s of STAGES) {
   fn.appendChild(seg);
 }
 document.getElementById('funnelLegend').innerHTML = STAGES.map((s) => {
-  const n = S.stages[{ held: 'held', assigned: 'assigned', 'pr-open': 'prOpen', merged: 'merged' }[s.k]];
+  const n = S.stages[{ held: 'held', assigned: 'assigned', 'pr-open': 'prOpen', approved: 'approved', merged: 'merged' }[s.k] ?? 0];
   return `<span><span class="swatch" style="background:${s.color}"></span>${s.label} · ${n}</span>`;
 }).join('');
 
@@ -152,7 +153,7 @@ function renderPieces() {
     rows.map((p) => `<tr>
       <td>${esc(p.slug)}</td><td class="num">${p.atomics}</td><td class="mono">${esc(p.v ?? '')}</td>
       <td>${prLink(p.pr)}</td><td>${stageChip(p.stage)}</td>
-      <td>${p.assignees?.length ? p.assignees.map(esc).join(', ') : (p.stage !== 'merged' ? `<a href="${claimUrl(p.slug)}" title="Claim ${esc(p.slug)} — pre-filled issue, a bot applies it">claim</a>` : '<span class="muted">—</span>')}</td>
+      <td>${p.assignees?.length ? p.assignees.map(esc).join(', ') : (p.stage !== 'merged' && !p.source ? `<a href="${claimUrl(p.slug)}" title="Claim ${esc(p.slug)} — pre-filled issue, a bot applies it">claim</a>` : '<span class="muted">—</span>')}</td>
       <td class="num">${p.t2shared ? `<span class="muted">w/ ${esc(p.t2shared)}</span>` : (p.t2t == null ? '<span class="muted" title="Tier-2 not run by our harness">&mdash;</span>' : `${p.t2v}/${p.t2t}`)}</td>
       <td class="muted">${esc(p.held ?? p.note ?? '')}</td></tr>`).join('') + '</tbody>';
 }

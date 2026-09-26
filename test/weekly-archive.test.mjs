@@ -311,3 +311,10 @@ test('an aiActions roster displayName is validated too', () =>
     aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30,
                  roster: [{ name: 'gmail', actions: 19, displayName: 12 }] },
   })), /aiActions\.roster\[0\]\.displayName/));
+
+test('aiActions.approved must be a number when present', () => {
+  const base = { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 };
+  assert.doesNotThrow(() => validateSnapshot(ok({ aiActions: base })));
+  assert.doesNotThrow(() => validateSnapshot(ok({ aiActions: { ...base, approved: 6 } })));
+  assert.throws(() => validateSnapshot(ok({ aiActions: { ...base, approved: '6' } })), /aiActions\.approved/);
+});

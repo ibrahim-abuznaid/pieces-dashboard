@@ -1,5 +1,5 @@
 {
-  "_comment": "Curated per-piece facts. No status field — stage derives from pr + data/pr-states.json. held = authored-but-not-shipped reason. Claims for pieces without a PR go in overrides.json. t2v/t2t null = Tier-2 not run by our harness (team-authored pieces); those contribute 0 to the verified tile rather than a fabricated number. atomics on team-authored rows is the live audience:'ai' count on main; on rollout rows it is the count as authored in our PR.",
+  "_comment": "Curated per-piece facts. No status field — stage derives from pr + data/pr-states.json. held = authored-but-not-shipped reason. Claims for pieces without a PR go in overrides.json. t2v/t2t null = Tier-2 not run by our harness (team-authored pieces); those contribute 0 to the verified tile rather than a fabricated number. A piece needs NO row to be counted: any piece with an audience:'ai' action on main is merged (lib/ai-roster.mjs), and main's count replaces atomics here once it lands. Before that, atomics is the count as authored in the PR.",
   "pieces": [
     {
       "slug": "google-docs",

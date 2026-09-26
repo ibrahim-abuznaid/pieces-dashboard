@@ -6059,10 +6059,10 @@
       "aiActions": {
         "status": "ok",
         "merged": 29,
-        "prOpen": 1,
+        "prOpen": 2,
         "assigned": 0,
         "held": 2,
-        "totalPieces": 32,
+        "totalPieces": 33,
         "catalogPieces": 764,
         "blockersOpen": 30,
         "roster": [
@@ -6289,6 +6289,13 @@
             "stage": "merged",
             "displayName": "PromptHub",
             "logo": "https://cdn.activepieces.com/pieces/prompthub.png"
+          },
+          {
+            "name": "whatsapp",
+            "actions": 0,
+            "stage": "pr-open",
+            "displayName": "WhatsApp Business",
+            "logo": "https://cdn.activepieces.com/pieces/whatsapp.png"
           }
         ]
       },
@@ -7889,14 +7896,35 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 30,
+        "merged": 52,
         "prOpen": 0,
         "assigned": 0,
         "held": 2,
-        "totalPieces": 32,
+        "totalPieces": 60,
         "catalogPieces": 764,
         "blockersOpen": 35,
         "roster": [
+          {
+            "name": "monday",
+            "actions": 91,
+            "stage": "merged",
+            "displayName": "monday.com",
+            "logo": "https://cdn.activepieces.com/pieces/monday.png"
+          },
+          {
+            "name": "mastodon",
+            "actions": 84,
+            "stage": "merged",
+            "displayName": "Mastodon",
+            "logo": "https://cdn.activepieces.com/pieces/mastodon.png"
+          },
+          {
+            "name": "salesforce",
+            "actions": 77,
+            "stage": "merged",
+            "displayName": "Salesforce",
+            "logo": "https://cdn.activepieces.com/pieces/salesforce.png"
+          },
           {
             "name": "stripe",
             "actions": 75,
@@ -7910,6 +7938,13 @@
             "stage": "merged",
             "displayName": "GitHub",
             "logo": "https://cdn.activepieces.com/pieces/github.png"
+          },
+          {
+            "name": "jira-cloud",
+            "actions": 60,
+            "stage": "merged",
+            "displayName": "Jira Cloud",
+            "logo": "https://cdn.activepieces.com/pieces/jira.png"
           },
           {
             "name": "clickup",
@@ -7940,11 +7975,25 @@
             "logo": "https://cdn.activepieces.com/pieces/slack.png"
           },
           {
+            "name": "mistral-ai",
+            "actions": 42,
+            "stage": "merged",
+            "displayName": "Mistral AI",
+            "logo": "https://cdn.activepieces.com/pieces/mistral-ai.png"
+          },
+          {
             "name": "todoist",
             "actions": 42,
             "stage": "merged",
             "displayName": "Todoist",
             "logo": "https://cdn.activepieces.com/pieces/todoist.png"
+          },
+          {
+            "name": "woocommerce",
+            "actions": 39,
+            "stage": "merged",
+            "displayName": "WooCommerce",
+            "logo": "https://cdn.activepieces.com/pieces/woocommerce.png"
           },
           {
             "name": "google-docs",
@@ -7968,6 +8017,13 @@
             "logo": "https://cdn.activepieces.com/pieces/resend.png"
           },
           {
+            "name": "microsoft-onedrive",
+            "actions": 35,
+            "stage": "merged",
+            "displayName": "Microsoft OneDrive",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png"
+          },
+          {
             "name": "google-sheets",
             "actions": 34,
             "stage": "merged",
@@ -7982,11 +8038,32 @@
             "logo": "https://cdn.activepieces.com/pieces/apify.png"
           },
           {
+            "name": "baserow",
+            "actions": 32,
+            "stage": "merged",
+            "displayName": "Baserow",
+            "logo": "https://cdn.activepieces.com/pieces/baserow.png"
+          },
+          {
             "name": "sendinblue",
             "actions": 32,
             "stage": "merged",
             "displayName": "Brevo",
             "logo": "https://cdn.activepieces.com/pieces/brevo.png"
+          },
+          {
+            "name": "wordpress",
+            "actions": 30,
+            "stage": "merged",
+            "displayName": "WordPress",
+            "logo": "https://cdn.activepieces.com/pieces/wordpress.png"
+          },
+          {
+            "name": "hugging-face",
+            "actions": 29,
+            "stage": "merged",
+            "displayName": "Hugging Face",
+            "logo": "https://cdn.activepieces.com/pieces/huggingface.svg"
           },
           {
             "name": "pinterest",
@@ -8003,11 +8080,32 @@
             "logo": "https://cdn.activepieces.com/pieces/tally.png"
           },
           {
+            "name": "youtube",
+            "actions": 24,
+            "stage": "merged",
+            "displayName": "YouTube",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png"
+          },
+          {
+            "name": "typeform",
+            "actions": 23,
+            "stage": "merged",
+            "displayName": "Typeform",
+            "logo": "https://cdn.activepieces.com/pieces/typeform.png"
+          },
+          {
             "name": "notion",
             "actions": 22,
             "stage": "merged",
             "displayName": "Notion",
             "logo": "https://cdn.activepieces.com/pieces/notion.png"
+          },
+          {
+            "name": "calendly",
+            "actions": 21,
+            "stage": "merged",
+            "displayName": "Calendly",
+            "logo": "https://cdn.activepieces.com/pieces/calendly.png"
           },
           {
             "name": "telegram-bot",
@@ -8022,6 +8120,20 @@
             "stage": "merged",
             "displayName": "Gmail",
             "logo": "https://cdn.activepieces.com/pieces/gmail.png"
+          },
+          {
+            "name": "google-contacts",
+            "actions": 19,
+            "stage": "merged",
+            "displayName": "Google Contacts",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png"
+          },
+          {
+            "name": "pushover",
+            "actions": 19,
+            "stage": "merged",
+            "displayName": "Pushover",
+            "logo": "https://cdn.activepieces.com/pieces/pushover.png"
           },
           {
             "name": "airtable",
@@ -8045,6 +8157,13 @@
             "logo": "https://cdn.activepieces.com/pieces/serp-api.png"
           },
           {
+            "name": "facebook-pages",
+            "actions": 16,
+            "stage": "merged",
+            "displayName": "Facebook Pages",
+            "logo": "https://cdn.activepieces.com/pieces/facebook.png"
+          },
+          {
             "name": "google-calendar",
             "actions": 16,
             "stage": "merged",
@@ -8057,6 +8176,13 @@
             "stage": "merged",
             "displayName": "Firecrawl",
             "logo": "https://cdn.activepieces.com/pieces/firecrawl.png"
+          },
+          {
+            "name": "imap",
+            "actions": 15,
+            "stage": "merged",
+            "displayName": "IMAP",
+            "logo": "https://cdn.activepieces.com/pieces/imap.png"
           },
           {
             "name": "whatsscale",
@@ -8073,6 +8199,20 @@
             "logo": "https://cdn.activepieces.com/pieces/pubrio.png"
           },
           {
+            "name": "google-my-business",
+            "actions": 11,
+            "stage": "merged",
+            "displayName": "Google My Business",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png"
+          },
+          {
+            "name": "claude",
+            "actions": 9,
+            "stage": "merged",
+            "displayName": "Anthropic Claude",
+            "logo": "https://cdn.activepieces.com/pieces/claude.png"
+          },
+          {
             "name": "google-tasks",
             "actions": 9,
             "stage": "merged",
@@ -8085,6 +8225,20 @@
             "stage": "merged",
             "displayName": "HubSpot",
             "logo": "https://cdn.activepieces.com/pieces/hubspot.png"
+          },
+          {
+            "name": "apitable",
+            "actions": 8,
+            "stage": "merged",
+            "displayName": "AITable",
+            "logo": "https://cdn.activepieces.com/pieces/apitable.png"
+          },
+          {
+            "name": "linkedin",
+            "actions": 6,
+            "stage": "merged",
+            "displayName": "LinkedIn",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png"
           },
           {
             "name": "senja",
@@ -8120,8 +8274,58 @@
             "stage": "merged",
             "displayName": "PromptHub",
             "logo": "https://cdn.activepieces.com/pieces/prompthub.png"
+          },
+          {
+            "name": "twitter",
+            "actions": 1,
+            "stage": "merged",
+            "displayName": "Twitter",
+            "logo": "https://cdn.activepieces.com/pieces/twitter.png"
+          },
+          {
+            "name": "asana",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "Asana",
+            "logo": "https://cdn.activepieces.com/pieces/asana.png"
+          },
+          {
+            "name": "dropbox",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "Dropbox",
+            "logo": "https://cdn.activepieces.com/pieces/dropbox.png"
+          },
+          {
+            "name": "mailer-lite",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "MailerLite",
+            "logo": "https://cdn.activepieces.com/pieces/mailer-lite.png"
+          },
+          {
+            "name": "microsoft-outlook",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "Microsoft Outlook",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png"
+          },
+          {
+            "name": "pipedrive",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "Pipedrive",
+            "logo": "https://cdn.activepieces.com/pieces/pipedrive.png"
+          },
+          {
+            "name": "whatsapp",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "WhatsApp Business",
+            "logo": "https://cdn.activepieces.com/pieces/whatsapp.png"
           }
-        ]
+        ],
+        "approved": 6
       },
       "uiImprovements": {
         "status": "ok",

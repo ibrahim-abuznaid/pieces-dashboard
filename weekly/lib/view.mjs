@@ -47,6 +47,19 @@ const mergedSchemas = (snap) => {
   return live === null || mergedNotLive === null ? null : live + mergedNotLive;
 };
 
+// AI-actions DONE: merged, plus open PRs the lead has approved. Approval is
+// where the team's part of the work ends -- the merge button is his, and it is
+// often pressed a day later -- so the week the work was finished is the week it
+// counts in. Kept as two stored stages rather than one, so the tile can say how
+// many are not on main yet and nothing downstream mistakes `approved` for
+// `merged`. A week recorded before the stage existed has no `approved` and
+// reads as none, which is what it had.
+const doneAiActions = (snap) => {
+  const merged = pick(snap, 'aiActions.merged');
+  if (merged === null) return null;
+  return merged + (pick(snap, 'aiActions.approved') ?? 0);
+};
+
 // ── who closed the tickets ──────────────────────────────────────────────────
 // One line inside the tickets box, read out of the SAME object the total is
 // summed from. Never out of a list of names kept here: the team is hiring a
@@ -350,20 +363,22 @@ const TILES = [
     // trap. Read the note above before touching this line.
     review: 'outputSchema.prOpen',
     strip: pieceStrip, done: ['live', 'merged-not-live'] },
-  // `totalPieces` here is only the 28 pieces the initiative TRACKS, so
+  // `totalPieces` here is only the pieces on the roster -- 28 when this was
+  // written, 60 by W39 once main was read for it (lib/ai-roster.mjs) -- so
   // "2 of 28 merged" reads as ~7% catalog coverage when the real figure is
   // 0.3%. When the snapshot recorded the catalog size, count against that. When
   // it did not — every snapshot written before the field existed — keep the old
   // wording: a historical week must not be retrofitted with a denominator it
   // never measured.
-  { key: 'aiActions', title: 'AI-actions', path: 'aiActions.merged',
+  { key: 'aiActions', title: 'AI-actions', path: doneAiActions,
     unit: (ws) => (typeof ws.catalogPieces === 'number'
       ? `of ${ws.catalogPieces} have AI actions`
       : `of ${ws.totalPieces} merged`),
     // Named `prOpen` here and `review` on the rollout below; both are the same
     // derived 'pr-open' stage — see the note above the table.
     review: 'aiActions.prOpen',
-    strip: pieceStrip, done: ['merged'] },
+    note: (ws) => (ws.approved > 0 ? `incl. ${ws.approved} approved, not yet merged` : ''),
+    strip: pieceStrip, done: ['merged', 'approved'] },
   // Two headlines, chosen by what the snapshot measured. With coverage recorded
   // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
   // drops to the note line; without it — every older snapshot, and any week the

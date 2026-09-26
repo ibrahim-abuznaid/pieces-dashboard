@@ -12,8 +12,8 @@ const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 //
 // These rows identify a piece by SLUG and carry neither its logo nor the name it
 // is published under, so `catalog` — the folder → { displayName, logo } index —
-// supplies both. The slug is the folder, so the lookup is a hit for all 28 tracked
-// pieces today; one that stops matching keeps its slug and records no logo, rather
+// supplies both. The slug is the folder, so the lookup is a hit for every piece
+// with AI actions today; one that stops matching keeps its slug and records no logo, rather
 // than a URL built from the slug (a silent 404 in the reader's browser, visible
 // nowhere a maintainer looks) or a name title-cased out of it (`Sendinblue` for a
 // piece the catalog calls `Brevo`).
@@ -62,6 +62,9 @@ export function collectAiActions({ readJson }) {
       status: 'ok',
       merged: num(s.stages.merged, 'stages.merged'),
       prOpen: num(s.stages.prOpen, 'stages.prOpen'),
+      // Spread, like catalogPieces: a build from before the stage existed has no
+      // count to report, and an absent field already reads as none.
+      ...(s.stages.approved === undefined ? {} : { approved: num(s.stages.approved, 'stages.approved') }),
       assigned: num(s.stages.assigned, 'stages.assigned'),
       held: num(s.stages.held, 'stages.held'),
       totalPieces: num(s.pieces, 'pieces'),

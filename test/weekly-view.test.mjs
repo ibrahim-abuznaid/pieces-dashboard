@@ -1333,3 +1333,49 @@ test('a snapshot that never recorded a review count yields null rather than zero
 test('a degraded workstream carries no review queue either', () =>
   assert.equal(oneWeek({ uiImprovements: { status: 'no-data', reason: 'build missing' } })
     .tiles.find((t) => t.key === 'uiImprovements').inReview, null));
+
+// ── approved counts as done ────────────────────────────────────────────────
+// An open PR the lead has APPROVED is finished work waiting on a merge button,
+// and the page counts it as done -- in the headline and in the strip -- but
+// says so, because it is not on main yet.
+const aiWith = (over) => ({ status: 'ok', merged: 2, prOpen: 1, assigned: 0, held: 0,
+  totalPieces: 4, blockersOpen: 0, catalogPieces: 764, ...over });
+const AI_APPROVED_ROSTER = [
+  { name: 'stripe', actions: 79, stage: 'merged' },
+  { name: 'gmail', actions: 26, stage: 'merged' },
+  { name: 'asana', actions: 0, stage: 'approved' },
+  { name: 'cal-com', actions: 0, stage: 'pr-open' },
+];
+
+test('an approved piece counts as done in the headline, and the note says it is not merged', () => {
+  const t = aiTile(oneWeek({ aiActions: aiWith({ approved: 1, roster: AI_APPROVED_ROSTER }) }));
+  assert.equal(t.value, 3);
+  assert.equal(t.inReview, 1, 'approved is not also in review');
+  assert.match(t.note, /1 approved, not yet merged/);
+  assert.ok(t.strip.items.concat(t.strip.rest).some((c) => c.name === 'asana'));
+});
+
+test('a snapshot from before the approved stage reads as none approved', () => {
+  const t = aiTile(oneWeek({ aiActions: aiWith({}) }));
+  assert.equal(t.value, 2);
+  assert.equal(t.note, '');
+});
+
+test('the delta counts approved on both sides', () => {
+  const v = buildView({ weeks: [
+    snap('2026-W30', { aiActions: aiWith({}) }),
+    snap('2026-W31', { aiActions: aiWith({ approved: 1 }) }),
+  ] });
+  assert.equal(aiTile(v).delta, 1);
+});
+
+// Approved one week and merged the next is ONE piece of work, reported once.
+test('a piece approved last week and merged this week is not done again', () => {
+  const prior = AI_APPROVED_ROSTER.slice(0, 3);
+  const now = prior.map((r) => (r.name === 'asana' ? { ...r, stage: 'merged', actions: 65 } : r));
+  const v = buildView({ weeks: [
+    snap('2026-W30', { aiActions: aiWith({ approved: 1, roster: prior }) }),
+    snap('2026-W31', { aiActions: aiWith({ merged: 3, roster: now }) }),
+  ] });
+  assert.equal(aiTile(v).strip.label, 'Nothing new this week');
+});

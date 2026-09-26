@@ -28,6 +28,9 @@ const REQUIRED = {
 // "of undefined pieces" or a NaN delta.
 const OPTIONAL_NUMBERS = {
   uiImprovements: ['live'],
+  // Open PRs the lead has approved (lib/ai-roster.mjs). Optional because every
+  // week before 2026-09-26 predates the stage, and a week without it had none.
+  aiActions: ['approved'],
 };
 
 // The three optional string fields a roster row may carry. All three are optional

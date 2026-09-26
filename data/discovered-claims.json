@@ -1,23 +1,33 @@
 {
-  "fetched": "2026-09-21",
+  "fetched": "2026-09-26",
   "outputSchema": {
+    "cal-com": 15816,
+    "mastodon": 15759,
+    "asana": 15757,
+    "mailer-lite": 15725,
+    "pipedrive": 15725,
+    "microsoft-outlook": 15696,
     "dropbox": 15661,
     "airtable": 15624,
     "instagram-business": 15618,
     "whatsapp": 15585,
     "flow-helper": 15390,
-    "google-gemini": 15389,
     "firecrawl": 15258
   },
   "uiImprovements": {
-    "discord": 15531,
-    "open-router": 15484,
-    "airtable": 15483,
-    "notion": 15397,
-    "google-docs": 15298,
+    "hubspot": 15814,
+    "youtube": 15813,
     "outseta": 15216,
     "telegram-bot": 14970,
     "gmail": 14943
   },
-  "aiActions": {}
+  "aiActions": {
+    "cal-com": 15816,
+    "asana": 15757,
+    "mailer-lite": 15725,
+    "pipedrive": 15725,
+    "microsoft-outlook": 15696,
+    "dropbox": 15661,
+    "whatsapp": 15585
+  }
 }

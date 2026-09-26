@@ -82,14 +82,15 @@ funnel('osFunnel', 'osLegend', [
 ]);
 
 document.getElementById('aiTiles').innerHTML = [
-  { label: 'AI atomics shipped', value: `${ai.atomics}`, foot: `across ${ai.pieces} pieces` },
-  { label: 'PRs', value: `${ai.prsOpen} <small>open</small> · ${ai.prsMerged} <small>merged</small>`, foot: 'upstream activepieces PRs' },
+  { label: 'AI atomics shipped', value: `${ai.atomics}`, foot: `across ${ai.stages.merged} pieces on main` },
+  { label: 'PRs', value: `${ai.prsOpen} <small>open</small> · ${ai.prsMerged} <small>merged</small>`, foot: 'open = every PR adding agent atomics; merged = PRs named on the curated roster' },
   { label: 'Open blockers', value: `${ai.blockersOpen}`, foot: `${ai.blockersDone} resolved` },
 ].map(tile).join('');
 funnel('aiFunnel', 'aiLegend', [
   { label: 'Held', n: ai.stages.held, color: 'var(--s-review)' },
   { label: 'Assigned', n: ai.stages.assigned, color: 'var(--st-assigned)' },
   { label: 'PR open', n: ai.stages.prOpen, color: 'var(--s-progress)' },
+  { label: 'Approved', n: ai.stages.approved ?? 0, color: 'var(--s-merged)' },
   { label: 'Merged', n: ai.stages.merged, color: 'var(--s-live)', dark: true },
 ]);
 

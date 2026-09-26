@@ -1,10 +1,9 @@
 #!/usr/bin/env node
-// Joins curated data + live PR states into dist/ai-actions/.
+// Joins main's agent atomics + curated data + live PR states into dist/ai-actions/.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { deriveStage, assigneesOf } from '../lib/stages.mjs';
-import { claimedPr } from '../lib/discover.mjs';
+import { buildAiRoster, summarizeAiRoster } from '../lib/ai-roster.mjs';
 import { renderPage } from '../lib/render.mjs';
 import { validateAiData } from './validate.mjs';
 
@@ -20,36 +19,41 @@ const prData = read('../data/pr-states.json');
 // a checkout that has not fetched yet builds on the curated claims alone, which
 // is exactly what this build did before discovery existed.
 const discovered = (() => { try { return read('../data/discovered-claims.json'); } catch { return {}; } })();
+// Which pieces carry audience:'ai' actions on main (scripts/fetch-repo-ai.sh):
+// the record for MERGED. Optional for the same reason as discovery -- a checkout
+// that has not fetched builds on the curated claims alone -- but said out loud,
+// because on that path a piece nobody wrote down is invisible again.
+const repoAi = (() => { try { return read('../data/repo-ai-actions.json'); } catch { return null; } })();
+if (!repoAi) console.warn('⚠ data/repo-ai-actions.json missing — merged counts fall back to the curated claims; run `npm run fetch:ai`');
 
 const problems = validateAiData({ pieces, categories, blockers, prStates: prData.prs });
 if (problems.length) { console.error('✗ ' + problems.join('\n✗ ')); process.exit(1); }
 
-const enriched = pieces.map((p) => {
-  const ov = overrides.pieces?.[p.slug] ?? {};
-  const claim = { assignee: ov.assignee ?? null, pr: claimedPr(p.pr ?? ov.pr ?? null, discovered.aiActions, p.slug) };
-  return {
-    ...p,
-    pr: claim.pr,
-    stage: p.held ? 'held' : (deriveStage(claim, prData.prs) ?? 'held'),
-    assignees: assigneesOf(claim, prData.prs),
-    prState: claim.pr ? (prData.prs[claim.pr]?.state ?? null) : null,
-  };
+const { rows: enriched, warnings } = buildAiRoster({
+  curated: pieces,
+  overrides: overrides.pieces ?? {},
+  discovered: discovered.aiActions ?? {},
+  prStates: prData.prs,
+  onMain: repoAi?.pieces ?? null,
+  mainAt: repoAi?.committedAt ?? null,
 });
+for (const w of warnings) console.warn(`⚠ ${w}`);
+// A curated slug that is not a piece folder can never match main, so it would sit
+// held beside the real piece's merged row -- `brevo` for the folder `sendinblue`.
+const folders = (() => { try { return new Set(read('../output-schema/data/repo-pieces.json')); } catch { return null; } })();
+for (const p of folders ? pieces : []) {
+  if (!folders.has(p.slug)) console.warn(`⚠ ${p.slug}: no packages/pieces/community/${p.slug} on main — the slug must be the piece's folder name`);
+}
 
-const sum = (fn) => enriched.reduce((a, p) => a + fn(p), 0);
-const stageCount = (s) => enriched.filter((p) => p.stage === s).length;
 const summary = {
   generated: new Date().toISOString().slice(0, 10),
   prFetched: prData.fetched,
-  pieces: enriched.length,
-  atomics: sum((p) => p.atomics),
-  t2v: sum((p) => p.t2v ?? 0),
-  t2t: sum((p) => p.t2t ?? 0),
-  stages: { held: stageCount('held'), assigned: stageCount('assigned'), prOpen: stageCount('pr-open'), merged: stageCount('merged') },
-  prsOpen: new Set(enriched.filter((p) => p.prState === 'OPEN').map((p) => p.pr)).size,
-  prsMerged: new Set(enriched.filter((p) => p.prState === 'MERGED').map((p) => p.pr)).size,
+  ...summarizeAiRoster(enriched),
   blockersOpen: blockers.filter((b) => !b.done).length,
   blockersDone: blockers.filter((b) => b.done).length,
+  // Where MERGED was read from, so a number on the page can be traced to a
+  // commit. Absent when main was not read.
+  ...(repoAi ? { mainCommit: repoAi.commit, mainAt: repoAi.committedAt } : {}),
 };
 
 const DIST = join(ROOT, '../dist/ai-actions');
@@ -68,4 +72,4 @@ writeFileSync(join(DIST, 'pieces.json'), JSON.stringify({
   generated: summary.generated,
   pieces: enriched.map(({ slug, atomics, stage, pr, prState }) => ({ slug, atomics, stage, pr, prState })),
 }, null, 2) + '\n');
-console.log(`✓ ai-actions: ${summary.pieces} pieces · ${summary.atomics} atomics · held ${summary.stages.held} / assigned ${summary.stages.assigned} / PR-open ${summary.stages.prOpen} / merged ${summary.stages.merged} · ${summary.blockersOpen} open blockers`);
+console.log(`✓ ai-actions: ${summary.pieces} pieces (${summary.fromMain} found on main, ${summary.fromPrs} in open PRs, uncurated) · ${summary.atomics} atomics · held ${summary.stages.held} / assigned ${summary.stages.assigned} / PR-open ${summary.stages.prOpen} / approved ${summary.stages.approved} / merged ${summary.stages.merged} · ${summary.blockersOpen} open blockers`);

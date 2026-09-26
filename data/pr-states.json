@@ -1,5 +1,5 @@
 {
-  "fetched": "2026-09-21",
+  "fetched": "2026-09-26",
   "prs": {
     "13937": {
       "state": "MERGED",
@@ -7,6 +7,9 @@
       "mergedAt": "2026-07-31T09:43:51Z",
       "title": "feat(google-drive, google-tasks): add AI-agent action surface",
       "url": "https://github.com/activepieces/activepieces/pull/13937",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -17,6 +20,9 @@
       "mergedAt": "2026-08-03T16:18:13Z",
       "title": "feat(google-sheets, google-forms, notion, telegram-bot): add AI-agent action surface",
       "url": "https://github.com/activepieces/activepieces/pull/13941",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -27,6 +33,9 @@
       "mergedAt": "2026-07-29T08:13:02Z",
       "title": "feat(slack, todoist): AI-ready agent atomics",
       "url": "https://github.com/activepieces/activepieces/pull/13946",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -37,6 +46,9 @@
       "mergedAt": "2026-08-03T08:24:47Z",
       "title": "feat(clickup): AI-ready agent atomics (core)",
       "url": "https://github.com/activepieces/activepieces/pull/13947",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -47,6 +59,9 @@
       "mergedAt": "2026-07-22T13:15:14Z",
       "title": "feat(pieces): add AI agent actions to Firecrawl and Apify",
       "url": "https://github.com/activepieces/activepieces/pull/13952",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -57,6 +72,9 @@
       "mergedAt": "2026-07-28T05:07:05Z",
       "title": "feat(trello): add AI agent actions for boards, cards, checklists, and comments",
       "url": "https://github.com/activepieces/activepieces/pull/13953",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -67,6 +85,9 @@
       "mergedAt": "2026-08-03T06:55:45Z",
       "title": "feat(discord): add AI agent actions for messages, channels, roles, and threads",
       "url": "https://github.com/activepieces/activepieces/pull/13954",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -77,6 +98,9 @@
       "mergedAt": "2026-07-31T07:39:18Z",
       "title": "feat(stripe): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/13969",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "sanket-a11y"
       ]
@@ -87,6 +111,9 @@
       "mergedAt": "2026-07-28T04:52:09Z",
       "title": "feat(airtable): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/13970",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -97,6 +124,9 @@
       "mergedAt": "2026-07-28T04:50:31Z",
       "title": "feat(serp-api): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/13971",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -107,6 +137,9 @@
       "mergedAt": "2026-07-28T12:32:38Z",
       "title": "feat(github): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/13972",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "sanket-a11y"
       ]
@@ -117,6 +150,9 @@
       "mergedAt": "2026-07-28T04:49:45Z",
       "title": "feat(cody): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/13973",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -127,6 +163,9 @@
       "mergedAt": "2026-08-05T13:19:29Z",
       "title": "feat: add agent atomics + output schemas for prompthub, reoon-verifier, senja",
       "url": "https://github.com/activepieces/activepieces/pull/13979",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -137,6 +176,9 @@
       "mergedAt": "2026-07-31T05:45:19Z",
       "title": "feat(google-docs): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/14519",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "14520": {
@@ -145,6 +187,9 @@
       "mergedAt": "2026-07-31T07:30:41Z",
       "title": "feat(google-calendar): add agent atomics for AI agents",
       "url": "https://github.com/activepieces/activepieces/pull/14520",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "14565": {
@@ -153,6 +198,9 @@
       "mergedAt": "2026-08-03T11:47:10Z",
       "title": "feat(gmail): add agent atomics for AI agents (read/draft/thread surface)",
       "url": "https://github.com/activepieces/activepieces/pull/14565",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "14943": {
@@ -161,6 +209,9 @@
       "mergedAt": null,
       "title": "feat(gmail): redesign property UI for human-facing actions and triggers",
       "url": "https://github.com/activepieces/activepieces/pull/14943",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -171,6 +222,9 @@
       "mergedAt": null,
       "title": "feat(telegram-bot): improve prop UI for human-facing actions",
       "url": "https://github.com/activepieces/activepieces/pull/14970",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "14981": {
@@ -179,6 +233,9 @@
       "mergedAt": "2026-08-23T08:36:42Z",
       "title": "feat(pieces): add QuickBooks Desktop (Conductor) piece",
       "url": "https://github.com/activepieces/activepieces/pull/14981",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "OdaiAhmed99"
       ]
@@ -189,6 +246,9 @@
       "mergedAt": "2026-09-08T13:18:31Z",
       "title": "feat(pieces): WhatsScale ai actions, output schemas, and UI improvements",
       "url": "https://github.com/activepieces/activepieces/pull/15010",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "OdaiAhmed99"
       ]
@@ -199,6 +259,9 @@
       "mergedAt": "2026-09-03T18:52:29Z",
       "title": "feat(http): improve the Send HTTP request step form",
       "url": "https://github.com/activepieces/activepieces/pull/15188",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15200": {
@@ -207,6 +270,9 @@
       "mergedAt": "2026-09-04T17:04:58Z",
       "title": "feat(google-sheets): improve the step forms",
       "url": "https://github.com/activepieces/activepieces/pull/15200",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "Talaljaber"
       ]
@@ -215,8 +281,11 @@
       "state": "OPEN",
       "createdAt": "2026-09-02T13:29:37Z",
       "mergedAt": null,
-      "title": "feat(outseta): expose subscription quantity and expiration date, add found=false lookups",
+      "title": "feat(outseta)!: rework outputs, lookups and list filters for 1.0.0",
       "url": "https://github.com/activepieces/activepieces/pull/15216",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15244": {
@@ -225,6 +294,9 @@
       "mergedAt": "2026-09-03T11:02:52Z",
       "title": "feat(pieces-tally): add agent atomics",
       "url": "https://github.com/activepieces/activepieces/pull/15244",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15258": {
@@ -233,14 +305,9 @@
       "mergedAt": null,
       "title": "feat(firecrawl): capture browser action outputs & add storeInCache toggle",
       "url": "https://github.com/activepieces/activepieces/pull/15258",
-      "assignees": []
-    },
-    "15298": {
-      "state": "OPEN",
-      "createdAt": "2026-09-06T15:02:11Z",
-      "mergedAt": null,
-      "title": "feat(google-docs): improve the step forms",
-      "url": "https://github.com/activepieces/activepieces/pull/15298",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15351": {
@@ -249,14 +316,9 @@
       "mergedAt": "2026-09-10T12:31:38Z",
       "title": "feat(sage-accounting): add Sage Accounting piece",
       "url": "https://github.com/activepieces/activepieces/pull/15351",
-      "assignees": []
-    },
-    "15389": {
-      "state": "OPEN",
-      "createdAt": "2026-09-09T07:16:20Z",
-      "mergedAt": null,
-      "title": "feat(google-gemini): add agent atomics for image, models, embeddings, tokens",
-      "url": "https://github.com/activepieces/activepieces/pull/15389",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15390": {
@@ -265,14 +327,9 @@
       "mergedAt": null,
       "title": "feat(flow-helper): add Create Waitpoint + Wait for Resume actions",
       "url": "https://github.com/activepieces/activepieces/pull/15390",
-      "assignees": []
-    },
-    "15397": {
-      "state": "OPEN",
-      "createdAt": "2026-09-09T12:30:32Z",
-      "mergedAt": null,
-      "title": "feat(notion): improve the step forms",
-      "url": "https://github.com/activepieces/activepieces/pull/15397",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15406": {
@@ -281,22 +338,9 @@
       "mergedAt": "2026-09-17T13:07:48Z",
       "title": "feat(google-calendar): improve the step forms",
       "url": "https://github.com/activepieces/activepieces/pull/15406",
-      "assignees": []
-    },
-    "15483": {
-      "state": "OPEN",
-      "createdAt": "2026-09-12T17:30:33Z",
-      "mergedAt": null,
-      "title": "feat(airtable): clearer setup forms and working record lookups",
-      "url": "https://github.com/activepieces/activepieces/pull/15483",
-      "assignees": []
-    },
-    "15484": {
-      "state": "OPEN",
-      "createdAt": "2026-09-12T17:34:15Z",
-      "mergedAt": null,
-      "title": "feat(OpenRouter): step form",
-      "url": "https://github.com/activepieces/activepieces/pull/15484",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15502": {
@@ -305,17 +349,12 @@
       "mergedAt": "2026-09-17T13:11:05Z",
       "title": "feat(brevo): add contact and list AI atomics with output schemas",
       "url": "https://github.com/activepieces/activepieces/pull/15502",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "OdaiAhmed99"
       ]
-    },
-    "15531": {
-      "state": "OPEN",
-      "createdAt": "2026-09-14T13:19:51Z",
-      "mergedAt": null,
-      "title": "feat(discord): step form",
-      "url": "https://github.com/activepieces/activepieces/pull/15531",
-      "assignees": []
     },
     "15539": {
       "state": "MERGED",
@@ -323,6 +362,9 @@
       "mergedAt": "2026-09-20T12:19:58Z",
       "title": "feat(pinterest,trello): expand board, pin, card and custom field actions for agents",
       "url": "https://github.com/activepieces/activepieces/pull/15539",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "OdaiAhmed99"
       ]
@@ -333,6 +375,9 @@
       "mergedAt": "2026-09-15T04:23:36Z",
       "title": "feat(hubspot): resolve ids, log notes and tasks, and search records for agents",
       "url": "https://github.com/activepieces/activepieces/pull/15542",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "OdaiAhmed99"
       ]
@@ -343,6 +388,9 @@
       "mergedAt": "2026-09-17T09:54:22Z",
       "title": "feat(resend): manage broadcast details and content with AI",
       "url": "https://github.com/activepieces/activepieces/pull/15582",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "kishanprmr"
       ]
@@ -353,6 +401,9 @@
       "mergedAt": null,
       "title": "feat(whatsapp): 19 new actions, 4 webhook triggers, output schemas and Graph v23.0",
       "url": "https://github.com/activepieces/activepieces/pull/15585",
+      "base": "main",
+      "approved": true,
+      "approvedAt": "2026-09-26T15:43:03Z",
       "assignees": [
         "OdaiAhmed99"
       ]
@@ -363,6 +414,9 @@
       "mergedAt": null,
       "title": "feat(instagram-business): revive on Graph v23.0 with 27 verified actions",
       "url": "https://github.com/activepieces/activepieces/pull/15618",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": [
         "OdaiAhmed99"
       ]
@@ -373,6 +427,9 @@
       "mergedAt": null,
       "title": "feat(airtable): choose which fields Update Record writes, drop the \"(Agent)\" suffix",
       "url": "https://github.com/activepieces/activepieces/pull/15624",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
       "assignees": []
     },
     "15661": {
@@ -381,9 +438,97 @@
       "mergedAt": null,
       "title": "feat(dropbox): add AI-ready atomic actions for files and batch jobs",
       "url": "https://github.com/activepieces/activepieces/pull/15661",
+      "base": "main",
+      "approved": true,
+      "approvedAt": "2026-09-26T15:42:43Z",
       "assignees": [
         "OdaiAhmed99"
       ]
+    },
+    "15696": {
+      "state": "OPEN",
+      "createdAt": "2026-09-21T21:12:36Z",
+      "mergedAt": null,
+      "title": "feat(microsoft-outlook): let agents read, send and organise mail",
+      "url": "https://github.com/activepieces/activepieces/pull/15696",
+      "base": "main",
+      "approved": true,
+      "approvedAt": "2026-09-26T15:42:10Z",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15725": {
+      "state": "OPEN",
+      "createdAt": "2026-09-23T00:24:35Z",
+      "mergedAt": null,
+      "title": "feat(pieces): add AI-agent atomics to pipedrive and mailer-lite",
+      "url": "https://github.com/activepieces/activepieces/pull/15725",
+      "base": "main",
+      "approved": true,
+      "approvedAt": "2026-09-26T15:41:10Z",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15757": {
+      "state": "OPEN",
+      "createdAt": "2026-09-23T22:09:16Z",
+      "mergedAt": null,
+      "title": "feat(asana): add 65 AI agent actions for tasks, projects, sections and tags",
+      "url": "https://github.com/activepieces/activepieces/pull/15757",
+      "base": "main",
+      "approved": true,
+      "approvedAt": "2026-09-26T15:39:59Z",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15759": {
+      "state": "OPEN",
+      "createdAt": "2026-09-23T22:37:24Z",
+      "mergedAt": null,
+      "title": "feat(mastodon): add triggers and richer Post Status for flow builders",
+      "url": "https://github.com/activepieces/activepieces/pull/15759",
+      "base": "feat/mastodon-crypto-ai-actions",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": [
+        "OdaiAhmed99"
+      ]
+    },
+    "15813": {
+      "state": "OPEN",
+      "createdAt": "2026-09-25T22:20:03Z",
+      "mergedAt": null,
+      "title": "feat(youtube): shorter Search form, tabbed channel and playlist lookups, and plain field help",
+      "url": "https://github.com/activepieces/activepieces/pull/15813",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "15814": {
+      "state": "OPEN",
+      "createdAt": "2026-09-25T23:26:23Z",
+      "mergedAt": null,
+      "title": "feat(hubspot): readable property notes, plain-language labels and optional fields under Advanced",
+      "url": "https://github.com/activepieces/activepieces/pull/15814",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "15816": {
+      "state": "OPEN",
+      "createdAt": "2026-09-26T08:06:18Z",
+      "mergedAt": null,
+      "title": "feat(cal-com): add AI actions and output schemas",
+      "url": "https://github.com/activepieces/activepieces/pull/15816",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
     }
   }
 }

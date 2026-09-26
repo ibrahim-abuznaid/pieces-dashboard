@@ -89,8 +89,7 @@ Two halves, and the difference matters:
   ask. Cloud ingestion **does** carry `propertyGroups` and `advanced` (verified 2026-09-13 — it was an open
   question in the team's `ui-improvements/README.md`).
 
-Claims live in `ui-improvements/pieces.json` (*slug + PR number*), one JSON edit and a push, exactly like
-`ai-actions/pieces.json`. The build counts a piece the cloud publishes even without a claim row, and prints
+Claims live in `ui-improvements/pieces.json` (*slug + PR number*), one JSON edit and a push. The build counts a piece the cloud publishes even without a claim row, and prints
 a `WARN` naming it so the list catches up. The shared **Custom API Call** action is excluded everywhere: one
 generic form injected into ~500 pieces gained four `advanced` props in
 [#15248](https://github.com/activepieces/activepieces/pull/15248), and counting it would report 10 pieces as
@@ -138,6 +137,12 @@ npm run build    # writes dist/ — open dist/index.html
 - `scripts/` — data fetchers (also run in CI)
 - `output-schema/`, `ai-actions/`, `site/` — one build.mjs + template.html each
 - Manual state lives ONLY in `output-schema/overrides.json`, `ai-actions/overrides.json`, and the curated `ai-actions/{pieces,blockers}.json`
+- AI-actions **merged** is read off upstream main, not the curated file: `scripts/fetch-repo-ai.sh` greps a sparse
+  shallow clone for `audience: 'ai'` actions per piece → `data/repo-ai-actions.json`, and `lib/ai-roster.mjs`
+  counts every piece found there whether or not it has a row. Open PRs are classified by the same rule
+  (`AI_AUDIENCE` in `lib/discover.mjs`), catalog-wide, one row per piece a PR carries. Until 2026-09-26 the roster
+  WAS the curated file, and W39 archived as +1 in a week the team shipped agent atomics to 23 pieces;
+  `scripts/backfill-ai-actions-from-main.mjs` restated the archive from main's git history.
 
 ## Public-data policy
 
