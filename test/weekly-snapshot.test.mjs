@@ -247,8 +247,14 @@ test('no targets file means no targets', () => {
   assert.equal('targets' in snap, false);
 });
 
-test('the archive refuses a snapshot whose targets name someone off the roster', () => {
+test('the archive refuses a snapshot whose targets name no such workstream', () => {
+  const snap = buildSnapshot({ weekId: '2026-W40', today: '2026-10-03', collectors: collectors(), targets: TARGETS_FILE });
+  snap.targets = { aiAction: { kishan: 5 } };
+  assert.throws(() => validateSnapshot(snap), /no such workstream/);
+});
+
+test('an archived week keeps a name the roster has since dropped', () => {
   const snap = buildSnapshot({ weekId: '2026-W40', today: '2026-10-03', collectors: collectors(), targets: TARGETS_FILE });
   snap.targets = { tickets: { ahmad: 5 } };
-  assert.throws(() => validateSnapshot(snap), /not on the team roster/);
+  assert.doesNotThrow(() => validateSnapshot(snap));
 });

@@ -116,7 +116,10 @@ export function validateSnapshot(snap) {
     throw new Error('decisions must be an array of strings');
   }
   // Optional: every week before weekly/data/targets.json's `from` has none.
-  if (snap.targets !== undefined) validateTargets(snap.targets);
+  // Shape only, no roster: an archived week keeps the names it was set with, so
+  // the live roster is not checked here — the snapshot path (readTargets →
+  // validateTargetsFile) already checked them when the week was written.
+  if (snap.targets !== undefined) validateTargets(snap.targets, 'targets', { roster: null });
   for (const [key, fields] of Object.entries(REQUIRED)) {
     const ws = snap[key];
     if (!ws || typeof ws !== 'object') throw new Error(`missing workstream: ${key}`);

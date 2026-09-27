@@ -15,7 +15,11 @@ export const TARGET_KEYS = ['aiActions', 'uiImprovements', 'testing', 'tickets']
 const WEEK_RE = /^\d{4}-W\d{2}$/;
 const isObject = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
 
-export function validateTargets(targets, at = 'targets') {
+// `roster` is who a person key may name. The file boundary checks it against
+// today's team; the archive passes null, because a past week keeps the names
+// its targets were set with — someone leaving the team must not turn every
+// week that named them invalid. With no roster only the shape is checked.
+export function validateTargets(targets, at = 'targets', { roster = PEOPLE } = {}) {
   if (!isObject(targets)) throw new Error(`${at} must be an object`);
   for (const [key, byPerson] of Object.entries(targets)) {
     if (!TARGET_KEYS.includes(key)) {
@@ -23,8 +27,9 @@ export function validateTargets(targets, at = 'targets') {
     }
     if (!isObject(byPerson)) throw new Error(`${at}.${key} must be an object of person → target`);
     for (const [person, n] of Object.entries(byPerson)) {
-      if (!PEOPLE.includes(person)) {
-        throw new Error(`${at}.${key}.${person}: not on the team roster (${PEOPLE.join(', ')})`);
+      if (!person) throw new Error(`${at}.${key} has an empty person key`);
+      if (Array.isArray(roster) && !roster.includes(person)) {
+        throw new Error(`${at}.${key}.${person}: not on the team roster (${roster.join(', ')})`);
       }
       if (!Number.isInteger(n) || n <= 0) {
         throw new Error(`${at}.${key}.${person} must be a positive integer, got ${JSON.stringify(n)}`);

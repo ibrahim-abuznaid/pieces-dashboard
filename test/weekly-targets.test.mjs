@@ -27,6 +27,11 @@ test('an unknown workstream is named in the error', () =>
 test('a person off the roster is named in the error', () =>
   assert.throws(() => validateTargets({ tickets: { ahmad: 5 } }), /targets\.tickets\.ahmad: not on the team roster/));
 
+test('without a roster, only the shape is checked', () => {
+  assert.doesNotThrow(() => validateTargets({ tickets: { ahmad: 5 } }, 'targets', { roster: null }));
+  assert.throws(() => validateTargets({ tickets: { ahmad: '5' } }, 'targets', { roster: null }), /must be a positive integer/);
+});
+
 test('a target must be a positive integer — a string, a zero or a fraction is a typo', () => {
   for (const bad of ['20', 0, -1, 2.5, null]) {
     assert.throws(() => validateTargets({ tickets: { kishan: bad } }), /targets\.tickets\.kishan must be a positive integer/);
