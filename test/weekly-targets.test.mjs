@@ -6,10 +6,10 @@ import { TARGET_KEYS, validateTargets, validateTargetsFile, targetsForWeek } fro
 
 const FILE = { from: '2026-W40', targets: { aiActions: { kishan: 20, odai: 20 }, tickets: { kishan: 5 } } };
 
-test('the committed targets file is valid and starts at W40', () => {
+test('the committed targets file is valid and starts at W39', () => {
   const file = JSON.parse(readFileSync(new URL('../weekly/data/targets.json', import.meta.url), 'utf8'));
   assert.doesNotThrow(() => validateTargetsFile(file));
-  assert.equal(file.from, '2026-W40');
+  assert.equal(file.from, '2026-W39');
   assert.deepEqual(file.targets, {
     aiActions: { kishan: 20, odai: 20 },
     uiImprovements: { talal: 15 },
