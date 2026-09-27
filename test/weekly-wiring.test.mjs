@@ -32,3 +32,17 @@ test('the piece-tester-web stats-endpoint limitation stays on the record in the 
   assert.match(readme, /build progress/i);
   assert.match(readme, /stats endpoint/i);
 });
+
+// The landing scan's credit is archived for good by the Saturday job, so there
+// an incomplete scan must fail the run (and the trap retry it tomorrow); CI's
+// daily rebuild keeps it best-effort. See landingScanVerdict in lib/discover.mjs.
+test('the Saturday job requires a complete landing scan; CI does not', () => {
+  const sh = readFileSync(new URL('../refresh-weekly.sh', import.meta.url), 'utf8');
+  const at = sh.search(/^export LANDINGS_REQUIRED=1$/m);
+  assert.ok(at >= 0, 'refresh-weekly.sh must export LANDINGS_REQUIRED=1');
+  assert.ok(at < sh.search(/^npm run fetch$/m), 'and before it runs the fetch');
+  const fetch = readFileSync(new URL('../scripts/fetch-pr-states.mjs', import.meta.url), 'utf8');
+  assert.match(fetch, /process\.env\.LANDINGS_REQUIRED === '1'/);
+  const yml = readFileSync(new URL('../.github/workflows/deploy.yml', import.meta.url), 'utf8');
+  assert.doesNotMatch(yml, /LANDINGS_REQUIRED/, 'CI stays best-effort');
+});

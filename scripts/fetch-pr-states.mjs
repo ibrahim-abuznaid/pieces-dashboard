@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { discoverClaims, discoverLandings, ROLLOUTS } from '../lib/discover.mjs';
+import { discoverClaims, discoverLandings, landingScanVerdict, ROLLOUTS } from '../lib/discover.mjs';
 import { reviewVerdict } from '../lib/reviews.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -77,42 +77,58 @@ writeFileSync(join(ROOT, 'data/discovered-claims.json'),
   JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), ...discovered }, null, 2) + '\n');
 
 // Which merged PR LANDED each piece's rollout work, for the pieces the builds
-// find done on main with no PR pointer (22 of 58 AI pieces and 15 of 22 UI
-// pieces on 2026-09-27). The weekly targets credit its author. 21 days covers
-// the week being snapshotted with two to spare; a piece that went done longer
-// ago than that is not this week's work, so it needs no landing.
+// find done with no PR pointer (22 of 58 AI pieces and 15 of 22 UI pieces on
+// 2026-09-27) or with one that never merged (lib/credit.mjs). The weekly
+// targets credit its author. 21 days covers the week being snapshotted with two
+// to spare; a piece that went done longer ago than that is not this week's
+// work, so it needs no landing.
 //
-// Best-effort, unlike the PR-state fetch below: a failed scan costs credit —
-// visible on the page as "not credited" — while a failed fetch costs the deploy.
+// Best-effort by default, unlike the PR-state fetch below: a failed scan costs
+// credit — visible on the page as "not credited" — while a failed fetch costs
+// the deploy. But every lost call is recorded, and the file says `complete:
+// false` when there was one. With LANDINGS_REQUIRED=1 (the Saturday job, see
+// refresh-weekly.sh) an incomplete scan fails this script at the end, after the
+// other data files are written: its snapshot would archive the missing credit
+// as a measured 0, permanently. See landingScanVerdict in lib/discover.mjs.
+//
+// Community AND core, unlike open-PR discovery above: see LANDING_PIECE_PATH.
 const LANDING_DAYS = 21;
+const LANDING_ROOTS = ['packages/pieces/community/', 'packages/pieces/core/'];
 function landings() {
   const since = new Date(Date.now() - LANDING_DAYS * 864e5).toISOString().slice(0, 10);
+  const failures = [];
   let merged = [];
   try {
     merged = gh(['pr', 'list', '--repo', REPO, '--state', 'merged', '--search', `merged:>=${since} base:main`,
       '--limit', '1000', '--json', 'number,files,author,mergedAt,baseRefName']);
   } catch (e) {
+    failures.push(`merged-PR list failed (${e.message})`);
     console.warn(`⚠ landing scan skipped (${e.message}) — pieces done without a PR pointer stay uncredited`);
-    return { since, ...Object.fromEntries(ROLLOUTS.map((r) => [r, {}])) };
   }
   const withPatches = [];
-  for (const pr of merged.filter((p) => (p.files ?? []).some((f) => f.path?.startsWith('packages/pieces/community/')))) {
+  for (const pr of merged.filter((p) => (p.files ?? []).some((f) => LANDING_ROOTS.some((r) => f.path?.startsWith(r))))) {
     try {
       const files = gh(['api', '--paginate', `repos/${REPO}/pulls/${pr.number}/files?per_page=100`]);
       withPatches.push({ number: pr.number, base: pr.baseRefName ?? null, mergedAt: pr.mergedAt,
         author: pr.author?.login ?? null, files });
     } catch (e) {
+      failures.push(`PR #${pr.number} files unavailable (${e.message})`);
       console.warn(`⚠ PR #${pr.number}: files unavailable (${e.message}) — its landings are not credited`);
     }
   }
   const found = discoverLandings(withPatches);
   const total = ROLLOUTS.reduce((a, r) => a + Object.keys(found[r]).length, 0);
-  console.log(`✓ found ${total} landings across ${withPatches.length} piece PRs merged since ${since}`);
-  return { since, ...found };
+  const verdict = landingScanVerdict({ failures, required: process.env.LANDINGS_REQUIRED === '1' });
+  console.log(`${verdict.complete ? '✓' : '⚠'} found ${total} landings across ${withPatches.length} piece PRs merged since ${since}${
+    verdict.complete ? '' : ` — INCOMPLETE, ${failures.length} call(s) failed`}`);
+  return { since, complete: verdict.complete, found, error: verdict.error };
 }
 
-writeFileSync(join(ROOT, 'data/landings.json'),
-  JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), ...landings() }, null, 2) + '\n');
+const landingScan = landings();
+writeFileSync(join(ROOT, 'data/landings.json'), JSON.stringify({
+  fetched: new Date().toISOString().slice(0, 10), since: landingScan.since, complete: landingScan.complete,
+  ...landingScan.found,
+}, null, 2) + '\n');
 
 // Discovered numbers need their state fetched like any other: the builds read
 // stage off data/pr-states.json, not off the fact that a PR was found.
@@ -195,3 +211,9 @@ for (const [n, pr] of Object.entries(prs)) {
 writeFileSync(join(ROOT, 'data/pr-states.json'),
   JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), prs }, null, 2) + '\n');
 console.log(`✓ fetched ${Object.keys(prs).length} PRs → data/pr-states.json`);
+
+// Last, so every data file above is still written and agrees with the others.
+if (landingScan.error) {
+  console.error(`✗ ${landingScan.error}`);
+  throw new Error('landing scan incomplete (LANDINGS_REQUIRED=1)');
+}

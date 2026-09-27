@@ -93,6 +93,7 @@ const rowFor = (claim) => {
   const cov = covByFolder.get(claim.slug);
   const cat = catalogByFolder.get(claim.slug);
   const pr = claim.pr ?? null;
+  const stage = stageOf(claim, cov);
   return {
     folder: claim.slug,
     // The published name, falling back to the folder for a piece the catalog
@@ -106,12 +107,12 @@ const rowFor = (claim) => {
     steps: (cov?.totalActions ?? 0) + (cov?.totalTriggers ?? 0),
     grouped: cov?.uiGrouped ?? 0,
     advanced: cov?.uiAdvanced ?? 0,
-    stage: stageOf(claim, cov),
+    stage,
     pr,
     prState: pr != null ? (prData.prs[pr]?.state ?? null) : null,
     mergedAt: pr != null ? (prData.prs[pr]?.mergedAt ?? null) : null,
     assignees: assigneesOf({ assignee: claim.assignee ?? null, pr }, prData.prs),
-    author: authorOf({ slug: claim.slug, pr }, 'uiImprovements', prData.prs, landings),
+    author: authorOf({ slug: claim.slug, pr, stage }, 'uiImprovements', prData.prs, landings),
     note: claim.note ?? null,
   };
 };

@@ -110,6 +110,13 @@ log "1/6 internal dashboard refresh (Linear + GitHub) — see $DASHBOARD/refresh
 bash "$DASHBOARD/refresh.sh" || log "WARN internal refresh failed — tickets will degrade to no-data"
 
 log "2/6 fetch + build this repo (populates dist/*/summary.json)"
+# The landing scan credits each finished piece to its PR author, and this job's
+# snapshot archives that credit for good. Best-effort is right for CI's daily
+# rebuild; here a scan that lost a call would archive someone's 0/20 as a
+# measured number, or hand a piece to the wrong person. REQUIRED makes an
+# incomplete scan fail the fetch, so the trap alerts and tomorrow's run retries
+# the week.
+export LANDINGS_REQUIRED=1
 npm run fetch
 npm run build
 

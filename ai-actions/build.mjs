@@ -76,7 +76,7 @@ writeFileSync(join(DIST, 'summary.json'), JSON.stringify(summary, null, 2) + '\n
 writeFileSync(join(DIST, 'pieces.json'), JSON.stringify({
   generated: summary.generated,
   pieces: enriched.map(({ slug, atomics, stage, pr, prState }) => ({
-    slug, atomics, stage, pr, prState, author: authorOf({ slug, pr }, 'aiActions', prData.prs, landings),
+    slug, atomics, stage, pr, prState, author: authorOf({ slug, pr, stage }, 'aiActions', prData.prs, landings),
   })),
 }, null, 2) + '\n');
 console.log(`✓ ai-actions: ${summary.pieces} pieces (${summary.fromMain} found on main, ${summary.fromPrs} in open PRs, uncurated) · ${summary.atomics} atomics · held ${summary.stages.held} / assigned ${summary.stages.assigned} / PR-open ${summary.stages.prOpen} / approved ${summary.stages.approved} / merged ${summary.stages.merged} · ${summary.blockersOpen} open blockers`);
