@@ -1473,6 +1473,22 @@ test('the bar fills to the share of the target and never past full', () => {
   assert.match(tile, /Odai[\s\S]*?class="fill" style="width:40%"/);
 });
 
+// Only a hit fills the bar: 399/400 is a miss, and rounding would draw it full.
+test('a near miss never draws a full bar — the fill rounds down', () => {
+  const near = snap('2026-W40', { targets: { tickets: { kishan: 400, odai: 3 } },
+    tickets: { status: 'ok', total: 401, byPerson: { kishan: 399, odai: 2 },
+               prsMerged: { kishan: 0 }, reviews: { kishan: 0 }, shipped: [] } });
+  const tile = tileOf(renderDom([near]), 'Tickets solved');
+  assert.match(tile, /Kishan[\s\S]*?class="fill" style="width:99%"/);
+  assert.match(tile, /Odai[\s\S]*?class="fill" style="width:66%"/);
+  assert.doesNotMatch(tile, /✓/);
+});
+
+test('the hit mark is announced as an image with its label', () => {
+  const tile = tileOf(renderDom([TARGET_WEEK]), 'Tickets solved');
+  assert.match(tile, /<span class="tick" role="img" aria-label="target hit">✓<\/span>/);
+});
+
 test('a row that could not be measured says so and draws no fill', () => {
   const w = snap('2026-W40', { targets: { aiActions: { kishan: 20 } },
     aiActions: { status: 'ok', merged: 2, prOpen: 0, assigned: 0, held: 0, totalPieces: 28, blockersOpen: 0,

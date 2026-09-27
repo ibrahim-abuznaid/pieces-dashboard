@@ -76,13 +76,27 @@ const byAuthor = (r) => (typeof r.author === 'string' && r.author ? (personOf(r.
 const CREDIT = { aiActions: byAuthor, uiImprovements: byAuthor, testing: () => 'sanket' };
 
 // Counts per credit key, or null when the week cannot be measured. Pieces use
-// the tile's own "done this week" diff (landed.mjs), so the per-person numbers
-// plus the "also" line are exactly the strip's pieces. `spec.done` absent means
-// every roster row is done — the tester's roster lists only covered pieces.
+// the tile's own "done this week" diff (landed.mjs). On the rollout tiles that
+// makes the per-person numbers plus the "also" line exactly the strip's pieces;
+// the testing tile runs the same diff, but its strip shows the cumulative
+// coverage instead. `spec.done` absent means every roster row is done — the
+// tester's roster lists only covered pieces.
+//
+// A rollout roster that is EMPTY this week is not measured. The collectors
+// (weekly/collect/ai-actions.mjs) return `roster: []` with status ok when
+// pieces.json is lost or one row is malformed, so "[]" there is a broken
+// reading, and every target would draw it as 0. priorRoster already refuses an
+// empty PRIOR roster for the same reason. The tester's empty roster is a real
+// reading — nothing covered — so testing keeps it.
+//
+// Known limit: the diff only compares against the week before. A piece whose
+// approval is withdrawn (approved → pr-open → merged) is done, then not, then
+// done again, and counts for its author in both weeks it crossed the line.
 function countsFor(spec, ws, weeks, selected) {
   if (spec.key === 'tickets') return checkedByPerson(ws.byPerson, ws.total);
   const credit = CREDIT[spec.key];
   if (!credit) return null;
+  if (spec.done && Array.isArray(ws.roster) && !ws.roster.length) return null;
   const isDone = spec.done ? (r) => spec.done.includes(r.stage) : () => true;
   const landed = landedRows(weeks, selected, spec.key, isDone);
   if (!landed) return null;

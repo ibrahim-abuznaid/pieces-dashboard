@@ -565,7 +565,8 @@ export function buildView(archive, { weekId, notes } = {}) {
       // The lead's per-person targets for this tile, from the week's own
       // snapshot (weekly/lib/targets.mjs). They replace the tickets tile's name
       // line rather than repeating it: the rows plus their "also" line are
-      // checked to add up to the same total, so nobody drops out of view.
+      // checked to add up to the same total, so every ticket closed stays in
+      // view. A zero with no target behind it is not listed.
       targets,
       note: curatedNote(notes?.[selected.week]?.[spec.key]) ?? spec.note?.(ws) ?? '',
     };

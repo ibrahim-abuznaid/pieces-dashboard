@@ -1,8 +1,10 @@
 // weekly/lib/landed.mjs
 // Which pieces crossed the line THIS week: done in the selected snapshot, not
-// done in the immediately-preceding one. The pieces strip labels these "Done
-// this week" and the per-person targets credit them, so both read ONE diff and
-// can never disagree about what a week delivered.
+// done in the immediately-preceding one. On the rollout tiles the pieces strip
+// labels these "Done this week" and the per-person targets credit them, so both
+// read ONE diff and can never disagree about what a week delivered. The testing
+// tile's targets read the same diff, but its strip is the cumulative coverage
+// (coveredStrip in view.mjs), so there the two do not list the same pieces.
 import { previousWeekId } from '../../lib/isoweek.mjs';
 
 // The roster of the immediately-preceding archive entry, or null when there is
@@ -54,8 +56,9 @@ export function alreadyDone(priorDone) {
 
 // Null when there is nothing honest to diff: this week recorded no roster, or
 // there is no legitimate prior roster (first week, a gap, an empty or degraded
-// prior — see priorRoster). The caller renders null as "not measured"; an empty
-// array is a real answer, a week that finished nothing.
+// prior — see priorRoster). The targets render null as "not measured"; the
+// pieces strip falls back to "Done in total". An empty array is a real answer,
+// a week that finished nothing.
 //
 // `filter` copies: the collector's ordering is preserved and the snapshot's own
 // roster is never sorted in place.

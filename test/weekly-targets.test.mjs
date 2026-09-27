@@ -155,6 +155,30 @@ test('a gap in the archive is not measured either', () => {
   assert.equal(targetsFor(AI, [W38, W40], W40).rows[0].actual, null);
 });
 
+// The rollout collectors return `roster: []` with status ok when pieces.json
+// is lost or one row is malformed, so an empty roster there is a broken
+// reading, not a week in which nobody finished anything.
+test('a rollout whose roster is empty THIS week is not measured, never 0', () => {
+  const empty = wk('2026-W40', { targets: TARGETS, aiActions: ok([]), uiImprovements: ok([]) });
+  for (const spec of [AI, UI]) {
+    const t = targetsFor(spec, [W39, empty], empty);
+    assert.ok(t.rows.every((r) => r.actual === null && r.hit === false), spec.key);
+    assert.equal(t.also, '');
+  }
+});
+
+test('a rollout whose PRIOR roster is empty is not measured either', () => {
+  const W39empty = wk('2026-W39', { aiActions: ok([]), uiImprovements: ok([]) });
+  for (const spec of [AI, UI]) {
+    assert.ok(targetsFor(spec, [W39empty, W40], W40).rows.every((r) => r.actual === null), spec.key);
+  }
+});
+
+test('an empty coverage roster is still a reading: the tester added nothing', () => {
+  const none = wk('2026-W40', { targets: TARGETS, testing: ok([]) });
+  assert.equal(targetsFor(TESTING, [W39, none], none).rows[0].actual, 0);
+});
+
 test('tickets whose per-person counts do not add up are not measured', () => {
   const bad = wk('2026-W40', { targets: TARGETS, tickets: { status: 'ok', total: 99, byPerson: { kishan: 6 } } });
   assert.equal(targetsFor(TICKETS, [bad], bad).rows[0].actual, null);

@@ -1,10 +1,11 @@
 // test/weekly-snapshot.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSnapshot, deriveDecisions, parseArgs, testerClient } from '../weekly/snapshot.mjs';
-import { existsSync, writeFileSync } from 'node:fs';
+import { buildSnapshot, deriveDecisions, parseArgs, testerClient, readTargets } from '../weekly/snapshot.mjs';
+import { existsSync, writeFileSync, mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from '../weekly/lib/archive.mjs';
 
 const collectors = (over = {}) => ({
@@ -257,4 +258,33 @@ test('an archived week keeps a name the roster has since dropped', () => {
   const snap = buildSnapshot({ weekId: '2026-W40', today: '2026-10-03', collectors: collectors(), targets: TARGETS_FILE });
   snap.targets = { tickets: { ahmad: 5 } };
   assert.doesNotThrow(() => validateSnapshot(snap));
+});
+
+// ── readTargets ────────────────────────────────────────────────────────────
+// Temp paths only: these tests must never touch the committed weekly/data files.
+const withTemp = (fn) => {
+  const dir = mkdtempSync(join(tmpdir(), 'pd-targets-'));
+  try { return fn(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
+};
+
+test('readTargets: no targets file means no targets', () =>
+  withTemp((dir) => assert.equal(readTargets(join(dir, 'targets.json')), null)));
+
+test('readTargets: malformed JSON fails loudly and names targets.json', () =>
+  withTemp((dir) => {
+    const path = join(dir, 'targets.json');
+    writeFileSync(path, '{ "from": "2026-W40", "targets": { ');
+    assert.throws(() => readTargets(path), /^Error: targets\.json: /);
+  }));
+
+test('readTargets: a file that parses but fails validation still throws', () =>
+  withTemp((dir) => {
+    const path = join(dir, 'targets.json');
+    writeFileSync(path, JSON.stringify({ from: 'W40', targets: {} }));
+    assert.throws(() => readTargets(path), /from must be YYYY-Wnn/);
+  }));
+
+test('readTargets: the committed file is returned as written', () => {
+  const committed = new URL('../weekly/data/targets.json', import.meta.url);
+  assert.deepEqual(readTargets(fileURLToPath(committed)), JSON.parse(readFileSync(committed, 'utf8')));
 });

@@ -179,10 +179,17 @@ export function testerClient({ baseUrl, password, exec, warn = console.warn,
 }
 
 // Curated like notes.json: absent means no targets, malformed fails loudly — a
-// half-read targets file would publish some people's rows and not others'.
+// half-read targets file would publish some people's rows and not others'. A
+// bare SyntaxError names neither the file nor the fix, and this is the file a
+// person hand-edits, so the parse error says which one it was.
 export function readTargets(path = TARGETS) {
   if (!existsSync(path)) return null;
-  const file = JSON.parse(readFileSync(path, 'utf8'));
+  let file;
+  try {
+    file = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (err) {
+    throw new Error(`targets.json: ${err.message}`);
+  }
   validateTargetsFile(file);
   return file;
 }
