@@ -27,3 +27,24 @@ export const sumOverPeople = (byPerson) =>
 // `kishan` -> `Kishan`. The per-person line is the one place a reader sees
 // these keys, and a lowercase name reads like a database column.
 export const displayName = (key) => key.charAt(0).toUpperCase() + key.slice(1);
+
+// Each person's GitHub login, keyed like PEOPLE. The same handles the internal
+// dashboard's pull-github.mjs uses (PEOPLE[].gh) — the weekly targets credit a
+// piece to the AUTHOR of the PR that shipped it, and the archive stores that
+// login as a fact, so this is where a login becomes a person. Never an
+// assignee: assignees and `git -S` both credit the wrong person.
+export const GITHUB = {
+  kishan: 'kishanprmr',
+  sanket: 'sanket-a11y',
+  odai: 'OdaiAhmed99',
+  talal: 'Talaljaber',
+};
+
+// GitHub treats logins case-insensitively and so do its APIs' answers, so a
+// login is matched the same way. Null for anyone off the team — the caller
+// decides whether that is "others" or "not credited".
+export function personOf(login) {
+  if (typeof login !== 'string' || !login) return null;
+  const want = login.toLowerCase();
+  return PEOPLE.find((p) => GITHUB[p]?.toLowerCase() === want) ?? null;
+}
