@@ -1,6 +1,7 @@
 {
   "fetched": "2026-09-27",
   "since": "2026-09-06",
+  "complete": true,
   "outputSchema": {
     "monday": {
       "pr": 15798,
@@ -33,6 +34,11 @@
       "mergedAt": "2026-09-24T13:48:17Z"
     },
     "mastodon": {
+      "pr": 15756,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-25T10:38:37Z"
+    },
+    "crypto": {
       "pr": 15756,
       "author": "OdaiAhmed99",
       "mergedAt": "2026-09-25T10:38:37Z"
@@ -127,6 +133,11 @@
       "author": "OdaiAhmed99",
       "mergedAt": "2026-09-21T18:02:47Z"
     },
+    "math-helper": {
+      "pr": 15679,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T22:44:21Z"
+    },
     "sendinblue": {
       "pr": 15599,
       "author": "kishanprmr",
@@ -217,6 +228,11 @@
       "author": "OdaiAhmed99",
       "mergedAt": "2026-09-08T06:54:29Z"
     },
+    "sftp": {
+      "pr": 15333,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T06:54:29Z"
+    },
     "ninety": {
       "pr": 15299,
       "author": "OdaiAhmed99",
@@ -244,10 +260,20 @@
       "author": "Talaljaber",
       "mergedAt": "2026-09-23T15:39:12Z"
     },
+    "file-helper": {
+      "pr": 15684,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T22:44:58Z"
+    },
     "wordpress": {
       "pr": 15680,
       "author": "Talaljaber",
       "mergedAt": "2026-09-22T20:41:12Z"
+    },
+    "pdf": {
+      "pr": 15532,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T22:41:46Z"
     },
     "discord": {
       "pr": 15531,
@@ -293,6 +319,16 @@
       "pr": 15298,
       "author": "Talaljaber",
       "mergedAt": "2026-09-23T17:48:07Z"
+    },
+    "tables": {
+      "pr": 15287,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T20:58:06Z"
+    },
+    "date-helper": {
+      "pr": 15281,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-25T15:49:41Z"
     },
     "whatsscale": {
       "pr": 15010,
