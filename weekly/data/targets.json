@@ -1,0 +1,9 @@
+{
+  "from": "2026-W40",
+  "targets": {
+    "aiActions": { "kishan": 20, "odai": 20 },
+    "uiImprovements": { "talal": 15 },
+    "testing": { "sanket": 70 },
+    "tickets": { "kishan": 5, "odai": 5 }
+  }
+}

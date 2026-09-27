@@ -1,6 +1,7 @@
 // weekly/lib/archive.mjs
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { validateTargets } from './targets.mjs';
 
 const WEEK_RE = /^\d{4}-W\d{2}$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -114,6 +115,8 @@ export function validateSnapshot(snap) {
   if (!Array.isArray(snap.decisions) || snap.decisions.some((d) => typeof d !== 'string')) {
     throw new Error('decisions must be an array of strings');
   }
+  // Optional: every week before weekly/data/targets.json's `from` has none.
+  if (snap.targets !== undefined) validateTargets(snap.targets);
   for (const [key, fields] of Object.entries(REQUIRED)) {
     const ws = snap[key];
     if (!ws || typeof ws !== 'object') throw new Error(`missing workstream: ${key}`);

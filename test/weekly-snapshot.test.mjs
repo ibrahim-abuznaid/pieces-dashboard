@@ -228,3 +228,27 @@ test('cleanup removes the cookie jar', () => {
   cleanup();
   assert.equal(existsSync(JAR), false);
 });
+
+const TARGETS_FILE = { from: '2026-W40', targets: { tickets: { kishan: 5, odai: 5 } } };
+
+test('a snapshot at or after `from` records the targets in force that week', () => {
+  const snap = buildSnapshot({ weekId: '2026-W40', today: '2026-10-03', collectors: collectors(), targets: TARGETS_FILE });
+  assert.deepEqual(snap.targets, { tickets: { kishan: 5, odai: 5 } });
+  assert.doesNotThrow(() => validateSnapshot(snap));
+});
+
+test('a snapshot before `from` carries no targets at all', () => {
+  const snap = buildSnapshot({ weekId: '2026-W39', today: '2026-09-26', collectors: collectors(), targets: TARGETS_FILE });
+  assert.equal('targets' in snap, false);
+});
+
+test('no targets file means no targets', () => {
+  const snap = buildSnapshot({ weekId: '2026-W40', today: '2026-10-03', collectors: collectors() });
+  assert.equal('targets' in snap, false);
+});
+
+test('the archive refuses a snapshot whose targets name someone off the roster', () => {
+  const snap = buildSnapshot({ weekId: '2026-W40', today: '2026-10-03', collectors: collectors(), targets: TARGETS_FILE });
+  snap.targets = { tickets: { ahmad: 5 } };
+  assert.throws(() => validateSnapshot(snap), /not on the team roster/);
+});

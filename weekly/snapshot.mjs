@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { isoWeekId, mondayOfWeekId, latestSealedWeek, windowForWeekId } from '../lib/isoweek.mjs';
 import { readArchive, appendWeek, writeArchive } from './lib/archive.mjs';
+import { validateTargetsFile, targetsForWeek } from './lib/targets.mjs';
 // One grammar for the whole product: the decision lines this file writes end up
 // in the same band as everything view.mjs phrases, so they share the helper.
 import { plural } from './lib/view.mjs';
@@ -22,12 +23,13 @@ import { collectShipping } from './collect/shipping.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ARCHIVE = join(ROOT, 'weekly/data/weeks.json');
+const TARGETS = join(ROOT, 'weekly/data/targets.json');
 const TEAM_DASHBOARD = process.env.PIECES_TEAM_DASHBOARD
   ?? '/home/ibrahim/AP_work/Activepieces_v/pieces-team/dashboard';
 
 const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'testing', 'tickets', 'shipping'];
 
-export function buildSnapshot({ weekId, today, collectors }) {
+export function buildSnapshot({ weekId, today, collectors, targets = null }) {
   const { start, end } = windowForWeekId(weekId);
   const snap = { week: weekId, start, end, builtAt: today };
   for (const key of WORKSTREAMS) {
@@ -38,6 +40,10 @@ export function buildSnapshot({ weekId, today, collectors }) {
       snap[key] = { status: 'no-data', reason: `${key} collector threw (${err.message})` };
     }
   }
+  // The targets in force THIS week, copied in so the archive never depends on
+  // today's targets.json to explain a past week. Absent before `from`.
+  const inForce = targetsForWeek(targets, weekId);
+  if (inForce) snap.targets = inForce;
   snap.decisions = deriveDecisions(snap);
   return snap;
 }
@@ -172,6 +178,15 @@ export function testerClient({ baseUrl, password, exec, warn = console.warn,
   };
 }
 
+// Curated like notes.json: absent means no targets, malformed fails loudly — a
+// half-read targets file would publish some people's rows and not others'.
+export function readTargets(path = TARGETS) {
+  if (!existsSync(path)) return null;
+  const file = JSON.parse(readFileSync(path, 'utf8'));
+  validateTargetsFile(file);
+  return file;
+}
+
 export function main(argv) {
   const { today, weekId, force } = parseArgs(argv);
   const window = windowForWeekId(weekId);
@@ -194,6 +209,7 @@ export function main(argv) {
   try {
     snap = buildSnapshot({
       weekId, today,
+      targets: readTargets(),
       collectors: {
         outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
         aiActions: () => collectAiActions({ readJson: readRepoJson }),
