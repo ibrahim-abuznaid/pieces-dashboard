@@ -1452,3 +1452,42 @@ test('the pill sits between the unit and the delta', () => {
   ]), 'UI improvements');
   assert.match(tile, /class="unit"[\s\S]*class="inreview"[\s\S]*class="delta/);
 });
+
+// ── per-person targets ──────────────────────────────────────────────────────
+const TARGET_WEEK = snap('2026-W40', { targets: { tickets: { kishan: 5, odai: 5 } },
+  tickets: { status: 'ok', total: 9, byPerson: { kishan: 6, sanket: 1, odai: 2, talal: 0 },
+             prsMerged: { kishan: 0 }, reviews: { kishan: 0 }, shipped: [] } });
+
+test('a tile with targets draws one row per person with actual/target', () => {
+  const tile = tileOf(renderDom([TARGET_WEEK]), 'Tickets solved');
+  assert.match(tile, /<ul class="targets"/);
+  assert.match(tile, /<li class="target hit">[\s\S]*?Kishan[\s\S]*?6\/5[\s\S]*?✓/);
+  assert.match(tile, /<li class="target">[\s\S]*?Odai[\s\S]*?2\/5/);
+  assert.match(tile, /also: Sanket 1/);
+  assert.doesNotMatch(tile, /Kishan 6 · Sanket 1/, 'the rows replace the per-person line');
+});
+
+test('the bar fills to the share of the target and never past full', () => {
+  const tile = tileOf(renderDom([TARGET_WEEK]), 'Tickets solved');
+  assert.match(tile, /Kishan[\s\S]*?class="fill" style="width:100%"/);
+  assert.match(tile, /Odai[\s\S]*?class="fill" style="width:40%"/);
+});
+
+test('a row that could not be measured says so and draws no fill', () => {
+  const w = snap('2026-W40', { targets: { aiActions: { kishan: 20 } },
+    aiActions: { status: 'ok', merged: 2, prOpen: 0, assigned: 0, held: 0, totalPieces: 28, blockersOpen: 0,
+                 roster: [{ name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' }] } });
+  const tile = tileOf(renderDom([w]), 'AI-actions');
+  assert.match(tile, /<li class="target unmeasured">[\s\S]*?— \/ 20 · not measured/);
+  assert.match(tile, /class="fill" style="width:0%"/);
+});
+
+test('a week before the targets existed renders no target markup at all', () => {
+  const dom = renderDom([snap('2026-W31')]);
+  assert.doesNotMatch(dom, /class="targets"/);
+});
+
+test('a target row is one line, whatever the name — the page height budget', () => {
+  const css = pageCss(render([TARGET_WEEK]).html);
+  assert.equal(declarationsFor(css, 'ul.targets .target')['white-space'], 'nowrap');
+});

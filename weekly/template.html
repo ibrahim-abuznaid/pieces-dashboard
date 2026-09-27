@@ -115,6 +115,23 @@
   .tile.is-nodata { border-style: dashed; }
   .nodata { color: var(--text-secondary); font-size: 13px; }
   .nodata b { color: var(--text-muted); font-weight: 600; }
+  /* Per-person weekly targets (weekly/data/targets.json): one row per person —
+     name, a bar filled to their share of the target, actual/target, and a ✓
+     when hit. Every row is ONE line at a fixed height, whatever the name, for the
+     same reason a chip is: the page's height budget holds only while no block
+     grows with its content. The ✓ and the dashed empty bar are the non-colour
+     cues, as the delta's glyph and the degraded tile's dashed edge are. Hitting
+     a target is a gain, so it is the one bar drawn in the live green. */
+  ul.targets { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; }
+  ul.targets .target { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center;
+                       gap: 8px; font-size: 12.5px; line-height: 18px; white-space: nowrap; }
+  ul.targets .who { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; }
+  ul.targets .bar { display: block; height: 6px; border-radius: 999px; background: var(--s-todo); overflow: hidden; }
+  ul.targets .fill { display: block; height: 100%; background: var(--bar-hue); }
+  ul.targets .hit .fill { background: var(--s-live); }
+  ul.targets .unmeasured .bar { background: transparent; border: 1px dashed var(--border); }
+  ul.targets .score { font-variant-numeric: tabular-nums; color: var(--text-primary); }
+  ul.targets .unmeasured .score { color: var(--text-muted); }
 
   /* The pieces behind the number, in the same box as the number. `.chip` is the
      shared vocabulary from shared/theme.css; the pill shape, the colours (all
@@ -326,6 +343,25 @@ function inReviewHtml(n) {
   return `<span class="inreview">+${num(n)} in review</span>`;
 }
 
+// The per-person target rows (see the CSS above). `actual` null means the week
+// could not be measured, and that is said in words — never drawn as a 0 or an
+// empty bar that reads like one. The bar is decorative: the score beside it is
+// the accessible text.
+function targetsHtml(tg) {
+  if (!tg || !tg.rows.length) return '';
+  const rows = tg.rows.map((r) => {
+    const measured = typeof r.actual === 'number';
+    const pct = measured ? Math.round(Math.min(r.actual / r.target, 1) * 100) : 0;
+    const cls = `target${r.hit ? ' hit' : ''}${measured ? '' : ' unmeasured'}`;
+    const score = measured
+      ? `${num(r.actual)}/${num(r.target)}${r.hit ? ' <span class="tick" aria-label="target hit">✓</span>' : ''}`
+      : `— / ${num(r.target)} · not measured`;
+    return `<li class="${cls}"><span class="who">${esc(r.name)}</span><span class="bar" aria-hidden="true"><span class="fill" style="width:${pct}%"></span></span><span class="score">${score}</span></li>`;
+  }).join('');
+  return `<ul class="targets" aria-label="Weekly targets">${rows}</ul>${
+    tg.also ? `<div class="note also">also: ${esc(tg.also)}</div>` : ''}`;
+}
+
 function tileHtml(t) {
   const wide = t.wide ? ' wide' : '';
   if (t.status !== 'ok') {
@@ -335,6 +371,7 @@ function tileHtml(t) {
   }
   return `<div class="tile${wide}"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${inReviewHtml(t.inReview)}${deltaHtml(t.delta)}</div>
+    ${targetsHtml(t.targets)}
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
     ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}
     ${t.wide ? `<div class="stripline">${stripHtml(t.strip)}</div>` : stripHtml(t.strip)}</div>`;
