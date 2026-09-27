@@ -1,0 +1,470 @@
+{
+  "fetched": "2026-09-27",
+  "since": "2026-09-06",
+  "outputSchema": {
+    "monday": {
+      "pr": 15798,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-25T08:20:35Z"
+    },
+    "baserow": {
+      "pr": 15797,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-25T05:37:39Z"
+    },
+    "hugging-face": {
+      "pr": 15793,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-25T11:42:53Z"
+    },
+    "microsoft-onedrive": {
+      "pr": 15781,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-24T17:13:54Z"
+    },
+    "salesforce": {
+      "pr": 15768,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:53:51Z"
+    },
+    "mistral-ai": {
+      "pr": 15762,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:48:17Z"
+    },
+    "mastodon": {
+      "pr": 15756,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-25T10:38:37Z"
+    },
+    "typeform": {
+      "pr": 15734,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:43:31Z"
+    },
+    "calendly": {
+      "pr": 15731,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:41:15Z"
+    },
+    "facebook-pages": {
+      "pr": 15728,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:40:44Z"
+    },
+    "jira-cloud": {
+      "pr": 15726,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:38:55Z"
+    },
+    "mailer-lite": {
+      "pr": 15725,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:00:54Z"
+    },
+    "pipedrive": {
+      "pr": 15725,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:00:54Z"
+    },
+    "google-my-business": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "imap": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "woocommerce": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "wordpress": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "apitable": {
+      "pr": 15703,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T10:50:50Z"
+    },
+    "claude": {
+      "pr": 15703,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T10:50:50Z"
+    },
+    "microsoft-outlook": {
+      "pr": 15696,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:00:28Z"
+    },
+    "google-contacts": {
+      "pr": 15695,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T11:14:39Z"
+    },
+    "pushover": {
+      "pr": 15333,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T06:54:29Z"
+    },
+    "linkedin": {
+      "pr": 15688,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-21T18:02:47Z"
+    },
+    "twitter": {
+      "pr": 15688,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-21T18:02:47Z"
+    },
+    "youtube": {
+      "pr": 15688,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-21T18:02:47Z"
+    },
+    "sendinblue": {
+      "pr": 15599,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-17T09:04:11Z"
+    },
+    "whatsapp": {
+      "pr": 15585,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:16:18Z"
+    },
+    "resend": {
+      "pr": 15555,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-16T10:40:36Z"
+    },
+    "hubspot": {
+      "pr": 15542,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-15T04:23:36Z"
+    },
+    "pinterest": {
+      "pr": 15471,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-18T12:28:51Z"
+    },
+    "trello": {
+      "pr": 15539,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-20T12:19:58Z"
+    },
+    "gmail": {
+      "pr": 15347,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-08T06:57:50Z"
+    },
+    "slack": {
+      "pr": 15360,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-14T12:11:21Z"
+    },
+    "google-drive": {
+      "pr": 15461,
+      "author": "danielpoonwj",
+      "mergedAt": "2026-09-14T06:33:55Z"
+    },
+    "floqer": {
+      "pr": 15425,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-15T19:42:53Z"
+    },
+    "notion": {
+      "pr": 15394,
+      "author": "ibrahim-abuznaid",
+      "mergedAt": "2026-09-14T15:44:02Z"
+    },
+    "google-gemini": {
+      "pr": 15389,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T06:32:43Z"
+    },
+    "open-router": {
+      "pr": 15389,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T06:32:43Z"
+    },
+    "supabase": {
+      "pr": 15389,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T06:32:43Z"
+    },
+    "sage-accounting": {
+      "pr": 15351,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-10T12:31:38Z"
+    },
+    "coda": {
+      "pr": 15333,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T06:54:29Z"
+    },
+    "ntfy": {
+      "pr": 15333,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T06:54:29Z"
+    },
+    "systeme-io": {
+      "pr": 15333,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T06:54:29Z"
+    },
+    "ninety": {
+      "pr": 15299,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-07T23:52:30Z"
+    },
+    "whatsscale": {
+      "pr": 15010,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T13:18:31Z"
+    }
+  },
+  "uiImprovements": {
+    "gmail": {
+      "pr": 15753,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-24T17:53:58Z"
+    },
+    "whatsapp": {
+      "pr": 15752,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-25T15:42:16Z"
+    },
+    "google-drive": {
+      "pr": 15685,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-23T15:39:12Z"
+    },
+    "wordpress": {
+      "pr": 15680,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T20:41:12Z"
+    },
+    "discord": {
+      "pr": 15531,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T22:33:44Z"
+    },
+    "open-router": {
+      "pr": 15484,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-25T12:26:00Z"
+    },
+    "airtable": {
+      "pr": 15483,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-22T22:46:41Z"
+    },
+    "slack": {
+      "pr": 15472,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-17T12:52:07Z"
+    },
+    "pinterest": {
+      "pr": 15471,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-18T12:28:51Z"
+    },
+    "google-calendar": {
+      "pr": 15406,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-17T13:07:48Z"
+    },
+    "notion": {
+      "pr": 15397,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-25T15:42:51Z"
+    },
+    "sage-accounting": {
+      "pr": 15351,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-10T12:31:38Z"
+    },
+    "google-docs": {
+      "pr": 15298,
+      "author": "Talaljaber",
+      "mergedAt": "2026-09-23T17:48:07Z"
+    },
+    "whatsscale": {
+      "pr": 15010,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T13:18:31Z"
+    }
+  },
+  "aiActions": {
+    "monday": {
+      "pr": 15798,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-25T08:20:35Z"
+    },
+    "baserow": {
+      "pr": 15797,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-25T05:37:39Z"
+    },
+    "hugging-face": {
+      "pr": 15793,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-25T11:42:53Z"
+    },
+    "microsoft-onedrive": {
+      "pr": 15781,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-24T17:13:54Z"
+    },
+    "salesforce": {
+      "pr": 15768,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:53:51Z"
+    },
+    "mistral-ai": {
+      "pr": 15762,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:48:17Z"
+    },
+    "mastodon": {
+      "pr": 15756,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-25T10:38:37Z"
+    },
+    "typeform": {
+      "pr": 15734,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:43:31Z"
+    },
+    "calendly": {
+      "pr": 15731,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:41:15Z"
+    },
+    "facebook-pages": {
+      "pr": 15728,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:40:44Z"
+    },
+    "jira-cloud": {
+      "pr": 15726,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-24T13:38:55Z"
+    },
+    "mailer-lite": {
+      "pr": 15725,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:00:54Z"
+    },
+    "pipedrive": {
+      "pr": 15725,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:00:54Z"
+    },
+    "google-my-business": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "imap": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "woocommerce": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "wordpress": {
+      "pr": 15722,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T22:24:08Z"
+    },
+    "apitable": {
+      "pr": 15703,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T10:50:50Z"
+    },
+    "claude": {
+      "pr": 15703,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-22T10:50:50Z"
+    },
+    "microsoft-outlook": {
+      "pr": 15696,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:00:28Z"
+    },
+    "google-contacts": {
+      "pr": 15695,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T11:14:39Z"
+    },
+    "pushover": {
+      "pr": 15694,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-22T11:11:47Z"
+    },
+    "linkedin": {
+      "pr": 15688,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-21T18:02:47Z"
+    },
+    "twitter": {
+      "pr": 15688,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-21T18:02:47Z"
+    },
+    "youtube": {
+      "pr": 15688,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-21T18:02:47Z"
+    },
+    "sendinblue": {
+      "pr": 15599,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-17T09:04:11Z"
+    },
+    "whatsapp": {
+      "pr": 15585,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-27T13:16:18Z"
+    },
+    "resend": {
+      "pr": 15555,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-16T10:40:36Z"
+    },
+    "hubspot": {
+      "pr": 15542,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-15T04:23:36Z"
+    },
+    "pinterest": {
+      "pr": 15539,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-20T12:19:58Z"
+    },
+    "trello": {
+      "pr": 15539,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-20T12:19:58Z"
+    },
+    "gmail": {
+      "pr": 15512,
+      "author": "kishanprmr",
+      "mergedAt": "2026-09-14T07:41:47Z"
+    },
+    "whatsscale": {
+      "pr": 15010,
+      "author": "OdaiAhmed99",
+      "mergedAt": "2026-09-08T13:18:31Z"
+    }
+  }
+}
