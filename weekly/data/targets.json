@@ -1,5 +1,5 @@
 {
-  "from": "2026-W40",
+  "from": "2026-W39",
   "targets": {
     "aiActions": { "kishan": 20, "odai": 20 },
     "uiImprovements": { "talal": 15 },
