@@ -681,3 +681,25 @@ for (const [what, files] of [
     assert.match(ws.reason, /npm run fetch && npm run build/);
   });
 }
+
+// ── who shipped it ──────────────────────────────────────────────────────────
+// The weekly targets credit a finished piece to the author of the PR that
+// shipped it. The builds resolve that login; the collectors only carry it onto
+// the archived row — spread, so an unknown author leaves no key at all.
+test('the AI-actions roster carries the author a build resolved', () => {
+  const out = collectAiActions({ readJson: aiRead({ 'dist/ai-actions/pieces.json': { pieces: [
+    { slug: 'google-docs', atomics: 37, stage: 'merged', pr: 13926, prState: 'MERGED', author: 'kishanprmr' },
+    { slug: 'airtable', atomics: 19, stage: 'merged', pr: null, prState: null, author: null },
+  ] } }) });
+  const byName = Object.fromEntries(out.roster.map((r) => [r.name, r]));
+  assert.equal(byName['google-docs'].author, 'kishanprmr');
+  assert.equal('author' in byName.airtable, false, 'an unknown author must leave no key, not a null');
+});
+
+test('the UI-improvements roster carries the author a build resolved', () => {
+  const pieces = UI_PIECES.pieces.map((p) => (p.folder === 'whatsscale' ? { ...p, author: 'OdaiAhmed99' } : p));
+  const out = collectUiImprovements({ readJson: uiRead({ 'dist/ui-improvements/pieces.json': { ...UI_PIECES, pieces } }) });
+  const byFolder = Object.fromEntries(out.roster.map((r) => [r.folder, r]));
+  assert.equal(byFolder.whatsscale.author, 'OdaiAhmed99');
+  assert.equal('author' in byFolder['google-sheets'], false);
+});

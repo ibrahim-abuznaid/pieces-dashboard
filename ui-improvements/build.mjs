@@ -21,6 +21,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deriveStage, assigneesOf } from '../lib/stages.mjs';
 import { claimedPr } from '../lib/discover.mjs';
+import { authorOf } from '../lib/credit.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
@@ -34,6 +35,10 @@ const prData = read('../data/pr-states.json');
 // a checkout that has not fetched yet builds on the curated claims alone, which
 // is exactly what this build did before discovery existed.
 const discovered = (() => { try { return read('../data/discovered-claims.json'); } catch { return {}; } })();
+// Which merged PR landed each piece done without a PR pointer
+// (scripts/fetch-pr-states.mjs), so the weekly targets can credit its author.
+// Optional like discovery: without it those rows publish `author: null`.
+const landings = (() => { try { return read('../data/landings.json'); } catch { return {}; } })();
 
 const DIST = join(ROOT, '../dist/ui-improvements');
 
@@ -106,6 +111,7 @@ const rowFor = (claim) => {
     prState: pr != null ? (prData.prs[pr]?.state ?? null) : null,
     mergedAt: pr != null ? (prData.prs[pr]?.mergedAt ?? null) : null,
     assignees: assigneesOf({ assignee: claim.assignee ?? null, pr }, prData.prs),
+    author: authorOf({ slug: claim.slug, pr }, 'uiImprovements', prData.prs, landings),
     note: claim.note ?? null,
   };
 };

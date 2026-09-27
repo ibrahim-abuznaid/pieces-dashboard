@@ -318,3 +318,17 @@ test('aiActions.approved must be a number when present', () => {
   assert.doesNotThrow(() => validateSnapshot(ok({ aiActions: { ...base, approved: 6 } })));
   assert.throws(() => validateSnapshot(ok({ aiActions: { ...base, approved: '6' } })), /aiActions\.approved/);
 });
+
+test('a roster row may carry an author login', () => {
+  const s = ok();
+  s.aiActions = { ...s.aiActions, roster: [{ name: 'gmail', actions: 3, stage: 'merged', author: 'kishanprmr' }] };
+  assert.doesNotThrow(() => validateSnapshot(s));
+});
+
+test('a roster author must be a non-empty string when present', () => {
+  for (const bad of ['', null, 42]) {
+    const s = ok();
+    s.aiActions = { ...s.aiActions, roster: [{ name: 'gmail', actions: 3, stage: 'merged', author: bad }] };
+    assert.throws(() => validateSnapshot(s), /aiActions\.roster\[0\]\.author/);
+  }
+});

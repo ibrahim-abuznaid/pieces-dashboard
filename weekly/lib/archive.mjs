@@ -33,11 +33,12 @@ const OPTIONAL_NUMBERS = {
   aiActions: ['approved'],
 };
 
-// The three optional string fields a roster row may carry. All three are optional
+// The four optional string fields a roster row may carry. All four are optional
 // for the same reason as `roster` itself — rows written before each field existed
 // must keep validating — and each is rejected rather than coerced when present,
-// because each one reaches the page: as an `<img src>`, as the chip's name, or as
-// the key that decides which pieces get claimed for this week.
+// because each one reaches the page: as an `<img src>`, as the chip's name, as
+// the key that decides which pieces get claimed for this week, or as the person
+// credited with it.
 //
 // `nullable` is the difference between them, and it tracks what a null MEANS:
 //
@@ -75,6 +76,9 @@ function validateRoster(key, ws) {
     // so it rides alongside rather than replacing it. The AI-actions roster puts a
     // slug in `name` and the catalog's editorial name here.
     optionalString(at, 'displayName', row.displayName, { nullable: true });
+    // The PR author credited with the piece (weekly/lib/targets.mjs). A login is
+    // a fact or it is absent — the collectors spread it, so null never lands here.
+    optionalString(at, 'author', row.author, { nullable: false });
   });
 }
 

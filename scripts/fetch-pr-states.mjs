@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { discoverClaims, ROLLOUTS } from '../lib/discover.mjs';
+import { discoverClaims, discoverLandings, ROLLOUTS } from '../lib/discover.mjs';
 import { reviewVerdict } from '../lib/reviews.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -76,6 +76,44 @@ const discovered = discover();
 writeFileSync(join(ROOT, 'data/discovered-claims.json'),
   JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), ...discovered }, null, 2) + '\n');
 
+// Which merged PR LANDED each piece's rollout work, for the pieces the builds
+// find done on main with no PR pointer (22 of 58 AI pieces and 15 of 22 UI
+// pieces on 2026-09-27). The weekly targets credit its author. 21 days covers
+// the week being snapshotted with two to spare; a piece that went done longer
+// ago than that is not this week's work, so it needs no landing.
+//
+// Best-effort, unlike the PR-state fetch below: a failed scan costs credit —
+// visible on the page as "not credited" — while a failed fetch costs the deploy.
+const LANDING_DAYS = 21;
+function landings() {
+  const since = new Date(Date.now() - LANDING_DAYS * 864e5).toISOString().slice(0, 10);
+  let merged = [];
+  try {
+    merged = gh(['pr', 'list', '--repo', REPO, '--state', 'merged', '--search', `merged:>=${since} base:main`,
+      '--limit', '1000', '--json', 'number,files,author,mergedAt,baseRefName']);
+  } catch (e) {
+    console.warn(`⚠ landing scan skipped (${e.message}) — pieces done without a PR pointer stay uncredited`);
+    return { since, ...Object.fromEntries(ROLLOUTS.map((r) => [r, {}])) };
+  }
+  const withPatches = [];
+  for (const pr of merged.filter((p) => (p.files ?? []).some((f) => f.path?.startsWith('packages/pieces/community/')))) {
+    try {
+      const files = gh(['api', '--paginate', `repos/${REPO}/pulls/${pr.number}/files?per_page=100`]);
+      withPatches.push({ number: pr.number, base: pr.baseRefName ?? null, mergedAt: pr.mergedAt,
+        author: pr.author?.login ?? null, files });
+    } catch (e) {
+      console.warn(`⚠ PR #${pr.number}: files unavailable (${e.message}) — its landings are not credited`);
+    }
+  }
+  const found = discoverLandings(withPatches);
+  const total = ROLLOUTS.reduce((a, r) => a + Object.keys(found[r]).length, 0);
+  console.log(`✓ found ${total} landings across ${withPatches.length} piece PRs merged since ${since}`);
+  return { since, ...found };
+}
+
+writeFileSync(join(ROOT, 'data/landings.json'),
+  JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), ...landings() }, null, 2) + '\n');
+
 // Discovered numbers need their state fetched like any other: the builds read
 // stage off data/pr-states.json, not off the fact that a PR was found.
 for (const rollout of ROLLOUTS) {
@@ -115,6 +153,9 @@ for (const n of [...nums.keys()].sort((a, b) => a - b)) {
     mergedAt: pr.merged_at,
     title: pr.title,
     url: pr.html_url,
+    // Who wrote it — the weekly targets credit a finished piece to this login,
+    // never to an assignee (lib/credit.mjs).
+    author: pr.user?.login ?? null,
     // The branch it merged INTO. A stacked PR (#15758 targets
     // feat/asana-ai-actions-a) reads MERGED the day it lands on its parent,
     // which says nothing about main; lib/ai-roster.mjs needs to tell the two apart.

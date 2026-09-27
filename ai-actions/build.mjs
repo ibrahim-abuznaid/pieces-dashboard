@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildAiRoster, summarizeAiRoster } from '../lib/ai-roster.mjs';
+import { authorOf } from '../lib/credit.mjs';
 import { renderPage } from '../lib/render.mjs';
 import { validateAiData } from './validate.mjs';
 
@@ -25,6 +26,10 @@ const discovered = (() => { try { return read('../data/discovered-claims.json');
 // because on that path a piece nobody wrote down is invisible again.
 const repoAi = (() => { try { return read('../data/repo-ai-actions.json'); } catch { return null; } })();
 if (!repoAi) console.warn('⚠ data/repo-ai-actions.json missing — merged counts fall back to the curated claims; run `npm run fetch:ai`');
+// Which merged PR landed each piece done without a PR pointer
+// (scripts/fetch-pr-states.mjs), so the weekly targets can credit its author.
+// Optional like discovery: without it those rows publish `author: null`.
+const landings = (() => { try { return read('../data/landings.json'); } catch { return {}; } })();
 
 const problems = validateAiData({ pieces, categories, blockers, prStates: prData.prs });
 if (problems.length) { console.error('✗ ' + problems.join('\n✗ ')); process.exit(1); }
@@ -70,6 +75,8 @@ writeFileSync(join(DIST, 'summary.json'), JSON.stringify(summary, null, 2) + '\n
 // from, so the roster can never disagree with the tiles.
 writeFileSync(join(DIST, 'pieces.json'), JSON.stringify({
   generated: summary.generated,
-  pieces: enriched.map(({ slug, atomics, stage, pr, prState }) => ({ slug, atomics, stage, pr, prState })),
+  pieces: enriched.map(({ slug, atomics, stage, pr, prState }) => ({
+    slug, atomics, stage, pr, prState, author: authorOf({ slug, pr }, 'aiActions', prData.prs, landings),
+  })),
 }, null, 2) + '\n');
 console.log(`✓ ai-actions: ${summary.pieces} pieces (${summary.fromMain} found on main, ${summary.fromPrs} in open PRs, uncurated) · ${summary.atomics} atomics · held ${summary.stages.held} / assigned ${summary.stages.assigned} / PR-open ${summary.stages.prOpen} / approved ${summary.stages.approved} / merged ${summary.stages.merged} · ${summary.blockersOpen} open blockers`);

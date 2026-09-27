@@ -40,6 +40,7 @@ function readRoster(readJson, catalog) {
           actions: p.atomics,
           stage: p.stage,
           ...(known?.displayName ? { displayName: known.displayName } : {}),
+          ...(typeof p.author === 'string' && p.author ? { author: p.author } : {}),
           logo: known?.logo ?? null,
         };
       })

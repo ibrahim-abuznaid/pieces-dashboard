@@ -34,6 +34,7 @@ function readRoster(readJson) {
         actions: p.steps,
         stage: p.stage,
         logo: p.logoUrl ?? null,
+        ...(typeof p.author === 'string' && p.author ? { author: p.author } : {}),
       };
     });
   } catch {
