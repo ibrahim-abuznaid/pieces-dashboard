@@ -17,7 +17,8 @@
 // A tile's `strip` is the opposite kind of field: OPTIONAL detail that exists
 // only when a snapshot recorded a roster, so older snapshots stay renderable.
 import { pick, deltaFor } from './deltas.mjs';
-import { previousWeekId } from '../../lib/isoweek.mjs';
+import { landedRows } from './landed.mjs';
+import { targetsFor, checkedByPerson } from './targets.mjs';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -88,11 +89,8 @@ const titled = (key) => key.charAt(0).toUpperCase() + key.slice(1);
 // `total` is passed rather than read off the workstream because three tiles now
 // share this and they keep their totals under three different names.
 function personLine(byPerson, total) {
-  const entries = Object.entries(byPerson ?? {});
-  if (!entries.length) return '';
-  if (entries.some(([, n]) => typeof n !== 'number' || !Number.isFinite(n))) return '';
-  if (entries.reduce((sum, [, n]) => sum + n, 0) !== total) return '';
-  return entries.map(([key, n]) => `${titled(key)} ${n}`).join(' · ');
+  const checked = checkedByPerson(byPerson, total);
+  return checked ? Object.entries(checked).map(([key, n]) => `${titled(key)} ${n}`).join(' · ') : '';
 }
 
 const perPersonLine = (ws) => personLine(ws.byPerson, ws.total);
@@ -441,7 +439,7 @@ const isAsk = (line) =>
 //
 // It is resolved HERE and not by renaming the row, because `name` is the identity
 // the done-this-week diff matches on and the only key the snapshots in the archive
-// carry — see `alreadyDone` below. The diff never sees this function.
+// carry — see `alreadyDone` in landed.mjs. The diff never sees this function.
 //
 // Both fields are normalised rather than trusted: an empty string in an `<img src>`
 // re-requests the page and renders as a broken image, an empty display name renders
@@ -452,53 +450,6 @@ const usable = (v) => (typeof v === 'string' && v ? v : null);
 
 const toChip = ({ name, displayName, logo }) =>
   ({ name: usable(displayName) ?? name, logo: usable(logo) });
-
-// The roster of the immediately-preceding archive entry, or null when there is
-// nothing legitimate to diff against. Mirrors the gap guard in `deltaFor`: the
-// preceding ENTRY is only the preceding WEEK if it literally is, so a hole in
-// the archive yields no comparison instead of two weeks' work labelled as one.
-// An empty roster counts as no roster — the collectors return `[]` for a lost
-// pieces.json, so "[] last week" cannot be read as "nothing was done last week".
-function priorRoster(weeks, selected, key) {
-  const at = weeks.findIndex((w) => w.week === selected.week);
-  if (at <= 0) return null;
-  if (weeks[at - 1].week !== previousWeekId(selected.week)) return null;
-  const ws = weeks[at - 1][key];
-  if (ws?.status !== 'ok' || !Array.isArray(ws.roster) || !ws.roster.length) return null;
-  return ws.roster;
-}
-
-// A row's stable identity, or null when it carries none. `folder` is the piece's
-// directory: the catalog's own key, unique across every row, and the one thing
-// about a piece that does not change.
-//
-// A DISPLAY NAME is not an identity, which is exactly why a row may carry one for
-// the chip to render (see `toChip`) and the diff still reads this. It is editorial —
-// the cloud catalog renames pieces, 'Telegram Bot' and 'Google Gemini' among
-// them — and it is not unique:
-// two folders publish 'Cashfree Payments' and two publish 'Weekdone' today. Both
-// failures land in the diff below, and since the strip is the tile's headline
-// claim they land above the fold: a rename re-reports finished work as this
-// week's output, and a duplicated name hides a genuinely new piece behind its
-// twin, so the tile's delta pill and its strip contradict each other.
-const folderOf = (r) => (typeof r.folder === 'string' && r.folder ? r.folder : null);
-
-// "Was this piece already done a week ago?", keyed on identity.
-//
-// Falls back to matching by NAME when last week's roster is not fully
-// folder-keyed. That is not a preference, it is a bridge: the AI-actions roster
-// identifies a piece by SLUG in `name`, which already is stable and unique, and
-// every snapshot written before `folder` existed is name-keyed — comparing this
-// week's folders against those rows would find nothing in common and report the
-// whole finished backlog as one week's work. When in doubt this errs toward
-// "already done", because the one rule this page has is never to overstate a
-// week.
-function alreadyDone(priorDone) {
-  const folders = new Set(priorDone.map(folderOf).filter(Boolean));
-  const names = new Set(priorDone.map((r) => r.name));
-  const keyedByFolder = priorDone.length > 0 && folders.size === priorDone.length;
-  return (r) => (keyedByFolder && folderOf(r) ? folders.has(folderOf(r)) : names.has(r.name));
-}
 
 // The pieces strip: the LABEL and the list come out of this one computation, so
 // they can never end up describing different weeks.
@@ -515,17 +466,17 @@ function pieceStrip(ws, spec, weeks, selected) {
   const rows = Array.isArray(ws.roster) ? ws.roster : [];
   if (!rows.length) return null;                  // no roster recorded: nothing to show
   const isDone = (r) => spec.done.includes(r.stage);
-  const done = rows.filter(isDone);
-  const prior = priorRoster(weeks, selected, spec.key);
+  const landed = landedRows(weeks, selected, spec.key, isDone);
   // With nothing to diff against, the tile's own number is the whole answer, so
   // a workstream with nothing finished yet carries no strip at all.
-  if (!prior) return done.length ? capped('pieces', 'Done in total', done.map(toChip)) : null;
-  const before = alreadyDone(prior.filter(isDone));
-  const landed = done.filter((r) => !before(r)).sort((a, b) => a.name.localeCompare(b.name));
+  if (!landed) {
+    const done = rows.filter(isDone);
+    return done.length ? capped('pieces', 'Done in total', done.map(toChip)) : null;
+  }
   // A week that moved nothing has to say it out loud — silence reads as "not
   // measured".
   return landed.length
-    ? capped('pieces', 'Done this week', landed.map(toChip))
+    ? capped('pieces', 'Done this week', [...landed].sort((a, b) => a.name.localeCompare(b.name)).map(toChip))
     : { kind: 'pieces', label: 'Nothing new this week', items: [], rest: [], more: 0 };
 }
 
@@ -592,11 +543,13 @@ export function buildView(archive, { weekId, notes } = {}) {
       // "collected and failed".
       return { key: spec.key, title: spec.title, wide: spec.wide === true,
                status: 'no-data', reason: NOT_MEASURED,
-               value: null, delta: null, inReview: null, unit: '', strip: null, perPerson: '', note: '' };
+               value: null, delta: null, inReview: null, unit: '', strip: null, perPerson: '',
+               targets: null, note: '' };
     }
     // Resolved per week when the spec asks (pathFor), so value and delta always
     // share one metric — see the piece-testing entry in TILES.
     const path = spec.pathFor ? spec.pathFor(ws) : spec.path;
+    const targets = targetsFor(spec, weeks, selected);
     return {
       key: spec.key, title: spec.title, wide: spec.wide === true, status: 'ok', reason: '',
       value: pick(selected, path),
@@ -608,7 +561,12 @@ export function buildView(archive, { weekId, notes } = {}) {
       inReview: spec.review ? pick(selected, spec.review) : null,
       unit: spec.unit(ws),
       strip: spec.strip?.(ws, spec, weeks, selected) ?? null,
-      perPerson: spec.perPerson?.(ws) ?? '',
+      perPerson: targets ? '' : (spec.perPerson?.(ws) ?? ''),
+      // The lead's per-person targets for this tile, from the week's own
+      // snapshot (weekly/lib/targets.mjs). They replace the tickets tile's name
+      // line rather than repeating it: the rows plus their "also" line are
+      // checked to add up to the same total, so nobody drops out of view.
+      targets,
       note: curatedNote(notes?.[selected.week]?.[spec.key]) ?? spec.note?.(ws) ?? '',
     };
   });

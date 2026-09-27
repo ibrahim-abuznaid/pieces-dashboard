@@ -212,7 +212,7 @@ test('only the tiles that count people carry a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'inReview', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'title', 'unit', 'value', 'wide']);
+      ['delta', 'inReview', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
   }
 });
 
@@ -1378,4 +1378,26 @@ test('a piece approved last week and merged this week is not done again', () => 
     snap('2026-W31', { aiActions: aiWith({ merged: 3, roster: now }) }),
   ] });
   assert.equal(aiTile(v).strip.label, 'Nothing new this week');
+});
+
+// ── per-person targets ──────────────────────────────────────────────────────
+test('a week with targets puts them on their tile and drops the tickets name line', () => {
+  const targets = { tickets: { kishan: 5 } };
+  const v = buildView({ weeks: [snap('2026-W40', { targets })] });
+  const t = tileOf(v, 'tickets');
+  assert.deepEqual(t.targets.rows, [{ person: 'kishan', name: 'Kishan', actual: 5, target: 5, hit: true }]);
+  assert.equal(t.targets.also, 'Sanket 6');
+  assert.equal(t.perPerson, '', 'the rows replace the per-person line');
+});
+
+test('every tile without targets carries targets: null, and keeps its per-person line', () => {
+  const v = buildView({ weeks: [snap('2026-W31')] });
+  for (const t of v.tiles) assert.equal(t.targets, null, t.key);
+  assert.equal(tileOf(v, 'tickets').perPerson, 'Kishan 5 · Sanket 6');
+});
+
+test('a degraded tile carries no targets', () => {
+  const v = buildView({ weeks: [snap('2026-W40', { targets: { tickets: { kishan: 5 } },
+    tickets: { status: 'no-data', reason: 'x' } })] });
+  assert.equal(tileOf(v, 'tickets').targets, null);
 });
