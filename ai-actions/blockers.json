@@ -547,6 +547,32 @@
       "title": "Deferred-dependency table in PROGRESS",
       "why": "The deferral chain (output-shape, engineCoupling, error-envelope, Phase 4) is load-bearing and external, with no consolidated table.",
       "fix": "Add a dependency table to PROGRESS with PR# / owner / ETA; gate the consuming phases."
+    },
+    {
+      "id": "onedrive-business-account",
+      "cat": "scope",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "microsoft-onedrive"
+      ],
+      "affected": 7,
+      "title": "microsoft-onedrive: 7 OneDrive for Business-only atomics, with no work/school test account",
+      "why": "Graph v1.0 marks preview, sharing-link grant, follow, unfollow, list followed items and item/drive activities as not supported on personal (MSA) drives, and permanentDelete returns \"API not found\" on a personal drive (verified live, by id and by path). The only seeded Tier-2 connection is a personal Microsoft account, so these 7 can't be live-tested or given output schemas. The other 35 atomics shipped Tier-2 on the personal account.",
+      "fix": "Seed a Microsoft 365 work/school OneDrive connection, then build and Tier-2 the 7 atomics (onedrive_permanently_delete_item, onedrive_get_item_preview_url, onedrive_grant_sharing_link_access, onedrive_follow_item, onedrive_unfollow_item, onedrive_list_followed_items, onedrive_list_activities) in a follow-up PR, with schemas from the captured output."
+    },
+    {
+      "id": "onedrive-all-scopes",
+      "cat": "scope",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "microsoft-onedrive"
+      ],
+      "affected": 2,
+      "title": "microsoft-onedrive: restore-deleted-item and org-wide search need broader Graph scopes",
+      "why": "Restoring an item from the recycle bin (POST /items/{id}/restore, personal only) needs Files.ReadWrite.All. Searching everything the user can access (POST /search/query, work/school only) needs Files.Read.All + Sites.Read.All. The piece requests only Files.ReadWrite, and adding scopes forces every existing OneDrive connection to re-consent (and possibly admin consent on some tenants).",
+      "fix": "Team decision on adding the scopes to the OneDrive OAuth request. If approved, ship onedrive_restore_deleted_item and onedrive_search_all_files in a follow-up PR verified on re-consented personal and work/school connections."
     }
   ]
 }
