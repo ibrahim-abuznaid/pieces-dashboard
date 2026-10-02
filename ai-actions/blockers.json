@@ -547,6 +547,19 @@
       "title": "Deferred-dependency table in PROGRESS",
       "why": "The deferral chain (output-shape, engineCoupling, error-envelope, Phase 4) is load-bearing and external, with no consolidated table.",
       "fix": "Add a dependency table to PROGRESS with PR# / owner / ETA; gate the consuming phases."
+    },
+    {
+      "id": "supadata-paid",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "supadata"
+      ],
+      "affected": 6,
+      "title": "supadata translate / batch / crawl — 6 atomics",
+      "why": "402 Upgrade Required — these endpoints need a paid Supadata plan; the test key is on the free plan. Translate YouTube Transcript (<code>GET /youtube/transcript/translate</code>), Start YouTube Transcript Batch and Start YouTube Video Batch (<code>POST /youtube/transcript/batch</code>, <code>POST /youtube/video/batch</code>), Start Web Crawl (<code>POST /web/crawl</code>), plus their poll actions Get YouTube Batch Result and Get Web Crawl Result, which have no job id without a start call. Held out of PIE-595.",
+      "fix": "Connect a paid Supadata key, then author + Tier-2 the 6: translate; both batch starts → get_youtube_batch_result; start_web_crawl → get_web_crawl_result."
     }
   ]
 }
