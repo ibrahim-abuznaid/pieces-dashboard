@@ -10146,7 +10146,7 @@
         "held": 2,
         "totalPieces": 82,
         "catalogPieces": 766,
-        "blockersOpen": 35,
+        "blockersOpen": 36,
         "roster": [
           {
             "name": "monday",
@@ -10767,6 +10767,7 @@
             "actions": 0,
             "stage": "pr-open",
             "displayName": "Grist",
+            "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/grist.png"
           },
           {
@@ -10774,6 +10775,7 @@
             "actions": 0,
             "stage": "pr-open",
             "displayName": "Presenton",
+            "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/presenton.png"
           },
           {
@@ -10781,6 +10783,7 @@
             "actions": 0,
             "stage": "pr-open",
             "displayName": "Retable",
+            "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/retable.png"
           },
           {
@@ -10788,6 +10791,7 @@
             "actions": 0,
             "stage": "pr-open",
             "displayName": "Supadata",
+            "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/supadata.svg"
           },
           {
@@ -10795,6 +10799,7 @@
             "actions": 0,
             "stage": "pr-open",
             "displayName": "TickTick",
+            "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/ticktick.png"
           }
         ]
