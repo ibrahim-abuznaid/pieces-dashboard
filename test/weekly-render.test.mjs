@@ -1498,18 +1498,19 @@ test('a row that could not be measured says so and draws no fill', () => {
   assert.match(tile, /class="fill" style="width:0%"/);
 });
 
-test('a row whose count includes open PRs says how many', () => {
+test('a row whose count includes open PRs splits it into merged and open', () => {
   const ai = (roster) => ({ status: 'ok', merged: 1, prOpen: 1, assigned: 0, held: 0, totalPieces: 2, blockersOpen: 0, roster });
   const W39 = snap('2026-W39', { aiActions: ai([{ name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' }]) });
   const W40 = snap('2026-W40', { targets: { aiActions: { kishan: 20, odai: 20 } }, aiActions: ai([
     { name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' },
+    { name: 'docs', actions: 1, stage: 'merged', author: 'kishanprmr' },
     { name: 'slack', actions: 1, stage: 'merged', author: 'OdaiAhmed99' },
     { name: 'grist', actions: 0, stage: 'pr-open', author: 'kishanprmr' },
   ]) });
   const tile = tileOf(renderDom([W39, W40]), 'AI-actions');
-  assert.match(tile, /Kishan[\s\S]*?1\/20 · 1 open PR</);
+  assert.match(tile, /Kishan[\s\S]*?2\/20 · 1 merged, 1 open</);
   assert.match(tile, /Odai[\s\S]*?1\/20</);
-  assert.doesNotMatch(tile, /Odai[\s\S]*?open PR/);
+  assert.doesNotMatch(tile, /Odai[\s\S]*?merged, /, 'no split when nothing is open');
 });
 
 test('a week before the targets existed renders no target markup at all', () => {

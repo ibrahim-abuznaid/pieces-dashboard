@@ -348,15 +348,16 @@ function inReviewHtml(n) {
 // empty bar that reads like one. The bar is decorative: the score beside it is
 // the accessible text. The fill rounds DOWN, so only a hit draws a full bar —
 // rounding would draw 399/400 full beside a score with no ✓.
-// `open` is how many of the row's pieces are still open PRs (AI actions from
-// W40), said beside the score because the strip below does not list them.
+// `open` is how many of the row's pieces are still open PRs (AI actions and UI
+// improvements from W40). The score is split into merged and open beside it,
+// because the strip below lists only the merged ones.
 function targetsHtml(tg) {
   if (!tg || !tg.rows.length) return '';
   const rows = tg.rows.map((r) => {
     const measured = typeof r.actual === 'number';
     const pct = measured ? Math.floor(Math.min(r.actual / r.target, 1) * 100) : 0;
     const cls = `target${r.hit ? ' hit' : ''}${measured ? '' : ' unmeasured'}`;
-    const open = r.open > 0 ? ` · ${num(r.open)} open PR${r.open === 1 ? '' : 's'}` : '';
+    const open = r.open > 0 ? ` · ${num(r.actual - r.open)} merged, ${num(r.open)} open` : '';
     const score = measured
       ? `${num(r.actual)}/${num(r.target)}${open}${r.hit ? ' <span class="tick" role="img" aria-label="target hit">✓</span>' : ''}`
       : `— / ${num(r.target)} · not measured`;
