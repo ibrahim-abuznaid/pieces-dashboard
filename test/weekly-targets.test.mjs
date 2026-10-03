@@ -153,6 +153,17 @@ test('before creditFrom an open PR counts for nobody, and rows carry no open cou
   ]);
 });
 
+const UI_OPEN = { ...UI, credit: ['live', 'merged', 'review'], creditFrom: '2026-W40' };
+
+test('UI improvements: from creditFrom an open PR in review counts for its author, once', () => {
+  const W40ui = { ...W40, uiImprovements: ok([...W40.uiImprovements.roster, row('twilio', 'review', 'Talaljaber')]) };
+  const t = targetsFor(UI_OPEN, [W39, W40ui], W40ui);
+  assert.deepEqual(t.rows, [{ person: 'talal', name: 'Talal', actual: 2, target: 15, hit: false, open: 1 }]);
+  const W41 = wk('2026-W41', { targets: TARGETS, uiImprovements: ok(W40ui.uiImprovements.roster.map((r) =>
+    (r.name === 'twilio' ? { ...r, stage: 'live' } : r))) });
+  assert.equal(targetsFor(UI_OPEN, [W39, W40ui, W41], W41).rows[0].actual, 0);
+});
+
 test('UI improvements: live and merged both count, logins match case-insensitively', () => {
   const t = targetsFor(UI, WEEKS, W40);
   assert.deepEqual(t.rows, [{ person: 'talal', name: 'Talal', actual: 1, target: 15, hit: false }]);

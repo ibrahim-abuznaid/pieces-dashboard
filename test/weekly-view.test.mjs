@@ -1403,6 +1403,19 @@ test('from W40 an open AI-actions PR counts on its author\'s target row, but not
   assert.deepEqual(t.strip.items.map((i) => i.name), ['slack']);
 });
 
+test('from W40 an open UI-improvements PR (stage review) counts on its author\'s row, but not in the strip', () => {
+  const ui = (roster) => ({ status: 'ok', merged: 1, live: 1, review: 1, assigned: 0, totalPieces: 765, roster });
+  const W39 = snap('2026-W39', { uiImprovements: ui([{ name: 'gmail', stage: 'live', author: 'Talaljaber' }]) });
+  const W40 = snap('2026-W40', { targets: { uiImprovements: { talal: 15 } }, uiImprovements: ui([
+    { name: 'gmail', stage: 'live', author: 'Talaljaber' },
+    { name: 'slack', stage: 'merged', author: 'Talaljaber' },
+    { name: 'twilio', stage: 'review', author: 'Talaljaber' },
+  ]) });
+  const t = tileOf(buildView({ weeks: [W39, W40] }), 'uiImprovements');
+  assert.deepEqual(t.targets.rows, [{ person: 'talal', name: 'Talal', actual: 2, target: 15, hit: false, open: 1 }]);
+  assert.deepEqual(t.strip.items.map((i) => i.name), ['slack']);
+});
+
 test('every tile without targets carries targets: null, and keeps its per-person line', () => {
   const v = buildView({ weeks: [snap('2026-W31')] });
   for (const t of v.tiles) assert.equal(t.targets, null, t.key);

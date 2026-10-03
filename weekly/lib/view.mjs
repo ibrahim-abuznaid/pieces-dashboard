@@ -407,7 +407,9 @@ const TILES = [
   { key: 'uiImprovements', title: 'UI improvements', path: 'uiImprovements.merged',
     unit: (ws) => `of ${ws.totalPieces} pieces`,
     review: 'uiImprovements.review',
-    strip: pieceStrip, done: ['live', 'merged'], wide: true },
+    // Open PRs count on the target row from W40, as on AI actions above.
+    strip: pieceStrip, done: ['live', 'merged'], wide: true,
+    credit: ['live', 'merged', 'review'], creditFrom: '2026-W40' },
 ];
 
 // ── decisions ───────────────────────────────────────────────────────────────

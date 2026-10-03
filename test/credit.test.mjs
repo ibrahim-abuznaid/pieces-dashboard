@@ -56,6 +56,9 @@ test('an OPEN pointer on an APPROVED row is the credit — approved open work is
 test('an OPEN pointer on a PR-OPEN row is the credit — the open PR is the work', () =>
   assert.equal(authorOf({ slug: 'grist', pr: 104, stage: 'pr-open' }, 'aiActions', prStates, landings), 'kishanprmr'));
 
+test('an OPEN pointer on a UI REVIEW row is the credit — the same open-PR stage, named differently', () =>
+  assert.equal(authorOf({ slug: 'twilio', pr: 104, stage: 'review' }, 'uiImprovements', prStates, landings), 'kishanprmr'));
+
 test('a CLOSED pointer on a PR-OPEN row credits nobody', () =>
   assert.equal(authorOf({ slug: 'slack', pr: 105, stage: 'pr-open' }, 'aiActions', prStates, landings), null));
 
