@@ -10818,7 +10818,8 @@
             "displayName": "HubSpot",
             "actions": 69,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/hubspot.png"
+            "logo": "https://cdn.activepieces.com/pieces/hubspot.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "outseta",
@@ -10826,7 +10827,8 @@
             "displayName": "Outseta",
             "actions": 50,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/outseta.png"
+            "logo": "https://cdn.activepieces.com/pieces/outseta.png",
+            "author": "bst1n"
           },
           {
             "folder": "whatsscale",
@@ -10887,7 +10889,8 @@
             "displayName": "Linear",
             "actions": 21,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/linear.png"
+            "logo": "https://cdn.activepieces.com/pieces/linear.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "telegram-bot",
@@ -10921,7 +10924,8 @@
             "displayName": "OpenAI",
             "actions": 19,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/openai.png"
+            "logo": "https://cdn.activepieces.com/pieces/openai.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "discord",
@@ -10974,7 +10978,8 @@
             "displayName": "Microsoft Outlook",
             "actions": 15,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png"
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "coupa",
@@ -10999,7 +11004,8 @@
             "displayName": "Google Gemini",
             "actions": 11,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/google-gemini.png"
+            "logo": "https://cdn.activepieces.com/pieces/google-gemini.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "twilio",
@@ -11007,7 +11013,8 @@
             "displayName": "Twilio",
             "actions": 11,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/twilio.png"
+            "logo": "https://cdn.activepieces.com/pieces/twilio.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "quickbooks-desktop-conductor",
@@ -11024,7 +11031,8 @@
             "displayName": "YouTube",
             "actions": 10,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/youtube.png"
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "date-helper",
@@ -11077,7 +11085,8 @@
             "displayName": "AI",
             "actions": 6,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg"
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg",
+            "author": "Talaljaber"
           },
           {
             "folder": "wordpress",
@@ -11102,7 +11111,8 @@
             "displayName": "Groq",
             "actions": 4,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/groq.png"
+            "logo": "https://cdn.activepieces.com/pieces/groq.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "claude",
@@ -11110,7 +11120,8 @@
             "displayName": "Anthropic Claude",
             "actions": 3,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/claude.png"
+            "logo": "https://cdn.activepieces.com/pieces/claude.png",
+            "author": "Talaljaber"
           },
           {
             "folder": "http",
@@ -11127,7 +11138,8 @@
             "displayName": "Twitter",
             "actions": 2,
             "stage": "review",
-            "logo": "https://cdn.activepieces.com/pieces/twitter.png"
+            "logo": "https://cdn.activepieces.com/pieces/twitter.png",
+            "author": "Talaljaber"
           }
         ]
       },
