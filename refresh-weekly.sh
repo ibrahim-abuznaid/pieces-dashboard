@@ -137,6 +137,11 @@ fi
 
 git add weekly/data/weeks.json
 git commit -m "chore(weekly): snapshot $WEEK"
+# Teammates push to this repo too (claims, blockers), so main can move while the
+# job runs. A rejected push used to strand the week: the commit stayed local and
+# the next day's guard saw the week as done, so nothing retried it (W40,
+# 2026-10-03). --autostash because the fetch leaves data/*.json modified.
+git pull --rebase --autostash
 git push
 SHA="$(git rev-parse HEAD)"
 log "pushed $WEEK as $SHA"
