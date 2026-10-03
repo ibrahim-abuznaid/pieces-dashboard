@@ -8,6 +8,7 @@
 // before `from` can show a miss against a target that did not exist yet.
 import { PEOPLE, personOf, displayName } from '../collect/people.mjs';
 import { landedRows } from './landed.mjs';
+import { previousWeekId } from '../../lib/isoweek.mjs';
 
 // The four tiles a target can sit in, by archive key. Anything else is a typo,
 // and a typo here silently drops a person's row from the page — so it throws.
@@ -89,23 +90,48 @@ const CREDIT = { aiActions: byAuthor, uiImprovements: byAuthor, testing: () => '
 // empty PRIOR roster for the same reason. The tester's empty roster is a real
 // reading — nothing covered — so testing keeps it.
 //
+// `spec.credit` widens what counts for a person past `spec.done`, from
+// `spec.creditFrom` on. AI actions use it for open PRs (Ibrahim's call
+// 2026-10-03): the work is done the week the PR opens, so it counts then, once,
+// and not again the week it merges — it is already over last week's line. The
+// headline and the strip stay on `done`, so on those weeks the rows add up to
+// more than the strip, and each row says how many of its pieces are `open`.
+//
+// Last week is judged by the rule in force LAST week. A PR open in W39 was
+// never credited, so it counts in W40; judging W39 by W40's rule would treat it
+// as credited already and it would never count at all.
+//
 // Known limit: the diff only compares against the week before. A piece whose
 // approval is withdrawn (approved → pr-open → merged) is done, then not, then
-// done again, and counts for its author in both weeks it crossed the line.
+// done again, and counts for its author in both weeks it crossed the line. So
+// does an open PR that is closed and reopened a week later.
+const creditStages = (spec, week) => (spec.credit && week >= spec.creditFrom ? spec.credit : spec.done);
+const widened = (spec, week) => Boolean(spec.credit) && week >= spec.creditFrom;
+
 function countsFor(spec, ws, weeks, selected) {
-  if (spec.key === 'tickets') return checkedByPerson(ws.byPerson, ws.total);
+  if (spec.key === 'tickets') {
+    const counts = checkedByPerson(ws.byPerson, ws.total);
+    return counts && { counts, open: {} };
+  }
   const credit = CREDIT[spec.key];
   if (!credit) return null;
   if (spec.done && Array.isArray(ws.roster) && !ws.roster.length) return null;
-  const isDone = spec.done ? (r) => spec.done.includes(r.stage) : () => true;
-  const landed = landedRows(weeks, selected, spec.key, isDone);
+  const inStages = (week) => {
+    const stages = creditStages(spec, week);
+    return (r) => stages.includes(r.stage);
+  };
+  const isDone = spec.done ? inStages(selected.week) : () => true;
+  const wasDone = spec.done ? inStages(previousWeekId(selected.week)) : isDone;
+  const landed = landedRows(weeks, selected, spec.key, isDone, wasDone);
   if (!landed) return null;
   const counts = {};
+  const open = {};
   for (const r of landed) {
     const who = credit(r);
     counts[who] = (counts[who] ?? 0) + 1;
+    if (spec.done && !spec.done.includes(r.stage)) open[who] = (open[who] ?? 0) + 1;
   }
-  return counts;
+  return { counts, open };
 }
 
 // Everything a target row does not show, so nothing done this week is hidden:
@@ -127,10 +153,13 @@ export function targetsFor(spec, weeks, selected) {
   if (!goals || !Object.keys(goals).length) return null;
   const ws = selected[spec.ws ?? spec.key];
   if (ws?.status !== 'ok') return null;
-  const counts = countsFor(spec, ws, weeks, selected);
+  const measured = countsFor(spec, ws, weeks, selected);
+  const counts = measured?.counts ?? null;
+  const showOpen = counts !== null && widened(spec, selected.week);
   const rows = Object.entries(goals).map(([person, target]) => {
     const actual = counts ? (counts[person] ?? 0) : null;
-    return { person, name: displayName(person), actual, target, hit: actual !== null && actual >= target };
+    return { person, name: displayName(person), actual, target, hit: actual !== null && actual >= target,
+      ...(showOpen ? { open: measured.open[person] ?? 0 } : {}) };
   });
   return { rows, also: counts ? alsoLine(counts, goals) : '' };
 }

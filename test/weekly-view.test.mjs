@@ -1390,6 +1390,19 @@ test('a week with targets puts them on their tile and drops the tickets name lin
   assert.equal(t.perPerson, '', 'the rows replace the per-person line');
 });
 
+test('from W40 an open AI-actions PR counts on its author\'s target row, but not in the strip', () => {
+  const ai = (roster) => ({ status: 'ok', merged: 1, prOpen: 1, assigned: 0, held: 0, totalPieces: 2, blockersOpen: 0, roster });
+  const W39 = snap('2026-W39', { aiActions: ai([{ name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' }]) });
+  const W40 = snap('2026-W40', { targets: { aiActions: { kishan: 20 } }, aiActions: ai([
+    { name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' },
+    { name: 'slack', actions: 1, stage: 'merged', author: 'kishanprmr' },
+    { name: 'grist', actions: 0, stage: 'pr-open', author: 'kishanprmr' },
+  ]) });
+  const t = tileOf(buildView({ weeks: [W39, W40] }), 'aiActions');
+  assert.deepEqual(t.targets.rows, [{ person: 'kishan', name: 'Kishan', actual: 2, target: 20, hit: false, open: 1 }]);
+  assert.deepEqual(t.strip.items.map((i) => i.name), ['slack']);
+});
+
 test('every tile without targets carries targets: null, and keeps its per-person line', () => {
   const v = buildView({ weeks: [snap('2026-W31')] });
   for (const t of v.tiles) assert.equal(t.targets, null, t.key);

@@ -117,6 +117,42 @@ test('an approved piece that merges the next week does not count twice', () => {
   assert.equal(t.rows.find((r) => r.person === 'kishan').actual, 0);
 });
 
+// Ibrahim's call 2026-10-03: from W40 an open AI-actions PR counts for its
+// author the week it first appears, once. The headline stays main-only.
+const AI_OPEN = { ...AI, credit: ['merged', 'approved', 'pr-open'], creditFrom: '2026-W40' };
+
+test('from creditFrom on, an open PR counts for its author, and the row says how many are open', () => {
+  const t = targetsFor(AI_OPEN, WEEKS, W40);
+  assert.deepEqual(t.rows, [
+    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, open: 0 },
+    { person: 'odai', name: 'Odai', actual: 2, target: 20, hit: false, open: 1 },
+  ]);
+  assert.equal(t.also, 'Talal 1 · 1 other · 1 not credited');
+});
+
+test('an open PR credited one week does not count again when it merges', () => {
+  const W41 = wk('2026-W41', { targets: TARGETS,
+    aiActions: ok(W40.aiActions.roster.map((r) => (r.name === 'zoom' ? { ...r, stage: 'merged' } : r))) });
+  const t = targetsFor(AI_OPEN, [W39, W40, W41], W41);
+  assert.equal(t.rows.find((r) => r.person === 'odai').actual, 0);
+});
+
+test('a PR open before creditFrom was never credited, so it counts in the first week of the rule', () => {
+  const W39open = wk('2026-W39', { aiActions: ok([row('gmail', 'merged', 'kishanprmr'), row('zoom', 'pr-open', 'OdaiAhmed99')]) });
+  const t = targetsFor(AI_OPEN, [W39open, W40], W40);
+  assert.equal(t.rows.find((r) => r.person === 'odai').actual, 2);
+});
+
+test('before creditFrom an open PR counts for nobody, and rows carry no open count', () => {
+  const W38 = wk('2026-W38', { aiActions: ok([row('gmail', 'merged', 'kishanprmr')]) });
+  const W39t = { ...W39, targets: TARGETS };
+  const t = targetsFor(AI_OPEN, [W38, W39t], W39t);
+  assert.deepEqual(t.rows, [
+    { person: 'kishan', name: 'Kishan', actual: 0, target: 20, hit: false },
+    { person: 'odai', name: 'Odai', actual: 0, target: 20, hit: false },
+  ]);
+});
+
 test('UI improvements: live and merged both count, logins match case-insensitively', () => {
   const t = targetsFor(UI, WEEKS, W40);
   assert.deepEqual(t.rows, [{ person: 'talal', name: 'Talal', actual: 1, target: 15, hit: false }]);

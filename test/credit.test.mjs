@@ -53,6 +53,12 @@ test('an OPEN pointer with no landing credits nobody', () =>
 test('an OPEN pointer on an APPROVED row is the credit — approved open work is done', () =>
   assert.equal(authorOf({ slug: 'gmail', pr: 104, stage: 'approved' }, 'aiActions', prStates, landings), 'kishanprmr'));
 
+test('an OPEN pointer on a PR-OPEN row is the credit — the open PR is the work', () =>
+  assert.equal(authorOf({ slug: 'grist', pr: 104, stage: 'pr-open' }, 'aiActions', prStates, landings), 'kishanprmr'));
+
+test('a CLOSED pointer on a PR-OPEN row credits nobody', () =>
+  assert.equal(authorOf({ slug: 'slack', pr: 105, stage: 'pr-open' }, 'aiActions', prStates, landings), null));
+
 test('a CLOSED pointer yields to the landing', () =>
   assert.equal(authorOf({ slug: 'gmail', pr: 105, stage: 'merged' }, 'aiActions', prStates, landings), 'OdaiAhmed99'));
 

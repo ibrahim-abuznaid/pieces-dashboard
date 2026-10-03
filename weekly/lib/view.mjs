@@ -376,7 +376,10 @@ const TILES = [
     // derived 'pr-open' stage — see the note above the table.
     review: 'aiActions.prOpen',
     note: (ws) => (ws.approved > 0 ? `incl. ${ws.approved} approved, not yet merged` : ''),
-    strip: pieceStrip, done: ['merged', 'approved'] },
+    // The target rows also count open PRs from W40 on (Ibrahim's call
+    // 2026-10-03, see countsFor in targets.mjs); the headline and strip do not.
+    strip: pieceStrip, done: ['merged', 'approved'],
+    credit: ['merged', 'approved', 'pr-open'], creditFrom: '2026-W40' },
   // Two headlines, chosen by what the snapshot measured. With coverage recorded
   // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
   // drops to the note line; without it — every older snapshot, and any week the

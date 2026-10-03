@@ -62,11 +62,14 @@ export function alreadyDone(priorDone) {
 //
 // `filter` copies: the collector's ordering is preserved and the snapshot's own
 // roster is never sorted in place.
-export function landedRows(weeks, selected, key, isDone) {
+//
+// `wasDone` is the line as it stood LAST week, when that differs from this
+// week's — the targets widen it from a given week on (see targets.mjs).
+export function landedRows(weeks, selected, key, isDone, wasDone = isDone) {
   const rows = selected?.[key]?.roster;
   if (!Array.isArray(rows)) return null;
   const prior = priorRoster(weeks, selected, key);
   if (!prior) return null;
-  const before = alreadyDone(prior.filter(isDone));
+  const before = alreadyDone(prior.filter(wasDone));
   return rows.filter(isDone).filter((r) => !before(r));
 }
