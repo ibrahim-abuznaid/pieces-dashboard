@@ -560,6 +560,19 @@
       "title": "supadata translate / batch / crawl — 6 atomics",
       "why": "402 Upgrade Required — these endpoints need a paid Supadata plan; the test key is on the free plan. Translate YouTube Transcript (<code>GET /youtube/transcript/translate</code>), Start YouTube Transcript Batch and Start YouTube Video Batch (<code>POST /youtube/transcript/batch</code>, <code>POST /youtube/video/batch</code>), Start Web Crawl (<code>POST /web/crawl</code>), plus their poll actions Get YouTube Batch Result and Get Web Crawl Result, which have no job id without a start call. Held out of PIE-595.",
       "fix": "Connect a paid Supadata key, then author + Tier-2 the 6: translate; both batch starts → get_youtube_batch_result; start_web_crawl → get_web_crawl_result."
+    },
+    {
+      "id": "robolly-paid",
+      "cat": "plan",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "robolly"
+      ],
+      "affected": 2,
+      "title": "robolly render video / multi-page PDF — 2 atomics",
+      "why": "Test account is on the free trial (25 render credits, 3 per image render). Render Video (<code>POST /v1/video/render</code>) costs far more than that (the docs' example render cost 250 credits), and Multi PDF (<code>GET /v1/pdf/render/</code>) is a paid-plan dashboard feature, so neither could run live. Held out of PIE-650.",
+      "fix": "Connect a paid Robolly account with an animated template and a Multi PDF set up in the dashboard, then author + Tier-2 Render Video (poll it with the existing Get Render) and Render Multi-Page PDF, including whether <code>json=1</code> returns JSON on the PDF endpoint."
     }
   ]
 }
