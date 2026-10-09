@@ -514,6 +514,312 @@
         },
         "reviewsApprox": true,
         "shipped": []
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 0,
+        "review": 33,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          }
+        ]
       }
     },
     {
@@ -1267,6 +1573,312 @@
         },
         "reviewsApprox": true,
         "shipped": []
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          }
+        ]
       }
     },
     {
@@ -1991,6 +2603,312 @@
         },
         "reviewsApprox": true,
         "shipped": []
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          }
+        ]
       }
     },
     {
@@ -2829,6 +3747,312 @@
         },
         "reviewsApprox": true,
         "shipped": []
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          }
+        ]
       }
     },
     {
@@ -3976,6 +5200,312 @@
         },
         "reviewsApprox": true,
         "shipped": []
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 0,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          }
+        ]
       }
     },
     {
@@ -5217,6 +6747,321 @@
             "url": "https://github.com/activepieces/activepieces/pull/15458",
             "author": "kishan",
             "kind": "mixed"
+          }
+        ]
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 1,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "feedjolt",
+            "name": "feedjolt",
+            "displayName": "feedjolt",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "mllopart"
           }
         ]
       }
@@ -6965,6 +8810,330 @@
             "url": "https://github.com/activepieces/activepieces/pull/15460",
             "author": "kishan",
             "kind": "pieces"
+          }
+        ]
+      },
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 2,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "feedjolt",
+            "name": "feedjolt",
+            "displayName": "feedjolt",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "mllopart"
+          },
+          {
+            "folder": "sap-successfactors-saml2-oauth",
+            "name": "sap-successfactors-saml2-oauth",
+            "displayName": "sap-successfactors-saml2-oauth",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "majewskibartosz"
           }
         ]
       }
@@ -8994,7 +11163,331 @@
       },
       "decisions": [
         "2 pieces merged but not live — needs a cloud release"
-      ]
+      ],
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 33,
+        "review": 2,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "feedjolt",
+            "name": "feedjolt",
+            "displayName": "feedjolt",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "mllopart"
+          },
+          {
+            "folder": "sap-successfactors-saml2-oauth",
+            "name": "sap-successfactors-saml2-oauth",
+            "displayName": "sap-successfactors-saml2-oauth",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "majewskibartosz"
+          }
+        ]
+      }
     },
     {
       "week": "2026-W40",
@@ -12123,7 +14616,556 @@
       },
       "decisions": [
         "3 pieces merged but not live — needs a cloud release"
-      ]
+      ],
+      "connectionIdentifier": {
+        "status": "ok",
+        "merged": 34,
+        "review": 26,
+        "assigned": 0,
+        "totalPieces": 111,
+        "roster": [
+          {
+            "folder": "simplyprint",
+            "name": "simplyprint",
+            "displayName": "SimplyPrint",
+            "actions": 125,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/simplyprint.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "xero",
+            "name": "xero",
+            "displayName": "Xero",
+            "actions": 61,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/xero.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "intercom",
+            "name": "intercom",
+            "displayName": "Intercom",
+            "actions": 48,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/intercom.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "pipedrive",
+            "name": "pipedrive",
+            "displayName": "Pipedrive",
+            "actions": 44,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/pipedrive.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "slack",
+            "name": "slack",
+            "displayName": "Slack",
+            "actions": 43,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-excel-365",
+            "name": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "actions": 37,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "salesforce",
+            "name": "salesforce",
+            "displayName": "Salesforce",
+            "actions": 36,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/salesforce.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "github",
+            "name": "github",
+            "displayName": "GitHub",
+            "actions": 33,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/github.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "bexio",
+            "name": "bexio",
+            "displayName": "Bexio",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/bexio.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-sheets",
+            "name": "google-sheets",
+            "displayName": "Google Sheets",
+            "actions": 31,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "instagram-business",
+            "name": "instagram-business",
+            "displayName": "Instagram for Business",
+            "actions": 27,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/instagram.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "mailchimp",
+            "name": "mailchimp",
+            "displayName": "Mailchimp",
+            "actions": 26,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/mailchimp.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "microsoft-sharepoint",
+            "name": "microsoft-sharepoint",
+            "displayName": "Microsoft SharePoint",
+            "actions": 24,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-sharepoint.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "quickbooks",
+            "name": "quickbooks",
+            "displayName": "Quickbooks Online",
+            "actions": 21,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/quickbooks.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "quickbooks-sandbox",
+            "name": "quickbooks-sandbox",
+            "displayName": "QuickBooks Online (Sandbox)",
+            "actions": 21,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/quickbooks.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "azure-ad",
+            "name": "azure-ad",
+            "displayName": "Azure Active Directory",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/azure-ad.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-drive",
+            "name": "google-drive",
+            "displayName": "Google Drive",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-teams",
+            "name": "microsoft-teams",
+            "displayName": "Microsoft Teams",
+            "actions": 20,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-teams.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-slides",
+            "name": "google-slides",
+            "displayName": "Google Slides",
+            "actions": 19,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-slides.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "notion",
+            "name": "notion",
+            "displayName": "Notion",
+            "actions": 19,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "savvycal",
+            "name": "savvycal",
+            "displayName": "SavvyCal",
+            "actions": 18,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/savvycal.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "microsoft-todo",
+            "name": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "actions": 17,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-calendar",
+            "name": "google-calendar",
+            "displayName": "Google Calendar",
+            "actions": 16,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "podio",
+            "name": "podio",
+            "displayName": "Podio",
+            "actions": 16,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/podio.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "spotify",
+            "name": "spotify",
+            "displayName": "Spotify",
+            "actions": 16,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/spotify.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "gmail",
+            "name": "gmail",
+            "displayName": "Gmail",
+            "actions": 15,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "microsoft-365-planner",
+            "name": "microsoft-365-planner",
+            "displayName": "Microsoft 365 Planner",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-planner.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook",
+            "name": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "actions": 15,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-bigquery",
+            "name": "google-bigquery",
+            "displayName": "Google BigQuery",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-bigquery.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-cloud-storage",
+            "name": "google-cloud-storage",
+            "displayName": "Google Cloud Storage",
+            "actions": 14,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "klaviyo",
+            "name": "klaviyo",
+            "displayName": "Klaviyo",
+            "actions": 13,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/klaviyo.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "sign-now",
+            "name": "sign-now",
+            "displayName": "SignNow",
+            "actions": 13,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/sign-now.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "digital-ocean",
+            "name": "digital-ocean",
+            "displayName": "DigitalOcean",
+            "actions": 11,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/digital-ocean.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "ringcentral",
+            "name": "ringcentral",
+            "displayName": "RingCentral",
+            "actions": 11,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/ringcentral.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "youtube",
+            "name": "youtube",
+            "displayName": "YouTube",
+            "actions": 10,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/youtube.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "zoom",
+            "name": "zoom",
+            "displayName": "Zoom",
+            "actions": 10,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/zoom.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "google-search-console",
+            "name": "google-search-console",
+            "displayName": "Google Search Console",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-search-console.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-power-bi",
+            "name": "microsoft-power-bi",
+            "displayName": "Microsoft Power BI",
+            "actions": 9,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-power-bi.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "pinterest",
+            "name": "pinterest",
+            "displayName": "Pinterest",
+            "actions": 9,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/pinterest.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "google-my-business",
+            "name": "google-my-business",
+            "displayName": "Google My Business",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-business.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "googlechat",
+            "name": "googlechat",
+            "displayName": "Google Chat",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/googlechat.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-365-people",
+            "name": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onenote",
+            "name": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "actions": 8,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "google-docs",
+            "name": "google-docs",
+            "displayName": "Google Docs",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-365-business-central",
+            "name": "microsoft-dynamics-365-business-central",
+            "displayName": "Microsoft Dynamics 365 Business Central",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-365-business-central.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-onedrive",
+            "name": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "actions": 7,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "free-agent",
+            "name": "free-agent",
+            "displayName": "FreeAgent",
+            "actions": 6,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/free-agent.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "todoist",
+            "name": "todoist",
+            "displayName": "Todoist",
+            "actions": 6,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/todoist.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-outlook-calendar",
+            "name": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "actions": 4,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "gitlab",
+            "name": "gitlab",
+            "displayName": "GitLab",
+            "actions": 3,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/gitlab.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "google-tasks",
+            "name": "google-tasks",
+            "displayName": "Google Tasks",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "linkedin",
+            "name": "linkedin",
+            "displayName": "LinkedIn",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "microsoft-copilot",
+            "name": "microsoft-copilot",
+            "displayName": "Microsoft 365 Copilot",
+            "actions": 3,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-copilot.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "asana",
+            "name": "asana",
+            "displayName": "Asana",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/asana.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "clicdata",
+            "name": "clicdata",
+            "displayName": "Clicdata",
+            "actions": 2,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/clicdata.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
+            "folder": "google-forms",
+            "name": "google-forms",
+            "displayName": "Google Forms",
+            "actions": 2,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "author": "AhmadTash"
+          },
+          {
+            "folder": "feedjolt",
+            "name": "feedjolt",
+            "displayName": "feedjolt",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "mllopart"
+          },
+          {
+            "folder": "sap-successfactors-saml2-oauth",
+            "name": "sap-successfactors-saml2-oauth",
+            "displayName": "sap-successfactors-saml2-oauth",
+            "actions": 0,
+            "stage": "review",
+            "logo": null,
+            "author": "majewskibartosz"
+          }
+        ]
+      }
     }
   ]
 }
