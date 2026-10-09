@@ -1,5 +1,5 @@
 {
-  "fetched": "2026-09-27",
+  "fetched": "2026-10-09",
   "prs": {
     "13937": {
       "state": "MERGED",
@@ -183,6 +183,30 @@
         "kishanprmr"
       ]
     },
+    "14402": {
+      "state": "MERGED",
+      "createdAt": "2026-07-24T13:55:32Z",
+      "mergedAt": "2026-08-06T09:29:19Z",
+      "title": "feat(builder): show connected-account identifier and status on connections",
+      "url": "https://github.com/activepieces/activepieces/pull/14402",
+      "author": "AhmadTash",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "14403": {
+      "state": "MERGED",
+      "createdAt": "2026-07-24T13:55:58Z",
+      "mergedAt": "2026-08-06T09:29:20Z",
+      "title": "feat(pieces): request identity scope so OAuth connections expose the account",
+      "url": "https://github.com/activepieces/activepieces/pull/14403",
+      "author": "AhmadTash",
+      "base": "feat/connection-details-ui",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
     "14519": {
       "state": "MERGED",
       "createdAt": "2026-07-31T05:21:49Z",
@@ -220,7 +244,7 @@
       "assignees": []
     },
     "14943": {
-      "state": "OPEN",
+      "state": "CLOSED",
       "createdAt": "2026-08-20T08:02:56Z",
       "mergedAt": null,
       "title": "feat(gmail): redesign property UI for human-facing actions and triggers",
@@ -234,7 +258,7 @@
       ]
     },
     "14970": {
-      "state": "OPEN",
+      "state": "CLOSED",
       "createdAt": "2026-08-21T07:53:50Z",
       "mergedAt": null,
       "title": "feat(telegram-bot): improve prop UI for human-facing actions",
@@ -359,6 +383,18 @@
       "approvedAt": null,
       "assignees": []
     },
+    "15401": {
+      "state": "OPEN",
+      "createdAt": "2026-09-09T13:25:26Z",
+      "mergedAt": null,
+      "title": "feat: add Feedjolt community piece",
+      "url": "https://github.com/activepieces/activepieces/pull/15401",
+      "author": "mllopart",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
     "15406": {
       "state": "MERGED",
       "createdAt": "2026-09-09T15:37:57Z",
@@ -413,6 +449,18 @@
         "OdaiAhmed99"
       ]
     },
+    "15567": {
+      "state": "OPEN",
+      "createdAt": "2026-09-15T14:08:03Z",
+      "mergedAt": null,
+      "title": "feat(pieces): add SAP SuccessFactors SAML2 OAuth piece",
+      "url": "https://github.com/activepieces/activepieces/pull/15567",
+      "author": "majewskibartosz",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
     "15582": {
       "state": "MERGED",
       "createdAt": "2026-09-16T11:01:22Z",
@@ -427,20 +475,6 @@
         "kishanprmr"
       ]
     },
-    "15618": {
-      "state": "OPEN",
-      "createdAt": "2026-09-17T20:50:06Z",
-      "mergedAt": null,
-      "title": "feat(instagram-business): revive on Graph v23.0 with 27 verified actions",
-      "url": "https://github.com/activepieces/activepieces/pull/15618",
-      "author": "OdaiAhmed99",
-      "base": "main",
-      "approved": false,
-      "approvedAt": null,
-      "assignees": [
-        "OdaiAhmed99"
-      ]
-    },
     "15624": {
       "state": "OPEN",
       "createdAt": "2026-09-18T13:05:44Z",
@@ -453,107 +487,141 @@
       "approvedAt": null,
       "assignees": []
     },
-    "15661": {
+    "15868": {
       "state": "OPEN",
-      "createdAt": "2026-09-20T20:41:54Z",
+      "createdAt": "2026-09-28T07:29:00Z",
       "mergedAt": null,
-      "title": "feat(dropbox): add AI-ready atomic actions for files and batch jobs",
-      "url": "https://github.com/activepieces/activepieces/pull/15661",
-      "author": "OdaiAhmed99",
-      "base": "main",
-      "approved": true,
-      "approvedAt": "2026-09-26T15:42:43Z",
-      "assignees": [
-        "OdaiAhmed99"
-      ]
-    },
-    "15757": {
-      "state": "OPEN",
-      "createdAt": "2026-09-23T22:09:16Z",
-      "mergedAt": null,
-      "title": "feat(asana): add 65 AI agent actions for tasks, projects, sections and tags",
-      "url": "https://github.com/activepieces/activepieces/pull/15757",
-      "author": "OdaiAhmed99",
-      "base": "main",
-      "approved": true,
-      "approvedAt": "2026-09-26T15:39:59Z",
-      "assignees": [
-        "OdaiAhmed99"
-      ]
-    },
-    "15759": {
-      "state": "OPEN",
-      "createdAt": "2026-09-23T22:37:24Z",
-      "mergedAt": null,
-      "title": "feat(mastodon): add triggers and richer Post Status for flow builders",
-      "url": "https://github.com/activepieces/activepieces/pull/15759",
-      "author": "OdaiAhmed99",
-      "base": "feat/mastodon-crypto-ai-actions",
-      "approved": false,
-      "approvedAt": null,
-      "assignees": [
-        "OdaiAhmed99"
-      ]
-    },
-    "15813": {
-      "state": "OPEN",
-      "createdAt": "2026-09-25T22:20:03Z",
-      "mergedAt": null,
-      "title": "feat(youtube): shorter Search form, tabbed channel and playlist lookups, and plain field help",
-      "url": "https://github.com/activepieces/activepieces/pull/15813",
-      "author": "Talaljaber",
-      "base": "main",
-      "approved": false,
-      "approvedAt": null,
-      "assignees": []
-    },
-    "15814": {
-      "state": "OPEN",
-      "createdAt": "2026-09-25T23:26:23Z",
-      "mergedAt": null,
-      "title": "feat(hubspot): readable property notes, plain-language labels and optional fields under Advanced",
-      "url": "https://github.com/activepieces/activepieces/pull/15814",
-      "author": "Talaljaber",
-      "base": "main",
-      "approved": false,
-      "approvedAt": null,
-      "assignees": []
-    },
-    "15816": {
-      "state": "OPEN",
-      "createdAt": "2026-09-26T08:06:18Z",
-      "mergedAt": null,
-      "title": "feat(cal-com): add AI actions and output schemas",
-      "url": "https://github.com/activepieces/activepieces/pull/15816",
+      "title": "feat(retable): add AI actions and output schemas",
+      "url": "https://github.com/activepieces/activepieces/pull/15868",
       "author": "kishanprmr",
       "base": "main",
       "approved": false,
       "approvedAt": null,
       "assignees": []
     },
-    "15826": {
-      "state": "OPEN",
-      "createdAt": "2026-09-26T21:16:04Z",
-      "mergedAt": null,
-      "title": "feat(google-gemini): clearer forms, aspect ratio cards and a shorter Create Video step",
-      "url": "https://github.com/activepieces/activepieces/pull/15826",
-      "author": "Talaljaber",
+    "16020": {
+      "state": "MERGED",
+      "createdAt": "2026-10-01T13:16:59Z",
+      "mergedAt": "2026-10-01T14:07:15Z",
+      "title": "feat(asana): see which Asana account each connection belongs to",
+      "url": "https://github.com/activepieces/activepieces/pull/16020",
+      "author": "ibrahim-abuznaid",
       "base": "main",
       "approved": false,
       "approvedAt": null,
       "assignees": []
     },
-    "15829": {
-      "state": "OPEN",
-      "createdAt": "2026-09-26T21:26:13Z",
-      "mergedAt": null,
-      "title": "feat(microsoft-outlook): To/Cc/Bcc tabs, body format cards and clearer email and folder pickers",
-      "url": "https://github.com/activepieces/activepieces/pull/15829",
-      "author": "Talaljaber",
+    "16025": {
+      "state": "MERGED",
+      "createdAt": "2026-10-01T14:23:57Z",
+      "mergedAt": "2026-10-06T02:25:01Z",
+      "title": "feat(pieces): see which account each connection belongs to on 20 more pieces",
+      "url": "https://github.com/activepieces/activepieces/pull/16025",
+      "author": "ibrahim-abuznaid",
       "base": "main",
       "approved": false,
       "approvedAt": null,
       "assignees": []
+    },
+    "16041": {
+      "state": "MERGED",
+      "createdAt": "2026-10-01T22:39:44Z",
+      "mergedAt": "2026-10-07T05:55:57Z",
+      "title": "feat(pieces): see which GitLab, Salesforce or QuickBooks account each connection belongs to",
+      "url": "https://github.com/activepieces/activepieces/pull/16041",
+      "author": "ibrahim-abuznaid",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "16232": {
+      "state": "MERGED",
+      "createdAt": "2026-10-07T20:30:20Z",
+      "mergedAt": "2026-10-09T10:42:16Z",
+      "title": "feat(google-translate): add Google Translate piece",
+      "url": "https://github.com/activepieces/activepieces/pull/16232",
+      "author": "fabio-kozlowski",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": [
+        "kishanprmr"
+      ]
+    },
+    "16251": {
+      "state": "OPEN",
+      "createdAt": "2026-10-08T02:56:31Z",
+      "mergedAt": null,
+      "title": "feat(google-document-ai): add Google Document AI piece",
+      "url": "https://github.com/activepieces/activepieces/pull/16251",
+      "author": "fabio-kozlowski",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "16291": {
+      "state": "OPEN",
+      "createdAt": "2026-10-08T13:41:21Z",
+      "mergedAt": null,
+      "title": "feat(apache-kafka): add a piece to publish and consume messages",
+      "url": "https://github.com/activepieces/activepieces/pull/16291",
+      "author": "eliseukadesh67",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "16292": {
+      "state": "OPEN",
+      "createdAt": "2026-10-08T13:46:40Z",
+      "mergedAt": null,
+      "title": "feat(jumpcloud): add JumpCloud piece to manage users, devices, groups and apps",
+      "url": "https://github.com/activepieces/activepieces/pull/16292",
+      "author": "eliseukadesh67",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "16294": {
+      "state": "OPEN",
+      "createdAt": "2026-10-08T14:02:17Z",
+      "mergedAt": null,
+      "title": "feat(google-ads): add Google Ads piece",
+      "url": "https://github.com/activepieces/activepieces/pull/16294",
+      "author": "fabio-kozlowski",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "16295": {
+      "state": "OPEN",
+      "createdAt": "2026-10-08T14:02:20Z",
+      "mergedAt": null,
+      "title": "feat(google-workspace): add Google Workspace piece",
+      "url": "https://github.com/activepieces/activepieces/pull/16295",
+      "author": "fabio-kozlowski",
+      "base": "main",
+      "approved": false,
+      "approvedAt": null,
+      "assignees": []
+    },
+    "16319": {
+      "state": "OPEN",
+      "createdAt": "2026-10-08T21:08:42Z",
+      "mergedAt": null,
+      "title": "feat(teable): manage tables, fields and batch records, with AI agent actions and polling triggers",
+      "url": "https://github.com/activepieces/activepieces/pull/16319",
+      "author": "OdaiAhmed99",
+      "base": "main",
+      "approved": true,
+      "approvedAt": "2026-10-09T03:03:28Z",
+      "assignees": [
+        "OdaiAhmed99"
+      ]
     }
   }
 }

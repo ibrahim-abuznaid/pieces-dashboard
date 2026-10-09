@@ -1,27 +1,27 @@
 {
-  "fetched": "2026-09-27",
+  "fetched": "2026-10-09",
   "outputSchema": {
-    "cal-com": 15816,
-    "mastodon": 15759,
-    "asana": 15757,
-    "dropbox": 15661,
+    "teable": 16319,
+    "google-workspace": 16295,
+    "google-ads": 16294,
+    "jumpcloud": 16292,
+    "google-document-ai": 16251,
+    "google-translate": 16232,
     "airtable": 15624,
-    "instagram-business": 15618,
     "flow-helper": 15390,
     "firecrawl": 15258
   },
   "uiImprovements": {
-    "microsoft-outlook": 15829,
-    "google-gemini": 15826,
-    "hubspot": 15814,
-    "youtube": 15813,
-    "outseta": 15216,
-    "telegram-bot": 14970,
-    "gmail": 14943
+    "jumpcloud": 16292,
+    "outseta": 15216
   },
   "aiActions": {
-    "cal-com": 15816,
-    "asana": 15757,
-    "dropbox": 15661
+    "teable": 16319,
+    "retable": 15868
+  },
+  "connectionIdentifier": {
+    "apache-kafka": 16291,
+    "sap-successfactors-saml2-oauth": 15567,
+    "feedjolt": 15401
   }
 }
