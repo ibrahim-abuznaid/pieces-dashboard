@@ -298,6 +298,15 @@
       "t2v": 16,
       "t2t": 16,
       "note": "All shipped atomics live-verified, plus the New Submission trigger schema. 7 held on the free test account (blockers opnform-paid, opnform-export-async); 5 form-integration (webhook) endpoints skipped as trigger-owned."
+    },
+    {
+      "slug": "runware",
+      "atomics": 21,
+      "v": "0.2.0",
+      "pr": 16352,
+      "t2v": 5,
+      "t2t": 21,
+      "note": "Refactored to the standard layout first. 5 of 21 atomics live-verified (model search, account, usage); 16 + the 4 existing actions are Tier-1 only on a $0-balance test account (blocker runware-credits)."
     }
   ]
 }
