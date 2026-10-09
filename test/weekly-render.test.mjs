@@ -19,6 +19,7 @@ const snap = (week, over = {}) => ({
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
   uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
+  connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
@@ -89,7 +90,7 @@ test('writes summary.json for the selected week', () => {
   const { outDir } = render([snap('2026-W31')]);
   const summary = JSON.parse(readFileSync(join(outDir, 'summary.json'), 'utf8'));
   assert.equal(summary.week, '2026-W31');
-  assert.equal(summary.tiles.length, 7);
+  assert.equal(summary.tiles.length, 8);
 });
 
 test('an empty archive renders a placeholder rather than throwing', () => {
@@ -164,9 +165,9 @@ test('the DOM-lite harness actually renders the page body', () => {
 
 const at = (dom, needle) => dom.indexOf(needle);
 
-test('the page is a header, seven boxes and nothing structural besides', () => {
+test('the page is a header, eight boxes and nothing structural besides', () => {
   const dom = renderDom([withRosters()]);
-  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 7);
+  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 8);
   assert.doesNotMatch(dom, /<section/, 'the roster and detail sections are gone');
   assert.doesNotMatch(dom, /<table|<tr|<td|<th/, 'nothing on this page is a table any more');
   assert.doesNotMatch(dom, /<details|<summary/, 'no collapsible per-piece detail');

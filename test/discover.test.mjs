@@ -162,3 +162,39 @@ test('a PR into main wins over a stacked one for the same piece', () => {
   ]);
   assert.deepEqual(out.aiActions, { asana: 15757 });
 });
+
+// ── connection identifier ───────────────────────────────────────────────────
+// The hook the rollout adds, as the auth property it is: assigned, shorthand,
+// or a method. Anchored to the start of an added line, like the AI-actions rule.
+test('an added getConnectionIdentifier is the connection-identifier signature', () => {
+  for (const line of ['+  getConnectionIdentifier: async ({ auth }) => {', '+\tgetConnectionIdentifier,',
+    '+  async getConnectionIdentifier({ auth }) {']) {
+    const m = classifyFiles([file(piece('zoom', 'src/lib/auth.ts'), line)]);
+    assert.deepEqual(rollouts(m, 'zoom'), ['connectionIdentifier'], `missed: ${line}`);
+  }
+});
+
+test('a getConnectionIdentifier mention that is not the hook is not the signature', () => {
+  for (const line of ['+  // getConnectionIdentifier resolves the email', '+  const id = await auth.getConnectionIdentifier?.()']) {
+    const m = classifyFiles([file(piece('zoom', 'src/lib/auth.ts'), line)]);
+    assert.deepEqual(rollouts(m, 'zoom'), [], `false hit: ${line}`);
+  }
+});
+
+test('a hook under test/ is a fixture, not a shipped hook', () => {
+  const m = classifyFiles([file(piece('zoom', 'test/auth.test.ts'), '+  getConnectionIdentifier: async () => "x",')]);
+  assert.deepEqual(rollouts(m, 'zoom'), []);
+});
+
+test('deleting the hook is not adopting it', () => {
+  const m = classifyFiles([file(piece('zoom', 'src/lib/auth.ts'), '-  getConnectionIdentifier: async () => "x",')]);
+  assert.deepEqual(rollouts(m, 'zoom'), []);
+});
+
+test('open connection-identifier PRs are discovered per piece', () => {
+  const out = discoverClaims([{ number: 16100, files: [
+    file(piece('box', 'src/index.ts'), '+  getConnectionIdentifier: async ({ auth }) => {'),
+    file(piece('figma', 'src/lib/auth.ts'), '+  getConnectionIdentifier,'),
+  ] }]);
+  assert.deepEqual(out.connectionIdentifier, { box: 16100, figma: 16100 });
+});

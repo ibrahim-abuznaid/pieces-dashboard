@@ -10,9 +10,9 @@ import { PEOPLE, personOf, displayName } from '../collect/people.mjs';
 import { landedRows } from './landed.mjs';
 import { previousWeekId } from '../../lib/isoweek.mjs';
 
-// The four tiles a target can sit in, by archive key. Anything else is a typo,
+// The tiles a target can sit in, by archive key. Anything else is a typo,
 // and a typo here silently drops a person's row from the page — so it throws.
-export const TARGET_KEYS = ['aiActions', 'uiImprovements', 'testing', 'tickets'];
+export const TARGET_KEYS = ['aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets'];
 
 const WEEK_RE = /^\d{4}-W\d{2}$/;
 const isObject = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
@@ -74,7 +74,7 @@ export function checkedByPerson(byPerson, total) {
 const OTHERS = 'others';
 const UNCREDITED = 'uncredited';
 const byAuthor = (r) => (typeof r.author === 'string' && r.author ? (personOf(r.author) ?? OTHERS) : UNCREDITED);
-const CREDIT = { aiActions: byAuthor, uiImprovements: byAuthor, testing: () => 'sanket' };
+const CREDIT = { aiActions: byAuthor, uiImprovements: byAuthor, connectionIdentifier: byAuthor, testing: () => 'sanket' };
 
 // Counts per credit key, or null when the week cannot be measured. Pieces use
 // the tile's own "done this week" diff (landed.mjs). On the rollout tiles that

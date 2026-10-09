@@ -17,6 +17,7 @@ import { plural } from './lib/view.mjs';
 import { collectOutputSchema } from './collect/output-schema.mjs';
 import { collectAiActions } from './collect/ai-actions.mjs';
 import { collectUiImprovements } from './collect/ui-improvements.mjs';
+import { collectConnectionIdentifier } from './collect/connection-identifier.mjs';
 import { collectTesting } from './collect/testing.mjs';
 import { collectTickets } from './collect/tickets.mjs';
 import { collectShipping } from './collect/shipping.mjs';
@@ -27,7 +28,7 @@ const TARGETS = join(ROOT, 'weekly/data/targets.json');
 const TEAM_DASHBOARD = process.env.PIECES_TEAM_DASHBOARD
   ?? '/home/ibrahim/AP_work/Activepieces_v/pieces-team/dashboard';
 
-const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'testing', 'tickets', 'shipping'];
+const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets', 'shipping'];
 
 export function buildSnapshot({ weekId, today, collectors, targets = null }) {
   const { start, end } = windowForWeekId(weekId);
@@ -74,6 +75,15 @@ export function deriveDecisions(snap) {
   if (ui?.status === 'ok' && typeof ui.live === 'number' && ui.merged - ui.live > 0) {
     const n = ui.merged - ui.live;
     lines.push(`${n} ${plural(n, 'piece')} with the new property UI merged but not live — needs a cloud release`);
+  }
+  // And once more for the hooks: a hook merged on main labels nobody's
+  // connection until the piece is republished. A token-road row only lands in
+  // this gap while its piece is not on cloud at all (lib/connection-identifier.mjs),
+  // so in practice it is the hook queue.
+  const ci = snap.connectionIdentifier;
+  if (ci?.status === 'ok' && typeof ci.live === 'number' && ci.merged - ci.live > 0) {
+    const n = ci.merged - ci.live;
+    lines.push(`${n} ${plural(n, 'piece')} with a connection identifier merged but not live — needs a cloud release`);
   }
   return lines;
 }
@@ -221,6 +231,7 @@ export function main(argv) {
         outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
         aiActions: () => collectAiActions({ readJson: readRepoJson }),
         uiImprovements: () => collectUiImprovements({ readJson: readRepoJson }),
+        connectionIdentifier: () => collectConnectionIdentifier({ readJson: readRepoJson }),
         testing: () => collectTesting({ window, gh, curl, testerUrl, readJson: readRepoJson }),
         tickets: () => collectTickets({
           window, weekId, readJson: readTeamJson,

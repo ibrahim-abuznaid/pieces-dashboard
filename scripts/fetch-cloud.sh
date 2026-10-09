@@ -45,7 +45,13 @@ jq -r '.[].name' data/cloud-catalog.json | xargs -P10 -n1 sh -c '
     # generic form nobody on this team authored. The outputSchema counts above
     # deliberately keep it: a schema on the shared action is still a schema that
     # piece publishes.
+    # oauth2 / connIdHook feed connection-identifier/build.mjs. `auth` is one
+    # object or an array of them (multi-auth pieces), so both are flattened.
+    # connIdHook is the flag the framework itself sets for a getConnectionIdentifier hook
+    # on ANY of the auths -- the hook works on API-key auths too.
     printf "%s" "$m" | jq -c "{name:.name, version:.version,
+      oauth2: ([.auth]|flatten|map(select(. != null))|any(.type == \"OAUTH2\")),
+      connIdHook: ([.auth]|flatten|map(select(. != null))|any(.hasConnectionIdentifier == true)),
       totalActions: ((.actions // {})|length), totalTriggers: ((.triggers // {})|length),
       actionsWithSchema: ([(.actions // {})|to_entries[]|select(.value.outputSchema != null)]|length),
       triggersWithSchema: ([(.triggers // {})|to_entries[]|select(.value.outputSchema != null)]|length),

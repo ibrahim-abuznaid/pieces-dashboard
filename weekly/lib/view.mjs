@@ -3,12 +3,12 @@
 // clock, so the whole page shape is unit-testable.
 //
 // The reader is a project manager, which sets the whole scope: a week header,
-// five numbers, the pieces behind each number, and an ask when there is one.
+// a number per box, the pieces behind each number, and an ask when there is one.
 // Nothing else is built here — a field computed but never rendered is how the
 // next reader gets misled about what the page actually shows.
 //
 // Two invariants the page depends on:
-//   1. `tiles` is ALWAYS length 5 in a fixed order, even when workstreams are
+//   1. `tiles` is ALWAYS the same length in a fixed order, even when workstreams are
 //      degraded — the layout must not reflow because a collector failed.
 //   2. A degraded workstream renders as "unknown", never as 0. `value` and
 //      `delta` both go empty and the box says it was not measured — see
@@ -410,6 +410,19 @@ const TILES = [
     // Open PRs count on the target row from W40, as on AI actions above.
     strip: pieceStrip, done: ['live', 'merged'], wide: true,
     credit: ['live', 'merged', 'review'], creditFrom: '2026-W40' },
+  // The connection-identifier rollout: pieces that label a new connection with
+  // the account it belongs to, by a hook or straight off the OAuth token (see
+  // lib/connection-identifier.mjs). Same reading as UI improvements — landed is
+  // the headline, `live` the subset cloud serves — and the same reason to be
+  // wide: a hook wave lands twenty pieces in one PR, and the strip needs the row.
+  //
+  // Wired for per-person credit from W41, open PRs included, but targets.json
+  // sets none yet; a row draws only once the lead adds one.
+  { key: 'connectionIdentifier', title: 'Connection identifier', path: 'connectionIdentifier.merged',
+    unit: (ws) => `of ${ws.totalPieces} pieces show the account`,
+    review: 'connectionIdentifier.review',
+    strip: pieceStrip, done: ['live', 'merged'], wide: true,
+    credit: ['live', 'merged', 'review'], creditFrom: '2026-W41' },
 ];
 
 // ── decisions ───────────────────────────────────────────────────────────────

@@ -19,7 +19,7 @@ test('the committed targets file is valid and starts at W39', () => {
 });
 
 test('only the four tiles that carry targets are accepted', () =>
-  assert.deepEqual(TARGET_KEYS, ['aiActions', 'uiImprovements', 'testing', 'tickets']));
+  assert.deepEqual(TARGET_KEYS, ['aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets']));
 
 test('an unknown workstream is named in the error', () =>
   assert.throws(() => validateTargets({ aiAction: { kishan: 20 } }), /targets\.aiAction: no such workstream/));
@@ -168,6 +168,28 @@ test('UI improvements: live and merged both count, logins match case-insensitive
   const t = targetsFor(UI, WEEKS, W40);
   assert.deepEqual(t.rows, [{ person: 'talal', name: 'Talal', actual: 1, target: 15, hit: false }]);
   assert.equal(t.also, '');
+});
+
+// Wired but unset: the moment the lead adds a number to targets.json, the
+// pieces a person's PRs landed this week count for them, open PRs included.
+const CI_OPEN = { key: 'connectionIdentifier', done: ['live', 'merged'], credit: ['live', 'merged', 'review'], creditFrom: '2026-W41' };
+
+test('connection identifier: no target set, no rows drawn', () => {
+  const W41 = wk('2026-W41', { targets: { aiActions: { odai: 20 } },
+    connectionIdentifier: ok([row('box', 'live', 'OdaiAhmed99')]) });
+  assert.equal(targetsFor(CI_OPEN, [W40, W41], W41), null);
+});
+
+test('connection identifier: with a target, landed and open pieces credit their PR author', () => {
+  const W40ci = { ...W40, connectionIdentifier: ok([row('asana', 'live', 'ibrahim-abuznaid')]) };
+  const W41 = wk('2026-W41', { targets: { connectionIdentifier: { odai: 8 } }, connectionIdentifier: ok([
+    row('asana', 'live', 'ibrahim-abuznaid'),   // done last week
+    row('box', 'live', 'OdaiAhmed99'),
+    row('figma', 'merged', 'OdaiAhmed99'),
+    row('zoho-crm', 'review', 'OdaiAhmed99'),
+  ]) });
+  const t = targetsFor(CI_OPEN, [W40ci, W41], W41);
+  assert.deepEqual(t.rows, [{ person: 'odai', name: 'Odai', actual: 3, target: 8, hit: false, open: 1 }]);
 });
 
 test('piece testing: every newly covered piece is Sanket\'s — a set difference, never negative', () => {

@@ -12,6 +12,7 @@ const collectors = (over = {}) => ({
   outputSchema: () => ({ status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 }),
   aiActions: () => ({ status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 }),
   uiImprovements: () => ({ status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 }),
+  connectionIdentifier: () => ({ status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 }),
   testing: () => ({ status: 'ok', prsMerged: 1, commits: 4, shipped: [] }),
   tickets: () => ({ status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
                     prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] }),
@@ -74,6 +75,33 @@ test('the property-UI rollout asks for the cloud release on the same terms', () 
     uiImprovements: { status: 'ok', merged: 5, live: 4 },
     tickets: { status: 'ok' }, testing: { status: 'ok' },
   }), ['1 piece with the new property UI merged but not live — needs a cloud release']);
+});
+
+// The third rollout whose done-ness waits on a cloud release: a hook merged on
+// main labels nobody's connection until the piece is republished.
+test('the connection-identifier rollout asks for the cloud release on the same terms', () => {
+  assert.deepEqual(deriveDecisions({
+    outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
+    aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, live: 5 },
+    connectionIdentifier: { status: 'ok', merged: 60, live: 58 },
+    tickets: { status: 'ok' }, testing: { status: 'ok' },
+  }), ['2 pieces with a connection identifier merged but not live — needs a cloud release']);
+});
+
+test('a connection-identifier week with no cloud measurement asks nothing', () => {
+  assert.deepEqual(deriveDecisions({
+    outputSchema: { status: 'ok', mergedNotLive: 0, review: 0 },
+    aiActions: { status: 'ok', prOpen: 0, blockersOpen: 0 },
+    uiImprovements: { status: 'ok', merged: 5, live: 5 },
+    connectionIdentifier: { status: 'ok', merged: 34, review: 0, assigned: 0, totalPieces: 111 },
+    tickets: { status: 'ok' }, testing: { status: 'ok' },
+  }), []);
+});
+
+test('the snapshot records the connection-identifier workstream', () => {
+  const snap = buildSnapshot({ weekId: '2026-W41', today: '2026-10-10', collectors: collectors() });
+  assert.equal(snap.connectionIdentifier.merged, 58);
 });
 
 test('a week that never measured cloud state asks nothing of it', () => {

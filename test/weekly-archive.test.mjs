@@ -11,6 +11,7 @@ const ok = (over = {}) => ({
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
   uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
+  connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
@@ -211,6 +212,36 @@ test('the reconstructable uiImprovements counts stay required', () => {
       new RegExp(`uiImprovements\\.${f} must be a number`));
   }
 });
+
+// --- connectionIdentifier ------------------------------------------------------
+// The same contract as uiImprovements, for the same reason: every week archived
+// before it existed was rebuilt from PR timestamps
+// (scripts/backfill-connection-identifier.mjs), which can say what had merged
+// and never what cloud served — so `live` is optional and the rest required.
+test('a week with no connectionIdentifier block is rejected', () => {
+  const snap = ok();
+  delete snap.connectionIdentifier;
+  assert.throws(() => validateSnapshot(snap), /missing workstream: connectionIdentifier/);
+});
+
+test('a reconstructed connectionIdentifier week with no live validates', () =>
+  validateSnapshot(ok({ connectionIdentifier: { status: 'ok', merged: 34, review: 0, assigned: 0, totalPieces: 111 } })));
+
+test('a null connectionIdentifier.live is rejected', () =>
+  assert.throws(() => validateSnapshot(ok({ connectionIdentifier: { status: 'ok', merged: 34, live: null, review: 0, assigned: 0, totalPieces: 111 } })),
+    /connectionIdentifier\.live must be a number/));
+
+test('the reconstructable connectionIdentifier counts stay required', () => {
+  for (const f of ['merged', 'review', 'assigned', 'totalPieces']) {
+    const ws = { status: 'ok', merged: 34, review: 0, assigned: 0, totalPieces: 111 };
+    delete ws[f];
+    assert.throws(() => validateSnapshot(ok({ connectionIdentifier: ws })),
+      new RegExp(`connectionIdentifier\\.${f} must be a number`));
+  }
+});
+
+test('a no-data connectionIdentifier validates when it carries a reason', () =>
+  validateSnapshot(ok({ connectionIdentifier: { status: 'no-data', reason: 'build output missing' } })));
 
 // --- logo (optional per-row logo URL) ----------------------------------------
 // OPTIONAL for the same reason as `roster` and `catalogPieces`: the snapshot

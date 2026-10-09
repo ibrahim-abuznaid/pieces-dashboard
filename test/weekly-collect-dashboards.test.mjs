@@ -590,6 +590,7 @@ test('what the collectors emit — including an unresolved logo — passes valid
     outputSchema: collectOutputSchema({ readJson: osRead() }),
     aiActions: collectAiActions({ readJson: aiRead() }),
     uiImprovements: collectUiImprovements({ readJson: uiRead() }),
+    connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
     testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
     tickets: { status: 'ok', total: 11 },
   };
@@ -646,6 +647,7 @@ test('an unmeasured cloud half stays absent, it does not become zero', () => {
     outputSchema: collectOutputSchema({ readJson: osRead() }),
     aiActions: collectAiActions({ readJson: aiRead() }),
     uiImprovements: ws,
+    connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
     testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
     tickets: { status: 'ok', total: 11 },
   });

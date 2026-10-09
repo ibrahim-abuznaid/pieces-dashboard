@@ -19,6 +19,11 @@ const REQUIRED = {
   // NOW, so a past week that records `merged` and omits `live` is the honest
   // shape and has to validate. See OPTIONAL_NUMBERS.
   uiImprovements: ['merged', 'review', 'assigned', 'totalPieces'],
+  // Same shape and the same asymmetry as uiImprovements, for the same reason:
+  // the weeks archived before it existed were rebuilt from PR timestamps
+  // (scripts/backfill-connection-identifier.mjs), which know what had merged
+  // and never what cloud served.
+  connectionIdentifier: ['merged', 'review', 'assigned', 'totalPieces'],
   testing: ['prsMerged', 'commits'],
   tickets: ['total'],
 };
@@ -29,6 +34,7 @@ const REQUIRED = {
 // "of undefined pieces" or a NaN delta.
 const OPTIONAL_NUMBERS = {
   uiImprovements: ['live'],
+  connectionIdentifier: ['live'],
   // Open PRs the lead has approved (lib/ai-roster.mjs). Optional because every
   // week before 2026-09-26 predates the stage, and a week without it had none.
   aiActions: ['approved'],

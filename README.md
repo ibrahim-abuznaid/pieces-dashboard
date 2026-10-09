@@ -7,7 +7,7 @@ Live site: **https://ibrahim-abuznaid.github.io/pieces-dashboard/**
 | [/](https://ibrahim-abuznaid.github.io/pieces-dashboard/) | Combined KPIs + stage funnels |
 | [/output-schema/](https://ibrahim-abuznaid.github.io/pieces-dashboard/output-schema/) | `outputSchema` rollout across the published piece catalog (computed from the cloud API + upstream repo) |
 | [/ai-actions/](https://ibrahim-abuznaid.github.io/pieces-dashboard/ai-actions/) | `audience:'ai'` agent-atomics coverage + blockers |
-| [/weekly/](https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/) | One week of team progress across all five workstreams, with an archive of past weeks |
+| [/weekly/](https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/) | One week of team progress across every workstream, with an archive of past weeks |
 
 ## How it stays fresh
 
@@ -18,7 +18,7 @@ fetch live data (Activepieces cloud API, upstream repo tree, GitHub PR states) �
 ## Weekly progress page
 
 [/weekly/](https://ibrahim-abuznaid.github.io/pieces-dashboard/weekly/) shows one week of team progress
-across the five workstreams. The counting window is the **7 days ending Friday** (Sat 00:00 → Fri 23:59 UTC).
+across every workstream. The counting window is the **7 days ending Friday** (Sat 00:00 → Fri 23:59 UTC).
 
 Snapshots are appended **locally, never in CI**: the Saturday job runs `npm run snapshot`, which writes one
 week into `weekly/data/weeks.json` — and that file **is** committed. CI only renders what is already
@@ -61,7 +61,7 @@ Both read the page the way a reader gets it: the DOM is built client-side from a
 blob, so grepping the served HTML for a week id proves nothing. `verify-weekly.mjs` parses that blob and
 executes the page's scripts in a `node:vm` sandbox.
 
-The page is written for a **project manager**: the week, five numbers, the pieces behind each number, and
+The page is written for a **project manager**: the week, a number per box, the pieces behind each number, and
 anything that needs a decision. Closed tickets and shipped PRs render as chips that **link to the artifact
 itself** (the ticket in Linear, the PR on GitHub). Every strip opens at 5 chips so the landing view fits one
 screen; **"+N more" is a button** that expands the full list in place (the whole roster is in the page,
@@ -100,6 +100,37 @@ from PR `createdAt`/`mergedAt` — permanent timestamps, so "how many had merged
 correct answer that does not drift. Those weeks record no `live`: cloud state is only ever knowable now, and
 the archive makes the field optional so a reconstructed week can stay silent rather than guess.
 
+### Connection identifier — pieces that label the account
+
+The connection-identifier box counts pieces that label a **new** connection with the account it belongs to (the email or name
+under a connection on the Connections page and in the builder's picker), out of every **OAuth2 piece on cloud
+minus the ten whose provider exposes no identity** (111 when this shipped). Full width, under UI improvements.
+
+A piece gets there by one of two roads, and the build treats them differently because only one is visible:
+
+- **hook** — the piece's auth defines `getConnectionIdentifier`. The cloud API publishes
+  `hasConnectionIdentifier: true` on that auth, so `scripts/fetch-cloud.sh` records it as `connIdHook` and the
+  build counts it with no claim needed (and prints a `WARN` naming any hook without a row, so the week it landed
+  can be attributed). Open hook PRs are discovered from their diff (`CONN_ID_HOOK` in `lib/discover.mjs`).
+- **token** — the provider returns the email in the token response or an OIDC `id_token` (Google's `email` scope,
+  Microsoft's `openid email profile`), with no piece code. Nothing on cloud says so, so these rows live only in
+  `connection-identifier/pieces.json`, and count as live once their PR merged and the piece is on cloud. A
+  token-road PR (a scope edit) is not discoverable: add its row by hand.
+
+`connection-identifier/pieces.json` also carries the `none` list: OAuth2 pieces with no identity to show
+(client-credentials tokens, tenant- or location-scoped grants). They leave the denominator; if one ever gains a
+hook it counts again and the build warns that the listing is stale. The counting rules are pure and unit-tested in
+`lib/connection-identifier.mjs`.
+
+As on UI improvements, the headline is **merged** (live + merged-not-live), `live` is optional in the archive, and
+`merged − live` becomes a "needs a cloud release" ask. The nine weeks archived before the box existed were rebuilt
+by `scripts/backfill-connection-identifier.mjs` from PR timestamps, without `live`. Per-person credit is wired
+(PR author, open PRs included from W41) but `targets.json` sets no target for it; adding one is a one-line edit.
+
+The new box costs page height: a second full-width box adds ~100–150px to a page that already ran ~100px past
+one 1366x768 screen (see the re-measurement note in `test/weekly-render.test.mjs`). Pairing it with UI improvements
+as two half-width boxes would cost no extra row, at the price of UI improvements' full-width strip.
+
 ### Piece testing — coverage when reachable, build progress otherwise
 
 When a snapshot is taken with **`PIECE_TESTER_URL`** set, the collector reads the running tester's
@@ -135,8 +166,8 @@ npm run build    # writes dist/ — open dist/index.html
 - `shared/theme.css` — one palette/light+dark theme, inlined into every page at build
 - `lib/` — render + stage derivation (unit-tested)
 - `scripts/` — data fetchers (also run in CI)
-- `output-schema/`, `ai-actions/`, `site/` — one build.mjs + template.html each
-- Manual state lives ONLY in `output-schema/overrides.json`, `ai-actions/overrides.json`, and the curated `ai-actions/{pieces,blockers}.json`
+- `output-schema/`, `ai-actions/`, `site/` — one build.mjs + template.html each; `ui-improvements/` and `connection-identifier/` are build.mjs + a claims file (the weekly page is their only reader)
+- Manual state lives ONLY in `output-schema/overrides.json`, `ai-actions/overrides.json`, the curated `ai-actions/{pieces,blockers}.json`, `ui-improvements/pieces.json` and `connection-identifier/pieces.json`
 - AI-actions **merged** is read off upstream main, not the curated file: `scripts/fetch-repo-ai.sh` greps a sparse
   shallow clone for `audience: 'ai'` actions per piece → `data/repo-ai-actions.json`, and `lib/ai-roster.mjs`
   counts every piece found there whether or not it has a row. Open PRs are classified by the same rule

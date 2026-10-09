@@ -10,6 +10,7 @@ const snap = (week, over = {}) => ({
   outputSchema: { status: 'ok', live: 9, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 },
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
   uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
+  connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 3, assigned: 0, totalPieces: 111 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [{ number: 5, title: 't', url: 'u' }] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 },
@@ -48,12 +49,12 @@ test('an empty archive is flagged rather than crashing', () =>
 test('picker lists weeks newest first', () =>
   assert.deepEqual(buildView(archive).weeks, ['2026-W31', '2026-W30']));
 
-// Seven, and the order is the argument. The week's own work leads -- PRs,
-// tickets, reviews, testing -- and the three rollouts follow it, because a page
+// Eight, and the order is the argument. The week's own work leads -- PRs,
+// tickets, reviews, testing -- and the four rollouts follow it, because a page
 // that opens on numbers which move in months reports nothing most weeks.
-test('always seven tiles in fixed order, the week before the rollouts', () =>
+test('always eight tiles in fixed order, the week before the rollouts', () =>
   assert.deepEqual(buildView(archive).tiles.map((t) => t.key),
-    ['prsMerged', 'tickets', 'reviews', 'testing', 'outputSchema', 'aiActions', 'uiImprovements']));
+    ['prsMerged', 'tickets', 'reviews', 'testing', 'outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier']));
 
 // Six small boxes fill three clean rows of the two-column grid before the wide
 // one spans the foot. Five would leave a half-empty row and a hole beside it.
@@ -62,13 +63,14 @@ test('the small tiles come in pairs so no row is left half-empty', () => {
   assert.equal(small.length % 2, 0, `${small.length} small tiles leaves a hole in a 2-column grid`);
 });
 
-// Exactly one, and last. The wide box spans both grid columns, so a second one
-// would leave an odd tile beside a hole — and anywhere but last it would split
-// a row pair. It is also where the full-width UI-improvements band used to sit.
-test('the UI-improvements tile is the only wide one, and it comes last', () => {
+// The wide boxes span both grid columns, so they sit together at the foot:
+// anywhere among the small ones they would split a row pair and leave a hole.
+// UI improvements first, where the full-width band used to sit, then the newer
+// rollout under it.
+test('the two wide tiles come last, UI improvements then connection identifier', () => {
   const tiles = buildView(archive).tiles;
-  assert.deepEqual(tiles.filter((t) => t.wide).map((t) => t.key), ['uiImprovements']);
-  assert.equal(tiles.at(-1).key, 'uiImprovements');
+  assert.deepEqual(tiles.filter((t) => t.wide).map((t) => t.key), ['uiImprovements', 'connectionIdentifier']);
+  assert.deepEqual(tiles.slice(-2).map((t) => t.key), ['uiImprovements', 'connectionIdentifier']);
 });
 
 // The headline for outputSchema is MERGED work — live + merged-not-live — not
@@ -350,7 +352,7 @@ test('a prior week that reported nothing still leaves nothing to compare', () =>
   const degraded = { status: 'no-data', reason: 'x' };
   const a = { weeks: [
     snap('2026-W30', { outputSchema: degraded, aiActions: degraded, uiImprovements: degraded,
-                       testing: degraded, tickets: degraded, shipping: degraded }),
+                       connectionIdentifier: degraded, testing: degraded, tickets: degraded, shipping: degraded }),
     snap('2026-W31'),
   ] };
   assert.equal(buildView(a).noPriorWeek, true);
@@ -1265,7 +1267,7 @@ const inReviewOf = (v) => Object.fromEntries(v.tiles.map((t) => [t.key, t.inRevi
 
 test('only the workstreams that measure a queue carry one', () =>
   assert.deepEqual(inReviewOf(buildView(archive)), {
-    aiActions: 24, uiImprovements: 2, outputSchema: null, testing: null, tickets: null,
+    aiActions: 24, uiImprovements: 2, connectionIdentifier: 3, outputSchema: null, testing: null, tickets: null,
     // Neither counts anything that waits on a reviewer: a merged PR has landed,
     // and a review given is over.
     prsMerged: null, reviews: null }));
@@ -1426,4 +1428,51 @@ test('a degraded tile carries no targets', () => {
   const v = buildView({ weeks: [snap('2026-W40', { targets: { tickets: { kishan: 5 } },
     tickets: { status: 'no-data', reason: 'x' } })] });
   assert.equal(tileOf(v, 'tickets').targets, null);
+});
+
+// ── the connection-identifier tile ──────────────────────────────────────────
+const ci = (over = {}) => ({ status: 'ok', merged: 58, live: 58, review: 2, assigned: 0, totalPieces: 111, ...over });
+const ciRow = (name, stage, author) => ({ folder: name, name, displayName: name, actions: 3, stage, logo: null, ...(author ? { author } : {}) });
+
+test('the connection-identifier tile leads with landed pieces against the reachable catalog', () => {
+  const t = tileOf(buildView({ weeks: [snap('2026-W41', { connectionIdentifier: ci() })] }), 'connectionIdentifier');
+  assert.equal(t.title, 'Connection identifier');
+  assert.equal(t.value, 58);
+  assert.equal(t.unit, 'of 111 pieces show the account');
+  assert.equal(t.inReview, 2);
+  assert.equal(t.wide, true);
+});
+
+test('the connection-identifier delta compares landed with landed', () => {
+  const t = tileOf(buildView({ weeks: [
+    snap('2026-W40', { connectionIdentifier: ci({ merged: 34, live: undefined }) }),
+    snap('2026-W41', { connectionIdentifier: ci() }),
+  ] }), 'connectionIdentifier');
+  assert.equal(t.delta, 24);
+});
+
+test('the strip lists the pieces that landed this week, live or merged', () => {
+  const W40 = snap('2026-W40', { connectionIdentifier: ci({ merged: 1, roster: [ciRow('asana', 'merged')] }) });
+  const W41 = snap('2026-W41', { connectionIdentifier: ci({ merged: 3, roster: [
+    ciRow('asana', 'live'), ciRow('gmail', 'live'), ciRow('gitlab', 'merged'), ciRow('box', 'review'),
+  ] }) });
+  const t = tileOf(buildView({ weeks: [W40, W41] }), 'connectionIdentifier');
+  assert.equal(t.strip.label, 'Done this week');
+  assert.deepEqual(t.strip.items.map((c) => c.name), ['gitlab', 'gmail']);
+});
+
+test('a week with no connection-identifier block renders as not measured, never 0', () => {
+  const week = snap('2026-W31');
+  delete week.connectionIdentifier;
+  const t = tileOf(buildView({ weeks: [week] }), 'connectionIdentifier');
+  assert.equal(t.status, 'no-data');
+  assert.equal(t.value, null);
+});
+
+// Wired for per-person credit like the other rollouts, but no target is set:
+// with nothing in targets.json for it, no row draws.
+test('the connection-identifier tile draws no target row while none is set', () => {
+  const W41 = snap('2026-W41', { targets: { aiActions: { odai: 20 } },
+    connectionIdentifier: ci({ roster: [ciRow('gmail', 'live', 'OdaiAhmed99')] }) });
+  assert.equal(tileOf(buildView({ weeks: [W41] }), 'connectionIdentifier').targets, null);
 });

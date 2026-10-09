@@ -46,3 +46,31 @@ test('the Saturday job requires a complete landing scan; CI does not', () => {
   const yml = readFileSync(new URL('../.github/workflows/deploy.yml', import.meta.url), 'utf8');
   assert.doesNotMatch(yml, /LANDINGS_REQUIRED/, 'CI stays best-effort');
 });
+
+// The snapshot reads dist/connection-identifier/, so its build has to run in
+// `npm run build` — the one command both CI and the Saturday job call.
+test('npm run build builds the connection-identifier output before the weekly page', () => {
+  assert.match(pkg.scripts.build, /connection-identifier\/build\.mjs/);
+  assert.ok(pkg.scripts.build.indexOf('connection-identifier/build.mjs') < pkg.scripts.build.indexOf('weekly/build.mjs'));
+});
+
+// The PR fetch only states PRs some file points at. Without this line every
+// curated connection-identifier row would read `planned` and the backfill
+// would refuse to run.
+test('the PR fetch reads the connection-identifier claims', () => {
+  const src = readFileSync(new URL('../scripts/fetch-pr-states.mjs', import.meta.url), 'utf8');
+  assert.match(src, /connection-identifier\/pieces\.json/);
+});
+
+// The hook flag is the only measurement of the hook road; a fetch that stopped
+// recording it would turn every live hook into an unmeasured one.
+test('the cloud fetch records the two connection-identifier fields', () => {
+  const sh = readFileSync(new URL('../scripts/fetch-cloud.sh', import.meta.url), 'utf8');
+  assert.match(sh, /oauth2:/);
+  assert.match(sh, /connIdHook:.*hasConnectionIdentifier/);
+});
+
+test('the committed claims file validates', async () => {
+  const { validateClaims } = await import('../lib/connection-identifier.mjs');
+  validateClaims(JSON.parse(readFileSync(new URL('../connection-identifier/pieces.json', import.meta.url), 'utf8')));
+});

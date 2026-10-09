@@ -1,0 +1,350 @@
+{
+  "_comment": "Pieces that label a new connection with its account (email or name under the connection). road: hook = the piece defines getConnectionIdentifier, and cloud says so itself (hasConnectionIdentifier), so a hook landed without a row still counts and the build WARNs; token = the OAuth token or id_token carries the email, which nothing on cloud shows, so these rows are the only record. No status field: stage derives from pr + data/pr-states.json + the cloud flag. none = OAuth2 pieces whose provider exposes no identity; they leave the denominator. Open hook PRs are discovered from their diff; a token-road PR (a scope edit) must be added here by hand.",
+  "pieces": [
+    {
+      "slug": "slack",
+      "road": "hook",
+      "pr": 14403,
+      "note": "The reference hook, shipped with the feature itself: labels User (Workspace)."
+    },
+    {
+      "slug": "asana",
+      "road": "hook",
+      "pr": 16020,
+      "note": "Hook instead of a scope edit: the email sits nested in the token response."
+    },
+    {
+      "slug": "clicdata",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "digital-ocean",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "free-agent",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "github",
+      "road": "hook",
+      "pr": 16025,
+      "note": "Labels with the login when the account email is private; no scope added."
+    },
+    {
+      "slug": "gmail",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "instagram-business",
+      "road": "hook",
+      "pr": 16025,
+      "note": "Account name, not email: email needs a Meta app review."
+    },
+    {
+      "slug": "intercom",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "klaviyo",
+      "road": "hook",
+      "pr": 16025,
+      "note": "Account-level sender email, on the API-key auth as well."
+    },
+    {
+      "slug": "mailchimp",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "notion",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "pinterest",
+      "road": "hook",
+      "pr": 16025,
+      "note": "Username, not email: the API exposes none."
+    },
+    {
+      "slug": "pipedrive",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "podio",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "ringcentral",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "savvycal",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "sign-now",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "simplyprint",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "spotify",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "todoist",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "zoom",
+      "road": "hook",
+      "pr": 16025
+    },
+    {
+      "slug": "gitlab",
+      "road": "hook",
+      "pr": 16041
+    },
+    {
+      "slug": "quickbooks",
+      "road": "hook",
+      "pr": 16041,
+      "note": "Company name: Intuit's id_token carries no email."
+    },
+    {
+      "slug": "quickbooks-sandbox",
+      "road": "hook",
+      "pr": 16041
+    },
+    {
+      "slug": "salesforce",
+      "road": "hook",
+      "pr": 16041
+    },
+    {
+      "slug": "azure-ad",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-bigquery",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-calendar",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-cloud-storage",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-contacts",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-docs",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-drive",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-forms",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-my-business",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-search-console",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-sheets",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-slides",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "google-tasks",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "googlechat",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-365-people",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-365-planner",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-copilot",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-dynamics-365-business-central",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-excel-365",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-onedrive",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-onenote",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-outlook",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-outlook-calendar",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-power-bi",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "microsoft-todo",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "youtube",
+      "road": "token",
+      "pr": 14403
+    },
+    {
+      "slug": "bexio",
+      "road": "token",
+      "pr": 14402,
+      "note": "Already requested openid/email before the feature shipped, so it labelled from day one."
+    },
+    {
+      "slug": "linkedin",
+      "road": "token",
+      "pr": 14402,
+      "note": "Already requested openid/email before the feature shipped, so it labelled from day one."
+    },
+    {
+      "slug": "microsoft-dynamics-crm",
+      "road": "token",
+      "pr": 14402,
+      "note": "Already requested openid/email before the feature shipped, so it labelled from day one."
+    },
+    {
+      "slug": "microsoft-sharepoint",
+      "road": "token",
+      "pr": 14402,
+      "note": "Already requested openid/email before the feature shipped, so it labelled from day one."
+    },
+    {
+      "slug": "microsoft-teams",
+      "road": "token",
+      "pr": 14402,
+      "note": "Already requested openid/email before the feature shipped, so it labelled from day one."
+    },
+    {
+      "slug": "xero",
+      "road": "token",
+      "pr": 14402,
+      "note": "Already requested openid/email before the feature shipped, so it labelled from day one."
+    }
+  ],
+  "none": [
+    {
+      "slug": "baremetrics",
+      "reason": "The account endpoint is the billing workspace; no owner email is surfaced."
+    },
+    {
+      "slug": "fathom",
+      "reason": "The API has no self/me call."
+    },
+    {
+      "slug": "greenhouse",
+      "reason": "Harvest partner grants are org-wide; nothing says who authorized them."
+    },
+    {
+      "slug": "http-oauth2",
+      "reason": "A generic, user-supplied provider: nothing to hardcode."
+    },
+    {
+      "slug": "insta-charts",
+      "reason": "Token validation returns only active/scope/client_id/exp."
+    },
+    {
+      "slug": "lead-connector",
+      "reason": "The token is scoped to a location, with no user behind it."
+    },
+    {
+      "slug": "tenzo",
+      "reason": "Scoped to locations/company; one mode is client-credentials."
+    },
+    {
+      "slug": "webflow",
+      "reason": "Introspection returns opaque user ids only."
+    },
+    {
+      "slug": "wootric",
+      "reason": "Client-credentials only: an app-level token by design."
+    },
+    {
+      "slug": "workday",
+      "reason": "Tenant/ISU-scoped, not a personal login."
+    }
+  ]
+}

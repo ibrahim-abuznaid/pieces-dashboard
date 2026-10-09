@@ -17,6 +17,7 @@ const nums = new Map();
 const ref = (pr, slug) => { if (pr) nums.set(pr, [...(nums.get(pr) ?? []), slug]); };
 for (const p of readIf('ai-actions/pieces.json')?.pieces ?? []) ref(p.pr, p.slug);
 for (const p of readIf('ui-improvements/pieces.json')?.pieces ?? []) ref(p.pr, p.slug);
+for (const p of readIf('connection-identifier/pieces.json')?.pieces ?? []) ref(p.pr, p.slug);
 for (const [slug, ov] of Object.entries(readIf('output-schema/overrides.json')?.pieces ?? {})) ref(ov.pr, slug);
 for (const [slug, ov] of Object.entries(readIf('ai-actions/overrides.json')?.pieces ?? {})) ref(ov.pr, slug);
 
