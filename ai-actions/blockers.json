@@ -573,6 +573,32 @@
       "title": "robolly render video / multi-page PDF — 2 atomics",
       "why": "Test account is on the free trial (25 render credits, 3 per image render). Render Video (<code>POST /v1/video/render</code>) costs far more than that (the docs' example render cost 250 credits), and Multi PDF (<code>GET /v1/pdf/render/</code>) is a paid-plan dashboard feature, so neither could run live. Held out of PIE-650.",
       "fix": "Connect a paid Robolly account with an animated template and a Multi PDF set up in the dashboard, then author + Tier-2 Render Video (poll it with the existing Get Render) and Render Multi-Page PDF, including whether <code>json=1</code> returns JSON on the PDF endpoint."
+    },
+    {
+      "id": "opnform-paid",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "opnform"
+      ],
+      "affected": 6,
+      "title": "opnform workspaces / members / invites — 6 atomics",
+      "why": "The test account is on OpnForm's free plan. Create Workspace (<code>POST /open/workspaces/create</code>) returns 403 \"You have reached the workspace limit for Free plan\", so there is no throwaway workspace for Delete Workspace (<code>DELETE /open/workspaces/{id}</code>), and the only workspace is the real one. Add Workspace User (<code>POST /open/workspaces/{id}/users/add</code>) returns 403 \"A Pro plan is required to invite users\", which leaves Resend / Cancel Workspace Invite with no invite and Remove Workspace User with no second member. Held out of PIE-662.",
+      "fix": "Connect a Pro OpnForm account, then author + Tier-2 the 6: create_workspace → add_workspace_user (to your own address) → list invites → resend → cancel invite; a second member (accept an invite) → remove_workspace_user; delete_workspace last."
+    },
+    {
+      "id": "opnform-export-async",
+      "cat": "harness",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "opnform"
+      ],
+      "affected": 1,
+      "title": "opnform get_export_status",
+      "why": "Export Submissions (<code>POST /open/forms/{id}/submissions/export</code>) returns the CSV inline for small forms; only large exports start an async job with a <code>job_id</code>, so Get Export Status (<code>GET /open/forms/{id}/submissions/export/status/{jobId}</code>) had nothing to poll on a test form. The vendor's async threshold is undocumented. Held out of PIE-662.",
+      "fix": "Seed a form with enough submissions that export_submissions returns is_async true, then author + Tier-2 get_export_status with its job_id."
     }
   ]
 }
