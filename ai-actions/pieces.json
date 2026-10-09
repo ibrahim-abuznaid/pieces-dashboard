@@ -289,6 +289,15 @@
       "t2v": null,
       "t2t": null,
       "note": "Team-authored: OdaiAhmed99 #15542 (2026-09-15). Tier-2 not run by us."
+    },
+    {
+      "slug": "opnform",
+      "atomics": 16,
+      "v": "0.3.0",
+      "pr": 16339,
+      "t2v": 16,
+      "t2t": 16,
+      "note": "All shipped atomics live-verified, plus the New Submission trigger schema. 7 held on the free test account (blockers opnform-paid, opnform-export-async); 5 form-integration (webhook) endpoints skipped as trigger-owned."
     }
   ]
 }
