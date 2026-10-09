@@ -18,7 +18,7 @@
 // roster beside it, or its strip can only say "Done in total" and its delta
 // pill stays empty — the week the team shipped 24 hooks would read as no news.
 //
-//   node scripts/backfill-connection-identifier.mjs [--apply]
+//   node scripts/backfill-connection-identifier.mjs [--apply] [--force]
 //
 // Prints the table and changes nothing without --apply. Run `npm run fetch &&
 // npm run build` first: it needs the PR timestamps and today's build.
@@ -55,10 +55,18 @@ if (missing.length) {
 }
 
 const apply = process.argv.includes('--apply');
+// A week that already has a block keeps it unless --force: from W41 on the
+// block is the collector's MEASUREMENT, with a `live` count no timestamp can
+// rebuild, and a re-run that overwrote it would destroy it for good.
+const force = process.argv.includes('--force');
 const archive = readArchive(ARCHIVE);
 if (!archive.weeks.length) throw new Error('empty archive — nothing to backfill');
 
 for (const week of archive.weeks) {
+  if (week.connectionIdentifier && !force) {
+    console.log(`${week.week} (…${week.end})  already has a block — kept (pass --force to rebuild it)`);
+    continue;
+  }
   const block = blockAt({ claims, prs, rowsNow, totalPieces, end: week.end });
   const had = week.connectionIdentifier ? 'already present, replaced' : 'added';
   console.log(`${week.week} (…${week.end})  merged ${block.merged}  review ${block.review}  of ${totalPieces}  · ${had}`);
