@@ -599,6 +599,19 @@
       "title": "opnform get_export_status",
       "why": "Export Submissions (<code>POST /open/forms/{id}/submissions/export</code>) returns the CSV inline for small forms; only large exports start an async job with a <code>job_id</code>, so Get Export Status (<code>GET /open/forms/{id}/submissions/export/status/{jobId}</code>) had nothing to poll on a test form. The vendor's async threshold is undocumented. Held out of PIE-662.",
       "fix": "Seed a form with enough submissions that export_submissions returns is_async true, then author + Tier-2 get_export_status with its job_id."
+    },
+    {
+      "id": "runware-credits",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "runware"
+      ],
+      "affected": 20,
+      "title": "runware generation / tool / media atomics — 16 atomics + 4 existing schemas",
+      "why": "The Runware test account's balance is $0 and every paid task returns 400 <code>insufficientCredits</code> (checked with imageInference and mediaStorage upload), so only modelSearch and accountManagement ran live. Generate Image/Video/Audio/Text/3D, Get Task Result, Remove Background, Upscale, Caption, Vectorize, Enhance Prompt, Image Mask, ControlNet Preprocess, Upload/Delete Media and Get Task Details shipped Tier-1 only in PIE-665 (#16352), and the 4 existing actions still have no output schema.",
+      "fix": "Top up the Runware test account (about $1; the run costs under $0.10), then run the 48-case file (<code>~/p3/runware/cases.json</code>, cheapest model per task) and wire schemas for the 20 from the captures."
     }
   ]
 }
