@@ -15177,7 +15177,7 @@
         "live": 155,
         "mergedNotLive": 4,
         "review": 5,
-        "prOpen": 1,
+        "prOpen": 2,
         "todo": 603,
         "totalPieces": 767,
         "roster": [
@@ -16663,12 +16663,12 @@
         "status": "ok",
         "merged": 117,
         "prOpen": 2,
-        "approved": 0,
+        "approved": 1,
         "assigned": 0,
         "held": 2,
-        "totalPieces": 121,
+        "totalPieces": 122,
         "catalogPieces": 767,
-        "blockersOpen": 37,
+        "blockersOpen": 40,
         "roster": [
           {
             "name": "shopify",
@@ -17635,6 +17635,14 @@
             "displayName": "Runware",
             "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/runware.png"
+          },
+          {
+            "name": "scrapegrapghai",
+            "actions": 0,
+            "stage": "approved",
+            "displayName": "ScrapeGraphAI",
+            "author": "kishanprmr",
+            "logo": "https://cdn.activepieces.com/pieces/scrapegraphai.jpg"
           }
         ]
       },
@@ -17642,7 +17650,7 @@
         "status": "ok",
         "merged": 45,
         "live": 45,
-        "review": 2,
+        "review": 3,
         "assigned": 0,
         "totalPieces": 767,
         "roster": [
@@ -17947,6 +17955,15 @@
             "actions": 7,
             "stage": "live",
             "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "author": "Talaljaber"
+          },
+          {
+            "folder": "ai",
+            "name": "ai",
+            "displayName": "AI",
+            "actions": 6,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg",
             "author": "Talaljaber"
           },
           {
@@ -20298,12 +20315,327 @@
         ]
       },
       "tickets": {
-        "status": "no-data",
-        "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
+        "status": "ok",
+        "total": 58,
+        "inReview": 18,
+        "byPerson": {
+          "kishan": 26,
+          "sanket": 1,
+          "odai": 31,
+          "talal": 0
+        },
+        "prsMerged": {
+          "kishan": 24,
+          "sanket": 1,
+          "odai": 33,
+          "talal": 27
+        },
+        "reviews": {
+          "kishan": 10,
+          "sanket": 21,
+          "odai": 2,
+          "talal": 0
+        },
+        "shipped": [
+          {
+            "id": "PIE-664",
+            "title": "WebScraping AI: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-663",
+            "title": "Flowise: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-662",
+            "title": "Opnform: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "GIT-1980",
+            "title": "[Feature]: Google Translate piece (community PR 16232)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "GIT-1982",
+            "title": "[Bug]: Google pieces mask 401/403 with \"Could not determine client ID\" (community PR 16314)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "PIE-654",
+            "title": "MailJet: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-649",
+            "title": "ImageRouter: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-650",
+            "title": "Robolly: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-653",
+            "title": "Mautic : AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-622",
+            "title": "Drip: AI actions, webhook triggers and output schemas (0.6.0)",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-635",
+            "title": "Square: bug — New Appointment sample is an invoice payload, webhook signature not constant-time, no dedupe or Custom API Call",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-636",
+            "title": "Square: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-620",
+            "title": "Taskade: add AI actions, webhook triggers and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-626",
+            "title": "Total CMS: bug — piece fails on Total CMS 3 (calls the removed v1/v2 totalapi.php API)",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-627",
+            "title": "Total CMS: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-637",
+            "title": "Google Search Console: bug — Search Analytics returns the whole HTTP response, hour dimension always fails, dates default to an empty day",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-638",
+            "title": "Google Search Console: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-628",
+            "title": "Browserless: bug — PDF options rejected, performance scores always null, BQL errors reported as success",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-629",
+            "title": "Browserless: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-633",
+            "title": "Bika.ai: bug — database dropdown empty, Find Records stops at one page, member and attachment fields never work",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-634",
+            "title": "Bika.ai: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-618",
+            "title": "Coda: add AI actions, doc/page/row tools and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-619",
+            "title": "Heartbeat: add AI actions, webhook triggers and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-614",
+            "title": "Zoom: add AI actions, meeting tools and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          }
+        ]
       },
       "shipping": {
-        "status": "no-data",
-        "reason": "internal dashboard GitHub data only reaches 2026-10-03, but this week ends 2026-10-09 — needs a full refresh"
+        "status": "ok",
+        "prsMerged": 85,
+        "piecePrs": 83,
+        "byPerson": {
+          "kishan": 24,
+          "sanket": 1,
+          "odai": 33,
+          "talal": 27
+        },
+        "reviews": 33,
+        "reviewsByPerson": {
+          "kishan": 10,
+          "sanket": 21,
+          "odai": 2,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": [
+          {
+            "number": 16319,
+            "title": "feat(teable): manage tables, fields and batch records, with AI agent actions and polling triggers",
+            "url": "https://github.com/activepieces/activepieces/pull/16319",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16349,
+            "title": "feat(webscraping-ai): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16349",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16340,
+            "title": "feat(flowise): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16340",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16339,
+            "title": "feat(opnform): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16339",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 16336,
+            "title": "chore(codeowners): unown all-contributors files so bot PRs skip core review",
+            "url": "https://github.com/activepieces/activepieces/pull/16336",
+            "author": "kishan",
+            "kind": "platform"
+          },
+          {
+            "number": 16324,
+            "title": "feat(mailjet): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16324",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16318,
+            "title": "feat(toggl-track): track time on Toggl Track and Toggl 2.0 from flows and AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16318",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16300,
+            "title": "feat(softr): manage databases, tables, fields, records and app users from flows and AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16300",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16296,
+            "title": "feat(localai): list models, create embeddings, generate speech and transcribe audio on your LocalAI server",
+            "url": "https://github.com/activepieces/activepieces/pull/16296",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16293,
+            "title": "feat(image-router): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16293",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 16297,
+            "title": "feat(robolly): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16297",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 16316,
+            "title": "feat(mautic): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16316",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16219,
+            "title": "feat(square): manage customers, catalog, inventory, orders and payments from flows and AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16219",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16212,
+            "title": "feat(totalcms): connect Total CMS 3 sites and manage collections and objects from flows and AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16212",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16227,
+            "title": "feat(google-search-console): query performance, inspect URLs and manage sitemaps from AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16227",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16172,
+            "title": "feat(taskade): manage projects, tasks and AI agents from flows and AI agents, and trigger on task and project events",
+            "url": "https://github.com/activepieces/activepieces/pull/16172",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16215,
+            "title": "feat(browserless): scrape, search, crawl and capture pages from flows and AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16215",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16217,
+            "title": "feat(bika): find, create and update records from flows and AI agents",
+            "url": "https://github.com/activepieces/activepieces/pull/16217",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16180,
+            "title": "feat(drip): let AI agents manage subscribers, tags, orders and email series, and trigger on subscriber events",
+            "url": "https://github.com/activepieces/activepieces/pull/16180",
+            "author": "odai",
+            "kind": "mixed"
+          }
+        ]
       },
       "targets": {
         "aiActions": {
