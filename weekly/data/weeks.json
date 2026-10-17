@@ -24642,7 +24642,2401 @@
             "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/68"
           }
         ],
-        "coverageError": "coverage unreachable (Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON)"
+        "catalogPieces": 769,
+        "roster": [
+          {
+            "name": "hubspot",
+            "folder": "hubspot",
+            "displayName": "HubSpot",
+            "logo": "https://cdn.activepieces.com/pieces/hubspot.png",
+            "actions": 47,
+            "stage": "covered"
+          },
+          {
+            "name": "ninjapipe",
+            "folder": "ninjapipe",
+            "displayName": "NinjaPipe",
+            "logo": "https://cdn.activepieces.com/pieces/ninjapipe.png",
+            "actions": 44,
+            "stage": "covered"
+          },
+          {
+            "name": "zoo",
+            "folder": "zoo",
+            "displayName": "Zoo",
+            "logo": "https://cdn.activepieces.com/pieces/zoo.jpg",
+            "actions": 44,
+            "stage": "covered"
+          },
+          {
+            "name": "bluesky",
+            "folder": "bluesky",
+            "displayName": "Bluesky",
+            "logo": "https://cdn.activepieces.com/pieces/bluesky.png",
+            "actions": 39,
+            "stage": "covered"
+          },
+          {
+            "name": "blockscout",
+            "folder": "blockscout",
+            "displayName": "Blockscout",
+            "logo": "https://cdn.activepieces.com/pieces/blockscout.png",
+            "actions": 34,
+            "stage": "covered"
+          },
+          {
+            "name": "coda",
+            "folder": "coda",
+            "displayName": "Coda",
+            "logo": "https://cdn.activepieces.com/pieces/coda.png",
+            "actions": 33,
+            "stage": "covered"
+          },
+          {
+            "name": "pdf-co",
+            "folder": "pdf-co",
+            "displayName": "PDF.co",
+            "logo": "https://cdn.activepieces.com/pieces/pdf-co.png",
+            "actions": 33,
+            "stage": "covered"
+          },
+          {
+            "name": "mempool-space",
+            "folder": "mempool-space",
+            "displayName": "Mempool",
+            "logo": "https://cdn.activepieces.com/pieces/mempool-space.png",
+            "actions": 31,
+            "stage": "covered"
+          },
+          {
+            "name": "taskade",
+            "folder": "taskade",
+            "displayName": "Taskade",
+            "logo": "https://cdn.activepieces.com/pieces/taskade.png",
+            "actions": 31,
+            "stage": "covered"
+          },
+          {
+            "name": "enrichlayer",
+            "folder": "enrichlayer",
+            "displayName": "Enrich Layer",
+            "logo": "https://cdn.activepieces.com/pieces/enrichlayer.png",
+            "actions": 26,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-excel-365",
+            "folder": "microsoft-excel-365",
+            "displayName": "Microsoft Excel 365",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-excel-365.png",
+            "actions": 25,
+            "stage": "covered"
+          },
+          {
+            "name": "confluence",
+            "folder": "confluence",
+            "displayName": "Confluence",
+            "logo": "https://cdn.activepieces.com/pieces/confluence.png",
+            "actions": 24,
+            "stage": "covered"
+          },
+          {
+            "name": "square",
+            "folder": "square",
+            "displayName": "Square",
+            "logo": "https://cdn.activepieces.com/pieces/square.png",
+            "actions": 23,
+            "stage": "covered"
+          },
+          {
+            "name": "supabase",
+            "folder": "supabase",
+            "displayName": "Supabase",
+            "logo": "https://cdn.activepieces.com/pieces/supabase.png",
+            "actions": 22,
+            "stage": "covered"
+          },
+          {
+            "name": "linear",
+            "folder": "linear",
+            "displayName": "Linear",
+            "logo": "https://cdn.activepieces.com/pieces/linear.png",
+            "actions": 21,
+            "stage": "covered"
+          },
+          {
+            "name": "github",
+            "folder": "github",
+            "displayName": "GitHub",
+            "logo": "https://cdn.activepieces.com/pieces/github.png",
+            "actions": 20,
+            "stage": "covered"
+          },
+          {
+            "name": "slack",
+            "folder": "slack",
+            "displayName": "Slack",
+            "logo": "https://cdn.activepieces.com/pieces/slack.png",
+            "actions": 20,
+            "stage": "covered"
+          },
+          {
+            "name": "dimo",
+            "folder": "dimo",
+            "displayName": "DIMO",
+            "logo": "https://cdn.activepieces.com/pieces/dimo.png",
+            "actions": 19,
+            "stage": "covered"
+          },
+          {
+            "name": "google-drive",
+            "folder": "google-drive",
+            "displayName": "Google Drive",
+            "logo": "https://cdn.activepieces.com/pieces/google-drive.png",
+            "actions": 18,
+            "stage": "covered"
+          },
+          {
+            "name": "google-sheets",
+            "folder": "google-sheets",
+            "displayName": "Google Sheets",
+            "logo": "https://cdn.activepieces.com/pieces/google-sheets.png",
+            "actions": 18,
+            "stage": "covered"
+          },
+          {
+            "name": "nifty",
+            "folder": "nifty",
+            "displayName": "Nifty",
+            "logo": "https://cdn.activepieces.com/pieces/nifty.png",
+            "actions": 18,
+            "stage": "covered"
+          },
+          {
+            "name": "resend",
+            "folder": "resend",
+            "displayName": "Resend",
+            "logo": "https://cdn.activepieces.com/pieces/resend.png",
+            "actions": 18,
+            "stage": "covered"
+          },
+          {
+            "name": "youtrack",
+            "folder": "youtrack",
+            "displayName": "YouTrack",
+            "logo": "https://cdn.activepieces.com/pieces/youtrack.png",
+            "actions": 18,
+            "stage": "covered"
+          },
+          {
+            "name": "mastodon",
+            "folder": "mastodon",
+            "displayName": "Mastodon",
+            "logo": "https://cdn.activepieces.com/pieces/mastodon.png",
+            "actions": 16,
+            "stage": "covered"
+          },
+          {
+            "name": "teable",
+            "folder": "teable",
+            "displayName": "Teable",
+            "logo": "https://cdn.activepieces.com/pieces/teable.png",
+            "actions": 16,
+            "stage": "covered"
+          },
+          {
+            "name": "iloveapi",
+            "folder": "iloveapi",
+            "displayName": "iLoveAPI",
+            "logo": "https://cdn.activepieces.com/pieces/iloveapi.png",
+            "actions": 15,
+            "stage": "covered"
+          },
+          {
+            "name": "dropbox",
+            "folder": "dropbox",
+            "displayName": "Dropbox",
+            "logo": "https://cdn.activepieces.com/pieces/dropbox.png",
+            "actions": 14,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-todo",
+            "folder": "microsoft-todo",
+            "displayName": "Microsoft To Do",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-todo.png",
+            "actions": 14,
+            "stage": "covered"
+          },
+          {
+            "name": "tarvent",
+            "folder": "tarvent",
+            "displayName": "Tarvent",
+            "logo": "https://cdn.activepieces.com/pieces/tarvent.png",
+            "actions": 14,
+            "stage": "covered"
+          },
+          {
+            "name": "attio",
+            "folder": "attio",
+            "displayName": "Attio",
+            "logo": "https://cdn.activepieces.com/pieces/attio.png",
+            "actions": 13,
+            "stage": "covered"
+          },
+          {
+            "name": "bigcommerce",
+            "folder": "bigcommerce",
+            "displayName": "BigCommerce",
+            "logo": "https://cdn.activepieces.com/pieces/bigcommerce.png",
+            "actions": 13,
+            "stage": "covered"
+          },
+          {
+            "name": "google-calendar",
+            "folder": "google-calendar",
+            "displayName": "Google Calendar",
+            "logo": "https://cdn.activepieces.com/pieces/google-calendar.png",
+            "actions": 13,
+            "stage": "covered"
+          },
+          {
+            "name": "mailer-lite",
+            "folder": "mailer-lite",
+            "displayName": "MailerLite",
+            "logo": "https://cdn.activepieces.com/pieces/mailer-lite.png",
+            "actions": 13,
+            "stage": "covered"
+          },
+          {
+            "name": "csv",
+            "folder": "csv",
+            "displayName": "CSV",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/csv.svg",
+            "actions": 12,
+            "stage": "covered"
+          },
+          {
+            "name": "gmail",
+            "folder": "gmail",
+            "displayName": "Gmail",
+            "logo": "https://cdn.activepieces.com/pieces/gmail.png",
+            "actions": 12,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-outlook",
+            "folder": "microsoft-outlook",
+            "displayName": "Microsoft Outlook",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "actions": 12,
+            "stage": "covered"
+          },
+          {
+            "name": "text-helper",
+            "folder": "text-helper",
+            "displayName": "Text Helper",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-helper.svg",
+            "actions": 12,
+            "stage": "covered"
+          },
+          {
+            "name": "toggl-track",
+            "folder": "toggl-track",
+            "displayName": "Toggl Track",
+            "logo": "https://cdn.activepieces.com/pieces/toggl-track.png",
+            "actions": 12,
+            "stage": "covered"
+          },
+          {
+            "name": "assemblyai",
+            "folder": "assemblyai",
+            "displayName": "AssemblyAI",
+            "logo": "https://cdn.activepieces.com/pieces/assemblyai.png",
+            "actions": 11,
+            "stage": "covered"
+          },
+          {
+            "name": "notion",
+            "folder": "notion",
+            "displayName": "Notion",
+            "logo": "https://cdn.activepieces.com/pieces/notion.png",
+            "actions": 11,
+            "stage": "covered"
+          },
+          {
+            "name": "quickzu",
+            "folder": "quickzu",
+            "displayName": "Quickzu",
+            "logo": "https://cdn.activepieces.com/pieces/quickzu.png",
+            "actions": 11,
+            "stage": "covered"
+          },
+          {
+            "name": "binance",
+            "folder": "binance",
+            "displayName": "Binance",
+            "logo": "https://cdn.activepieces.com/pieces/binance.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "elastic-email",
+            "folder": "elastic-email",
+            "displayName": "Elastic Email",
+            "logo": "https://cdn.activepieces.com/pieces/elastic-email.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "klaviyo",
+            "folder": "klaviyo",
+            "displayName": "Klaviyo",
+            "logo": "https://cdn.activepieces.com/pieces/klaviyo.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "reddit",
+            "folder": "reddit",
+            "displayName": "Reddit",
+            "logo": "https://cdn.activepieces.com/pieces/reddit.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "stripe",
+            "folder": "stripe",
+            "displayName": "Stripe",
+            "logo": "https://cdn.activepieces.com/pieces/stripe.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "systeme-io",
+            "folder": "systeme-io",
+            "displayName": "Systeme.io",
+            "logo": "https://cdn.activepieces.com/pieces/systeme-io.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "wistia",
+            "folder": "wistia",
+            "displayName": "Wistia",
+            "logo": "https://cdn.activepieces.com/pieces/wistia.png",
+            "actions": 10,
+            "stage": "covered"
+          },
+          {
+            "name": "acuity-scheduling",
+            "folder": "acuity-scheduling",
+            "displayName": "Acuity Scheduling",
+            "logo": "https://cdn.activepieces.com/pieces/acuity-scheduling.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "date-helper",
+            "folder": "date-helper",
+            "displayName": "Date Helper",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/date-helper.svg",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "hunter",
+            "folder": "hunter",
+            "displayName": "Hunter",
+            "logo": "https://cdn.activepieces.com/pieces/hunter.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "open-router",
+            "folder": "open-router",
+            "displayName": "OpenRouter",
+            "logo": "https://cdn.activepieces.com/pieces/open-router.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "pastefy",
+            "folder": "pastefy",
+            "displayName": "Pastefy",
+            "logo": "https://cdn.activepieces.com/pieces/pastefy.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "pinterest",
+            "folder": "pinterest",
+            "displayName": "Pinterest",
+            "logo": "https://cdn.activepieces.com/pieces/pinterest.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "textcortex-ai",
+            "folder": "textcortex-ai",
+            "displayName": "TextCortex AI",
+            "logo": "https://cdn.activepieces.com/pieces/textcortex-ai.png",
+            "actions": 9,
+            "stage": "covered"
+          },
+          {
+            "name": "amazon-s3",
+            "folder": "amazon-s3",
+            "displayName": "Amazon S3",
+            "logo": "https://cdn.activepieces.com/pieces/amazon-s3.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "apitemplate-io",
+            "folder": "apitemplate-io",
+            "displayName": "APITemplate.io",
+            "logo": "https://cdn.activepieces.com/pieces/apitemplate-io.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "bigin-by-zoho",
+            "folder": "bigin-by-zoho",
+            "displayName": "Bigin by Zoho CRM",
+            "logo": "https://cdn.activepieces.com/pieces/bigin-by-zoho.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "carbone",
+            "folder": "carbone",
+            "displayName": "Carbone",
+            "logo": "https://cdn.activepieces.com/pieces/carbone.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "descript",
+            "folder": "descript",
+            "displayName": "Descript",
+            "logo": "https://cdn.activepieces.com/pieces/descript.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "folk",
+            "folder": "folk",
+            "displayName": "Folk",
+            "logo": "https://cdn.activepieces.com/pieces/folk.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-onenote",
+            "folder": "microsoft-onenote",
+            "displayName": "Microsoft OneNote",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-onenote.png",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "pdf",
+            "folder": "pdf",
+            "displayName": "PDF",
+            "logo": "https://cdn.activepieces.com/pieces/pdf.svg",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "tables",
+            "folder": "tables",
+            "displayName": "Tables",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/tables.svg",
+            "actions": 8,
+            "stage": "covered"
+          },
+          {
+            "name": "coralogix",
+            "folder": "coralogix",
+            "displayName": "Coralogix",
+            "logo": "https://cdn.activepieces.com/pieces/coralogix.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "dataforb2b",
+            "folder": "dataforb2b",
+            "displayName": "DataForB2B",
+            "logo": "https://cdn.activepieces.com/pieces/dataforb2b.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "deftform",
+            "folder": "deftform",
+            "displayName": "Deftform",
+            "logo": "https://cdn.activepieces.com/pieces/deftform.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "famulor",
+            "folder": "famulor",
+            "displayName": "Famulor AI - Voice Agent",
+            "logo": "https://cdn.activepieces.com/pieces/famulor.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "file-helper",
+            "folder": "file-helper",
+            "displayName": "Files Helper",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/file-helper.svg",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "image-helper",
+            "folder": "image-helper",
+            "displayName": "Image Helper",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/image-helper.svg",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-365-people",
+            "folder": "microsoft-365-people",
+            "displayName": "Microsoft 365 People",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-365-people.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-onedrive",
+            "folder": "microsoft-onedrive",
+            "displayName": "Microsoft OneDrive",
+            "logo": "https://cdn.activepieces.com/pieces/oneDrive.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "openai",
+            "folder": "openai",
+            "displayName": "OpenAI",
+            "logo": "https://cdn.activepieces.com/pieces/openai.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "ticktick",
+            "folder": "ticktick",
+            "displayName": "TickTick",
+            "logo": "https://cdn.activepieces.com/pieces/ticktick.png",
+            "actions": 7,
+            "stage": "covered"
+          },
+          {
+            "name": "ai",
+            "folder": "ai",
+            "displayName": "AI",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/text-ai.svg",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "apify",
+            "folder": "apify",
+            "displayName": "Apify",
+            "logo": "https://cdn.activepieces.com/pieces/apify.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "cloudinary",
+            "folder": "cloudinary",
+            "displayName": "Cloudinary",
+            "logo": "https://cdn.activepieces.com/pieces/cloudinary.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "emailoctopus",
+            "folder": "emailoctopus",
+            "displayName": "EmailOctopus",
+            "logo": "https://cdn.activepieces.com/pieces/emailoctopus.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "google-docs",
+            "folder": "google-docs",
+            "displayName": "Google Docs",
+            "logo": "https://cdn.activepieces.com/pieces/google-docs.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "greip",
+            "folder": "greip",
+            "displayName": "Greip",
+            "logo": "https://cdn.activepieces.com/pieces/greip.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "heygen",
+            "folder": "heygen",
+            "displayName": "HeyGen",
+            "logo": "https://cdn.activepieces.com/pieces/heygen.jpg",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "manus",
+            "folder": "manus",
+            "displayName": "Manus",
+            "logo": "https://cdn.activepieces.com/pieces/manus.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "math-helper",
+            "folder": "math-helper",
+            "displayName": "Math Helper",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/math-helper.svg",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "quizell",
+            "folder": "quizell",
+            "displayName": "Quizell",
+            "logo": "https://cdn.activepieces.com/pieces/quizell.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "raindrop",
+            "folder": "raindrop",
+            "displayName": "Raindrop",
+            "logo": "https://cdn.activepieces.com/pieces/raindrop.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "schedule",
+            "folder": "schedule",
+            "displayName": "Schedule",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/schedule.svg",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "sendgrid",
+            "folder": "sendgrid",
+            "displayName": "SendGrid",
+            "logo": "https://cdn.activepieces.com/pieces/sendgrid.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "send-it",
+            "folder": "send-it",
+            "displayName": "SendIt",
+            "logo": "https://cdn.activepieces.com/pieces/send-it.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "store",
+            "folder": "store",
+            "displayName": "Storage",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/store.svg",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "vero",
+            "folder": "vero",
+            "displayName": "Vero",
+            "logo": "https://cdn.activepieces.com/pieces/vero.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "webscraping-ai",
+            "folder": "webscraping-ai",
+            "displayName": "WebScraping AI",
+            "logo": "https://cdn.activepieces.com/pieces/webscraping-ai.png",
+            "actions": 6,
+            "stage": "covered"
+          },
+          {
+            "name": "airtop",
+            "folder": "airtop",
+            "displayName": "Airtop",
+            "logo": "https://cdn.activepieces.com/pieces/airtop.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "crypto",
+            "folder": "crypto",
+            "displayName": "Crypto",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/crypto.svg",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "dub",
+            "folder": "dub",
+            "displayName": "Dub",
+            "logo": "https://cdn.activepieces.com/pieces/dub.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "google-contacts",
+            "folder": "google-contacts",
+            "displayName": "Google Contacts",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "google-gemini",
+            "folder": "google-gemini",
+            "displayName": "Google Gemini",
+            "logo": "https://cdn.activepieces.com/pieces/google-gemini.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "hugging-face",
+            "folder": "hugging-face",
+            "displayName": "Hugging Face",
+            "logo": "https://cdn.activepieces.com/pieces/huggingface.svg",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "lemon-squeezy",
+            "folder": "lemon-squeezy",
+            "displayName": "Lemon Squeezy",
+            "logo": "https://cdn.activepieces.com/pieces/lemon-squeezy.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "murf-api",
+            "folder": "murf-api",
+            "displayName": "Murf AI",
+            "logo": "https://cdn.activepieces.com/pieces/murf-api.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "pollybot-ai",
+            "folder": "pollybot-ai",
+            "displayName": "PollyBot AI",
+            "logo": "https://cdn.activepieces.com/pieces/pollybot-ai.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "posthog",
+            "folder": "posthog",
+            "displayName": "PostHog",
+            "logo": "https://cdn.activepieces.com/pieces/posthog.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "provenexpert",
+            "folder": "provenexpert",
+            "displayName": "ProvenExpert",
+            "logo": "https://cdn.activepieces.com/pieces/provenexpert.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "queue",
+            "folder": "queue",
+            "displayName": "Queue",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/queue.svg",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "senja",
+            "folder": "senja",
+            "displayName": "Senja",
+            "logo": "https://cdn.activepieces.com/pieces/senja.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "skyvern",
+            "folder": "skyvern",
+            "displayName": "Skyvern",
+            "logo": "https://cdn.activepieces.com/pieces/skyvern.jpg",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "socialkit",
+            "folder": "socialkit",
+            "displayName": "Socialkit",
+            "logo": "https://cdn.activepieces.com/pieces/socialkit.png",
+            "actions": 5,
+            "stage": "covered"
+          },
+          {
+            "name": "airtable",
+            "folder": "airtable",
+            "displayName": "Airtable",
+            "logo": "https://cdn.activepieces.com/pieces/airtable.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "apitable",
+            "folder": "apitable",
+            "displayName": "AITable",
+            "logo": "https://cdn.activepieces.com/pieces/apitable.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "buttondown",
+            "folder": "buttondown",
+            "displayName": "Buttondown",
+            "logo": "https://cdn.activepieces.com/pieces/buttondown.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "calendly",
+            "folder": "calendly",
+            "displayName": "Calendly",
+            "logo": "https://cdn.activepieces.com/pieces/calendly.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "camb-ai",
+            "folder": "camb-ai",
+            "displayName": "Camb.AI",
+            "logo": "https://cdn.activepieces.com/pieces/camb-ai.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "cody",
+            "folder": "cody",
+            "displayName": "Cody",
+            "logo": "https://cdn.activepieces.com/pieces/cody.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "comfyicu",
+            "folder": "comfyicu",
+            "displayName": "Comfy.ICU",
+            "logo": "https://cdn.activepieces.com/pieces/comfyicu.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "data-summarizer",
+            "folder": "data-summarizer",
+            "displayName": "Data Summarizer",
+            "logo": "https://cdn.activepieces.com/pieces/data-summarizer.svg",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "deepgram",
+            "folder": "deepgram",
+            "displayName": "Deepgram",
+            "logo": "https://cdn.activepieces.com/pieces/deepgram.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "exa",
+            "folder": "exa",
+            "displayName": "Exa",
+            "logo": "https://cdn.activepieces.com/pieces/exa.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "filetopdf",
+            "folder": "filetopdf",
+            "displayName": "FileToPDF",
+            "logo": "https://cdn.activepieces.com/pieces/filetopdf.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "firecrawl",
+            "folder": "firecrawl",
+            "displayName": "Firecrawl",
+            "logo": "https://cdn.activepieces.com/pieces/firecrawl.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "gender-api",
+            "folder": "gender-api",
+            "displayName": "Gender API",
+            "logo": "https://cdn.activepieces.com/pieces/gender-api.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "useinbox",
+            "folder": "useinbox",
+            "displayName": "Inbox",
+            "logo": "https://cdn.activepieces.com/pieces/useinbox.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "jina-ai",
+            "folder": "jina-ai",
+            "displayName": "Jina AI",
+            "logo": "https://cdn.activepieces.com/pieces/jinaai.jpeg",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "json",
+            "folder": "json",
+            "displayName": "JSON",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/json-helper.svg",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "klipy",
+            "folder": "klipy",
+            "displayName": "Klipy",
+            "logo": "https://cdn.activepieces.com/pieces/klipy.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "knock",
+            "folder": "knock",
+            "displayName": "Knock",
+            "logo": "https://cdn.activepieces.com/pieces/knock.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "mistral-ai",
+            "folder": "mistral-ai",
+            "displayName": "Mistral AI",
+            "logo": "https://cdn.activepieces.com/pieces/mistral-ai.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "pdf4me",
+            "folder": "pdf4me",
+            "displayName": "PDF4me",
+            "logo": "https://cdn.activepieces.com/pieces/pdf4me.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "plunk",
+            "folder": "plunk",
+            "displayName": "Plunk",
+            "logo": "https://cdn.activepieces.com/pieces/plunk.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "recall-ai",
+            "folder": "recall-ai",
+            "displayName": "Recall.ai",
+            "logo": "https://cdn.activepieces.com/pieces/recall-ai.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "reply-io",
+            "folder": "reply-io",
+            "displayName": "Reply.io",
+            "logo": "https://cdn.activepieces.com/pieces/reply-io.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "scrapegrapghai",
+            "folder": "scrapegrapghai",
+            "displayName": "ScrapeGraphAI",
+            "logo": "https://cdn.activepieces.com/pieces/scrapegraphai.jpg",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "scrapeless",
+            "folder": "scrapeless",
+            "displayName": "Scrapeless",
+            "logo": "https://cdn.activepieces.com/pieces/scrapeless.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "serp-api",
+            "folder": "serp-api",
+            "displayName": "SerpApi",
+            "logo": "https://cdn.activepieces.com/pieces/serp-api.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "strale",
+            "folder": "strale",
+            "displayName": "Strale",
+            "logo": "https://cdn.activepieces.com/pieces/strale.png",
+            "actions": 4,
+            "stage": "covered"
+          },
+          {
+            "name": "bland-ai",
+            "folder": "bland-ai",
+            "displayName": "Bland AI",
+            "logo": "https://cdn.activepieces.com/pieces/bland-ai.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "chess-com",
+            "folder": "chess-com",
+            "displayName": "Chess.com",
+            "logo": "https://cdn.activepieces.com/pieces/chess-com.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "clearoutphone",
+            "folder": "clearoutphone",
+            "displayName": "ClearoutPhone",
+            "logo": "https://cdn.activepieces.com/pieces/clearoutphone.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "dappier",
+            "folder": "dappier",
+            "displayName": "Dappier",
+            "logo": "https://cdn.activepieces.com/pieces/dappier.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "fillout-forms",
+            "folder": "fillout-forms",
+            "displayName": "Fillout Forms",
+            "logo": "https://cdn.activepieces.com/pieces/fillout-forms.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "gladia",
+            "folder": "gladia",
+            "displayName": "Gladia",
+            "logo": "https://cdn.activepieces.com/pieces/gladia.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "image-router",
+            "folder": "image-router",
+            "displayName": "ImageRouter",
+            "logo": "https://cdn.activepieces.com/pieces/image-router.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "klenty",
+            "folder": "klenty",
+            "displayName": "Klenty",
+            "logo": "https://cdn.activepieces.com/pieces/klenty.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "lusha",
+            "folder": "lusha",
+            "displayName": "Lusha",
+            "logo": "https://cdn.activepieces.com/pieces/lusha.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "microsoft-outlook-calendar",
+            "folder": "microsoft-outlook-calendar",
+            "displayName": "Microsoft Outlook Calendar",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "parseur",
+            "folder": "parseur",
+            "displayName": "Parseur",
+            "logo": "https://cdn.activepieces.com/pieces/parseur.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "reoon-verifier",
+            "folder": "reoon-verifier",
+            "displayName": "Reoon Email Verifier",
+            "logo": "https://cdn.activepieces.com/pieces/reoon-verifier.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "sender",
+            "folder": "sender",
+            "displayName": "Sender",
+            "logo": "https://cdn.activepieces.com/pieces/sender.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "seven",
+            "folder": "seven",
+            "displayName": "seven",
+            "logo": "https://cdn.activepieces.com/pieces/seven.jpg",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "streak",
+            "folder": "streak",
+            "displayName": "Streak",
+            "logo": "https://cdn.activepieces.com/pieces/streak.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "tavily",
+            "folder": "tavily",
+            "displayName": "Tavily",
+            "logo": "https://cdn.activepieces.com/pieces/tavily.jpg",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "teamhood",
+            "folder": "teamhood",
+            "displayName": "Teamhood",
+            "logo": "https://cdn.activepieces.com/pieces/teamhood.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "todoist",
+            "folder": "todoist",
+            "displayName": "Todoist",
+            "logo": "https://cdn.activepieces.com/pieces/todoist.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "valyu",
+            "folder": "valyu",
+            "displayName": "Valyu",
+            "logo": "https://cdn.activepieces.com/pieces/valyu.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "vlm-run",
+            "folder": "vlm-run",
+            "displayName": "VLM Run",
+            "logo": "https://cdn.activepieces.com/pieces/vlm-run.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "webflow",
+            "folder": "webflow",
+            "displayName": "Webflow",
+            "logo": "https://cdn.activepieces.com/pieces/webflow.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "xml",
+            "folder": "xml",
+            "displayName": "XML",
+            "logo": "https://cdn.activepieces.com/pieces/xml.png",
+            "actions": 3,
+            "stage": "covered"
+          },
+          {
+            "name": "ask-handle",
+            "folder": "ask-handle",
+            "displayName": "AskHandle",
+            "logo": "https://cdn.activepieces.com/pieces/ask-handle.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "bitly",
+            "folder": "bitly",
+            "displayName": "Bitly",
+            "logo": "https://cdn.activepieces.com/pieces/bitly.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "chartly",
+            "folder": "chartly",
+            "displayName": "Chartly",
+            "logo": "https://cdn.activepieces.com/pieces/chartly.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "clearout",
+            "folder": "clearout",
+            "displayName": "Clearout",
+            "logo": "https://cdn.activepieces.com/pieces/clearout.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "cohere",
+            "folder": "cohere",
+            "displayName": "Cohere",
+            "logo": "https://cdn.activepieces.com/pieces/cohere.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "cryptolens",
+            "folder": "cryptolens",
+            "displayName": "Cryptolens",
+            "logo": "https://cdn.activepieces.com/pieces/cryptolens.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "customer-io",
+            "folder": "customer-io",
+            "displayName": "customer.io",
+            "logo": "https://cdn.activepieces.com/pieces/customerio.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "delay",
+            "folder": "delay",
+            "displayName": "Delay",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/delay.svg",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "dust",
+            "folder": "dust",
+            "displayName": "Dust",
+            "logo": "https://cdn.activepieces.com/pieces/dust.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "eden-ai",
+            "folder": "eden-ai",
+            "displayName": "Eden AI",
+            "logo": "https://cdn.activepieces.com/pieces/eden-ai.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "elevenlabs",
+            "folder": "elevenlabs",
+            "displayName": "ElevenLabs",
+            "logo": "https://cdn.activepieces.com/pieces/elevenlabs.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "fireberry",
+            "folder": "fireberry",
+            "displayName": "Fireberry",
+            "logo": "https://cdn.activepieces.com/pieces/fireberry.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "flow-helper",
+            "folder": "flow-helper",
+            "displayName": "Flow Helper",
+            "logo": "https://cdn.activepieces.com/pieces/flow-helper.svg",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "grist",
+            "folder": "grist",
+            "displayName": "Grist",
+            "logo": "https://cdn.activepieces.com/pieces/grist.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "hackernews",
+            "folder": "hackernews",
+            "displayName": "Hacker News",
+            "logo": "https://cdn.activepieces.com/pieces/hackernews.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "http",
+            "folder": "http",
+            "displayName": "HTTP",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/http.svg",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "insighto-ai",
+            "folder": "insighto-ai",
+            "displayName": "Insighto.ai",
+            "logo": "https://cdn.activepieces.com/pieces/insighto-ai.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "linkedin",
+            "folder": "linkedin",
+            "displayName": "LinkedIn",
+            "logo": "https://cdn.activepieces.com/pieces/linkedin.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "linkup",
+            "folder": "linkup",
+            "displayName": "Linkup",
+            "logo": "https://cdn.activepieces.com/pieces/linkup.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "logsnag",
+            "folder": "logsnag",
+            "displayName": "LogSnag",
+            "logo": "https://cdn.activepieces.com/pieces/logsnag.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "maileroo",
+            "folder": "maileroo",
+            "displayName": "Maileroo",
+            "logo": "https://cdn.activepieces.com/pieces/maileroo.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "mixpanel",
+            "folder": "mixpanel",
+            "displayName": "Mixpanel",
+            "logo": "https://cdn.activepieces.com/pieces/mixpanel.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "muna-ai",
+            "folder": "muna-ai",
+            "displayName": "Muna",
+            "logo": "https://cdn.activepieces.com/pieces/muna-ai.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "neverbounce",
+            "folder": "neverbounce",
+            "displayName": "NeverBounce",
+            "logo": "https://cdn.activepieces.com/pieces/neverbounce.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "pandadoc",
+            "folder": "pandadoc",
+            "displayName": "PandaDoc",
+            "logo": "https://cdn.activepieces.com/pieces/pandadoc.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "pinecone",
+            "folder": "pinecone",
+            "displayName": "Pinecone",
+            "logo": "https://cdn.activepieces.com/pieces/pinecone.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "pipedrive",
+            "folder": "pipedrive",
+            "displayName": "Pipedrive",
+            "logo": "https://cdn.activepieces.com/pieces/pipedrive.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "podio",
+            "folder": "podio",
+            "displayName": "Podio",
+            "logo": "https://cdn.activepieces.com/pieces/podio.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "presentation",
+            "folder": "presentation",
+            "displayName": "Presenton",
+            "logo": "https://cdn.activepieces.com/pieces/presenton.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "rss",
+            "folder": "rss",
+            "displayName": "RSS Feed",
+            "logo": "https://cdn.activepieces.com/pieces/rss.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "sendpulse",
+            "folder": "sendpulse",
+            "displayName": "SendPulse",
+            "logo": "https://cdn.activepieces.com/pieces/sendpulse.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "shippo",
+            "folder": "shippo",
+            "displayName": "Shippo",
+            "logo": "https://cdn.activepieces.com/pieces/shippo.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "slite",
+            "folder": "slite",
+            "displayName": "Slite",
+            "logo": "https://cdn.activepieces.com/pieces/slite.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "smsmode",
+            "folder": "smsmode",
+            "displayName": "smsmode",
+            "logo": "https://cdn.activepieces.com/pieces/smsmode.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "softr",
+            "folder": "softr",
+            "displayName": "Softr",
+            "logo": "https://cdn.activepieces.com/pieces/softr.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "stability-ai",
+            "folder": "stability-ai",
+            "displayName": "Stability AI",
+            "logo": "https://cdn.activepieces.com/pieces/stability-ai.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "telegram-bot",
+            "folder": "telegram-bot",
+            "displayName": "Telegram Bot",
+            "logo": "https://cdn.activepieces.com/pieces/telegram_bot.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "twilio",
+            "folder": "twilio",
+            "displayName": "Twilio",
+            "logo": "https://cdn.activepieces.com/pieces/twilio.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "vercel",
+            "folder": "vercel",
+            "displayName": "Vercel",
+            "logo": "https://cdn.activepieces.com/pieces/vercel.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "zeplin",
+            "folder": "zeplin",
+            "displayName": "Zeplin",
+            "logo": "https://cdn.activepieces.com/pieces/zeplin.png",
+            "actions": 2,
+            "stage": "covered"
+          },
+          {
+            "name": "air-ops",
+            "folder": "air-ops",
+            "displayName": "AirOps",
+            "logo": "https://cdn.activepieces.com/pieces/air-ops.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "airparser",
+            "folder": "airparser",
+            "displayName": "Airparser",
+            "logo": "https://cdn.activepieces.com/pieces/airparser.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "alai",
+            "folder": "alai",
+            "displayName": "Alai",
+            "logo": "https://cdn.activepieces.com/pieces/alai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "alt-text-ai",
+            "folder": "alt-text-ai",
+            "displayName": "AltText.ai",
+            "logo": "https://cdn.activepieces.com/pieces/alt-text-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "alttextify",
+            "folder": "alttextify",
+            "displayName": "AltTextify",
+            "logo": "https://cdn.activepieces.com/pieces/alttextify.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "approval",
+            "folder": "approval",
+            "displayName": "Approval (Legacy)",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/approvals.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "asana",
+            "folder": "asana",
+            "displayName": "Asana",
+            "logo": "https://cdn.activepieces.com/pieces/asana.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "avian",
+            "folder": "avian",
+            "displayName": "Avian",
+            "logo": "https://cdn.activepieces.com/pieces/avian.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "baserow",
+            "folder": "baserow",
+            "displayName": "Baserow",
+            "logo": "https://cdn.activepieces.com/pieces/baserow.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "beamer",
+            "folder": "beamer",
+            "displayName": "Beamer",
+            "logo": "https://cdn.activepieces.com/pieces/beamer.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "bolna",
+            "folder": "bolna",
+            "displayName": "Bolna AI",
+            "logo": "https://cdn.activepieces.com/pieces/bolna.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "bonjoro",
+            "folder": "bonjoro",
+            "displayName": "Bonjoro",
+            "logo": "https://cdn.activepieces.com/pieces/bonjoro.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "browse-ai",
+            "folder": "browse-ai",
+            "displayName": "Browse AI",
+            "logo": "https://cdn.activepieces.com/pieces/browse-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "chaindesk",
+            "folder": "chaindesk",
+            "displayName": "Chaindesk",
+            "logo": "https://cdn.activepieces.com/pieces/chaindesk.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "chatnode",
+            "folder": "chatnode",
+            "displayName": "ChatNode",
+            "logo": "https://cdn.activepieces.com/pieces/chatnode.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "chatsistant",
+            "folder": "chatsistant",
+            "displayName": "Chatsistant",
+            "logo": "https://cdn.activepieces.com/pieces/chatsistant.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "chatwoot",
+            "folder": "chatwoot",
+            "displayName": "Chatwoot",
+            "logo": "https://cdn.activepieces.com/pieces/chatwoot.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "clockify",
+            "folder": "clockify",
+            "displayName": "Clockify",
+            "logo": "https://cdn.activepieces.com/pieces/clockify.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "cognito-forms",
+            "folder": "cognito-forms",
+            "displayName": "Cognito Forms",
+            "logo": "https://cdn.activepieces.com/pieces/cognito-forms.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "cometapi",
+            "folder": "cometapi",
+            "displayName": "CometAPI",
+            "logo": "https://cdn.activepieces.com/pieces/cometapi.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "constant-contact",
+            "folder": "constant-contact",
+            "displayName": "Constant Contact",
+            "logo": "https://cdn.activepieces.com/pieces/constant-contact.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "crisp",
+            "folder": "crisp",
+            "displayName": "Crisp",
+            "logo": "https://cdn.activepieces.com/pieces/crisp.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "data-mapper",
+            "folder": "data-mapper",
+            "displayName": "Data Mapper",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/data-mapper.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "datocms",
+            "folder": "datocms",
+            "displayName": "Dato CMS",
+            "logo": "https://cdn.activepieces.com/pieces/datocms.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "denser-ai",
+            "folder": "denser-ai",
+            "displayName": "Denser.ai",
+            "logo": "https://cdn.activepieces.com/pieces/denser-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "detecting-ai",
+            "folder": "detecting-ai",
+            "displayName": "DETECTING-AI.COM",
+            "logo": "https://cdn.activepieces.com/pieces/detecting-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "doctly",
+            "folder": "doctly",
+            "displayName": "Doctly AI",
+            "logo": "https://cdn.activepieces.com/pieces/doctly.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "documentpro",
+            "folder": "documentpro",
+            "displayName": "DocumentPro",
+            "logo": "https://cdn.activepieces.com/pieces/documentpro.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "drip",
+            "folder": "drip",
+            "displayName": "Drip",
+            "logo": "https://cdn.activepieces.com/pieces/drip.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "duckdb",
+            "folder": "duckdb",
+            "displayName": "DuckDB",
+            "logo": "https://cdn.activepieces.com/pieces/duckdb.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "easy-peasy-ai",
+            "folder": "easy-peasy-ai",
+            "displayName": "Easy-Peasy.AI",
+            "logo": "https://cdn.activepieces.com/pieces/easy-peasy-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "everhour",
+            "folder": "everhour",
+            "displayName": "Everhour",
+            "logo": "https://cdn.activepieces.com/pieces/everhour.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "facebook-leads",
+            "folder": "facebook-leads",
+            "displayName": "Facebook Leads",
+            "logo": "https://cdn.activepieces.com/pieces/facebook.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "figma",
+            "folder": "figma",
+            "displayName": "Figma",
+            "logo": "https://cdn.activepieces.com/pieces/figma.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "flowise",
+            "folder": "flowise",
+            "displayName": "Flowise",
+            "logo": "https://cdn.activepieces.com/pieces/flowise.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "formbricks",
+            "folder": "formbricks",
+            "displayName": "Formbricks",
+            "logo": "https://cdn.activepieces.com/pieces/formbricks.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "gistly",
+            "folder": "gistly",
+            "displayName": "Gistly",
+            "logo": "https://cdn.activepieces.com/pieces/gistly.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "google-forms",
+            "folder": "google-forms",
+            "displayName": "Google Forms",
+            "logo": "https://cdn.activepieces.com/pieces/google-forms.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "google-tasks",
+            "folder": "google-tasks",
+            "displayName": "Google Tasks",
+            "logo": "https://cdn.activepieces.com/pieces/google-tasks.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "graphql",
+            "folder": "graphql",
+            "displayName": "GraphQL",
+            "logo": "https://cdn.activepieces.com/pieces/graphql.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "griptape",
+            "folder": "griptape",
+            "displayName": "Griptape Cloud",
+            "logo": "https://cdn.activepieces.com/pieces/griptape.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "forms",
+            "folder": "forms",
+            "displayName": "Human Input",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/human-input.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "jira-cloud",
+            "folder": "jira-cloud",
+            "displayName": "Jira Cloud",
+            "logo": "https://cdn.activepieces.com/pieces/jira.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "jogg-ai",
+            "folder": "jogg-ai",
+            "displayName": "JoggAI",
+            "logo": "https://cdn.activepieces.com/pieces/jogg-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "kapso",
+            "folder": "kapso",
+            "displayName": "Kapso",
+            "logo": "https://cdn.activepieces.com/pieces/kapso.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "knack",
+            "folder": "knack",
+            "displayName": "Knack",
+            "logo": "https://cdn.activepieces.com/pieces/knack.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "kommo",
+            "folder": "kommo",
+            "displayName": "Kommo",
+            "logo": "https://cdn.activepieces.com/pieces/kommo.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "leexi",
+            "folder": "leexi",
+            "displayName": "Leexi",
+            "logo": "https://cdn.activepieces.com/pieces/leexi.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "letta",
+            "folder": "letta",
+            "displayName": "Letta",
+            "logo": "https://cdn.activepieces.com/pieces/letta.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "line",
+            "folder": "line",
+            "displayName": "Line Bot",
+            "logo": "https://cdn.activepieces.com/pieces/line.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "livesession",
+            "folder": "livesession",
+            "displayName": "LiveSession",
+            "logo": "https://cdn.activepieces.com/pieces/livesession.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "lokalise",
+            "folder": "lokalise",
+            "displayName": "Lokalise",
+            "logo": "https://cdn.activepieces.com/pieces/lokalise.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "magical-api",
+            "folder": "magical-api",
+            "displayName": "Magical API",
+            "logo": "https://cdn.activepieces.com/pieces/magical-api.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "magicslides",
+            "folder": "magicslides",
+            "displayName": "MagicSlides",
+            "logo": "https://cdn.activepieces.com/pieces/magicslides.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mailchimp",
+            "folder": "mailchimp",
+            "displayName": "Mailchimp",
+            "logo": "https://cdn.activepieces.com/pieces/mailchimp.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mailercheck",
+            "folder": "mailercheck",
+            "displayName": "Mailercheck",
+            "logo": "https://cdn.activepieces.com/pieces/mailercheck.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mailgun",
+            "folder": "mailgun",
+            "displayName": "Mailgun",
+            "logo": "https://cdn.activepieces.com/pieces/mailgun.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mailjet",
+            "folder": "mailjet",
+            "displayName": "Mailjet",
+            "logo": "https://cdn.activepieces.com/pieces/mailjet.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "matrix",
+            "folder": "matrix",
+            "displayName": "Matrix",
+            "logo": "https://cdn.activepieces.com/pieces/matrix.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mautic",
+            "folder": "mautic",
+            "displayName": "Mautic",
+            "logo": "https://cdn.activepieces.com/pieces/mautic.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mcp",
+            "folder": "mcp",
+            "displayName": "MCP",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/mcp.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "meetgeek-ai",
+            "folder": "meetgeek-ai",
+            "displayName": "Meetgeek",
+            "logo": "https://cdn.activepieces.com/pieces/meetgeek-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "mindee",
+            "folder": "mindee",
+            "displayName": "Mindee",
+            "logo": "https://cdn.activepieces.com/pieces/mindee.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "moonclerk",
+            "folder": "moonclerk",
+            "displayName": "Moonclerk",
+            "logo": "https://cdn.activepieces.com/pieces/moonclerk.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "moveo-ai",
+            "folder": "moveo-ai",
+            "displayName": "Moveo",
+            "logo": "https://cdn.activepieces.com/pieces/moveo-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "moxie-crm",
+            "folder": "moxie-crm",
+            "displayName": "Moxie",
+            "logo": "https://cdn.activepieces.com/pieces/moxie-crm.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "opnform",
+            "folder": "opnform",
+            "displayName": "Opnform",
+            "logo": "https://cdn.activepieces.com/pieces/opnform.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "orimon",
+            "folder": "orimon",
+            "displayName": "Orimon",
+            "logo": "https://cdn.activepieces.com/pieces/orimon.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "pdfmonkey",
+            "folder": "pdfmonkey",
+            "displayName": "PDFMonkey",
+            "logo": "https://cdn.activepieces.com/pieces/pdfmonkey.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "peekshot",
+            "folder": "peekshot",
+            "displayName": "PeekShot",
+            "logo": "https://cdn.activepieces.com/pieces/peekshot.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "perplexity-ai",
+            "folder": "perplexity-ai",
+            "displayName": "Perplexity AI",
+            "logo": "https://cdn.activepieces.com/pieces/perplexity-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "phone-validator",
+            "folder": "phone-validator",
+            "displayName": "Phone Validator",
+            "logo": "https://cdn.activepieces.com/pieces/phone-validator.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "placid",
+            "folder": "placid",
+            "displayName": "Placid",
+            "logo": "https://cdn.activepieces.com/pieces/placid.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "prompthub",
+            "folder": "prompthub",
+            "displayName": "PromptHub",
+            "logo": "https://cdn.activepieces.com/pieces/prompthub.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "promptmate",
+            "folder": "promptmate",
+            "displayName": "PromptMate",
+            "logo": "https://cdn.activepieces.com/pieces/promptmate.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "pubrio",
+            "folder": "pubrio",
+            "displayName": "Pubrio",
+            "logo": "https://cdn.activepieces.com/pieces/pubrio.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "pushbullet",
+            "folder": "pushbullet",
+            "displayName": "Pushbullet",
+            "logo": "https://cdn.activepieces.com/pieces/pushbullet.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "pushover",
+            "folder": "pushover",
+            "displayName": "Pushover",
+            "logo": "https://cdn.activepieces.com/pieces/pushover.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "qrcode",
+            "folder": "qrcode",
+            "displayName": "QR Code",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/qrcode.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "rapidtext-ai",
+            "folder": "rapidtext-ai",
+            "displayName": "RapidText AI",
+            "logo": "https://cdn.activepieces.com/pieces/rapidtext-ai.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "rendex",
+            "folder": "rendex",
+            "displayName": "Rendex",
+            "logo": "https://cdn.activepieces.com/pieces/rendex.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "respond-io",
+            "folder": "respond-io",
+            "displayName": "Respond.io",
+            "logo": "https://cdn.activepieces.com/pieces/respond-io.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "robolly",
+            "folder": "robolly",
+            "displayName": "Robolly",
+            "logo": "https://cdn.activepieces.com/pieces/robolly.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "segment",
+            "folder": "segment",
+            "displayName": "Segment",
+            "logo": "https://cdn.activepieces.com/pieces/segment.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "short-io",
+            "folder": "short-io",
+            "displayName": "Short.io",
+            "logo": "https://cdn.activepieces.com/pieces/short-io.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "smartlead",
+            "folder": "smartlead",
+            "displayName": "SmartLead",
+            "logo": "https://cdn.activepieces.com/pieces/smartlead.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "subflows",
+            "folder": "subflows",
+            "displayName": "Sub Flows",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/subflows.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "tags",
+            "folder": "tags",
+            "displayName": "Tags",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/tags.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "tally",
+            "folder": "tally",
+            "displayName": "Tally",
+            "logo": "https://cdn.activepieces.com/pieces/tally.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "telnyx",
+            "folder": "telnyx",
+            "displayName": "Telnyx",
+            "logo": "https://cdn.activepieces.com/pieces/telnyx.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "trello",
+            "folder": "trello",
+            "displayName": "Trello",
+            "logo": "https://cdn.activepieces.com/pieces/trello.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "typefully",
+            "folder": "typefully",
+            "displayName": "Typefully",
+            "logo": "https://cdn.activepieces.com/pieces/typefully.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "uptimerobot",
+            "folder": "uptimerobot",
+            "displayName": "UptimeRobot",
+            "logo": "https://cdn.activepieces.com/pieces/uptimerobot.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "uxsniff",
+            "folder": "uxsniff",
+            "displayName": "UXsniff",
+            "logo": "https://cdn.activepieces.com/pieces/uxsniff.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "validatedmails",
+            "folder": "validatedmails",
+            "displayName": "ValidatedMails",
+            "logo": "https://cdn.activepieces.com/pieces/validatedmails.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "vapi",
+            "folder": "vapi",
+            "displayName": "Vapi",
+            "logo": "https://cdn.activepieces.com/pieces/vapi.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "vtiger",
+            "folder": "vtiger",
+            "displayName": "Vtiger",
+            "logo": "https://cdn.activepieces.com/pieces/vtiger.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "webhook",
+            "folder": "webhook",
+            "displayName": "Webhook",
+            "logo": "https://cdn.activepieces.com/pieces/new-core/webhooks.svg",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "woocommerce",
+            "folder": "woocommerce",
+            "displayName": "WooCommerce",
+            "logo": "https://cdn.activepieces.com/pieces/woocommerce.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "wufoo",
+            "folder": "wufoo",
+            "displayName": "Wufoo",
+            "logo": "https://cdn.activepieces.com/pieces/wufoo.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "xquik",
+            "folder": "xquik",
+            "displayName": "Xquik",
+            "logo": "https://cdn.activepieces.com/pieces/xquik.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "zerobounce",
+            "folder": "zerobounce",
+            "displayName": "ZeroBounce",
+            "logo": "https://cdn.activepieces.com/pieces/zerobounce.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "zoho-books",
+            "folder": "zoho-books",
+            "displayName": "Zoho Books",
+            "logo": "https://cdn.activepieces.com/pieces/zoho-books.png",
+            "actions": 1,
+            "stage": "covered"
+          },
+          {
+            "name": "zoho-desk",
+            "folder": "zoho-desk",
+            "displayName": "Zoho Desk",
+            "logo": "https://cdn.activepieces.com/pieces/zoho-desk.png",
+            "actions": 1,
+            "stage": "covered"
+          }
+        ]
       },
       "tickets": {
         "status": "ok",
