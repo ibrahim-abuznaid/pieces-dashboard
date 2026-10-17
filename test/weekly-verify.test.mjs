@@ -430,3 +430,21 @@ test('verify-weekly.sh is read-only — it must never mutate the archive or the 
   assert.match(sh, /^export PATH=/m, 'cron has no nvm node on its default PATH');
   assert.match(sh, /set -euo pipefail/);
 });
+
+// A degraded week used to be sealed by the job's own guard, which asked only
+// whether the week was in weeks.json. W33, W41 and W42 were each archived with
+// tiles missing and nothing ever retried them.
+test('refresh-weekly.sh re-collects a degraded week instead of sealing it', () => {
+  const sh = decomment(read('../refresh-weekly.sh'));
+  assert.match(sh, /degradedWorkstreams/, 'the guard must tell a degraded week from a complete one');
+  assert.match(sh, /snapshot\.mjs[^\n]*SNAPSHOT_FLAGS/, 'the snapshot must receive --heal for a degraded week');
+  assert.match(sh, /SNAPSHOT_FLAGS=\(--heal\)/);
+});
+
+// Both scripts used to write only to Alicent's inbox, where W42's two alerts sat
+// unread among dozens of rows. `notify` is the path that reaches a phone.
+test('both cron scripts push their alerts, not only file them', () => {
+  for (const file of ['../refresh-weekly.sh', '../verify-weekly.sh']) {
+    assert.match(decomment(read(file)), /"\$ALICENT" notify /, `${file} must notify, not only report`);
+  }
+});

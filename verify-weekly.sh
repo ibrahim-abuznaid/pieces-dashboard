@@ -26,18 +26,25 @@ command -v node >/dev/null || { echo "✗ node not on PATH — check the PATH li
 # code used to be the whole alarm, and on a laptop that is local mail nobody
 # reads -- which is how a missing W35 went unnoticed for three weeks.
 #
-# Alicent is the assistant's local inbox and the CLI is the cron-safe door into
-# it (the MCP endpoint wants a bearer token this script must not carry).
+# Alicent is the assistant and the CLI is the cron-safe door into her (the MCP
+# endpoint wants a bearer token this script must not carry). `report` files the
+# row in her inbox; `notify` is what reaches his phone (Discord webhook, held
+# through quiet hours). Report alone let W42's red check sit unread for a day.
 # Alerting is best-effort by construction: a stopped daemon must not turn a
 # healthy check into a failing one, nor a failing one into a crash.
 #
 # "$@" passes through --url/--attempts for a human running it by hand against a
 # different build.
 ALICENT="${ALICENT_BIN:-/home/ibrahim/AP_work/Activepieces_v/Alicent/.venv/bin/alicent}"
+ALICENT_HOME="${ALICENT_HOME:-/home/ibrahim/AP_work/Activepieces_v/Alicent}"
 
 if node verify-weekly.mjs "$@"; then exit 0; fi
 
 if [ -x "$ALICENT" ]; then
+  ALICENT_HOME="$ALICENT_HOME" "$ALICENT" notify --kind alert --urgency critical \
+    "pieces weekly page: the daily health check is red" \
+    "The live page or the archive is not right. Detail: $REPO/verify-weekly.log. The snapshot job retries at 09/13/17/21h." \
+    >/dev/null 2>&1 || true
   "$ALICENT" report --kind error --project pieces-dashboard --urgency high \
     --summary "the weekly page failed its daily health check" \
     --body "verify-weekly.sh is red. Causes it checks for: the archive stopped validating, the newest snapshot is more than 8 days old (a Saturday that never landed), a NEEDS-LINEAR-REFRESH marker is sitting in the team dashboard, or the live page is not serving. Detail in $REPO/verify-weekly.log." \

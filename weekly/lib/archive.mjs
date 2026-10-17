@@ -154,6 +154,27 @@ export function appendWeek(archive, snap, { force = false } = {}) {
   return { ...archive, weeks };
 }
 
+export const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets', 'shipping'];
+
+// A no-data tile is a collector that failed, never a measured quiet week (a
+// quiet week is `ok` with zeros), so this list is what the week is still missing.
+export const degradedWorkstreams = (snap) => WORKSTREAMS.filter((k) => snap?.[k]?.status === 'no-data');
+
+// The one way an archived week may be replaced without --force-week. A week
+// archived degraded used to be sealed by the job's own guard: the next run saw
+// the week and stopped, so one bad Saturday stayed bad (W33, W41, W42). A retry
+// may only make it better: every tile it fails must already have failed, and it
+// must fail fewer. Anything else leaves the archive exactly as it was.
+export function healWeek(archive, snap) {
+  const existing = archive?.weeks?.find((w) => w.week === snap.week);
+  if (!existing) return { archive: appendWeek(archive, snap), replaced: true };
+  const before = degradedWorkstreams(existing);
+  const after = degradedWorkstreams(snap);
+  const better = after.length < before.length && after.every((k) => before.includes(k));
+  if (!better) return { archive, replaced: false };
+  return { archive: appendWeek(archive, snap, { force: true }), replaced: true };
+}
+
 export function readArchive(path) {
   if (!existsSync(path)) return { weeks: [] };
   const parsed = JSON.parse(readFileSync(path, 'utf8'));

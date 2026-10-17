@@ -920,11 +920,17 @@ test('a shipped title that is only a prefix is never rendered as an empty chip',
 // tester password landed on 2026-09-19 there were no prefixed titles left in it
 // to strip. The path did not go away: the PRs merged box renders the same
 // `prStrip`, over seventeen conventional-commit titles rather than one.
+//
+// The NEWEST week that has such titles, not the newest week. CI runs this on
+// every deploy, and the newest week can legitimately have none: a quiet week,
+// or one archived with shipping `no-data` while the job heals it. Pinning
+// `.at(-1)` let that one week fail the whole site's deploy (W41, W42).
 test('the week in the committed archive reaches the page without its prefix', () => {
   const archive = JSON.parse(readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8'));
-  const week = archive.weeks.at(-1);
-  const prefixed = (week.shipping.shipped ?? []).filter((pr) => prTitle(pr.title) !== pr.title);
-  assert.ok(prefixed.length, 'the committed archive no longer exercises the prefix path');
+  const isPrefixed = (pr) => prTitle(pr.title) !== pr.title;
+  const week = archive.weeks.findLast((w) => (w.shipping?.shipped ?? []).some(isPrefixed));
+  assert.ok(week, 'the committed archive no longer exercises the prefix path');
+  const prefixed = week.shipping.shipped.filter(isPrefixed);
   const tile = tileOf(renderDom([week]), 'PRs merged');
   for (const pr of prefixed) {
     const prefix = pr.title.slice(0, pr.title.indexOf(':') + 1);          // 'feat(health):'

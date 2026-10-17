@@ -151,11 +151,17 @@ test('a clean week produces no decision lines', () => {
 
 test('parseArgs defaults the week to the latest complete week for --today', () =>
   assert.deepEqual(parseArgs(['--today=2026-08-01']),
-    { today: '2026-08-01', weekId: '2026-W31', force: false }));
+    { today: '2026-08-01', weekId: '2026-W31', force: false, heal: false }));
 
 test('parseArgs honours an explicit --week and --force-week', () =>
   assert.deepEqual(parseArgs(['--today=2026-08-01', '--week=2026-W30', '--force-week']),
-    { today: '2026-08-01', weekId: '2026-W30', force: true }));
+    { today: '2026-08-01', weekId: '2026-W30', force: true, heal: false }));
+
+test('parseArgs honours --heal', () =>
+  assert.equal(parseArgs(['--today=2026-08-01', '--heal']).heal, true));
+
+test('--heal and --force-week together are rejected — one replaces only if better, the other always', () =>
+  assert.throws(() => parseArgs(['--today=2026-08-01', '--heal', '--force-week']), /--heal cannot be combined with --force-week/));
 
 test('parseArgs rejects a wrongly formatted --today', () =>
   assert.throws(() => parseArgs(['--today=01/08/2026']), /--today/));

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateSnapshot, appendWeek, readArchive } from '../weekly/lib/archive.mjs';
+import { validateSnapshot, appendWeek, readArchive, degradedWorkstreams, healWeek } from '../weekly/lib/archive.mjs';
 
 const ok = (over = {}) => ({
   week: '2026-W31', start: '2026-07-25', end: '2026-07-31', builtAt: '2026-08-01',
@@ -362,4 +362,51 @@ test('a roster author must be a non-empty string when present', () => {
     s.aiActions = { ...s.aiActions, roster: [{ name: 'gmail', actions: 3, stage: 'merged', author: bad }] };
     assert.throws(() => validateSnapshot(s), /aiActions\.roster\[0\]\.author/);
   }
+});
+
+// ── healing a degraded week ─────────────────────────────────────────────────
+// A week archived with a no-data tile is not finished: its collector failed,
+// and the job retries until the week is whole. Replacing an archived week is
+// otherwise forbidden, so these pin the one case where it is allowed — the new
+// snapshot is strictly better and gives up nothing the old one had.
+
+const noData = (reason = 'internal refresh failed') => ({ status: 'no-data', reason });
+const shipped = { status: 'ok', prsMerged: { kishan: 3 }, shipped: [] };
+
+test('degradedWorkstreams names the no-data tiles, shipping included', () => {
+  assert.deepEqual(degradedWorkstreams(ok({ shipping: shipped })), []);
+  assert.deepEqual(degradedWorkstreams(ok({ tickets: noData(), shipping: noData() })), ['tickets', 'shipping']);
+});
+
+test('heal appends a week the archive does not have yet', () => {
+  const { archive, replaced } = healWeek({ weeks: [] }, ok({ tickets: noData() }));
+  assert.equal(replaced, true);
+  assert.equal(archive.weeks.length, 1);
+});
+
+test('heal replaces a degraded week with a complete one', () => {
+  const before = { weeks: [ok({ tickets: noData(), shipping: noData() })] };
+  const { archive, replaced } = healWeek(before, ok({ builtAt: '2026-08-02', shipping: shipped }));
+  assert.equal(replaced, true);
+  assert.deepEqual(degradedWorkstreams(archive.weeks[0]), []);
+  assert.equal(archive.weeks[0].builtAt, '2026-08-02');
+});
+
+test('heal keeps the archived week when the retry failed the same way', () => {
+  const before = { weeks: [ok({ tickets: noData(), shipping: noData() })] };
+  const { archive, replaced } = healWeek(before, ok({ builtAt: '2026-08-02', tickets: noData(), shipping: noData() }));
+  assert.equal(replaced, false);
+  assert.equal(archive, before);
+});
+
+test('heal never trades a tile that worked for one that did not', () => {
+  const before = { weeks: [ok({ tickets: noData(), shipping: noData() })] };
+  const { replaced } = healWeek(before, ok({ testing: noData(), shipping: shipped }));
+  assert.equal(replaced, false);
+});
+
+test('heal never touches a complete week', () => {
+  const before = { weeks: [ok({ shipping: shipped })] };
+  const { replaced } = healWeek(before, ok({ builtAt: '2026-08-02', shipping: shipped }));
+  assert.equal(replaced, false);
 });

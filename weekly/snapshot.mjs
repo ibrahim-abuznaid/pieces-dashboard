@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { isoWeekId, mondayOfWeekId, latestSealedWeek, windowForWeekId } from '../lib/isoweek.mjs';
-import { readArchive, appendWeek, writeArchive } from './lib/archive.mjs';
+import { readArchive, appendWeek, writeArchive, healWeek, degradedWorkstreams, WORKSTREAMS } from './lib/archive.mjs';
 import { validateTargetsFile, targetsForWeek } from './lib/targets.mjs';
 // One grammar for the whole product: the decision lines this file writes end up
 // in the same band as everything view.mjs phrases, so they share the helper.
@@ -27,8 +27,6 @@ const ARCHIVE = join(ROOT, 'weekly/data/weeks.json');
 const TARGETS = join(ROOT, 'weekly/data/targets.json');
 const TEAM_DASHBOARD = process.env.PIECES_TEAM_DASHBOARD
   ?? '/home/ibrahim/AP_work/Activepieces_v/pieces-team/dashboard';
-
-const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets', 'shipping'];
 
 export function buildSnapshot({ weekId, today, collectors, targets = null }) {
   const { start, end } = windowForWeekId(weekId);
@@ -96,7 +94,7 @@ export function deriveDecisions(snap) {
 // week lands in the archive as a real, permanent, immutable snapshot.
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const WEEK_RE = /^\d{4}-W\d{2}$/;
-const USAGE = 'usage: node weekly/snapshot.mjs [--week=YYYY-Wnn] [--today=YYYY-MM-DD] [--force-week]';
+const USAGE = 'usage: node weekly/snapshot.mjs [--week=YYYY-Wnn] [--today=YYYY-MM-DD] [--force-week | --heal]';
 
 function requireDate(value, flag) {
   if (!DATE_RE.test(value)) throw new Error(`--${flag} must be YYYY-MM-DD, got "${value}" — ${USAGE}`);
@@ -118,7 +116,7 @@ function requireWeekId(value) {
   return value;
 }
 
-const FLAGS = ['--week=', '--today=', '--force-week'];
+const FLAGS = ['--week=', '--today=', '--force-week', '--heal'];
 
 export function parseArgs(argv) {
   for (const a of argv) {
@@ -142,7 +140,10 @@ export function parseArgs(argv) {
   // way; the two disagreeing by a day would be a silent off-by-one nobody sees
   // until a week is written with a day still left in it.
   const weekId = rawWeek === undefined ? latestSealedWeek(today) : requireWeekId(rawWeek);
-  return { today, weekId, force: argv.includes('--force-week') };
+  const force = argv.includes('--force-week');
+  const heal = argv.includes('--heal');
+  if (force && heal) throw new Error(`--heal cannot be combined with --force-week — ${USAGE}`);
+  return { today, weekId, force, heal };
 }
 
 // The tester is not an open endpoint. server/src/index.ts mounts `requireAuth`
@@ -205,7 +206,7 @@ export function readTargets(path = TARGETS) {
 }
 
 export function main(argv) {
-  const { today, weekId, force } = parseArgs(argv);
+  const { today, weekId, force, heal } = parseArgs(argv);
   const window = windowForWeekId(weekId);
 
   const readRepoJson = (rel) => JSON.parse(readFileSync(join(ROOT, rel), 'utf8'));
@@ -251,9 +252,21 @@ export function main(argv) {
     cleanup();
   }
 
-  writeArchive(ARCHIVE, appendWeek(readArchive(ARCHIVE), snap, { force }));
-  const degraded = WORKSTREAMS.filter((k) => snap[k].status === 'no-data');
-  console.log(`✓ snapshot ${weekId} (${snap.start}→${snap.end}) appended`);
+  const degraded = degradedWorkstreams(snap);
+  if (heal) {
+    // refresh-weekly.sh re-runs a degraded week until it is whole. A retry that
+    // failed the same way must not churn the archive, so only a strictly better
+    // snapshot replaces the one already there (lib/archive.mjs healWeek).
+    const { archive, replaced } = healWeek(readArchive(ARCHIVE), snap);
+    if (!replaced) {
+      console.warn(`⚠ ${weekId} not healed — this run is no better (degraded: ${degraded.join(', ') || 'none'}); archive unchanged`);
+      return;
+    }
+    writeArchive(ARCHIVE, archive);
+  } else {
+    writeArchive(ARCHIVE, appendWeek(readArchive(ARCHIVE), snap, { force }));
+  }
+  console.log(`✓ snapshot ${weekId} (${snap.start}→${snap.end}) ${heal ? 'healed' : 'appended'}`);
   if (degraded.length) console.warn(`⚠ degraded: ${degraded.join(', ')}`);
   // A coverage miss is not a degraded workstream (PRs and commits landed), but
   // the operator standing at this terminal is the only person who can fix it.
