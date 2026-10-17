@@ -168,6 +168,13 @@ export function testerClient({ baseUrl, password, exec, warn = console.warn,
   const plain = (url) => exec('curl', ['-fsS', '--max-time', '30', url],
     { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
   if (!baseUrl || !password) return { curl: plain, cleanup: () => {} };
+  // The tester redirects plain HTTP to HTTPS (since 2026-10-14). Over http:// the
+  // password would leave in clear before the 301, and the redirect page would be
+  // parsed as coverage. Refuse, and say what to change.
+  if (!/^https:\/\//i.test(baseUrl)) {
+    warn('⚠ PIECE_TESTER_URL is not https:// — not sending the tester password in clear; set it to https:// in .env.local. Coverage will degrade');
+    return { curl: plain, cleanup: () => {} };
+  }
 
   const cleanup = () => { try { rmSync(jarPath, { force: true }); } catch { /* best effort */ } };
   try {

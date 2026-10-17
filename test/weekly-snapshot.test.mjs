@@ -200,8 +200,8 @@ const recorder = (fail = null) => {
 
 test('no password means no login — the collector gets a plain GET', () => {
   const { calls, exec } = recorder();
-  const { curl } = testerClient({ baseUrl: 'http://tester.example', password: '', exec, jarPath: JAR });
-  curl('http://tester.example/api/coverage');
+  const { curl } = testerClient({ baseUrl: 'https://tester.example', password: '', exec, jarPath: JAR });
+  curl('https://tester.example/api/coverage');
   assert.equal(calls.length, 1, 'a login was attempted with no password to send');
   assert.ok(!calls[0].args.includes('-b'));
 });
@@ -214,8 +214,8 @@ test('an unset tester URL means no login either', () => {
 
 test('a password buys a session cookie, and every later GET carries it', () => {
   const { calls, exec } = recorder();
-  const { curl } = testerClient({ baseUrl: 'http://tester.example/', password: 'hunter2', exec, jarPath: JAR });
-  curl('http://tester.example/api/coverage');
+  const { curl } = testerClient({ baseUrl: 'https://tester.example/', password: 'hunter2', exec, jarPath: JAR });
+  curl('https://tester.example/api/coverage');
 
   const [login, get] = calls;
   assert.ok(login.args.includes('/api/auth/login') || login.args.some((a) => a.endsWith('/api/auth/login')),
@@ -227,15 +227,15 @@ test('a password buys a session cookie, and every later GET carries it', () => {
 // A trailing slash on the configured URL must not produce //api/auth/login.
 test('the login URL is joined cleanly', () => {
   const { calls, exec } = recorder();
-  testerClient({ baseUrl: 'http://tester.example/', password: 'hunter2', exec, jarPath: JAR });
-  assert.ok(calls[0].args.includes('http://tester.example/api/auth/login'));
+  testerClient({ baseUrl: 'https://tester.example/', password: 'hunter2', exec, jarPath: JAR });
+  assert.ok(calls[0].args.includes('https://tester.example/api/auth/login'));
 });
 
 // argv is world-readable in `ps` for the life of the call, and a snapshot runs
 // under cron beside whatever else is on that machine.
 test('the password goes in on stdin, never in the arguments', () => {
   const { calls, exec } = recorder();
-  testerClient({ baseUrl: 'http://tester.example', password: 'hunter2', exec, jarPath: JAR });
+  testerClient({ baseUrl: 'https://tester.example', password: 'hunter2', exec, jarPath: JAR });
   assert.equal(calls[0].input, JSON.stringify({ password: 'hunter2' }));
   assert.ok(!calls[0].args.some((a) => String(a).includes('hunter2')), 'password leaked into argv');
 });
@@ -246,12 +246,26 @@ test('the password goes in on stdin, never in the arguments', () => {
 test('a failed login degrades instead of taking the snapshot down', () => {
   const warned = [];
   const { calls, exec } = recorder('/api/auth/login');
-  const { curl } = testerClient({ baseUrl: 'http://tester.example', password: 'wrong', exec,
+  const { curl } = testerClient({ baseUrl: 'https://tester.example', password: 'wrong', exec,
     jarPath: JAR, warn: (m) => warned.push(m) });
-  curl('http://tester.example/api/coverage');
+  curl('https://tester.example/api/coverage');
   assert.equal(warned.length, 1);
   assert.doesNotMatch(warned[0], /wrong/, 'the warning must not carry the password');
   assert.ok(!calls[1].args.includes('-b'), 'a failed login must not leave a jar in play');
+});
+
+// The tester moved behind HTTPS on 2026-10-14 and 301s plain HTTP. With the old
+// http:// URL the password went out in clear before the redirect, and the 301
+// page was parsed as coverage ("Unexpected token '<'"), so W42 lost its roster.
+test('a password is never sent to a plain-http tester URL', () => {
+  const warned = [];
+  const { calls, exec } = recorder();
+  const { curl } = testerClient({ baseUrl: 'http://tester.example', password: 'hunter2', exec,
+    jarPath: JAR, warn: (m) => warned.push(m) });
+  curl('http://tester.example/api/coverage');
+  assert.equal(calls.length, 1, 'no login call may be made over http');
+  assert.ok(!calls.some((c) => String(c.input ?? '').includes('hunter2')));
+  assert.match(warned[0] ?? '', /https/);
 });
 
 // The jar holds a live 7-day session for a host this repo deliberately does not
@@ -259,7 +273,7 @@ test('a failed login degrades instead of taking the snapshot down', () => {
 test('cleanup removes the cookie jar', () => {
   const { exec } = recorder();
   writeFileSync(JAR, 'session');
-  const { cleanup } = testerClient({ baseUrl: 'http://tester.example', password: 'hunter2', exec, jarPath: JAR });
+  const { cleanup } = testerClient({ baseUrl: 'https://tester.example', password: 'hunter2', exec, jarPath: JAR });
   cleanup();
   assert.equal(existsSync(JAR), false);
 });
