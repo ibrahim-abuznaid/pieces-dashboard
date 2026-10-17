@@ -20661,7 +20661,7 @@
       "week": "2026-W42",
       "start": "2026-10-10",
       "end": "2026-10-16",
-      "builtAt": "2026-10-17",
+      "builtAt": "2026-10-18",
       "outputSchema": {
         "status": "ok",
         "live": 167,
@@ -21136,7 +21136,7 @@
             "actions": 15,
             "triggers": 5,
             "stage": "live",
-            "tier": "P4",
+            "tier": "P3",
             "logo": "https://cdn.activepieces.com/pieces/attio.png"
           },
           {
@@ -21235,7 +21235,7 @@
             "actions": 12,
             "triggers": 3,
             "stage": "live",
-            "tier": "P3",
+            "tier": "P2",
             "logo": "https://cdn.activepieces.com/pieces/microsoft-outlook.png"
           },
           {
@@ -21370,7 +21370,7 @@
             "actions": 9,
             "triggers": 0,
             "stage": "live",
-            "tier": "P2",
+            "tier": "P1",
             "logo": "https://cdn.activepieces.com/pieces/pdf.svg"
           },
           {
@@ -21379,7 +21379,7 @@
             "actions": 9,
             "triggers": 3,
             "stage": "live",
-            "tier": "P2",
+            "tier": "P1",
             "logo": "https://cdn.activepieces.com/pieces/new-core/tables.svg"
           },
           {
@@ -21451,7 +21451,7 @@
             "actions": 8,
             "triggers": 1,
             "stage": "live",
-            "tier": "P4",
+            "tier": "P3",
             "logo": "https://cdn.activepieces.com/pieces/ntfy.png"
           },
           {
@@ -21469,7 +21469,7 @@
             "actions": 8,
             "triggers": 1,
             "stage": "live",
-            "tier": "P4",
+            "tier": "P3",
             "logo": "https://cdn.activepieces.com/pieces/ticktick.png"
           },
           {
@@ -21676,7 +21676,7 @@
             "actions": 6,
             "triggers": 0,
             "stage": "live",
-            "tier": "P2",
+            "tier": "P1",
             "logo": "https://cdn.activepieces.com/pieces/new-core/math-helper.svg"
           },
           {
@@ -21874,7 +21874,7 @@
             "actions": 4,
             "triggers": 0,
             "stage": "live",
-            "tier": "P4",
+            "tier": "P3",
             "logo": "https://cdn.activepieces.com/pieces/groq.png"
           },
           {
@@ -22252,7 +22252,7 @@
             "actions": 0,
             "triggers": 2,
             "stage": "live",
-            "tier": "P2",
+            "tier": "P1",
             "logo": "https://cdn.activepieces.com/pieces/rss.png"
           }
         ]
@@ -23395,7 +23395,7 @@
         "status": "ok",
         "merged": 51,
         "live": 51,
-        "review": 8,
+        "review": 16,
         "assigned": 0,
         "totalPieces": 769,
         "roster": [
@@ -23496,6 +23496,24 @@
             "actions": 28,
             "stage": "review",
             "logo": "https://cdn.activepieces.com/pieces/woocommerce.png",
+            "author": "Talaljaber"
+          },
+          {
+            "folder": "instagram-business",
+            "name": "instagram-business",
+            "displayName": "Instagram for Business",
+            "actions": 27,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/instagram.png",
+            "author": "Talaljaber"
+          },
+          {
+            "folder": "jira-cloud",
+            "name": "jira-cloud",
+            "displayName": "Jira Cloud",
+            "actions": 26,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/jira.png",
             "author": "Talaljaber"
           },
           {
@@ -23655,6 +23673,15 @@
             "logo": "https://cdn.activepieces.com/pieces/new-core/tables.svg"
           },
           {
+            "folder": "trello",
+            "name": "trello",
+            "displayName": "Trello",
+            "actions": 12,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/trello.png",
+            "author": "Talaljaber"
+          },
+          {
             "folder": "google-gemini",
             "name": "google-gemini",
             "displayName": "Google Gemini",
@@ -23769,6 +23796,15 @@
             "author": "OdaiAhmed99"
           },
           {
+            "folder": "firecrawl",
+            "name": "firecrawl",
+            "displayName": "Firecrawl",
+            "actions": 6,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/firecrawl.png",
+            "author": "Talaljaber"
+          },
+          {
             "folder": "todoist",
             "name": "todoist",
             "displayName": "Todoist",
@@ -23804,6 +23840,15 @@
             "author": "Talaljaber"
           },
           {
+            "folder": "google-contacts",
+            "name": "google-contacts",
+            "displayName": "Google Contacts",
+            "actions": 5,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/google-contacts.png",
+            "author": "Talaljaber"
+          },
+          {
             "folder": "customer-io",
             "name": "customer-io",
             "displayName": "customer.io",
@@ -23818,6 +23863,15 @@
             "actions": 4,
             "stage": "live",
             "logo": "https://cdn.activepieces.com/pieces/groq.png",
+            "author": "Talaljaber"
+          },
+          {
+            "folder": "serp-api",
+            "name": "serp-api",
+            "displayName": "SerpApi",
+            "actions": 4,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/serp-api.png",
             "author": "Talaljaber"
           },
           {
@@ -23875,6 +23929,15 @@
             "author": "Talaljaber"
           },
           {
+            "folder": "facebook-leads",
+            "name": "facebook-leads",
+            "displayName": "Facebook Leads",
+            "actions": 2,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/facebook.png",
+            "author": "Talaljaber"
+          },
+          {
             "folder": "google-forms",
             "name": "google-forms",
             "displayName": "Google Forms",
@@ -23908,6 +23971,15 @@
             "actions": 1,
             "stage": "live",
             "logo": "https://cdn.activepieces.com/pieces/perplexity-ai.png",
+            "author": "Talaljaber"
+          },
+          {
+            "folder": "pushover",
+            "name": "pushover",
+            "displayName": "Pushover",
+            "actions": 1,
+            "stage": "review",
+            "logo": "https://cdn.activepieces.com/pieces/pushover.png",
             "author": "Talaljaber"
           },
           {
@@ -24573,12 +24645,334 @@
         "coverageError": "coverage unreachable (Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON)"
       },
       "tickets": {
-        "status": "no-data",
-        "reason": "Linear refresh pending — internal dashboard wrote NEEDS-LINEAR-REFRESH"
+        "status": "ok",
+        "total": 37,
+        "inReview": 38,
+        "byPerson": {
+          "kishan": 9,
+          "sanket": 1,
+          "odai": 27,
+          "talal": 0
+        },
+        "prsMerged": {
+          "kishan": 6,
+          "sanket": 1,
+          "odai": 12,
+          "talal": 18
+        },
+        "reviews": {
+          "kishan": 3,
+          "sanket": 8,
+          "odai": 3,
+          "talal": 0
+        },
+        "shipped": [
+          {
+            "id": "PIE-565",
+            "title": "Workday: move business-object actions and triggers to Workday Web Services (SOAP)",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-711",
+            "title": "Multipart upload audit: 33 piece versions targeted by the v23 upgrade register still send broken form bodies (customer analysis, verify per piece)",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "GIT-2001",
+            "title": "[Feature]:[Pieces] Amazon Textract, add IAM Role / OIDC auth option (same as Amazon S3)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "PIE-644",
+            "title": "Add connection identifier to 5 pieces that need a new scope",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "GIT-1994",
+            "title": "[BUG] Google Drive New File / New Folder triggers reset the polling checkpoint on republish (drop isRepublish)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "PIE-666",
+            "title": "ScrapeGraphAI: AI actions / output schema",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-559",
+            "title": "Workday: fix Get Report (use RaaS) and add an Integration System User connection",
+            "assignee": "kishan",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-687",
+            "title": "Emailit: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-686",
+            "title": "Emailit: bug — Sending Only keys rejected, email content in error logs, duplicate sends on retry, header injection",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-685",
+            "title": "SmartSuite: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-684",
+            "title": "SmartSuite: bug — empty solution/table dropdowns, webhook trigger pages forever and re-sends events, find_records unbounded",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-683",
+            "title": "Lemon Squeezy: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-682",
+            "title": "Lemon Squeezy: bug — triggers dead with test-mode keys, unsigned webhooks accepted, guessable secret, path injection",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-680",
+            "title": "Short.io: add AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-679",
+            "title": "Short.io: bug — TTL deletes/rejects links, password leaks in trigger and outputs, trigger misses links, path injection",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-681",
+            "title": "Serve the Piece Tester over HTTPS",
+            "assignee": "sanket",
+            "team": "Pieces"
+          },
+          {
+            "id": "GIT-1981",
+            "title": "[Feature]: Google Document AI piece (community PR 16251)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "GIT-1977",
+            "title": "[Feature]: JumpCloud piece (community PR 16292)",
+            "assignee": "odai",
+            "team": "GIT"
+          },
+          {
+            "id": "GIT-1996",
+            "title": "[Feature]: Slack Request Action custom Blocks input (community PR 16418)",
+            "assignee": "kishan",
+            "team": "GIT"
+          },
+          {
+            "id": "PIE-678",
+            "title": "pieces-common httpClient: option to keep request body out of error logs",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-675",
+            "title": "GitLab: add AI actions and output schemas (waves 1 + 2)",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-674",
+            "title": "GitLab: bug — webhook accepts forged events, project dropdown shows only 20 projects, webhook cleanup and paging broken",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-673",
+            "title": "Nuelink: add public REST API, AI actions and output schemas",
+            "assignee": "odai",
+            "team": "Pieces"
+          },
+          {
+            "id": "PIE-672",
+            "title": "Nuelink: bug — wrong auth wording, no connection check, Create Post promises scheduling it can't do",
+            "assignee": "odai",
+            "team": "Pieces"
+          }
+        ]
       },
       "shipping": {
-        "status": "no-data",
-        "reason": "internal dashboard GitHub data only reaches 2026-10-10, but this week ends 2026-10-16 — needs a full refresh"
+        "status": "ok",
+        "prsMerged": 37,
+        "piecePrs": 37,
+        "byPerson": {
+          "kishan": 6,
+          "sanket": 1,
+          "odai": 12,
+          "talal": 18
+        },
+        "reviews": 14,
+        "reviewsByPerson": {
+          "kishan": 3,
+          "sanket": 8,
+          "odai": 3,
+          "talal": 0
+        },
+        "reviewsApprox": true,
+        "shipped": [
+          {
+            "number": 16564,
+            "title": "feat(workday): search, fetch and watch 15 Workday objects through Workday Web Services",
+            "url": "https://github.com/activepieces/activepieces/pull/16564",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16582,
+            "title": "fix(pieces): file uploads and form posts in 22 pieces reach the API intact again",
+            "url": "https://github.com/activepieces/activepieces/pull/16582",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16551,
+            "title": "feat(pieces): see which Canva, SurveyMonkey, Typeform or Facebook account each connection belongs to",
+            "url": "https://github.com/activepieces/activepieces/pull/16551",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16550,
+            "title": "fix(google-drive): New File and New Folder triggers no longer miss items after republish",
+            "url": "https://github.com/activepieces/activepieces/pull/16550",
+            "author": "kishan",
+            "kind": "mixed"
+          },
+          {
+            "number": 16360,
+            "title": "feat(scrapegraphai): add AI actions and output schemas",
+            "url": "https://github.com/activepieces/activepieces/pull/16360",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 16526,
+            "title": "fix(workday): run Get Report through RaaS, add an Integration System User connection, fix broken actions",
+            "url": "https://github.com/activepieces/activepieces/pull/16526",
+            "author": "kishan",
+            "kind": "pieces"
+          },
+          {
+            "number": 16538,
+            "title": "fix(amazon-textract): upload single-page PDF and TIFF files directly, no S3 needed",
+            "url": "https://github.com/activepieces/activepieces/pull/16538",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16426,
+            "title": "feat(smartsuite): agent-ready actions, bulk records, members and comments; fix webhook trigger loop",
+            "url": "https://github.com/activepieces/activepieces/pull/16426",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16429,
+            "title": "feat(emailit): let AI agents send, track and manage emails, audiences and suppressions",
+            "url": "https://github.com/activepieces/activepieces/pull/16429",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16423,
+            "title": "feat(lemon-squeezy): manage customers, subscriptions, discounts and license keys; verify webhooks",
+            "url": "https://github.com/activepieces/activepieces/pull/16423",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16420,
+            "title": "feat(short-io): agent-ready link, folder, QR and statistics actions; fix TTL and trigger password leak",
+            "url": "https://github.com/activepieces/activepieces/pull/16420",
+            "author": "odai",
+            "kind": "mixed"
+          },
+          {
+            "number": 16366,
+            "title": "feat(openai): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16366",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16367,
+            "title": "feat(google-drive): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16367",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16403,
+            "title": "feat(delay): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16403",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16383,
+            "title": "feat(pieces-common): group the Custom API Call form into Request and Data to send cards",
+            "url": "https://github.com/activepieces/activepieces/pull/16383",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16406,
+            "title": "feat(google-gemini): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16406",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16405,
+            "title": "feat(slack): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16405",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16364,
+            "title": "feat(date-helper): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16364",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16365,
+            "title": "feat(telegram-bot): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16365",
+            "author": "talal",
+            "kind": "mixed"
+          },
+          {
+            "number": 16372,
+            "title": "feat(todoist): ui improvement",
+            "url": "https://github.com/activepieces/activepieces/pull/16372",
+            "author": "talal",
+            "kind": "mixed"
+          }
+        ]
       },
       "targets": {
         "aiActions": {
