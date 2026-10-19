@@ -1,5 +1,5 @@
 // weekly/collect/testing.mjs
-// Progress on Sanket's piece-tester-web: BUILD progress (PRs merged, commits)
+// Progress on Sanket's pieces-tester: BUILD progress (PRs merged, commits)
 // always, and — when the running tester itself is reachable — which pieces the
 // project COVERS, read from its /api/coverage endpoint.
 //
@@ -13,7 +13,7 @@
 // exactly as before.
 import { readCatalogPieces } from './output-schema.mjs';
 
-export const REPO = 'ibrahim-abuznaid/piece-tester-web';
+export const REPO = 'activepieces/pieces-tester';
 
 const dayOf = (iso) => String(iso).slice(0, 10);
 const inWindow = (iso, { start, end }) => {
@@ -79,7 +79,7 @@ export function collectTesting({ window, gh, curl, testerUrl, readJson }) {
       shipped: merged.map(({ number, title, url }) => ({ number, title, url })),
     };
   } catch (err) {
-    return { status: 'no-data', reason: `piece-tester-web unreachable (${err.message})` };
+    return { status: 'no-data', reason: `pieces-tester unreachable (${err.message})` };
   }
 
   if (!testerUrl || !curl) return base;

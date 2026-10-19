@@ -511,7 +511,7 @@ function pieceStrip(ws, spec, weeks, selected) {
 // So the box says the only part this reader can use: the number is MISSING, not
 // zero. The collector's sentence is not lost — every snapshot stores it verbatim
 // in weekly/data/weeks.json, which is committed, where whoever can act on it is
-// already looking. The same trade as the piece-tester-web caveat, which moved to
+// already looking. The same trade as the pieces-tester caveat, which moved to
 // README.md rather than being deleted.
 //
 // Phrased on RENDER rather than at snapshot time, so the weeks already in the

@@ -140,7 +140,7 @@ stays out of this public repo: put it in the gitignored `.env.local` (sourced by
 `export PIECE_TESTER_URL=http://<tester-host>:4000`. Snapshots only ever run locally, so CI never needs it.
 
 Without the URL — every older week, and any week the server is unreachable — the box counts
-**merged PRs on `piece-tester-web`** with their titles as chips: build progress, exactly as before. A
+**merged PRs on `pieces-tester`** with their titles as chips: build progress, exactly as before. A
 coverage miss is recorded as `coverageError` in the snapshot and warned at snapshot time, never rendered.
 
 Neither headline is piece **health**: pass/fail run results are still not collected, and unlocking them needs

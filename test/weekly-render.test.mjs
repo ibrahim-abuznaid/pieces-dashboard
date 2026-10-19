@@ -1218,7 +1218,7 @@ test('the page keeps the whitespace budget that makes it fit a laptop screen', (
 const coveredWeek = (week = '2026-W31') => snap(week, {
   testing: { status: 'ok', prsMerged: 1, commits: 6,
     shipped: [{ number: 5, title: 'feat(health): piece health board',
-                url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5' }],
+                url: 'https://github.com/activepieces/pieces-tester/pull/5' }],
     catalogPieces: 720,
     roster: [
       { name: 'zendesk', folder: 'zendesk', displayName: 'Zendesk', logo: null, actions: 12, stage: 'covered' },
@@ -1257,10 +1257,10 @@ test('a hostile curated note is escaped on its way to the DOM', () => {
 test('a shipped PR chip links to the PR when the archive recorded an https URL', () => {
   const tile = tileOf(renderDom([testingWeek('2026-W31', [
     { number: 5, title: 'feat(health): piece health board',
-      url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5' },
+      url: 'https://github.com/activepieces/pieces-tester/pull/5' },
   ])]), 'Piece testing');
   assert.match(tile,
-    /<a href="https:\/\/github\.com\/ibrahim-abuznaid\/piece-tester-web\/pull\/5" target="_blank" rel="noopener">/);
+    /<a href="https:\/\/github\.com\/activepieces\/pieces-tester\/pull\/5" target="_blank" rel="noopener">/);
 });
 
 test('a PR whose recorded url is not https renders a plain, unlinked chip', () => {

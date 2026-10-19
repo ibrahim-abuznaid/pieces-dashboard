@@ -248,7 +248,7 @@ test('a workstream missing from the snapshot entirely reads as unmeasured too', 
   assert.equal(tile.reason, 'not measured this week');
 });
 
-// The piece-tester-web stats-endpoint caveat is an engineering note, so it left
+// The pieces-tester stats-endpoint caveat is an engineering note, so it left
 // the page. It is not smuggled back in as a view field either — the record for
 // it is README.md (see weekly-wiring.test.mjs).
 test('no view field carries the piece-testing caveat any more', () => {

@@ -69,7 +69,7 @@ export function checkedByPerson(byPerson, total) {
 // Credit for a piece that crossed the line this week. The rollouts credit the
 // PR author the build resolved (lib/credit.mjs) — a login off the team is
 // "others", no login is "not credited", never a guess. The tester is Sanket's
-// project and piece-tester-web records no per-plan author, so every piece it
+// project and pieces-tester records no per-plan author, so every piece it
 // newly covers is his.
 const OTHERS = 'others';
 const UNCREDITED = 'uncredited';

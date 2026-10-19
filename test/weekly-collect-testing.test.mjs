@@ -8,11 +8,11 @@ const WINDOW = { start: '2026-07-25', end: '2026-07-31' };
 
 const PRS = JSON.stringify([
   { number: 5, title: 'feat(health): piece health board', mergedAt: '2026-07-30T07:36:31Z',
-    url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5' },
+    url: 'https://github.com/activepieces/pieces-tester/pull/5' },
   { number: 3, title: 'feat(assertions): output assertions', mergedAt: '2026-06-22T10:00:00Z',
-    url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/3' },
+    url: 'https://github.com/activepieces/pieces-tester/pull/3' },
   { number: 4, title: 'feat: alerts', mergedAt: null,
-    url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/4' },
+    url: 'https://github.com/activepieces/pieces-tester/pull/4' },
 ]);
 
 const COMMITS = JSON.stringify([{ sha: 'a' }, { sha: 'b' }, { sha: 'c' }, { sha: 'd' }]);
@@ -26,7 +26,7 @@ test('counts only PRs merged inside the window', () => {
   assert.equal(out.prsMerged, 1);
   assert.deepEqual(out.shipped, [{
     number: 5, title: 'feat(health): piece health board',
-    url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5',
+    url: 'https://github.com/activepieces/pieces-tester/pull/5',
   }]);
 });
 
