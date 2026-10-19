@@ -115,6 +115,23 @@ test('an unreachable tester degrades coverage alone — PRs and commits survive'
   assert.ok(!('roster' in out));
 });
 
+test('a coverage failure never records the tester address — the snapshot is public', () => {
+  const failWith = (testerUrl, message) => collectTesting({ window: WINDOW, gh: fakeGh(), testerUrl,
+    curl: () => { throw new Error(message); } }).coverageError;
+
+  const refused = failWith('https://203.0.113.7:8443/',
+    'Command failed: curl -fsS --max-time 30 https://203.0.113.7:8443/api/coverage\n'
+    + "curl: (7) Failed to connect to 203.0.113.7 port 8443 after 3 ms: Couldn't connect to server");
+  assert.match(refused, /coverage unreachable/);
+  assert.match(refused, /Failed to connect/);
+  assert.doesNotMatch(refused, /203\.0\.113\.7|https?:\/\//);
+
+  const unresolved = failWith('https://tester.internal',
+    'curl: (6) Could not resolve host: tester.internal');
+  assert.match(unresolved, /Could not resolve host/);
+  assert.doesNotMatch(unresolved, /tester\.internal/);
+});
+
 test('a coverage endpoint returning junk degrades coverage alone', () => {
   const out = withCoverage('not json');
   assert.equal(out.status, 'ok');

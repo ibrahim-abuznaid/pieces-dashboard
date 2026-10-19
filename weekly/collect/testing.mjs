@@ -93,6 +93,16 @@ export function collectTesting({ window, gh, curl, testerUrl, readJson }) {
     // Coverage degrades ALONE: PRs and commits were measured, so the workstream
     // stays ok and the miss is recorded where the operator looks — the snapshot
     // itself (committed) and snapshot.mjs's warning line, not the page.
-    return { ...base, coverageError: `coverage unreachable (${err.message})` };
+    return { ...base, coverageError: `coverage unreachable (${withoutAddress(err.message, testerUrl)})` };
   }
+}
+
+// The committed snapshot is public, the tester's address is not. curl's message
+// carries the full URL ("Command failed: curl … https://host/api/coverage") and
+// the bare host ("Failed to connect to host port 443"), so both go.
+function withoutAddress(message, testerUrl) {
+  let host = '';
+  try { host = new URL(testerUrl).hostname; } catch { /* not a URL: the regex still runs */ }
+  const noUrls = String(message).replace(/https?:\/\/\S+/gi, '<tester>');
+  return host ? noUrls.split(host).join('<tester>') : noUrls;
 }
