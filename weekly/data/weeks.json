@@ -433,14 +433,7 @@
       "testing": {
         "status": "ok",
         "prsMerged": 1,
-        "commits": 6,
-        "shipped": [
-          {
-            "number": 5,
-            "title": "feat(health): piece health board, needs-attention inbox, persisted ru…",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/5"
-          }
-        ]
+        "commits": 6
       },
       "tickets": {
         "status": "ok",
@@ -1426,34 +1419,7 @@
       "testing": {
         "status": "ok",
         "prsMerged": 5,
-        "commits": 14,
-        "shipped": [
-          {
-            "number": 11,
-            "title": "fix(ai-agent): stop MCP test flows leaking on the platform",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/11"
-          },
-          {
-            "number": 10,
-            "title": "perf(ai-agent): add prompt caching to the v2 tool-use loop",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/10"
-          },
-          {
-            "number": 9,
-            "title": "feat: Coverage cockpit",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/9"
-          },
-          {
-            "number": 7,
-            "title": "fix(deploy): rebuild client + install deps in deploy.sh",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/7"
-          },
-          {
-            "number": 6,
-            "title": "feat: Health error playbook + Scheduled Runs at scale",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/6"
-          }
-        ]
+        "commits": 14
       },
       "tickets": {
         "status": "ok",
@@ -2557,19 +2523,7 @@
       "testing": {
         "status": "ok",
         "prsMerged": 2,
-        "commits": 10,
-        "shipped": [
-          {
-            "number": 13,
-            "title": "feat(waves): full run breakdown + drill any piece in Scheduled Runs",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/13"
-          },
-          {
-            "number": 12,
-            "title": "fix(scheduler): gate background work behind port bind + reconcile orp…",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/12"
-          }
-        ]
+        "commits": 10
       },
       "tickets": {
         "status": "no-data",
@@ -3623,34 +3577,7 @@
       "testing": {
         "status": "ok",
         "prsMerged": 5,
-        "commits": 18,
-        "shipped": [
-          {
-            "number": 18,
-            "title": "feat(triggers): add 'Fix with AI' for trigger plans + user-instructio…",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/18"
-          },
-          {
-            "number": 17,
-            "title": "fix(triggers): resolve trigger_test assertions against captured samples",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/17"
-          },
-          {
-            "number": 16,
-            "title": "secure the API: session login, secret masking, and CORS   lockdown",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/16"
-          },
-          {
-            "number": 15,
-            "title": "feat(plans): guard stale test plans on connection change, block, don't fail",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/15"
-          },
-          {
-            "number": 14,
-            "title": " feat(connections): block runs on broken imported connections instead of failing the piece",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/14"
-          }
-        ]
+        "commits": 18
       },
       "tickets": {
         "status": "ok",
@@ -5033,39 +4960,7 @@
       "testing": {
         "status": "ok",
         "prsMerged": 6,
-        "commits": 20,
-        "shipped": [
-          {
-            "number": 30,
-            "title": "feat: merge Health board cards to one per piece with detail drawer",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/30"
-          },
-          {
-            "number": 29,
-            "title": "fix: collapse Health board to four columns (Errors/Connection/Reporte…",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/29"
-          },
-          {
-            "number": 28,
-            "title": "feat: report piece failures to Linear + rebuild Health as a fix-owner Kanban board",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/28"
-          },
-          {
-            "number": 27,
-            "title": "fix: stop Reports filter hang; replace picker with Recent/All toggle",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/27"
-          },
-          {
-            "number": 26,
-            "title": "feat: rebuild Reports as a visual analytics dashboard",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/26"
-          },
-          {
-            "number": 25,
-            "title": "feat: plan-based \"Run Now\" launcher; retire legacy test engine",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/25"
-          }
-        ]
+        "commits": 20
       },
       "tickets": {
         "status": "ok",
@@ -6558,39 +6453,7 @@
       "testing": {
         "status": "ok",
         "prsMerged": 6,
-        "commits": 41,
-        "shipped": [
-          {
-            "number": 36,
-            "title": "feat(alerts): Discord alerts for confirmed piece bugs",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/36"
-          },
-          {
-            "number": 35,
-            "title": "Feat/linear report template",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/35"
-          },
-          {
-            "number": 34,
-            "title": "feat: coverage-aware Generate step in batch setup",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/34"
-          },
-          {
-            "number": 33,
-            "title": "feat: batch setup wizard with per-target selection",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/33"
-          },
-          {
-            "number": 32,
-            "title": "feat: auto-link test connections by naming convention",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/32"
-          },
-          {
-            "number": 31,
-            "title": "feat: auto-refresh the Activepieces   sign-in JWT (no more re-pasting)",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/31"
-          }
-        ]
+        "commits": 41
       },
       "tickets": {
         "status": "ok",
@@ -8310,13 +8173,6 @@
         "status": "ok",
         "prsMerged": 1,
         "commits": 2,
-        "shipped": [
-          {
-            "number": 37,
-            "title": "fix(batch-setup): use v2 planner for actions so plans don't stall as …",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/37"
-          }
-        ],
         "catalogPieces": 764,
         "roster": [
           {
@@ -10845,53 +10701,6 @@
         "status": "ok",
         "prsMerged": 9,
         "commits": 61,
-        "shipped": [
-          {
-            "number": 55,
-            "title": "fix(client): keep the layout up when a lazy page can't load; drop the last recharts Cell",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/55"
-          },
-          {
-            "number": 54,
-            "title": "fix: Bug Trend follow-ups — exact 1920 px PNG, no deprecated Cell, footnote, code-split bundle",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/54"
-          },
-          {
-            "number": 53,
-            "title": "feat: Bug Trend page — Pieces Team bugs from Linear, exportable as PNG",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/53"
-          },
-          {
-            "number": 43,
-            "title": "feat: gate plan generation on an active connection",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/43"
-          },
-          {
-            "number": 42,
-            "title": "feat: reliable + concurrent batch setup (retries, parallelism, independent batches)",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/42"
-          },
-          {
-            "number": 41,
-            "title": "fix: mcp usage",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/41"
-          },
-          {
-            "number": 40,
-            "title": "Feat/import connections by piecename",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/40"
-          },
-          {
-            "number": 39,
-            "title": "fix:Scroll the log pane directly instead of scrollIntoView",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/39"
-          },
-          {
-            "number": 38,
-            "title": "fix(mcp): add request timeout so a stalled MCP server can't hang batc…",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/38"
-          }
-        ],
         "catalogPieces": 764,
         "roster": [
           {
@@ -13640,28 +13449,6 @@
         "status": "ok",
         "prsMerged": 4,
         "commits": 9,
-        "shipped": [
-          {
-            "number": 58,
-            "title": "fix: stop batch auto-test hanging on fixer-added human_input steps",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/58"
-          },
-          {
-            "number": 57,
-            "title": "fix: paginate listConnections so callers see connections past page 1",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/57"
-          },
-          {
-            "number": 56,
-            "title": "fix: cancel button",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/56"
-          },
-          {
-            "number": 44,
-            "title": "perf(plan-gen): reduce V2 plan-generation latency & cost",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/44"
-          }
-        ],
         "catalogPieces": 766,
         "roster": [
           {
@@ -18647,53 +18434,6 @@
         "status": "ok",
         "prsMerged": 9,
         "commits": 83,
-        "shipped": [
-          {
-            "number": 67,
-            "title": "feat(batch-setup): tracked first run right after plan generation",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/67"
-          },
-          {
-            "number": 66,
-            "title": "fix(pieces): no-auth pieces no longer read as unconnected or stale",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/66"
-          },
-          {
-            "number": 65,
-            "title": "feat(ai): run the research and verifier workers on Sonnet 5.5 too",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/65"
-          },
-          {
-            "number": 64,
-            "title": "feat(ai): move the tester to Claude Sonnet 5.5",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/64"
-          },
-          {
-            "number": 63,
-            "title": "feat(vendor-watch): bulk-safe watcher rollout (GitHub token, generation queue, inbox paging)",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/63"
-          },
-          {
-            "number": 62,
-            "title": "feat(vendor-watch): watch vendor APIs and file breaking changes in Linear",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/62"
-          },
-          {
-            "number": 61,
-            "title": "feat(batch-setup): include no-auth pieces in the setup wizard",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/61"
-          },
-          {
-            "number": 60,
-            "title": "fix(batch): resume batch setup runs interrupted by a server restart",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/60"
-          },
-          {
-            "number": 59,
-            "title": "feat(health): close issues when a retest passes + show recently recovered   pieces",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/59"
-          }
-        ],
         "catalogPieces": 767,
         "roster": [
           {
@@ -24610,38 +24350,6 @@
         "status": "ok",
         "prsMerged": 6,
         "commits": 17,
-        "shipped": [
-          {
-            "number": 74,
-            "title": "Notify Discord once when a vendor account runs out of credits",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/74"
-          },
-          {
-            "number": 73,
-            "title": "Separate out-of-credits failures from piece errors",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/73"
-          },
-          {
-            "number": 72,
-            "title": "fix: serve the tester over HTTPS",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/72"
-          },
-          {
-            "number": 71,
-            "title": "fix: security hardening (URL allowlist, per-client login throttle, cross-site guard, deps, Node 24)",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/71"
-          },
-          {
-            "number": 69,
-            "title": "ci: deploy over an SSH key instead of a password",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/69"
-          },
-          {
-            "number": 68,
-            "title": "perf(db): index run history and keep step payloads out of the board queries",
-            "url": "https://github.com/ibrahim-abuznaid/piece-tester-web/pull/68"
-          }
-        ],
         "catalogPieces": 769,
         "roster": [
           {

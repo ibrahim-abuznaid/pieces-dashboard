@@ -11,6 +11,12 @@
 // (they only ever run locally; see snapshot.mjs). Unset means the coverage
 // half of this collector is simply off, and the tile reports build progress
 // exactly as before.
+//
+// COUNTS ONLY from the repo. It went private on 2026-10-19 and this dashboard
+// is public, so no PR title, commit message, number or URL may reach a snapshot:
+// the PR query asks for merge dates alone, and the commit list is only ever
+// counted. Weeks archived before then were scrubbed of their `shipped` list,
+// and the view ignores one if it turns up.
 import { readCatalogPieces } from './output-schema.mjs';
 
 export const REPO = 'activepieces/pieces-tester';
@@ -68,15 +74,13 @@ export function collectTesting({ window, gh, curl, testerUrl, readJson }) {
   let base;
   try {
     const prs = JSON.parse(gh(['pr', 'list', '--repo', REPO, '--state', 'merged',
-      '--limit', '100', '--json', 'number,title,mergedAt,url']));
-    const merged = prs.filter((pr) => inWindow(pr.mergedAt, window));
+      '--limit', '100', '--json', 'mergedAt']));
     const commits = JSON.parse(gh(['api',
       `repos/${REPO}/commits?since=${window.start}T00:00:00Z&until=${window.end}T23:59:59Z&per_page=100`]));
     base = {
       status: 'ok',
-      prsMerged: merged.length,
+      prsMerged: prs.filter((pr) => inWindow(pr.mergedAt, window)).length,
       commits: Array.isArray(commits) ? commits.length : 0,
-      shipped: merged.map(({ number, title, url }) => ({ number, title, url })),
     };
   } catch (err) {
     return { status: 'no-data', reason: `pieces-tester unreachable (${err.message})` };

@@ -110,6 +110,16 @@ test('every already-committed snapshot still validates unchanged', () => {
   for (const w of archive.weeks) validateSnapshot(w);
 });
 
+// activepieces/pieces-tester went private on 2026-10-19 and this repo is
+// public, so the archive keeps counts of it and no PR detail. The weeks written
+// before then had their `testing.shipped` scrubbed that day; git history still
+// holds them.
+test('the committed archive carries no detail of the private tester repo', () => {
+  const raw = readFileSync(new URL('../weekly/data/weeks.json', import.meta.url), 'utf8');
+  for (const w of JSON.parse(raw).weeks) assert.equal(w.testing?.shipped, undefined, `${w.week} keeps testing.shipped`);
+  assert.doesNotMatch(raw, /github\.com\/(activepieces\/pieces-tester|ibrahim-abuznaid\/piece-tester-web)\//);
+});
+
 test('a well-formed roster validates', () =>
   validateSnapshot(withRoster([{ name: 'Slack', actions: 12, triggers: 3, stage: 'live', tier: 'P1' }])));
 

@@ -167,9 +167,10 @@ export function prTitle(title) {
 // escaping defends. A refused href costs the chip its link, never its place.
 const httpsHref = (v) => (typeof v === 'string' && /^https:\/\//.test(v) ? v : undefined);
 
-// Piece testing ships PRs, not pieces: its strip is their titles, and there is
-// no logo to show for a pull request. The collector already windowed them to
-// this week, so no diff is involved.
+// The PRs merged box ships PRs, not pieces: its strip is their titles, and there
+// is no logo to show for a pull request. The collector already windowed them to
+// this week, so no diff is involved. Piece testing used to share it, until its
+// repo went private — see the TILES entry.
 //
 // `shipped` is optional detail the archive does not validate — a snapshot
 // missing it, or carrying a titleless entry, costs the strip and never the
@@ -337,6 +338,12 @@ const TILES = [
   // hands `value`, so a delta can never compare a coverage count against a PR
   // count across the changeover: coveredCount is null on unmeasured weeks, and
   // a null side yields no delta at all.
+  //
+  // No PR strip in either mode. activepieces/pieces-tester went private on
+  // 2026-10-19 and this page is public, so the box shows counts of that repo
+  // and nothing else. Weeks archived before then carried `shipped` — titles and
+  // URLs of its PRs — and were scrubbed; it is never read here, so a copy that
+  // survives anywhere still cannot reach the page.
   { key: 'testing', title: 'Piece testing',
     pathFor: (ws) => (coveredRows(ws) ? coveredCount : 'testing.prsMerged'),
     unit: (ws) => (coveredRows(ws)
@@ -344,7 +351,7 @@ const TILES = [
         ? `of ${ws.catalogPieces} pieces covered`
         : `${plural(coveredRows(ws).length, 'piece')} covered`)
       : `${plural(ws.prsMerged, 'PR')} shipped`),
-    strip: (ws) => (coveredRows(ws) ? coveredStrip(ws) : prStrip(ws.shipped)),
+    strip: (ws) => (coveredRows(ws) ? coveredStrip(ws) : null),
     note: (ws) => (coveredRows(ws)
       ? `${ws.prsMerged} ${plural(ws.prsMerged, 'PR')} merged · ${ws.commits} ${plural(ws.commits, 'commit')} this week`
       : '') },

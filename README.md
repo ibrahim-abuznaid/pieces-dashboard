@@ -140,8 +140,13 @@ stays out of this public repo: put it in the gitignored `.env.local` (sourced by
 `export PIECE_TESTER_URL=http://<tester-host>:4000`. Snapshots only ever run locally, so CI never needs it.
 
 Without the URL — every older week, and any week the server is unreachable — the box counts
-**merged PRs on `pieces-tester`** with their titles as chips: build progress, exactly as before. A
-coverage miss is recorded as `coverageError` in the snapshot and warned at snapshot time, never rendered.
+**merged PRs on `pieces-tester`**: build progress, exactly as before. A coverage miss is recorded as
+`coverageError` in the snapshot and warned at snapshot time, never rendered.
+
+**Counts only from the repo.** `activepieces/pieces-tester` went private on 2026-10-19 and this dashboard is
+public, so the collector stores how many PRs merged and how many commits landed, and nothing else: no PR
+title, commit message, number or URL. The weeks archived before then had their `testing.shipped` list
+scrubbed from `weekly/data/weeks.json` (git history still holds it), and the page ignores one if it turns up.
 
 Neither headline is piece **health**: pass/fail run results are still not collected, and unlocking them needs
 a **stats endpoint** read the same way (the coverage endpoint already reports per-piece health — rendering it

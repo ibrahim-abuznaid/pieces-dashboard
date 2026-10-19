@@ -24,10 +24,6 @@ test('counts only PRs merged inside the window', () => {
   const out = collectTesting({ window: WINDOW, gh: fakeGh() });
   assert.equal(out.status, 'ok');
   assert.equal(out.prsMerged, 1);
-  assert.deepEqual(out.shipped, [{
-    number: 5, title: 'feat(health): piece health board',
-    url: 'https://github.com/activepieces/pieces-tester/pull/5',
-  }]);
 });
 
 test('unmerged PRs are excluded', () => {
@@ -35,7 +31,6 @@ test('unmerged PRs are excluded', () => {
     { number: 4, title: 'feat: alerts', mergedAt: null, url: 'u' },
   ])) });
   assert.equal(out.prsMerged, 0);
-  assert.deepEqual(out.shipped, []);
 });
 
 test('a PR merged on the final day of the window counts', () => {
@@ -167,4 +162,38 @@ test('an unavailable catalog omits the denominator rather than falling back to t
   const out = withCoverage(COVERAGE, 'http://tester.internal:4000', () => { throw new Error('ENOENT'); });
   assert.ok(!('catalogPieces' in out), 'a missing catalog must not leave a stale or invented denominator');
   assert.equal(out.roster.length, 2, 'coverage still lands without a denominator');
+});
+
+// ── a private repo, a public page ───────────────────────────────────────────
+// activepieces/pieces-tester went private on 2026-10-19 and this dashboard is
+// public, so the snapshot keeps COUNTS of it and nothing else: no PR title, no
+// commit message, no number or URL pointing into the repo. Titles are not even
+// requested — what the collector never holds, it cannot leak.
+const COMMITS_WITH_DETAIL = JSON.stringify([
+  { sha: 'f00dfeed', commit: { message: 'chore: private commit message' },
+    html_url: 'https://github.com/activepieces/pieces-tester/commit/f00dfeed' },
+]);
+
+const PRIVATE_DETAIL = [/piece health board/, /output assertions/, /private commit message/,
+  /f00dfeed/, /github\.com/, /\/pull\//, /"number"/, /"title"/, /"url"/, /"shipped"/];
+
+test('the snapshot keeps counts of the private repo and none of its detail', () => {
+  const gh = fakeGh(PRS, COMMITS_WITH_DETAIL);
+  for (const out of [
+    collectTesting({ window: WINDOW, gh }),
+    collectTesting({ window: WINDOW, gh, curl: () => COVERAGE, testerUrl: 'http://tester', readJson: catalogRead() }),
+  ]) {
+    assert.equal(out.status, 'ok');
+    assert.equal(out.prsMerged, 1);
+    assert.equal(out.commits, 1);
+    const stored = JSON.stringify(out);
+    for (const re of PRIVATE_DETAIL) assert.doesNotMatch(stored, re);
+  }
+});
+
+test('the PR query asks for merge dates only', () => {
+  const calls = [];
+  collectTesting({ window: WINDOW, gh: (args) => { calls.push(args); return args.includes('pr') ? PRS : COMMITS; } });
+  const pr = calls.find((args) => args.includes('pr'));
+  assert.equal(pr[pr.indexOf('--json') + 1], 'mergedAt');
 });

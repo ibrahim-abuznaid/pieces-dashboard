@@ -11,7 +11,7 @@ const snap = (week, over = {}) => ({
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
   uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
   connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 3, assigned: 0, totalPieces: 111 },
-  testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [{ number: 5, title: 't', url: 'u' }] },
+  testing: { status: 'ok', prsMerged: 1, commits: 4 },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 },
              shipped: [{ id: 'PIE-101', title: 'x', assignee: 'kishan', team: 'Pieces' }] },
@@ -107,7 +107,7 @@ test('the testing tile pluralises its unit', () => {
   const one = buildView(archive).tiles.find((t) => t.key === 'testing');
   assert.equal(one.value, 1);
   assert.equal(one.unit, 'PR shipped');
-  const many = oneWeek({ testing: { status: 'ok', prsMerged: 3, commits: 1, shipped: [] } })
+  const many = oneWeek({ testing: { status: 'ok', prsMerged: 3, commits: 1 } })
     .tiles.find((t) => t.key === 'testing');
   assert.equal(many.unit, 'PRs shipped');
 });
@@ -703,20 +703,50 @@ test('the AI-actions strip shows merged pieces only — not the PRs still open',
   assert.equal(s.label, 'Done in total');
 });
 
-test("the testing tile's strip is the titles of the PRs it shipped", () =>
-  assert.deepEqual(stripOf(buildView(archive), 'testing'),
-    { kind: 'prs', label: 'Shipped', items: [{ name: 't' }], rest: [], more: 0 }));
+// The PRs merged box lists what merged into activepieces, which is public.
+const shippingWith = (shipped) => ({ ...snap('2026-W31').shipping, shipped });
 
-test('the testing strip is capped like any other', () => {
+test("the PRs merged tile's strip is the titles of the PRs it shipped", () =>
+  assert.deepEqual(stripOf(buildView(archive), 'prsMerged'),
+    { kind: 'prs', label: 'Shipped', items: [{ name: 'X', href: 'https://g/9' }], rest: [], more: 0 }));
+
+test('the PRs merged strip is capped like any other', () => {
   const shipped = Array.from({ length: STRIP_CAP + 1 }, (_, i) => ({ number: i, title: `pr ${i}`, url: 'u' }));
-  const s = stripOf(oneWeek({ testing: { status: 'ok', prsMerged: shipped.length, commits: 9, shipped } }), 'testing');
+  const s = stripOf(oneWeek({ shipping: shippingWith(shipped) }), 'prsMerged');
   assert.equal(s.items.length, STRIP_CAP);
   assert.equal(s.more, 1);
 });
 
-test('a testing week that shipped no PRs carries no strip', () =>
-  assert.equal(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 0, commits: 3, shipped: [] } }), 'testing'),
-    null));
+test('a week that merged no PRs carries no PRs merged strip', () =>
+  assert.equal(stripOf(oneWeek({ shipping: shippingWith([]) }), 'prsMerged'), null));
+
+// ── piece testing: counts of a private repo ─────────────────────────────────
+// activepieces/pieces-tester went private on 2026-10-19, so its box is counts
+// only. Every week archived before then still carries `testing.shipped` — PR
+// numbers, titles and URLs into that repo — and the view must ignore it rather
+// than render it, in both of the box's modes.
+const TESTER_PRS = [
+  { number: 901, title: 'feat(cockpit): private roadmap item',
+    url: 'https://github.com/activepieces/pieces-tester/pull/901' },
+  { number: 902, title: 'fix: internal-only change',
+    url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/902' },
+];
+const TESTER_DETAIL = [/private roadmap item/i, /internal-only change/i, /pieces-tester/, /piece-tester-web/, /\/pull\/90[12]/];
+const legacyTesting = (extra = {}) => ({ status: 'ok', prsMerged: 2, commits: 9, shipped: TESTER_PRS, ...extra });
+
+test('the testing tile shows no PR of the private repo, even from a snapshot that recorded them', () => {
+  const tile = tileOf(oneWeek({ testing: legacyTesting() }), 'testing');
+  assert.equal(tile.value, 2);
+  assert.equal(tile.unit, 'PRs shipped');
+  assert.equal(tile.strip, null);
+});
+
+test('no detail of the private repo reaches the view model, whichever headline the week has', () => {
+  for (const testing of [legacyTesting(), legacyTesting({ roster: [], catalogPieces: 720 })]) {
+    const model = JSON.stringify(oneWeek({ testing }));
+    for (const re of TESTER_DETAIL) assert.doesNotMatch(model, re);
+  }
+});
 
 // ── the tickets strip ───────────────────────────────────────────────────────
 // One chip per closed ticket: id, shortened title, and a link to the ticket
@@ -793,21 +823,21 @@ test('building a strip does not mutate the archive', () => {
 
 // `shipped` is optional detail the archive schema does not check, so a snapshot
 // that lost it must cost the strip and never the tile's number.
-test('a malformed shipped list costs the testing strip, not the tile', () => {
-  const v = oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped: 'nope' } });
-  const tile = v.tiles.find((t) => t.key === 'testing');
+test('a malformed shipped list costs the PRs merged strip, not the tile', () => {
+  const v = oneWeek({ shipping: shippingWith('nope') });
+  const tile = v.tiles.find((t) => t.key === 'prsMerged');
   assert.equal(tile.strip, null);
-  assert.equal(tile.value, 2);
+  assert.equal(tile.value, 7);
 });
 
 test('a shipped entry with no title is skipped rather than rendered as a blank chip', () => {
   const shipped = [{ number: 1, url: 'u' }, { number: 2, title: 'feat: real one', url: 'u' }];
-  assert.deepEqual(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped } }), 'testing').items,
+  assert.deepEqual(stripOf(oneWeek({ shipping: shippingWith(shipped) }), 'prsMerged').items,
     [{ name: 'Real one' }]);
 });
 
 // ── a shipped PR, in words a reader outside the repo can use ───────────────
-// The testing box lists the PRs that shipped, and their titles are commit
+// The PRs merged box lists the PRs that shipped, and their titles are commit
 // subjects: `feat(health): piece health board, needs-attention inbox, persisted
 // ru…`. Everything up to the colon is a machine-readable classifier — a type and
 // a scope, for the repo's own tooling — and it is charged to the front of a chip
@@ -816,7 +846,7 @@ test('a shipped entry with no title is skipped rather than rendered as a blank c
 // `piece health board`.
 //
 // DISPLAY ONLY, and this is the last transform before the chip: the collector
-// records the subject verbatim (see weekly-collect-testing.test.mjs) and the
+// records the subject verbatim (see weekly/collect/shipping.mjs) and the
 // committed archive keeps it that way, because that is the record of what actually
 // shipped.
 
@@ -860,20 +890,20 @@ test('a title that is nothing but a prefix keeps the original string', () => {
   }
 });
 
-test('the testing strip carries the display form of each title', () =>
-  assert.deepEqual(stripOf(oneWeek({ testing: { status: 'ok', prsMerged: 2, commits: 4, shipped: [
+test('the PRs merged strip carries the display form of each title', () =>
+  assert.deepEqual(stripOf(oneWeek({ shipping: shippingWith([
     { number: 5, title: 'feat(health): piece health board', url: 'u' },
     { number: 6, title: 'fix(runner): stop double-counting a retry', url: 'u' },
-  ] } }), 'testing').items,
+  ]) }), 'prsMerged').items,
   [{ name: 'Piece health board' }, { name: 'Stop double-counting a retry' }]));
 
 // The archive is the record of what shipped, so the subject stays in it verbatim —
 // including in the week this view was just built from.
 test('rendering a week does not rewrite the title the snapshot recorded', () => {
   const shipped = [{ number: 5, title: 'feat(health): piece health board', url: 'u' }];
-  const week = snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4, shipped } });
+  const week = snap('2026-W31', { shipping: shippingWith(shipped) });
   buildView({ weeks: [week] });
-  assert.equal(week.testing.shipped[0].title, 'feat(health): piece health board');
+  assert.equal(week.shipping.shipped[0].title, 'feat(health): piece health board');
 });
 
 // ── which piece is which ───────────────────────────────────────────────────
@@ -1069,9 +1099,7 @@ const COVERED = [
 ];
 
 const testingCovered = (roster = COVERED, extra = {}) => ({
-  status: 'ok', prsMerged: 1, commits: 6,
-  shipped: [{ number: 5, title: 'feat: x', url: 'https://x/pull/5' }],
-  roster, catalogPieces: 720, ...extra,
+  status: 'ok', prsMerged: 1, commits: 6, roster, catalogPieces: 720, ...extra,
 });
 
 const testingTile = (over) => oneWeek(over).tiles.find((t) => t.key === 'testing');

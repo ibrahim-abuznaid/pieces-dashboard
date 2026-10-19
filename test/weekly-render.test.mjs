@@ -20,7 +20,7 @@ const snap = (week, over = {}) => ({
   aiActions: { status: 'ok', merged: 2, prOpen: 24, assigned: 0, held: 2, totalPieces: 28, blockersOpen: 30 },
   uiImprovements: { status: 'ok', merged: 5, live: 5, review: 2, assigned: 0, totalPieces: 765 },
   connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
-  testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
+  testing: { status: 'ok', prsMerged: 1, commits: 4 },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
   shipping: { status: 'ok', prsMerged: 7, piecePrs: 5,
@@ -699,10 +699,10 @@ test('a strip that fits shows no "+N more"', () =>
 
 // The title arrives as a commit subject, so what the box shows is the sentence
 // without its machine-readable prefix — see the display tests further down.
-test("the testing box carries the titles of the PRs it shipped", () => {
-  const tile = tileOf(renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4,
+test("the PRs merged box carries the titles of the PRs it shipped", () => {
+  const tile = tileOf(renderDom([snap('2026-W31', { shipping: { ...snap('2026-W31').shipping,
     shipped: [{ number: 5, title: 'feat(health): piece health board', url: 'https://x/pull/5' }] } })]),
-    'Piece testing');
+    'PRs merged');
   assert.match(tile, /Piece health board/);
   assert.match(tile, /Shipped/);
   assert.doesNotMatch(tile, /class="ic"/, 'a PR title has no logo');
@@ -764,7 +764,7 @@ test('a logo URL cannot break out of its attribute', () => {
 });
 
 test('a shipped PR title in the strip is HTML-escaped', () => {
-  const dom = renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 1,
+  const dom = renderDom([snap('2026-W31', { shipping: { ...snap('2026-W31').shipping,
     shipped: [{ number: 1, title: '<script>alert(1)</script>', url: 'u' }] } })]);
   assert.match(dom, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
   assert.doesNotMatch(dom, /<script>alert\(1\)/);
@@ -881,7 +881,7 @@ test('a display name is HTML-escaped like any other value', () => {
   assert.doesNotMatch(dom, /<img onerror=alert\(1\)>/);
 });
 
-// ── and the testing box named PRs by their commit subject ──────────────────
+// ── and the PRs merged box named PRs by their commit subject ───────────────
 // The same complaint, one box over: `feat(health): piece health board, needs-
 // attention inbox, persisted ru…`. The prefix is a classifier for the repo's own
 // tooling, and a chip is clamped to half a strip row — so those nine characters
@@ -890,22 +890,22 @@ test('a display name is HTML-escaped like any other value', () => {
 // The transform lives in the view (unit-tested in weekly-view.test.mjs); these
 // pin that it is wired to the page, and that nothing else on the page changed.
 
-const testingWeek = (week, shipped) => snap(week, {
-  testing: { status: 'ok', prsMerged: shipped.length, commits: 4, shipped },
+const shippingWeek = (week, shipped) => snap(week, {
+  shipping: { ...snap(week).shipping, shipped },
 });
 
-test('the testing box shows the sentence, not the commit classifier', () => {
-  const tile = tileOf(renderDom([testingWeek('2026-W31', [
+test('the PRs merged box shows the sentence, not the commit classifier', () => {
+  const tile = tileOf(renderDom([shippingWeek('2026-W31', [
     { number: 5, title: 'feat(health): piece health board', url: 'https://x/pull/5' },
     { number: 6, title: 'chore(deps): bump the test runner', url: 'https://x/pull/6' },
-  ])]), 'Piece testing');
+  ])]), 'PRs merged');
   assert.deepEqual(chipNames(tile), ['Piece health board', 'Bump the test runner']);
   assert.doesNotMatch(tile, /feat\(|chore\(/);
 });
 
 test('a shipped title that is only a prefix is never rendered as an empty chip', () => {
-  const tile = tileOf(renderDom([testingWeek('2026-W31',
-    [{ number: 7, title: 'feat:', url: 'https://x/pull/7' }])]), 'Piece testing');
+  const tile = tileOf(renderDom([shippingWeek('2026-W31',
+    [{ number: 7, title: 'feat:', url: 'https://x/pull/7' }])]), 'PRs merged');
   assert.deepEqual(chipNames(tile), ['feat:']);
 });
 
@@ -918,7 +918,7 @@ test('a shipped title that is only a prefix is never rendered as an empty chip',
 // It used to read the Piece testing box. That box shows a COVERAGE roster the
 // moment the tester is reachable -- piece names, no PR titles -- so once the
 // tester password landed on 2026-09-19 there were no prefixed titles left in it
-// to strip. The path did not go away: the PRs merged box renders the same
+// to strip, and since 2026-10-19 it lists no PRs at all. The path did not go away: the PRs merged box renders the same
 // `prStrip`, over seventeen conventional-commit titles rather than one.
 //
 // The NEWEST week that has such titles, not the newest week. CI runs this on
@@ -1114,8 +1114,8 @@ test('a clamped chip ellipsizes its name rather than clipping it mid-glyph', () 
 // selection and a screen reader whole.
 test('a chip keeps the full name in the markup, however long it is', () => {
   const title = 'feat(health): piece health board, needs-attention inbox, persisted runs';
-  const tile = tileOf(renderDom([snap('2026-W31', { testing: { status: 'ok', prsMerged: 1, commits: 4,
-    shipped: [{ number: 5, title, url: 'https://x/pull/5' }] } })]), 'Piece testing');
+  const tile = tileOf(renderDom([shippingWeek('2026-W31',
+    [{ number: 5, title, url: 'https://x/pull/5' }])]), 'PRs merged');
   // The prefix is dropped for display; every one of the remaining 57 characters
   // stays, and the CSS above is what clips them.
   assert.deepEqual(chipNames(tile), ['Piece health board, needs-attention inbox, persisted runs']);
@@ -1217,8 +1217,6 @@ test('the page keeps the whitespace budget that makes it fit a laptop screen', (
 
 const coveredWeek = (week = '2026-W31') => snap(week, {
   testing: { status: 'ok', prsMerged: 1, commits: 6,
-    shipped: [{ number: 5, title: 'feat(health): piece health board',
-                url: 'https://github.com/activepieces/pieces-tester/pull/5' }],
     catalogPieces: 720,
     roster: [
       { name: 'zendesk', folder: 'zendesk', displayName: 'Zendesk', logo: null, actions: 12, stage: 'covered' },
@@ -1255,21 +1253,52 @@ test('a hostile curated note is escaped on its way to the DOM', () => {
 });
 
 test('a shipped PR chip links to the PR when the archive recorded an https URL', () => {
-  const tile = tileOf(renderDom([testingWeek('2026-W31', [
-    { number: 5, title: 'feat(health): piece health board',
-      url: 'https://github.com/activepieces/pieces-tester/pull/5' },
-  ])]), 'Piece testing');
+  const tile = tileOf(renderDom([shippingWeek('2026-W31', [
+    { number: 5, title: 'feat(slack): send a DM',
+      url: 'https://github.com/activepieces/activepieces/pull/5' },
+  ])]), 'PRs merged');
   assert.match(tile,
-    /<a href="https:\/\/github\.com\/activepieces\/pieces-tester\/pull\/5" target="_blank" rel="noopener">/);
+    /<a href="https:\/\/github\.com\/activepieces\/activepieces\/pull\/5" target="_blank" rel="noopener">/);
 });
 
 test('a PR whose recorded url is not https renders a plain, unlinked chip', () => {
-  const tile = tileOf(renderDom([testingWeek('2026-W31', [
+  const tile = tileOf(renderDom([shippingWeek('2026-W31', [
     { number: 6, title: 'feat: alerts', url: 'javascript:alert(1)' },
-  ])]), 'Piece testing');
+  ])]), 'PRs merged');
   assert.doesNotMatch(tile, /<a /);
   assert.doesNotMatch(tile, /javascript:/);
   assert.deepEqual(chipNames(tile), ['Alerts']);
+});
+
+// ── piece testing: counts of a private repo ─────────────────────────────────
+// activepieces/pieces-tester went private on 2026-10-19 and this page is
+// public. Every week archived before then carries `testing.shipped` — numbers,
+// titles and URLs of PRs in that repo — so the check covers everything the
+// site serves: the page as a reader sees it, the views embedded in index.html
+// for every week in the picker, and summary.json.
+const TESTER_PRS = [
+  { number: 901, title: 'feat(cockpit): private roadmap item',
+    url: 'https://github.com/activepieces/pieces-tester/pull/901' },
+  { number: 902, title: 'fix: internal-only change',
+    url: 'https://github.com/ibrahim-abuznaid/piece-tester-web/pull/902' },
+];
+const TESTER_DETAIL = [/private roadmap item/i, /internal-only change/i, /pieces-tester/, /piece-tester-web/, /\/pull\/90[12]/];
+
+test('the site publishes counts of the private tester repo and none of its detail', () => {
+  const legacy = { status: 'ok', prsMerged: 2, commits: 9, shipped: TESTER_PRS };
+  const weeks = [snap('2026-W30', { testing: legacy }),
+    snap('2026-W31', { testing: { ...legacy, ...coveredWeek().testing, prsMerged: 2, commits: 9 } })];
+  const { html, outDir } = render(weeks);
+  const summary = readFileSync(join(outDir, 'summary.json'), 'utf8');
+  const unmeasured = tileOf(renderDom(weeks, '#2026-W30'), 'Piece testing');
+  const covered = tileOf(renderDom(weeks), 'Piece testing');
+  assert.match(unmeasured, /class="big">2</);
+  assert.match(unmeasured, /PRs shipped/);
+  assert.doesNotMatch(unmeasured, /class="strip"/);
+  assert.match(covered, /2 PRs merged · 9 commits this week/);
+  for (const published of [html, summary, unmeasured, covered]) {
+    for (const re of TESTER_DETAIL) assert.doesNotMatch(published, re);
+  }
 });
 
 // The ticket chips of the week the site is serving right now, out of the
