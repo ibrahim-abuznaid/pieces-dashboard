@@ -651,6 +651,32 @@
       "title": "pinecone evaluate_answer",
       "why": "Evaluate Answer (<code>POST /evaluation/metrics/alignment</code> on the assistant data host) returns \"Endpoint not supported for your plan. Upgrade to standard plan for access.\" on the Starter test account. Held out of PIE-724.",
       "fix": "Connect a Standard Pinecone project, then author + Tier-2 evaluate_answer (question, answer, ground truth). Generator: <code>~/p3/scripts/gen_rest.py</code>."
+    },
+    {
+      "id": "sender-sending-domain",
+      "cat": "vendorui",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "sender"
+      ],
+      "affected": 5,
+      "title": "sender sends / schedule / workflow start — 5 atomics",
+      "why": "Every send in the Sender test account (pieces@activepieces.com) is rejected because its only sender domain, activepieces.com, has a DMARC policy but no SPF/DKIM records configured in Sender (\"The domain activepieces.com has a DMARC policy, but SPF/DKIM records are not configured\"). Send Campaign (<code>POST /campaigns/{id}/send</code>) and Schedule Campaign (<code>POST /campaigns/{id}/schedule</code>) return 403 with the SPF/DKIM checklist, Send Transactional Campaign (<code>POST /message/{id}/send</code>) and Send Transactional Email (<code>POST /message/send</code>) return the same domain error, and Start Workflow (<code>POST /workflows/{id}/start</code>) needs an active workflow, which cannot be activated for the same reason. The existing human send_campaign has no capture for its outputSchema for the same reason. Held out of PIE-667: sender_send_campaign, sender_schedule_campaign, sender_send_transactional_campaign, sender_send_transactional_email, sender_start_workflow.",
+      "fix": "Add SPF + DKIM for a sending domain in Sender (Settings → Domains) on the test account, then restore the 5 actions from <code>~/p3/sender/held/</code> and Tier-2 them: create_campaign (HTML, unsubscribe link is appended) → send_campaign / schedule_campaign → cancel_scheduled_campaign; create_transactional_campaign → send_transactional_campaign; send_transactional_email; activate a workflow → start_workflow. Also capture the human send_campaign for its schema."
+    },
+    {
+      "id": "sender-pro-plan",
+      "cat": "plan",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "sender"
+      ],
+      "affected": 2,
+      "title": "sender campaign group performance / workflow ecommerce report — 2 atomics",
+      "why": "The Sender test account is on the free plan. Get Campaign Performance by Group (<code>GET /campaigns/{id}/groups</code>) returns \"Pro account plan required\" and Get Workflow Ecommerce Report (<code>GET /workflows/{id}/ecommerce-report</code>) returns 403 \"This feature is not available with your current plan.\" Held out of PIE-667: sender_get_campaign_group_performance, sender_get_workflow_ecommerce_report.",
+      "fix": "Connect a Sender Pro account (with a sent campaign and a workflow; ecommerce report also needs a connected store), restore the 2 actions from <code>~/p3/sender/held/</code> and Tier-2 them."
     }
   ]
 }
