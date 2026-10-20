@@ -677,6 +677,19 @@
       "title": "sender campaign group performance / workflow ecommerce report — 2 atomics",
       "why": "The Sender test account is on the free plan. Get Campaign Performance by Group (<code>GET /campaigns/{id}/groups</code>) returns \"Pro account plan required\" and Get Workflow Ecommerce Report (<code>GET /workflows/{id}/ecommerce-report</code>) returns 403 \"This feature is not available with your current plan.\" Held out of PIE-667: sender_get_campaign_group_performance, sender_get_workflow_ecommerce_report.",
       "fix": "Connect a Sender Pro account (with a sent campaign and a workflow; ecommerce report also needs a connected store), restore the 2 actions from <code>~/p3/sender/held/</code> and Tier-2 them."
+    },
+    {
+      "id": "sender-webhooks",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "sender"
+      ],
+      "affected": 7,
+      "title": "sender triggers — webhook delivery needs a paid plan (7 triggers)",
+      "why": "Sender account webhooks are a paid feature (every <code>/account/webhooks</code> endpoint is marked \"Paid plan required\"). On the free test account the webhook registers fine through the public URL and shows ACTIVE, but Sender never delivers: total_deliveries and total_failures both stay 0 after the subscriber/group/campaign events fire. PIE-667 ships output schemas for the 5 subscriber triggers (new_subscriber, updated_subscriber, new_unsubscriber, new_subscriber_in_group, new_unsubscriber_from_group) from Sender's documented webhook payload (a bare subscriber object) checked against a live Get Subscriber capture, not from a delivered event. new_group and new_campaign have no documented payload, so they ship without an output schema.",
+      "fix": "Connect a paid Sender account, expose the dev stack (ngrok + AP_FRONTEND_URL), and run the 7 trigger cases from <code>~/p3/sender/cases.json</code> (t_new_*, t_updated_subscriber). Re-check the 5 subscriber-trigger schemas against the captured payloads and add output schemas for new_group and new_campaign from theirs."
     }
   ]
 }
