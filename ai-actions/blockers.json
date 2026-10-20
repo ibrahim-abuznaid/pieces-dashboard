@@ -612,6 +612,45 @@
       "title": "runware generation / tool / media atomics — 16 atomics + 4 existing schemas",
       "why": "The Runware test account's balance is $0 and every paid task returns 400 <code>insufficientCredits</code> (checked with imageInference and mediaStorage upload), so only modelSearch and accountManagement ran live. Generate Image/Video/Audio/Text/3D, Get Task Result, Remove Background, Upscale, Caption, Vectorize, Enhance Prompt, Image Mask, ControlNet Preprocess, Upload/Delete Media and Get Task Details shipped Tier-1 only in PIE-665 (#16352), and the 4 existing actions still have no output schema.",
       "fix": "Top up the Runware test account (about $1; the run costs under $0.10), then run the 48-case file (<code>~/p3/runware/cases.json</code>, cheapest model per task) and wire schemas for the 20 from the captures."
+    },
+    {
+      "id": "pinecone-backups",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "pinecone"
+      ],
+      "affected": 14,
+      "title": "pinecone backups / restore jobs / backup schedules — 14 atomics",
+      "why": "The Pinecone test account is on the free Starter plan. Create Backup (<code>POST /indexes/{index_name}/backups</code>) and Create Backup Schedule (<code>POST /indexes/{index_name}/backup-schedules</code>) both return \"Your organization's plan does not include backups. Upgrade to Standard or Enterprise to enable this feature.\", so there is no backup, restore job or schedule to read, restore from, update or delete. The list endpoints run on Starter but only ever return empty lists. Held out of PIE-724: Create / List (per index and per project) / Get / Delete Backup, Create Index from Backup, List / Get Restore Jobs, and List / Create / Get / Update / Delete Backup Schedule + Schedule History.",
+      "fix": "Connect a Standard or Enterprise Pinecone project, then author + Tier-2 the 14 on a throwaway serverless index: create_backup → list_index_backups / list_project_backups → get_backup → create_index_from_backup → list_restore_jobs / get_restore_job → delete the restored index and the backup; create_backup_schedule → list / get / update / history → delete. The generators are in <code>~/p3/scripts/gen_backups.py</code>."
+    },
+    {
+      "id": "pinecone-collections",
+      "cat": "plan",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "pinecone"
+      ],
+      "affected": 4,
+      "title": "pinecone collections — 4 atomics",
+      "why": "Collections are snapshots of pod-based indexes. Create Collection (<code>POST /collections</code>) from a serverless index returns \"Cannot create collections from serverless indexes\", pod indexes need a paid plan, and the 2026-07 API can no longer create pod indexes at all (\"Pod-based indexes cannot be created on the 2026-07 API\"). With no collection, Get / Delete Collection have no target and List Collections only returns an empty list. Held out of PIE-724.",
+      "fix": "Needs a paid Pinecone project that already has a pod-based index: author + Tier-2 create_collection from it → list_collections → get_collection → delete_collection. Generator: <code>~/p3/scripts/gen_vec.py</code>."
+    },
+    {
+      "id": "pinecone-evaluate",
+      "cat": "plan",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "pinecone"
+      ],
+      "affected": 1,
+      "title": "pinecone evaluate_answer",
+      "why": "Evaluate Answer (<code>POST /evaluation/metrics/alignment</code> on the assistant data host) returns \"Endpoint not supported for your plan. Upgrade to standard plan for access.\" on the Starter test account. Held out of PIE-724.",
+      "fix": "Connect a Standard Pinecone project, then author + Tier-2 evaluate_answer (question, answer, ground truth). Generator: <code>~/p3/scripts/gen_rest.py</code>."
     }
   ]
 }
