@@ -755,6 +755,19 @@
       "title": "youform submission refill link — 1 atomic",
       "why": "403 'Only PRO users can use this feature. Please upgrade to proceed.' from the refill-link API on a free Youform account (confirmed on two calls, a real and an unknown submission id). Refill links via the API need Youform Pro.",
       "fix": "Test on a Youform Pro account, then add back <code>youform_set_submission_refill_link</code> (<code>POST /submissions/{id}/refill-link</code>; body: enable boolean)."
+    },
+    {
+      "id": "simplepdf-api-access",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "simplepdf"
+      ],
+      "affected": 10,
+      "title": "simplepdf REST API — 10 atomics",
+      "why": "SimplePDF's REST API (API keys) is only available on the paid Premium plan; there is no Premium account to test on, so none of the API-backed actions can run live.",
+      "fix": "Test on a SimplePDF Premium account (BYOS storage with read access for create prefill), then add <code>simplepdf_list_documents</code> (<code>GET /documents</code>), <code>simplepdf_get_document</code> (<code>GET /documents/{document_id}</code>), <code>simplepdf_update_document</code> (<code>PATCH /documents/{document_id}</code>), <code>simplepdf_list_document_fields</code> (<code>GET /documents/{document_id}/fields</code>), <code>simplepdf_create_prefill</code> / <code>simplepdf_list_prefills</code> (<code>POST|GET /documents/{document_id}/prefills</code>), <code>simplepdf_get_prefill</code> / <code>simplepdf_delete_prefill</code> (<code>GET|DELETE /documents/{document_id}/prefills/{prefill_id}</code>), <code>simplepdf_list_submissions</code> (<code>GET /documents/{document_id}/submissions</code>), <code>simplepdf_get_submission</code> (<code>GET /documents/{document_id}/submissions/{submission_id}</code>). Tracked in PIE-736."
     }
   ]
 }
