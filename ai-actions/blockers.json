@@ -690,6 +690,32 @@
       "title": "sender triggers — webhook delivery needs a paid plan (7 triggers)",
       "why": "Sender account webhooks are a paid feature (every <code>/account/webhooks</code> endpoint is marked \"Paid plan required\"). On the free test account the webhook registers fine through the public URL and shows ACTIVE, but Sender never delivers: total_deliveries and total_failures both stay 0 after the subscriber/group/campaign events fire. PIE-667 ships output schemas for the 5 subscriber triggers (new_subscriber, updated_subscriber, new_unsubscriber, new_subscriber_in_group, new_unsubscriber_from_group) from Sender's documented webhook payload (a bare subscriber object) checked against a live Get Subscriber capture, not from a delivered event. new_group and new_campaign have no documented payload, so they ship without an output schema.",
       "fix": "Connect a paid Sender account, expose the dev stack (ngrok + AP_FRONTEND_URL), and run the 7 trigger cases from <code>~/p3/sender/cases.json</code> (t_new_*, t_updated_subscriber). Re-check the 5 subscriber-trigger schemas against the captured payloads and add output schemas for new_group and new_campaign from theirs."
+    },
+    {
+      "id": "clockify-users-api",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "clockify"
+      ],
+      "affected": 2,
+      "title": "clockify adding workspace users — 2 atomics",
+      "why": "Clockify refuses to add users through the API on free and trial workspaces: 400 'Upgrade to paid plan to add users to workspace using Clockify API' (confirmed on two calls). Adding limited users returns 200 on the trial but creates no user (confirmed twice with a list after the add).",
+      "fix": "Test on a paid (not trial) Clockify workspace, then add back <code>clockify_add_user</code> (<code>POST /v1/workspaces/{workspaceId}/users</code>) and <code>clockify_add_limited_users</code> (<code>POST /v1/workspaces/{workspaceId}/limited-users</code>)."
+    },
+    {
+      "id": "clockify-audit-log",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "clockify"
+      ],
+      "affected": 1,
+      "title": "clockify audit log — 1 atomic",
+      "why": "401 'Wrong subscription plan' from the audit log API on a Pro trial workspace (confirmed on two calls). The audit log is a Clockify Enterprise feature.",
+      "fix": "Test on an Enterprise Clockify workspace, then add back <code>clockify_generate_audit_log</code> (<code>POST https://auditlog-api.api.clockify.me/v1/workspaces/{workspaceId}/audit-log</code>; body: start, end, actions, authors {authorIds, contains}, page, page-size ≤ 50)."
     }
   ]
 }
