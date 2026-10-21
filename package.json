@@ -11,5 +11,6 @@
     "test": "node --test",
     "build": "node output-schema/build.mjs && node ai-actions/build.mjs && node ui-improvements/build.mjs && node connection-identifier/build.mjs && node site/build.mjs && node weekly/build.mjs",
     "snapshot": "node weekly/snapshot.mjs"
-  }
+  },
+  "devDependencies": { "typescript": "5.9.3" }
 }
