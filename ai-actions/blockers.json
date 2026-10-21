@@ -716,6 +716,19 @@
       "title": "clockify audit log — 1 atomic",
       "why": "401 'Wrong subscription plan' from the audit log API on a Pro trial workspace (confirmed on two calls). The audit log is a Clockify Enterprise feature.",
       "fix": "Test on an Enterprise Clockify workspace, then add back <code>clockify_generate_audit_log</code> (<code>POST https://auditlog-api.api.clockify.me/v1/workspaces/{workspaceId}/audit-log</code>; body: start, end, actions, authors {authorIds, contains}, page, page-size ≤ 50)."
+    },
+    {
+      "id": "clockify-remove-user",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "clockify"
+      ],
+      "affected": 1,
+      "title": "clockify remove workspace user — 1 atomic",
+      "why": "400 'User is migrated to Cake. Use Cake to remove user from workspace' for both a registered member and a pending invite (confirmed on two users) on a workspace whose account is on CAKE.com. Clockify only lets the API remove users from workspaces not yet migrated to CAKE.com.",
+      "fix": "Test on an older Clockify workspace not migrated to CAKE.com (or wait for a CAKE.com user-removal API), then add back <code>clockify_remove_user</code> (<code>DELETE /v1/workspaces/{workspaceId}/users/{userId}</code>)."
     }
   ]
 }
