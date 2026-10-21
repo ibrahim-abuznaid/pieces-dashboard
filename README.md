@@ -153,6 +153,46 @@ a **stats endpoint** read the same way (the coverage endpoint already reports pe
 is a deliberate later step, not a data gap). Do not read that box as "pieces passing" — see
 `weekly/collect/testing.mjs`.
 
+## AI actions — quality & rollout (counts only)
+
+The AI-actions page's **Quality & rollout** section answers "is it going as planned" with four of the
+methodology's KPIs (`pieces-team/ai-actions-eval/METHODOLOGY.md` §4): **K1** pieces gained per week,
+merged only, against the 40/week target (week-over-week `aiActions.merged` in the weekly archive; approved
+on its own line, because the weekly targets count approved and open PRs by design); **K3** on npm at main's
+version, served on Cloud, merge → npm lag; **K4** the share of AI actions passing every P1 check; **K9**
+actions demoted `both` → `human` with no breaking-changes entry.
+
+`scripts/fetch-ai-audit.mjs` (last step of `npm run fetch`) clones upstream main sparse and shallow, parses
+every `createAction` with the TypeScript compiler (`lib/ai-audit.mjs`, pinned `typescript` 5.9.3; the script
+runs `npm ci` itself if `node_modules` is missing or stale) and runs the council's checks: P1 = S1 optional
+Checkbox on an AI update action (behaviour flags such as `clear_*` excluded), S2 undeclared demotion, S3/S4
+floor outside 0.86.4…latest release, S6 unregistered, S7 duplicate name; P2 = S1b optional Array/dynamic
+props on an update, S5 the same intent twice, S8 no `outputSchema`, S9 no `classification`. P2s carry no
+target. It then runs `scripts/fetch-ai-rollout.mjs` for the same commit against npm and
+`cloud.activepieces.com/api/v1/pieces/<name>?audience=all&cb=<ts>` — the default audience is human and hides
+every AI action, and Cloudflare caches. No credentials anywhere.
+
+**Counts only, by rule.** This repo is public and a finding names an agent action that does damage, so
+`data/ai-audit.json` and `data/ai-rollout.json` hold aggregate numbers plus the commit and date, and
+`test/ai-audit-wiring.test.mjs` fails on any key or string that could be a name. The per-piece findings
+(file:line and a one-line why) exist only with `--private <dir>`, which `refresh-weekly.sh` passes once per ISO
+week to `pieces-team/ai-actions-eval/audit/` (override with `AI_AUDIT_PRIVATE_DIR`, `""` turns it off). A
+private run writes nothing inside the repo and refuses a dir that is; a failure there is a WARN line, never
+the week.
+
+S2 diffs against `data/ai-audit-baseline.json`: every action's audience at `9ed198f`, the last main commit
+before the first AI-actions PR (#13952, merged 2026-07-22). Rebuild it only to move the baseline
+(`scripts/build-ai-audit-baseline.mjs`). The mention test is loose, so S2 is a floor; S1/S1b are a floor too,
+because props built by helpers imported from outside the piece cannot be typed.
+
+Regression oracle: the council's throwaway scripts at main `6d93dbc` (2026-10-20). This port reproduces every
+count they measured there — 132 pieces / 4,005 AI actions, S1 58/27 total and 21/13 on saved state, S3 13/4,
+S5 11/2, S8 68/13 (39 deletes exempt), S9 25/3, S6/S7 0, and against their 09-11 baseline S2 433/81 demoted,
+72 pieces undeclared. K4 reads 99.2% here against their 98.9% because they counted S5 as a P1.
+
+Not done yet: the weekly archive does not record any of this (its format is untouched), so the page shows
+the current reading only and K1 is the one number with history.
+
 ## Claiming work (the 3-stage model)
 
 Stages are **derived, never hand-edited**: assignee only → `assigned` · open PR → `PR open` · merged PR → `merged`.
@@ -161,7 +201,7 @@ To claim a piece or record a PR you edit ONE json file and push — see [CONTRIB
 ## Local dev
 
 ```bash
-npm run fetch    # needs curl, jq, gh (authed); ~3 min
+npm run fetch    # needs curl, jq, gh (authed); ~4 min
 npm test
 npm run build    # writes dist/ — open dist/index.html
 ```
@@ -170,7 +210,7 @@ npm run build    # writes dist/ — open dist/index.html
 
 - `shared/theme.css` — one palette/light+dark theme, inlined into every page at build
 - `lib/` — render + stage derivation (unit-tested)
-- `scripts/` — data fetchers (also run in CI)
+- `scripts/` — data fetchers (also run in CI); `fetch-ai-audit.mjs` + `fetch-ai-rollout.mjs` write the AI-actions quality counts
 - `output-schema/`, `ai-actions/`, `site/` — one build.mjs + template.html each; `ui-improvements/` and `connection-identifier/` are build.mjs + a claims file (the weekly page is their only reader)
 - Manual state lives ONLY in `output-schema/overrides.json`, `ai-actions/overrides.json`, the curated `ai-actions/{pieces,blockers}.json`, `ui-improvements/pieces.json` and `connection-identifier/pieces.json`
 - AI-actions **merged** is read off upstream main, not the curated file: `scripts/fetch-repo-ai.sh` greps a sparse
