@@ -729,6 +729,19 @@
       "title": "clockify remove workspace user — 1 atomic",
       "why": "400 'User is migrated to Cake. Use Cake to remove user from workspace' for both a registered member and a pending invite (confirmed on two users) on a workspace whose account is on CAKE.com. Clockify only lets the API remove users from workspaces not yet migrated to CAKE.com.",
       "fix": "Test on an older Clockify workspace not migrated to CAKE.com (or wait for a CAKE.com user-removal API), then add back <code>clockify_remove_user</code> (<code>DELETE /v1/workspaces/{workspaceId}/users/{userId}</code>)."
+    },
+    {
+      "id": "clockify-change-feed",
+      "cat": "vendorui",
+      "sev": "low",
+      "done": false,
+      "pieces": [
+        "clockify"
+      ],
+      "affected": 2,
+      "title": "clockify updated / deleted change feeds — 2 atomics",
+      "why": "Clockify's experimental change-feed endpoints for updated and deleted records returned an empty list on every call, including right after updating and deleting a time entry, tag and project, with and without a date window. The created-records feed works on the same workspace, so the code path is sound; there is no capture to build an output schema from.",
+      "fix": "Retry on another workspace (or after Clockify promotes the endpoints out of experimental): update and delete a time entry, then call the feeds. Add back <code>clockify_list_updated_entities</code> (<code>GET /v1/workspaces/{workspaceId}/entities/updated</code>) and <code>clockify_list_deleted_entities</code> (<code>GET /v1/workspaces/{workspaceId}/entities/deleted</code>), both with <code>type</code>, <code>start</code>, <code>end</code>, <code>page</code>, <code>limit</code>."
     }
   ]
 }
