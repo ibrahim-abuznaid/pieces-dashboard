@@ -6,6 +6,13 @@
 <title>AI Actions — Pieces Team</title>
 <style>
 /*__THEME__*/
+#quality h3 { font-size: 13px; font-weight: 600; margin: 18px 0 6px; }
+.qgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 8px 28px; }
+.gap { display: inline-block; color: var(--text-muted); background: var(--s-todo); border-radius: 6px; padding: 0 8px; font-size: 13px; font-weight: 500; line-height: 1.6; }
+.tile .value .gap { font-size: 15px; vertical-align: middle; }
+.tile .foot b.warn { color: var(--sev-high); font-weight: 600; }
+.sevtag.P1 { color: var(--sev-high); border: 1px solid var(--sev-high); }
+.sevtag.P2 { color: var(--text-muted); border: 1px solid var(--text-muted); }
 </style>
 </head>
 <body>
@@ -26,6 +33,24 @@
     <p class="hint">held (authored, no PR — blocked or parked) → assigned → PR open → merged. Derived from GitHub + overrides.json; nobody edits stages by hand.</p>
     <div class="funnel" id="funnel"></div>
     <div class="legend" id="funnelLegend"></div>
+  </section>
+
+  <section class="card" id="quality">
+    <h2>Quality &amp; rollout</h2>
+    <p class="hint">Is the rollout going as planned, is what merged actually live, and does it pass the checks with a real failure behind them. Counts only: the per-piece findings stay in a private report. Merged, approved and served are separate numbers, never added; <span class="gap">not measured</span> is a gap, not a zero.</p>
+    <div class="tiles" id="qtiles"></div>
+    <div class="qgrid">
+      <div>
+        <h3>Pieces gained per week <span class="muted">(merged only)</span></h3>
+        <table id="paceTable"></table>
+      </div>
+      <div>
+        <h3>Static checks <span class="muted">(AI actions / pieces)</span></h3>
+        <table id="checksTable"></table>
+        <p class="hint" id="checksFoot"></p>
+      </div>
+    </div>
+    <p class="hint" id="qualitySource"></p>
   </section>
 
   <div class="tabs" role="tablist">
@@ -50,7 +75,7 @@
   </section>
 
   <footer>
-    Sources: <code>audience:'ai'</code> actions read off upstream main (merged, every piece), open PR diffs (in review), curated <code>ai-actions/pieces.json</code> + <code>blockers.json</code> (notes, Tier-2, held), PR states via GitHub API (auto-refreshed daily). Claim work per <code>CONTRIBUTING.md</code>. Related Linear: PIE-364 · PIE-365 · PIE-366 (outputSchema on these atomics — separate track).
+    Sources: <code>audience:'ai'</code> actions read off upstream main (merged, every piece), a static audit of every AI action on main (quality, counts only), open PR diffs (in review), curated <code>ai-actions/pieces.json</code> + <code>blockers.json</code> (notes, Tier-2, held), PR states via GitHub API (auto-refreshed daily). Claim work per <code>CONTRIBUTING.md</code>. Related Linear: PIE-364 · PIE-365 · PIE-366 (outputSchema on these atomics — separate track).
   </footer>
 </div>
 <div id="tip" role="tooltip"></div>
@@ -101,6 +126,60 @@ document.getElementById('tiles').innerHTML = [
   { label: 'Tier-2 live-verified', value: `${S.t2v} <small>/ ${S.t2t}</small>`, foot: `${t2pct}% verified against live vendors (our rollout only)` },
   { label: 'Open blockers', value: `${S.blockersOpen}`, foot: `${S.blockersDone} resolved` },
 ].map((t) => `<div class="tile"><div class="label">${t.label}</div><div class="value">${t.value}</div><div class="foot">${t.foot}</div></div>`).join('');
+
+// ------- quality & rollout (counts only; null renders as a grey gap, never 0)
+{
+  const Q = DATA.quality ?? {};
+  const GAP = '<span class="gap">not measured</span>';
+  const has = (v) => v !== null && v !== undefined;
+  const num = (v, suffix = '') => (has(v) ? `${v}${suffix}` : GAP);
+  const sha = (s) => (s ? `<code>${esc(String(s).slice(0, 7))}</code>` : GAP);
+  const day = (s) => (s ? esc(String(s).slice(0, 10)) : '');
+  const k1 = Q.k1, k3 = Q.k3, k4 = Q.k4, k9 = Q.k9;
+  const span = k1?.weeks?.length ? `${esc(k1.weeks[0].week.slice(5))}–${esc(k1.weeks.at(-1).week.slice(5))}` : '';
+  const lag = k3?.npm?.lag;
+  document.getElementById('qtiles').innerHTML = [
+    { label: 'K1 · pace vs plan', value: has(k1?.perWeek) ? `${k1.perWeek} <small>/ wk of ${k1.target}</small>` : GAP,
+      foot: has(k1?.pacePct) ? `${k1.pacePct}% of target, merged only, ${span}${k1.belowHalfStreak >= 2 ? ` · <b class="warn">under half for ${k1.belowHalfStreak} weeks: re-plan</b>` : ''}` : 'pieces gaining AI actions on main per week' },
+    { label: 'K3 · on npm at main', value: has(k3?.npm?.pct) ? `${k3.npm.pct}% <small>${k3.npm.atMain}/${k3.npm.measured}</small>` : GAP,
+      foot: lag ? `merge → npm ${lag.median} min median, p90 ${lag.p90}, max ${lag.max} · ${k3.npm.collisions} version collisions` : 'merge → npm lag' },
+    { label: 'K3 · served on Cloud', value: has(k3?.cloud?.pct) ? `${k3.cloud.pct}% <small>${k3.cloud.served}/${k3.cloud.measured}</small>` : GAP,
+      foot: k3?.cloud ? `at main's version · with every AI action ${k3.cloud.withAiPct}% · ${has(k3.stuck24h) ? (k3.stuck24h ? `<b class="warn">${k3.stuck24h} stuck &gt; 24 h</b>` : '0 stuck &gt; 24 h') : 'stuck &gt; 24 h not measured'}` : 'Cloud serves main with its AI actions' },
+    { label: 'K4 · P1 pass rate', value: has(k4?.passPct) ? `${k4.passPct}%` : GAP,
+      foot: k4 ? `${k4.failing} of ${k4.actions} AI actions fail a P1 · ${k4.piecesClean}/${k4.pieces} pieces clean${has(k4.piecesCleanIncludingS2) ? ` (${k4.piecesCleanIncludingS2} with no undeclared demotion)` : ''}` : 'AI actions passing every P1 check' },
+    { label: 'K9 · undeclared demotions', value: k9 ? `${k9.actions} <small>actions · ${k9.pieces} pieces</small>` : GAP,
+      foot: k9 ? `both → human since ${day(k9.baselineAt)} (${sha(k9.baselineCommit)}) with no breaking-changes entry${k9.demoted ? `, of ${k9.demoted.actions} demoted in ${k9.demoted.pieces}` : ''}` : 'demoted with no breaking-changes entry' },
+  ].map((t) => `<div class="tile"><div class="label">${t.label}</div><div class="value">${t.value}</div><div class="foot">${t.foot}</div></div>`).join('');
+
+  const weeks = k1?.weeks ?? [];
+  document.getElementById('paceTable').innerHTML = weeks.length || k1?.thisWeek
+    ? '<thead><tr><th>Week</th><th class="num">Gained (merged)</th><th class="num">Target</th><th class="num">Approved, not merged</th></tr></thead><tbody>'
+      + weeks.map((w) => `<tr><td>${esc(w.week)}</td><td class="num">${num(w.gained)}</td><td class="num">${num(w.target)}</td><td class="num">${num(w.approved)}</td></tr>`).join('')
+      + (k1?.thisWeek ? `<tr class="muted"><td>${esc(k1.thisWeek.week)} so far</td><td class="num">${num(k1.thisWeek.soFar)}</td><td class="num">${num(k1.target)}</td><td class="num">${num(k1.thisWeek.approved)}</td></tr>` : '')
+      + '</tbody>'
+    : `<tbody><tr><td>${GAP}</td></tr></tbody>`;
+
+  const checks = Q.checks ?? [];
+  document.getElementById('checksTable').innerHTML = checks.length
+    ? '<thead><tr><th>Check</th><th></th><th class="num">Actions</th><th class="num">Pieces</th></tr></thead><tbody>'
+      + checks.map((c) => `<tr><td><b>${esc(c.id)}</b> <span class="muted">${esc(Q.titles?.[c.id] ?? '')}</span></td><td><span class="sevtag ${esc(c.severity)}">${esc(c.severity)}</span></td><td class="num">${num(c.actions)}</td><td class="num">${num(c.pieces)}</td></tr>`).join('')
+      + '</tbody>'
+    : `<tbody><tr><td>${GAP}</td></tr></tbody>`;
+  const F = Q.floor, soft = Q.soft;
+  document.getElementById('checksFoot').innerHTML = F
+    ? [`S1 and S1b are a floor: ${F.unresolvedProps} AI actions have a prop the audit could not type.`,
+      F.s1All ? `S1 counts the ${F.s1All.actions} optional Checkboxes on updates minus the behaviour flags (clear_*, notify*, skip_*…).` : '',
+      F.s8Exempt ? `S8 exempts ${F.s8Exempt.actions} deletes.` : '',
+      'P2 checks carry no target.',
+      soft ? `AI descriptions: median ${soft.descWords.median} words (p10 ${soft.descWords.p10}, p90 ${soft.descWords.p90}); props per AI action: median ${soft.props.median}, p90 ${soft.props.p90}, max ${soft.props.max}.` : '',
+    ].filter(Boolean).join(' ')
+    : '';
+  document.getElementById('qualitySource').innerHTML = [
+    `Static audit: upstream main ${sha(Q.audit?.commit)}${Q.audit ? ` (${day(Q.audit.committedAt)}), fetched ${day(Q.audit.fetched)}, latest release ${Q.audit.latestRelease ? esc(Q.audit.latestRelease) : GAP}` : ''}.`,
+    `Rollout: ${Q.rollout?.fetched ? `main ${sha(Q.rollout.commit)}, read ${day(Q.rollout.fetched)} from npm and the Cloud API (<code>?audience=all</code>)` : GAP}.`,
+    `Pace: the weekly archive's merged count, week over week${k1 ? ` from ${esc(k1.from)}` : ''}.`,
+  ].join(' ');
+}
 
 // ------- stage funnel (piece counts per stage)
 const fn = document.getElementById('funnel');
