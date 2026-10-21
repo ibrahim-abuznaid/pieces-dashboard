@@ -5,9 +5,10 @@
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
-    "fetch": "bash scripts/fetch-cloud.sh && bash scripts/fetch-repo-ai.sh && node scripts/fetch-pr-states.mjs",
+    "fetch": "bash scripts/fetch-cloud.sh && bash scripts/fetch-repo-ai.sh && node scripts/fetch-pr-states.mjs && node scripts/fetch-ai-audit.mjs",
     "fetch:ai": "bash scripts/fetch-repo-ai.sh",
     "fetch:prs": "node scripts/fetch-pr-states.mjs",
+    "fetch:audit": "node scripts/fetch-ai-audit.mjs",
     "test": "node --test",
     "build": "node output-schema/build.mjs && node ai-actions/build.mjs && node ui-improvements/build.mjs && node connection-identifier/build.mjs && node site/build.mjs && node weekly/build.mjs",
     "snapshot": "node weekly/snapshot.mjs"

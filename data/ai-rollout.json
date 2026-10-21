@@ -1,0 +1,31 @@
+{
+  "commit": "930c8cc54cef583b3825a3ef2e4b08175a522e37",
+  "fetched": "2026-10-21",
+  "measured": true,
+  "pieces": 149,
+  "npm": {
+    "measured": 149,
+    "atMain": 149,
+    "atMainPct": 100,
+    "behind": 0,
+    "lagMinutes": {
+      "n": 149,
+      "median": 6,
+      "p90": 17,
+      "max": 58
+    },
+    "collisions": 0
+  },
+  "cloud": {
+    "measured": 149,
+    "registered": 149,
+    "served": 149,
+    "servedPct": 100,
+    "servedWithAi": 149,
+    "servedWithAiPct": 100
+  },
+  "stuck24h": {
+    "measured": 149,
+    "count": 0
+  }
+}

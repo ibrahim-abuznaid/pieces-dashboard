@@ -28,7 +28,8 @@ jobs:
       - uses: actions/configure-pages@v4   # creates/enables the Pages site on first run
         with:
           enablement: true
-      - run: npm run fetch     # cloud catalog + coverage + repo tree + PR states (~3 min)
+      - run: npm ci            # the pinned typescript the AI-actions audit parses pieces with
+      - run: npm run fetch     # cloud catalog + coverage + repo tree + PR states + AI-actions audit (~4 min)
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3

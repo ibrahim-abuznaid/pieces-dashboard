@@ -1,0 +1,113 @@
+{
+  "commit": "930c8cc54cef583b3825a3ef2e4b08175a522e37",
+  "committedAt": "2026-10-21T19:20:21+05:30",
+  "fetched": "2026-10-21",
+  "baseline": {
+    "commit": "9ed198fb27f53755acd0df6711b84ac547ee066e",
+    "committedAt": "2026-07-21T22:41:18+03:00"
+  },
+  "latestRelease": "0.92.3",
+  "canvasFloor": "0.86.4",
+  "catalog": {
+    "pieces": 741,
+    "actions": 10487,
+    "audience": {
+      "both": 5038,
+      "ai": 4555,
+      "human": 872,
+      "unset": 22,
+      "expr": 0
+    },
+    "factoryCalls": 0,
+    "toolingErrors": 0
+  },
+  "ai": {
+    "pieces": 149,
+    "actions": 4555,
+    "grepLines": 4555,
+    "unresolvedProps": 338,
+    "unregisteredUnchecked": 0
+  },
+  "checks": {
+    "S1": {
+      "severity": "P1",
+      "actions": 22,
+      "pieces": 14,
+      "allOptionalCheckbox": {
+        "actions": 64,
+        "pieces": 31
+      }
+    },
+    "S1b": {
+      "severity": "P2",
+      "actions": 73,
+      "pieces": 41
+    },
+    "S2": {
+      "severity": "P1",
+      "actions": 573,
+      "pieces": 90,
+      "demoted": {
+        "actions": 719,
+        "pieces": 113
+      }
+    },
+    "S3": {
+      "severity": "P1",
+      "actions": 25,
+      "pieces": 6
+    },
+    "S4": {
+      "severity": "P1",
+      "actions": 0,
+      "pieces": 0
+    },
+    "S5": {
+      "severity": "P2",
+      "actions": 11,
+      "pieces": 2
+    },
+    "S6": {
+      "severity": "P1",
+      "actions": 0,
+      "pieces": 0
+    },
+    "S7": {
+      "severity": "P1",
+      "actions": 0,
+      "pieces": 0
+    },
+    "S8": {
+      "severity": "P2",
+      "actions": 68,
+      "pieces": 13,
+      "exempt": {
+        "actions": 39,
+        "pieces": 14
+      }
+    },
+    "S9": {
+      "severity": "P2",
+      "actions": 25,
+      "pieces": 3
+    }
+  },
+  "k4": {
+    "p1Actions": 47,
+    "p1PassPct": 99,
+    "piecesCleanOfP1": 129,
+    "piecesCleanIncludingS2": 51
+  },
+  "soft": {
+    "descWords": {
+      "p10": 20,
+      "median": 41,
+      "p90": 68
+    },
+    "props": {
+      "median": 2,
+      "p90": 7,
+      "max": 30
+    }
+  }
+}
