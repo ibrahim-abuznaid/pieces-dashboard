@@ -742,6 +742,19 @@
       "title": "clockify updated / deleted change feeds — 2 atomics",
       "why": "Clockify's experimental change-feed endpoints for updated and deleted records returned an empty list on every call, including right after updating and deleting a time entry, tag and project, with and without a date window. The created-records feed works on the same workspace, so the code path is sound; there is no capture to build an output schema from.",
       "fix": "Retry on another workspace (or after Clockify promotes the endpoints out of experimental): update and delete a time entry, then call the feeds. Add back <code>clockify_list_updated_entities</code> (<code>GET /v1/workspaces/{workspaceId}/entities/updated</code>) and <code>clockify_list_deleted_entities</code> (<code>GET /v1/workspaces/{workspaceId}/entities/deleted</code>), both with <code>type</code>, <code>start</code>, <code>end</code>, <code>page</code>, <code>limit</code>."
+    },
+    {
+      "id": "youform-refill-link",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "youform"
+      ],
+      "affected": 1,
+      "title": "youform submission refill link — 1 atomic",
+      "why": "403 'Only PRO users can use this feature. Please upgrade to proceed.' from the refill-link API on a free Youform account (confirmed on two calls, a real and an unknown submission id). Refill links via the API need Youform Pro.",
+      "fix": "Test on a Youform Pro account, then add back <code>youform_set_submission_refill_link</code> (<code>POST /submissions/{id}/refill-link</code>; body: enable boolean)."
     }
   ]
 }
