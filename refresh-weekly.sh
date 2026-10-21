@@ -127,6 +127,37 @@ if [ "$BRANCH" != "main" ]; then
   exit 1
 fi
 
+# The PRIVATE AI-actions report: the static audit's findings by piece, with
+# file:line, and the rollout pieces that are stuck. The public page carries the
+# counts; the names live only here, because a public list of agent actions
+# that silently rewrite saved settings is not something this repo can publish.
+#
+# Once per ISO week (the stamp is written only on success, so a failed run is
+# retried at the next 09/13/17/21h), and BEFORE the snapshot guard below, which
+# exits early on most runs. It writes only to AI_AUDIT_PRIVATE_DIR, outside the
+# repo -- fetch-ai-audit.mjs refuses a --private dir inside it -- so nothing it
+# makes can be committed or pushed. Set AI_AUDIT_PRIVATE_DIR="" to turn it off.
+#
+# It must never cost the week. It runs as its own process, under a timeout, in
+# a function called from `||`: errexit is off in there and the ERR trap does not
+# fire, so every step is checked by hand and a failure is a WARN line, never an
+# exit. ~2 min when it runs; a stamp check when it does not.
+AI_AUDIT_PRIVATE_DIR="${AI_AUDIT_PRIVATE_DIR-/home/ibrahim/AP_work/Activepieces_v/pieces-team/ai-actions-eval/audit}"
+ai_audit_private() {
+  [ -n "$AI_AUDIT_PRIVATE_DIR" ] || return 0
+  local week stamp
+  week="$(node -e 'import("./lib/isoweek.mjs").then(m=>console.log(m.isoWeekId(process.argv[1])))' "$TODAY")" || return 1
+  stamp="$AI_AUDIT_PRIVATE_DIR/.done-week"
+  [ "$(cat "$stamp" 2>/dev/null)" = "$week" ] && return 0
+  log "ai-audit: private weekly report for $week → $AI_AUDIT_PRIVATE_DIR"
+  if ! timeout 1200 node scripts/fetch-ai-audit.mjs --private "$AI_AUDIT_PRIVATE_DIR" </dev/null; then
+    return 1
+  fi
+  printf '%s\n' "$week" > "$stamp" || return 1
+  log "ai-audit: private report for $week written"
+}
+ai_audit_private || log "WARN ai-audit private report failed — the snapshot job carries on; the next run retries"
+
 # Cheapest check first. Re-running the job in the same week is a normal
 # outcome, not a failure: without this guard a re-run burns the internal
 # refresh plus a ~3-minute fetch before discovering it has nothing to do,
