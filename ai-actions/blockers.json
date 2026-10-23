@@ -768,6 +768,19 @@
       "title": "simplepdf REST API — 10 atomics",
       "why": "SimplePDF's REST API (API keys) is only available on the paid Premium plan; there is no Premium account to test on, so none of the API-backed actions can run live.",
       "fix": "Test on a SimplePDF Premium account (BYOS storage with read access for create prefill), then add <code>simplepdf_list_documents</code> (<code>GET /documents</code>), <code>simplepdf_get_document</code> (<code>GET /documents/{document_id}</code>), <code>simplepdf_update_document</code> (<code>PATCH /documents/{document_id}</code>), <code>simplepdf_list_document_fields</code> (<code>GET /documents/{document_id}/fields</code>), <code>simplepdf_create_prefill</code> / <code>simplepdf_list_prefills</code> (<code>POST|GET /documents/{document_id}/prefills</code>), <code>simplepdf_get_prefill</code> / <code>simplepdf_delete_prefill</code> (<code>GET|DELETE /documents/{document_id}/prefills/{prefill_id}</code>), <code>simplepdf_list_submissions</code> (<code>GET /documents/{document_id}/submissions</code>), <code>simplepdf_get_submission</code> (<code>GET /documents/{document_id}/submissions/{submission_id}</code>). Tracked in PIE-736."
+    },
+    {
+      "id": "agentx-api-access",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "agentx"
+      ],
+      "affected": 12,
+      "title": "agentx API — 12 atomics",
+      "why": "AgentX API access needs a paid AgentX plan; there is no paid account to test on, so none of the API-backed actions or triggers can run live and no output schemas can be captured.",
+      "fix": "Test on a paid AgentX account, run the live cases for <code>agentx_list_agents</code> (<code>GET /api/v1/access/agents</code>), <code>agentx_list_conversations</code> (<code>GET /api/v1/access/agents/{id}/conversations</code>), <code>agentx_get_conversation</code> (<code>GET /api/v1/access/agents/{id}/conversations/{cid}</code>), <code>agentx_create_conversation</code> (<code>POST /api/v1/access/agents/{id}/conversations/new</code>), <code>agentx_send_message</code> (<code>POST /api/v1/access/conversations/{id}/message</code>), <code>agentx_send_message_with_attachment</code> (<code>POST /api/v1/access/conversations/{id}/attachment</code>), <code>agentx_add_conversation_context</code> (<code>PUT /api/v1/access/conversations/{id}/update-context</code>), <code>agentx_reset_conversation_context</code> (<code>DELETE /api/v1/access/conversations/{id}</code>), <code>agentx_get_message_trace</code> (<code>GET /api/v1/access/messages/{id}/trace</code>), <code>agentx_get_trace</code> (<code>GET /api/v1/access/traces/{id}</code>), <code>agentx_get_profile</code> (<code>GET /api/v1/access/getProfile</code>), <code>agentx_text_to_speech</code> (<code>POST /api/v1/voiceApi/tts/synthesize</code>), plus the 5 existing actions and 2 triggers, then wire output schemas and mark the draft PR ready. Tracked in PIE-774."
     }
   ]
 }
