@@ -88,6 +88,47 @@ test('the outputSchema delta follows the same derived merged metric', () => {
   assert.equal(tile.delta, 2);                  // 13 merged last week → 15
 });
 
+// ── what the week before did ───────────────────────────────────────────────
+// The pill reads "this week · prev week", so both halves have to be the same
+// kind of number. A running total did its week's work as a CHANGE, so its prior
+// is the previous week's change; a weekly count did it as the count itself, so
+// its prior is the previous week's count. A difference of two weekly counts
+// ("+29 vs prior week") was what the page used to show, and it read as 29 done.
+const threeWeeks = { weeks: [
+  snap('2026-W29', { outputSchema: { status: 'ok', live: 4, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 } }),
+  ...archive.weeks,
+] };
+
+test('the four rollouts are running totals and the people counts are not', () =>
+  assert.deepEqual(buildView(archive).tiles.filter((t) => t.running).map((t) => t.key),
+    ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier']));
+
+test('a running total carries the previous week\'s change as its prior', () => {
+  const tile = tileOf(buildView(threeWeeks), 'outputSchema');
+  assert.equal(tile.delta, 2);                  // 13 → 15 this week
+  assert.equal(tile.prior, 3);                  // 10 → 13 the week before
+});
+
+test('a running total has no prior without the week before the previous one', () =>
+  assert.equal(tileOf(buildView(archive), 'outputSchema').prior, null));
+
+test('a weekly count carries the previous week\'s count as its prior', () => {
+  const a = { weeks: [snap('2026-W30', { shipping: { ...snap('x').shipping, prsMerged: 12 } }), snap('2026-W31')] };
+  assert.equal(tileOf(buildView(a), 'prsMerged').prior, 12);
+});
+
+test('a weekly count has no prior across a hole in the archive', () => {
+  const a = { weeks: [snap('2026-W29'), snap('2026-W31')] };
+  assert.equal(tileOf(buildView(a), 'prsMerged').prior, null);
+});
+
+test('piece testing is a running total only on a week that measured coverage', () => {
+  const covered = { roster: [{ name: 'slack', folder: 'slack', actions: 2, stage: 'covered' }] };
+  const measured = { weeks: [snap('2026-W31', { testing: { ...snap('x').testing, ...covered } })] };
+  assert.equal(tileOf(buildView(archive), 'testing').running, false);
+  assert.equal(tileOf(buildView(measured), 'testing').running, true);
+});
+
 // The delta pill is now the ONLY comparison a tile carries. The per-tile trend
 // series went with the sparkline it fed: read by index over the archive, it drew
 // weeks that were never recorded as if they were adjacent, and it was the tallest
@@ -214,7 +255,7 @@ test('only the tiles that count people carry a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'inReview', 'key', 'note', 'perPerson', 'reason', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
+      ['delta', 'inReview', 'key', 'note', 'perPerson', 'prior', 'reason', 'running', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
   }
 });
 
@@ -224,6 +265,7 @@ test('a no-data workstream produces a no-data tile, not a zero', () => {
   assert.equal(tile.status, 'no-data');
   assert.equal(tile.value, null);
   assert.equal(tile.delta, null);
+  assert.equal(tile.prior, null);
   assert.equal(tile.perPerson, '');
   assert.equal(tile.reason, 'not measured this week');
 });

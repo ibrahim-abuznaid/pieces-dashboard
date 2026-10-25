@@ -17,6 +17,7 @@
 // A tile's `strip` is the opposite kind of field: OPTIONAL detail that exists
 // only when a snapshot recorded a roster, so older snapshots stay renderable.
 import { pick, deltaFor } from './deltas.mjs';
+import { previousWeekId } from '../../lib/isoweek.mjs';
 import { landedRows } from './landed.mjs';
 import { targetsFor, checkedByPerson } from './targets.mjs';
 
@@ -292,6 +293,14 @@ function coveredStrip(ws) {
 // is a piece it has RUN: nothing waits on a reviewer for that number to move. It
 // reports null rather than an empty queue nobody is measuring — a 0 would claim
 // the queue was looked at and found empty.
+//
+// `running` marks a RUNNING TOTAL: a count that only grows as work lands (the
+// rollouts, and testing coverage on a week that measured it), as against a
+// WEEKLY count that starts from zero every week (PRs, tickets, reviews). The
+// pill says how much got done this week and the week before, and the two kinds
+// say it differently: a running total's work is its change, a weekly count's
+// work is the count itself. Subtracting two weekly counts ("+29 vs prior week"
+// beside 66 PRs merged) read as 29 PRs done, which is why the flag exists.
 const TILES = [
   // ── what the team did with the week ───────────────────────────────────────
   // These two lead, and that is the point of adding them. The page opened on
@@ -346,6 +355,7 @@ const TILES = [
   // survives anywhere still cannot reach the page.
   { key: 'testing', title: 'Piece testing',
     pathFor: (ws) => (coveredRows(ws) ? coveredCount : 'testing.prsMerged'),
+    running: (ws) => Boolean(coveredRows(ws)),
     unit: (ws) => (coveredRows(ws)
       ? (typeof ws.catalogPieces === 'number'
         ? `of ${ws.catalogPieces} pieces covered`
@@ -367,7 +377,7 @@ const TILES = [
     // `prOpen`, never `review` — the two are unrelated and one of them is a
     // trap. Read the note above before touching this line.
     review: 'outputSchema.prOpen',
-    strip: pieceStrip, done: ['live', 'merged-not-live'] },
+    strip: pieceStrip, done: ['live', 'merged-not-live'], running: true },
   // `totalPieces` here is only the pieces on the roster -- 28 when this was
   // written, 60 by W39 once main was read for it (lib/ai-roster.mjs) -- so
   // "2 of 28 merged" reads as ~7% catalog coverage when the real figure is
@@ -385,7 +395,7 @@ const TILES = [
     note: (ws) => (ws.approved > 0 ? `incl. ${ws.approved} approved, not yet merged` : ''),
     // The target rows also count open PRs from W40 on (Ibrahim's call
     // 2026-10-03, see countsFor in targets.mjs); the headline and strip do not.
-    strip: pieceStrip, done: ['merged', 'approved'],
+    strip: pieceStrip, done: ['merged', 'approved'], running: true,
     credit: ['merged', 'approved', 'pr-open'], creditFrom: '2026-W40' },
   // Two headlines, chosen by what the snapshot measured. With coverage recorded
   // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
@@ -415,7 +425,7 @@ const TILES = [
     unit: (ws) => `of ${ws.totalPieces} pieces`,
     review: 'uiImprovements.review',
     // Open PRs count on the target row from W40, as on AI actions above.
-    strip: pieceStrip, done: ['live', 'merged'], wide: true,
+    strip: pieceStrip, done: ['live', 'merged'], wide: true, running: true,
     credit: ['live', 'merged', 'review'], creditFrom: '2026-W40' },
   // The connection-identifier rollout: pieces that label a new connection with
   // the account it belongs to, by a hook or straight off the OAuth token (see
@@ -428,7 +438,7 @@ const TILES = [
   { key: 'connectionIdentifier', title: 'Connection identifier', path: 'connectionIdentifier.merged',
     unit: (ws) => `of ${ws.totalPieces} pieces show the account`,
     review: 'connectionIdentifier.review',
-    strip: pieceStrip, done: ['live', 'merged'], wide: true,
+    strip: pieceStrip, done: ['live', 'merged'], wide: true, running: true,
     credit: ['live', 'merged', 'review'], creditFrom: '2026-W41' },
 ];
 
@@ -540,6 +550,18 @@ const NOT_MEASURED = 'not measured this week';
 const curatedNote = (v) =>
   (typeof v === 'string' && v.trim() ? v.trim().replace(/\s+/g, ' ') : null);
 
+// ── what the week before did ────────────────────────────────────────────────
+// In the same terms as this week's half of the pill (see `running` above
+// TILES): a running total's previous change, a weekly count's previous count.
+// Null when the archive does not hold the literal previous ISO week, for the
+// reason deltaFor gives: a hole must not pass for one week's work. A running
+// total needs the week before THAT one too, and deltaFor checks it.
+function priorFor(weeks, selected, path, running) {
+  const before = weeks.find((w) => w.week === previousWeekId(selected.week));
+  if (!before) return null;
+  return running ? deltaFor(weeks, before.week, path) : pick(before, path);
+}
+
 // `opts.today` is accepted for caller symmetry with snapshot.mjs but deliberately
 // unused: the newest entry in the archive already is the newest complete week,
 // and reading a clock here would break purity.
@@ -568,17 +590,21 @@ export function buildView(archive, { weekId, notes } = {}) {
       // "collected and failed".
       return { key: spec.key, title: spec.title, wide: spec.wide === true,
                status: 'no-data', reason: NOT_MEASURED,
-               value: null, delta: null, inReview: null, unit: '', strip: null, perPerson: '',
+               value: null, delta: null, running: false, prior: null,
+               inReview: null, unit: '', strip: null, perPerson: '',
                targets: null, note: '' };
     }
     // Resolved per week when the spec asks (pathFor), so value and delta always
     // share one metric — see the piece-testing entry in TILES.
     const path = spec.pathFor ? spec.pathFor(ws) : spec.path;
+    const running = typeof spec.running === 'function' ? spec.running(ws) : spec.running === true;
     const targets = targetsFor(spec, weeks, selected);
     return {
       key: spec.key, title: spec.title, wide: spec.wide === true, status: 'ok', reason: '',
       value: pick(selected, path),
       delta: deltaFor(weeks, selected.week, path),
+      running,
+      prior: priorFor(weeks, selected, path, running),
       // `pick` is what keeps a real 0 apart from a count the snapshot never
       // took: it yields the number when there is one and null otherwise, so a
       // week written before a collector recorded its queue reports no queue
@@ -609,7 +635,7 @@ export function buildView(archive, { weekId, notes } = {}) {
     weeks: list,
     tiles,
     // Said once, in the caption, rather than stamped on all four tiles.
-    noPriorWeek: tiles.every((tile) => tile.delta === null),
+    noPriorWeek: tiles.every((tile) => tile.delta === null && tile.prior === null),
     decisions: (selected.decisions ?? []).filter(isAsk),
   };
 }

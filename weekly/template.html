@@ -98,7 +98,7 @@
            border: 1px solid var(--border); margin-left: 8px; vertical-align: 3px; white-space: nowrap; }
   .delta .arrow { font-size: 10px; }
   .delta.up { color: var(--good-text); } .delta.down { color: var(--sev-high); }
-  .delta.flat { color: var(--text-muted); }
+  .delta.flat, .delta.prev { color: var(--text-muted); }
   /* Work in flight. Same pill geometry as the delta so the number line reads as
      one row, deliberately quieter so it never competes with the headline: muted
      text and a DASHED edge, which is also the cue that survives without colour —
@@ -237,16 +237,23 @@ const ARCHIVE = /*__DATA__*/null;
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : '—');
 
-function deltaHtml(d) {
-  // Direction is carried by the glyph and the sign, not by hue alone: red and
-  // green are ~ΔE 5 apart under protan/deutan simulation.
+function deltaHtml(t) {
+  // How much got done, this week and the week before, in the tile's own terms
+  // (`running` in view.mjs). A weekly count's big number already is this week's
+  // work, so the pill adds only the week before's count, and no direction.
   // No delta, no badge: the caption says "no prior week" once for the page
   // instead of four pills repeating an absence on every tile.
-  if (d === null || d === undefined) return '';
+  const has = (v) => v !== null && v !== undefined;
+  const signed = (n) => `${n > 0 ? '+' : ''}${num(n)}`;
+  if (!t.running) return has(t.prior) ? `<span class="delta prev">${num(t.prior)} prev week</span>` : '';
+  if (!has(t.delta)) return '';
+  // Direction is carried by the glyph and the sign, not by hue alone: red and
+  // green are ~ΔE 5 apart under protan/deutan simulation.
+  const d = t.delta;
   const cls = d > 0 ? 'up' : d < 0 ? 'down' : 'flat';
   const glyph = d > 0 ? '▲' : d < 0 ? '▼' : '■';
-  const sign = d > 0 ? '+' : '';
-  return `<span class="delta ${cls}"><span class="arrow" aria-hidden="true">${glyph}</span> ${sign}${d} vs prior week</span>`;
+  const before = has(t.prior) ? ` · ${signed(t.prior)} prev week` : '';
+  return `<span class="delta ${cls}"><span class="arrow" aria-hidden="true">${glyph}</span> ${signed(d)} this week${before}</span>`;
 }
 
 // A piece's logo, with its first letter underneath. The letter is always in the
@@ -375,7 +382,7 @@ function tileHtml(t) {
       <div class="nodata"><b>No data</b> — ${esc(t.reason)}</div></div>`;
   }
   return `<div class="tile${wide}"><h2>${esc(t.title)}</h2>
-    <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${inReviewHtml(t.inReview)}${deltaHtml(t.delta)}</div>
+    <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${inReviewHtml(t.inReview)}${deltaHtml(t)}</div>
     ${targetsHtml(t.targets)}
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
     ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}

@@ -223,8 +223,29 @@ test('a real delta still renders its badge on the tile', () => {
     snap('2026-W31'),
   ]);
   assert.match(dom, /class="delta up"/);
-  assert.match(dom, /\+2 vs prior week/);
+  assert.match(tileOf(dom, 'outputSchema'), /▲<\/span> \+2 this week<\/span>/);
+  assert.doesNotMatch(dom, /vs prior week/);
   assert.doesNotMatch(dom, /no prior week/);
+});
+
+// A rollout is a running total, so "how much we did" is its change: this week's
+// beside the week before's, in one pill, read left to right.
+test('a running total shows this week\'s change and the week before\'s', () => {
+  const os = (live) => ({ outputSchema: { status: 'ok', live, mergedNotLive: 6, review: 8, todo: 733, totalPieces: 756 } });
+  const tile = tileOf(renderDom([snap('2026-W29', os(4)), snap('2026-W30', os(7)), snap('2026-W31')]), 'outputSchema');
+  assert.match(tile, /class="delta up"><span class="arrow" aria-hidden="true">▲<\/span> \+2 this week · \+3 prev week<\/span>/);
+});
+
+// A weekly count already IS how much the week did, so the pill carries only the
+// week before's count, with no direction: "+29 vs prior week" beside 66 PRs read
+// as 29 done.
+test('a weekly count shows the week before\'s count, not a difference', () => {
+  const tile = tileOf(renderDom([
+    snap('2026-W30', { shipping: { ...snap('x').shipping, prsMerged: 12 } }),
+    snap('2026-W31'),
+  ]), 'PRs merged');
+  assert.match(tile, /<span class="delta prev">12 prev week<\/span>/);
+  assert.doesNotMatch(tile, /this week|vs prior week|-5/);
 });
 
 // ── moving between weeks ───────────────────────────────────────────────────
@@ -804,7 +825,7 @@ test('the delta pill and the strip in the same box agree when two pieces share a
   ]);
   const tile = tileOf(renderDom([osCountedWeek('2026-W30', dup('review'), { live: 1, review: 1 }),
                                  osCountedWeek('2026-W31', dup('live'), { live: 2 })]), 'outputSchema');
-  assert.match(tile, /▲<\/span> \+1 vs prior week/);
+  assert.match(tile, /▲<\/span> \+1 this week/);
   assert.match(tile, /Done this week/);
   assert.equal([...tile.matchAll(/<li class="chip"/g)].length, 1);
   assert.doesNotMatch(tile, /Nothing new this week/);
@@ -1070,7 +1091,7 @@ test('a hole in the archive is never presented as recent movement', () => {
   ]);
   assert.doesNotMatch(dom, /last \d+ weeks/);
   assert.doesNotMatch(dom, /<svg/);
-  assert.doesNotMatch(dom, /vs prior week/, 'W20 is not the week before W31, so there is no delta either');
+  assert.doesNotMatch(dom, /class="delta/, 'W20 is not the week before W31, so there is no delta either');
   assert.match(dom, /no prior week to compare against yet/);
 });
 
