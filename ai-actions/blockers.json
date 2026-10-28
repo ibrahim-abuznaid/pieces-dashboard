@@ -803,10 +803,10 @@
       "pieces": [
         "raindrop"
       ],
-      "affected": 1,
-      "title": "raindrop permanent copy — 1 atomic",
-      "why": "The permanent copy (web archive) of a bookmark is a Raindrop Pro feature; the test account is on the free plan.",
-      "fix": "Test on a Raindrop Pro account, then add <code>raindrop_get_permanent_copy</code> (<code>GET /raindrop/{id}/cache</code>, return the 307 Location URL without following it). Tracked in PIE-816."
+      "affected": 3,
+      "title": "raindrop Pro features — 3 atomics",
+      "why": "Permanent copies and collection/tag suggestions are Raindrop Pro features; the free test account gets 'pro only' (suggest) and no archive (permanent copy).",
+      "fix": "Test on a Raindrop Pro account, then add <code>raindrop_get_permanent_copy</code> (<code>GET /raindrop/{id}/cache</code>, return the 307 Location URL without following it), <code>raindrop_suggest_for_new_bookmark</code> (<code>POST /raindrop/suggest</code>) and <code>raindrop_suggest_for_bookmark</code> (<code>GET /raindrop/{id}/suggest</code>). Tracked in PIE-816."
     }
   ]
 }
