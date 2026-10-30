@@ -820,6 +820,19 @@
       "title": "Perplexity AI: Orchestrator API needs preview access",
       "why": "The Orchestrator API (chat completions, messages, responses and its model catalog) answers 403 \"currently in limited preview\" for standard API keys, so its five actions cannot be run live.",
       "fix": "Request Orchestrator access from api@perplexity.ai for the test account, then add the five Orchestrator actions back and test them. Tracked in PIE-835."
+    },
+    {
+      "id": "groq-paid-plan",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "groq"
+      ],
+      "affected": 9,
+      "title": "Groq: Files and Batch actions need the Developer plan",
+      "why": "Groq's Batch API (and the Files API that feeds it JSONL input) is only available on the paid Developer plan; the test account is on the free plan, so these actions can't be run live.",
+      "fix": "Run the Files and Batch actions against a Groq account on the Developer plan, then add them back to the piece with output schemas from those runs. Tracked in PIE-836."
     }
   ]
 }
