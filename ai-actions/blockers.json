@@ -807,6 +807,19 @@
       "title": "raindrop Pro features — 3 atomics",
       "why": "Permanent copies and collection/tag suggestions are Raindrop Pro features; the free test account gets 'pro only' (suggest) and no archive (permanent copy).",
       "fix": "Test on a Raindrop Pro account, then add <code>raindrop_get_permanent_copy</code> (<code>GET /raindrop/{id}/cache</code>, return the 307 Location URL without following it), <code>raindrop_suggest_for_new_bookmark</code> (<code>POST /raindrop/suggest</code>) and <code>raindrop_suggest_for_bookmark</code> (<code>GET /raindrop/{id}/suggest</code>). Tracked in PIE-816."
+    },
+    {
+      "id": "perplexity-ai-paid-plan",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "perplexity-ai"
+      ],
+      "affected": 5,
+      "title": "Perplexity AI: Orchestrator API needs preview access",
+      "why": "The Orchestrator API (chat completions, messages, responses and its model catalog) answers 403 \"currently in limited preview\" for standard API keys, so its five actions cannot be run live.",
+      "fix": "Request Orchestrator access from api@perplexity.ai for the test account, then add the five Orchestrator actions back and test them. Tracked in PIE-835."
     }
   ]
 }
