@@ -829,10 +829,10 @@
       "pieces": [
         "groq"
       ],
-      "affected": 9,
-      "title": "Groq: Files and Batch actions need the Developer plan",
-      "why": "Groq's Batch API (and the Files API that feeds it JSONL input) is only available on the paid Developer plan; the test account is on the free plan, so these actions can't be run live.",
-      "fix": "Run the Files and Batch actions against a Groq account on the Developer plan, then add them back to the piece with output schemas from those runs. Tracked in PIE-836."
+      "affected": 11,
+      "title": "Groq: Files, Batch, Embeddings and Reranking actions need a paid Groq account",
+      "why": "On the free plan, Groq's Files and Batch APIs return 403 not_available_for_plan, and the account lists no embedding or reranking model (Create Embedding returns 404 model not found). None of these 11 actions can run on the free test account, so they were left out of the piece.",
+      "fix": "Get a Groq account on the Developer plan with an embedding and a reranking model enabled, then add List/Upload/Get/Download/Delete File, List/Create/Get/Cancel Batch, Create Embedding and Rerank Documents back to the piece with output schemas from live runs. Tracked in PIE-836."
     }
   ]
 }
