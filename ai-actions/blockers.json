@@ -833,6 +833,19 @@
       "title": "Groq: Files, Batch, Embeddings and Reranking actions need a paid Groq account",
       "why": "On the free plan, Groq's Files and Batch APIs return 403 not_available_for_plan, and the account lists no embedding or reranking model (Create Embedding returns 404 model not found). None of these 11 actions can run on the free test account, so they were left out of the piece.",
       "fix": "Get a Groq account on the Developer plan with an embedding and a reranking model enabled, then add List/Upload/Get/Download/Delete File, List/Create/Get/Cancel Batch, Create Embedding and Rerank Documents back to the piece with output schemas from live runs. Tracked in PIE-836."
+    },
+    {
+      "id": "webflow-paid-plan",
+      "cat": "plan",
+      "sev": "med",
+      "done": false,
+      "pieces": [
+        "webflow"
+      ],
+      "affected": 39,
+      "title": "Webflow: AI actions that need a paid Webflow plan",
+      "why": "The test account is on Webflow's free plan. Enterprise-only endpoints (site create/update/delete, redirects, robots.txt, well-known files, site plan, activity logs), the Analyze add-on reports, Ecommerce (products, SKUs, orders, inventory, settings) and Localization (bulk multi-locale items, page and component content in secondary locales) can't run on it, so their AI actions were left out.",
+      "fix": "Get a Webflow account with an Enterprise workspace, an Analyze add-on, an Ecommerce site plan and Localization, then add and live-test these actions. Tracked in PIE-843."
     }
   ]
 }
