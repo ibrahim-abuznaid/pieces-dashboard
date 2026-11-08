@@ -1599,9 +1599,9 @@ const actionsWeeks = (more = {}) => [
 
 test('the AI-actions box says how many actions are on main and how many landed this week', () => {
   const tile = tileOf(renderDom(actionsWeeks({ actionsLanded: LANDED_BLOCK })), 'AI-actions');
-  assert.match(tile, /<div class="note actions">7,155 agent-only actions on main · this week \+353 agent-only \(\+12 by others\)<\/div>/);
-  assert.match(tile, /Odai[\s\S]*?\+112 agent-only/);
-  assert.match(tile, /Kishan[\s\S]*?\+229 agent-only/);
+  assert.match(tile, /<div class="note actions" title="[^"]*\+12 by people outside the team[^"]*">7,155 agent actions on main · \+353 agent-only actions added this week<\/div>/);
+  assert.match(tile, /Odai[\s\S]*?\d+\/20 pieces[\s\S]*?\+112 agent-only actions added/);
+  assert.match(tile, /Kishan[\s\S]*?\+229 agent-only actions added/);
 });
 
 test('the actions line sits under the headline and above the target rows', () => {
@@ -1612,35 +1612,36 @@ test('the actions line sits under the headline and above the target rows', () =>
 test('a week that never measured landed actions shows neither the line nor the row counts', () => {
   const dom = renderDom(actionsWeeks());
   assert.doesNotMatch(dom, /this week [+−]/);
-  // A row count is a SIGNED number: "+112 agent-only", "+180 actions". The
-  // unsigned "7,155 agent-only actions on main" is the count on main, drawn on
+  // A row count is a SIGNED number followed by "actions added". The unsigned
+  // "7,155 agent actions on main" is the count on main, drawn on every week
   // every week with a roster, and is not what this guards against.
-  assert.doesNotMatch(dom, /[+−][\d,]+ (agent-only|actions)/);
+  assert.doesNotMatch(dom, /[+−][\d,]+ (agent-only )?actions added/);
   assert.doesNotMatch(renderDom([snap('2026-W31')]), /actions on main/);
 });
 
 test('a week with the count on main but nothing landed measured says only the count', () => {
   const tile = tileOf(renderDom(actionsWeeks()), 'AI-actions');
-  assert.match(tile, /<div class="note actions">7,155 agent-only actions on main<\/div>/);
+  assert.match(tile, /<div class="note actions" title="[^"]*">7,155 agent actions on main<\/div>/);
 });
 
 test('a measured quiet week reads +0, and removals read with a real minus sign', () => {
   const quiet = { total: -3, byPerson: { kishan: 0, sanket: 0, odai: -3, talal: 0, others: 0 }, prs: [] };
   const tile = tileOf(renderDom(actionsWeeks({ actionsLanded: quiet })), 'AI-actions');
-  assert.match(tile, /agent-only actions on main · this week −3 agent-only</);
-  assert.match(tile, /Kishan[\s\S]*?\+0 agent-only/);
-  assert.match(tile, /Odai[\s\S]*?−3 agent-only/);
+  assert.match(tile, /agent actions on main · −3 agent-only actions added this week</);
+  assert.match(tile, /Kishan[\s\S]*?\+0 agent-only actions added/);
+  assert.match(tile, /Odai[\s\S]*?−3 agent-only actions added/);
   assert.doesNotMatch(tile, /by others/);
 });
 
-// Both counts measured: every action created leads, the agent-only ones follow.
-// Twitch's 51 shared actions show up in the first and not the second.
+// Both counts measured: ONE number on the page, every action created, so
+// Twitch's 51 shared actions count; the agent-only share is tooltip detail.
 test('with the actions created recorded, the line and the rows carry both counts', () => {
   const block = { ...LANDED_BLOCK, newActions: { total: 420, byPerson: { kishan: 229, sanket: 0, odai: 180, talal: 0, others: 11 } } };
   const tile = tileOf(renderDom(actionsWeeks({ actionsLanded: block })), 'AI-actions');
-  assert.match(tile, /<div class="note actions">7,155 agent-only actions on main · this week \+420 new actions, \+353 agent-only \(\+11 by others\)<\/div>/);
-  assert.match(tile, /Odai[\s\S]*?· \+180 actions, \+112 agent-only/);
-  assert.match(tile, /Kishan[\s\S]*?· \+229 actions, \+229 agent-only/);
+  assert.match(tile, /<div class="note actions" title="\+353 of this week's actions are agent-only \(audience 'ai'\) · \+11 by people outside the team · [^"]*">7,155 agent actions on main · \+420 actions added this week<\/div>/);
+  assert.match(tile, /Odai[\s\S]*?<span class="score" title="\+180 actions in this week's merged PRs, any audience · \+112 of them agent-only \(audience 'ai'\)">\d+\/20 pieces · \+180 actions added/);
+  assert.match(tile, /Kishan[\s\S]*?· \+229 actions added/);
+  assert.doesNotMatch(tile, /agent-only actions added/, 'the agent-only share is tooltip detail, not page text');
 });
 
 test('no other box draws an actions line', () => {

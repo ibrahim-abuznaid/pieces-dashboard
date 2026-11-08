@@ -223,10 +223,17 @@ PRs, per author and per piece, with the `prs` behind them so every number is aud
   `audience: 'both'` lines are deliberately not a measure of their own: a catalog-wide migration put them on 663
   pieces, and a PR that promotes a `both` action to an agent-only atomic would read as one fewer.
 
-The tile shows both as one line under the headline ("7,155 agent-only actions on main · this week +2,010 new
-actions, +1,652 agent-only") and beside each person's pieces score ("· +260 actions, +199 agent-only"). Shown,
-not targeted — `targets.json` still targets pieces, and a piece whose only agent-callable actions are `both`
-does not count as a piece with AI actions. Whether it should is the lead's call, not the page's.
+The page shows ONE number for the week, the actions created: a line under the headline ("7,155 agent actions
+on main · +1,781 actions added this week") and one beside each person's pieces score ("12/20 pieces · +321
+actions added"). The agent-only share and the share from people outside the team are in the hover tooltip of
+each, not on the page — two numbers side by side read as a puzzle (Ibrahim, 2026-11-08). The "on main" count
+is agent-only atomics, because that is the only stock the code can count honestly (see above).
+
+**Decision, 2026-11-08:** the per-person target stays *pieces with at least one agent-only action*, the
+program's own definition (`ai-actions-eval/METHODOLOGY.md`), and the actions count is shown, not targeted. A
+piece built with `both` actions only therefore earns 0 toward the pieces target but all of its actions in the
+actions count. The standard for the team: an action meant for agents is marked `audience: 'ai'`; an action
+genuinely for both audiences is fine and counts as an action.
 
 How it is measured: the same 21-day merged-PR scan that credits the pieces (`scripts/fetch-pr-states.mjs` →
 `data/landings.json` `actionsLanded`, rule in `lib/discover.mjs` `discoverActionsLanded`), read off the diff:
@@ -239,11 +246,19 @@ count and not the other is an older scan, and the week is not measured rather th
 
 `scripts/backfill-ai-actions-landed.mjs` restated W39–W45 on 2026-11-08 from the same rule, one week at a time
 (`--weeks 2026-W39..2026-W45 --apply`; dry run by default, `--verbose` lists the PRs). The agent-only count for
-W41–W45 matches the week-over-week change in actions on main exactly. W39 and W40 do not: the W39 approved-PR
-restatement (`backfill-ai-actions-approved.mjs`) moved five of Odai's PRs into W39's roster although they merged
-in W40's window, so W40 reads +600 landed against +394 on main and W39 the mirror image, plus a 27-action
-residue in W39 from the older hand-kept roster. Both numbers are right about what they measure; they just
-measure different things across that one seam.
+W41–W45 matches the week-over-week change in actions on main exactly. W39 and W40 do not, and both gaps are
+accounted for piece by piece (verified 2026-11-08, nothing to fix):
+
+- **206 across W39/W40, by decision.** Five of Odai's PRs (#15585 whatsapp 1, #15661 dropbox 26, #15696
+  microsoft-outlook 45, #15725 mailer-lite 37 + pipedrive 32, #15757 asana 65) merged in W40's window, so the
+  landed count puts them in W40 (+600 against +394 on main). W39's roster carries them as `merged` with those
+  counts because the lead counted them done in W39, the week the work was finished and approved
+  (`backfill-ai-actions-approved.mjs`), and the later main re-read filled their counts in. W39 therefore reads
+  +740 landed against +973 on main.
+- **27 in W39, by instrument.** W38's roster still carried the hand-kept, authored counts for six pieces that
+  had landed earlier; W39 was the first week read off main, which had more: stripe 75→79, github 72→74,
+  sendinblue 20→32, gmail 19→26, airtable 18→19, cody 18→19. None of them had a PR in W39's window, so the landed
+  count does not see the +27 and the on-main delta does.
 
 ## Claiming work (the 3-stage model)
 
