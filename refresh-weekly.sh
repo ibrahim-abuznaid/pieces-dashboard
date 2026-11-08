@@ -115,9 +115,27 @@ trap 'fail "$LINENO"' ERR
 
 cd "$REPO"
 
-for cmd in node npm git gh; do
+for cmd in node npm git gh flock; do
   command -v "$cmd" >/dev/null || { log "ERROR $cmd not on PATH"; exit 1; }
 done
+
+# One run at a time. Two things start this job now: cron at 09/13/17/21h and
+# the systemd catch-up timer (catchup-weekly.sh) that fires after a boot, a
+# resume, or any slot the machine slept through. A Saturday run holds the tree
+# for ~50 minutes, and a second run inside that window would fetch into the
+# same data/ files, append the same week twice and race the push. The lock is
+# non-blocking on purpose: a run that finds it held has nothing to add, so it
+# says so and exits 0 rather than queueing behind the first.
+#
+# fd 9 is inherited by every child, so the lock lives exactly as long as the
+# job and everything it spawned; a crash releases it with the process.
+LOCK_DIR="$HOME/.cache/pieces-dashboard"
+mkdir -p "$LOCK_DIR"
+exec 9>"$LOCK_DIR/refresh-weekly.lock"
+if ! flock -n 9; then
+  log "another refresh-weekly run holds the lock — nothing to do here"
+  exit 0
+fi
 
 # Deploy only fires on pushes to main (plus the daily schedule), so a snapshot
 # committed anywhere else would never render.

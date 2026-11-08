@@ -61,6 +61,18 @@ Both read the page the way a reader gets it: the DOM is built client-side from a
 blob, so grepping the served HTML for a week id proves nothing. `verify-weekly.mjs` parses that blob and
 executes the page's scripts in a `node:vm` sandbox.
 
+**After the machine was off.** Cron has no memory: a 09/13/17/21h slot the machine was off or asleep for is
+skipped, and a daily 20:00 verify is skipped the same way. `catchup-weekly.sh` closes that gap. A systemd
+user timer (`~/.config/systemd/user/pieces-weekly-catchup.timer`, `Persistent=true`) runs it 4 minutes after
+every boot and 30 minutes after each cron slot — so a slot the machine slept through is replayed as soon as it
+is awake. It waits for the network, runs `refresh-weekly.sh` (whose guard decides in 54 ms whether the latest
+sealed week is already complete, and collects it when it is missing), then runs `verify-weekly.sh`, and writes
+one verdict line to `catchup-weekly.log` and `~/.cache/pieces-dashboard/last-catchup`. It speaks up (Discord
+via Alicent) only when it had to collect a missing week, or when the verify is red afterwards; a quiet boot
+stays quiet. `refresh-weekly.sh` holds a non-blocking lock (`~/.cache/pieces-dashboard/refresh-weekly.lock`)
+so the cron run and a catch-up can never overlap; a catch-up that finds the lock held exits without running
+the verify either, because mid-refresh the committed archive is ahead of the deployed page by design.
+
 The page is written for a **project manager**: the week, a number per box, the pieces behind each number, and
 anything that needs a decision. Closed tickets and shipped PRs render as chips that **link to the artifact
 itself** (the ticket in Linear, the PR on GitHub). Every strip opens at 5 chips so the landing view fits one
