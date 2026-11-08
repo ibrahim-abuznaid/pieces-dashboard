@@ -320,6 +320,9 @@ function qaRows(ws) {
   const also = [];
   if (ws.unassigned?.fixed > 0) also.push(`${ws.unassigned.fixed} fixed with no assignee`);
   if (ws.others?.fixed > 0) also.push(`${ws.others.fixed} fixed by others`);
+  // Tickets held by someone off the roster (the lead reviewing one himself,
+  // 2026-11-08): no row, but not silently missing from the total either.
+  if (ws.others?.assigned > 0) also.push(`${ws.others.assigned} assigned to others`);
   return { rows, also: also.join(' · ') };
 }
 

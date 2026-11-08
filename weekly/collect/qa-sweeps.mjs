@@ -156,7 +156,11 @@ export function qaSweepsForWindow(qa, window, { asOf = null } = {}) {
   return {
     ...out,
     byPerson, others, unassigned,
-    projects: [...projects.values()],
+    // Only the sweeps that hold a ticket of ours as of this reading: the
+    // Engineering sweeps are real projects with nothing of this team's in
+    // them, and a week before the first ticket existed had no sweep at all.
+    // A "0/0" line on the page would say otherwise.
+    projects: [...projects.values()].filter((p) => p.total > 0),
     fixedIds: fixedIds.sort(byIdNumber),
   };
 }

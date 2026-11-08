@@ -1648,6 +1648,11 @@ test('the QA rows are fixed over ASSIGNED, for the people with tickets, with the
   assert.equal(t.perPerson, '', 'the rows replace the per-person line');
 });
 
+test('a ticket held by someone off the roster is named on the also line, not dropped', () => {
+  const t = qaTile(qaLive({ others: qaPerson({ assigned: 1, inReview: 1 }), total: 150, open: 142, inReview: 2 }));
+  assert.equal(t.targets.also, '6 fixed with no assignee · 1 assigned to others');
+});
+
 test('a QA row is hit when everything assigned to the person is fixed', () => {
   const t = qaTile(qaLive({ byPerson: { ...qaLive().byPerson, talal: qaPerson({ assigned: 2, fixed: 2, fixedThisWeek: 1 }) }, fixed: 8, fixedThisWeek: 7 }));
   assert.deepEqual(t.targets.rows.at(-1), { person: 'talal', name: 'Talal', actual: 2, target: 2, hit: true, unit: 'fixed', detail: '+1 this week' });

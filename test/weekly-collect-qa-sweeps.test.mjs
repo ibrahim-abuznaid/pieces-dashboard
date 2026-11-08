@@ -100,10 +100,17 @@ test('as of an earlier day, a later fix is not yet fixed and a later cancel stil
   assert.deepEqual(out.fixedIds, ['PIE-902']);
 });
 
-test('a ticket created after the day did not exist', () => {
+test('a ticket created after the day did not exist, and a sweep with none of ours is not listed', () => {
   const out = qaSweepsForWindow(QA(), { start: '2026-09-26', end: '2026-10-02' }, { asOf: '2026-10-02' });
   assert.deepEqual({ total: out.total, fixed: out.fixed, fixedThisWeek: out.fixedThisWeek }, { total: 0, fixed: 0, fixedThisWeek: 0 });
   assert.deepEqual(out.fixedIds, []);
+  assert.deepEqual(out.projects, [], 'no ticket of ours existed yet, so no sweep is listed');
+});
+
+test('a sweep holding none of this team\'s tickets is not listed', () => {
+  const qa = QA();
+  qa.tickets = qa.tickets.filter((t) => t.id !== 'ENG-859');
+  assert.deepEqual(qaSweepsForWindow(qa, W45).projects.map((p) => p.id), ['P-PIE-366']);
 });
 
 test('a day after the stamp cannot be restated', () =>
