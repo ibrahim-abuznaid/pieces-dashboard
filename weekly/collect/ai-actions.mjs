@@ -59,10 +59,17 @@ function readRoster(readJson, catalog) {
 // PR merged into main this week added, per author. Shown beside the pieces,
 // never targeted (weekly/data/targets.json targets pieces).
 //
+// Two counts, side by side. `total`/`byPerson`/`prs[].n` are the AGENT-ONLY
+// atomics (`audience: 'ai'`); `newActions` is every action CREATED, whatever
+// its audience — Odai's twitch added 51 actions that serve humans and agents
+// alike and not one agent-only line (2026-11-08), and a count that saw none of
+// that was the reason this field exists. Both ride on the same scan rows
+// (lib/discover.mjs discoverActionsLanded), so a row carrying one and not the
+// other is an older scan, and the week is not measured rather than half so.
+//
 // Read off data/landings.json, which scripts/fetch-pr-states.mjs writes from
-// the same 21-day merged-PR scan that credits the pieces (lib/discover.mjs
-// discoverActionsLanded). PURE, handed the file, so the rule is testable
-// without one.
+// the same 21-day merged-PR scan that credits the pieces. PURE, handed the
+// file, so the rule is testable without one.
 //
 // Null — not measured — rather than a zero whenever the scan cannot vouch for
 // the whole week: no file, a file from before the field existed, a scan whose
@@ -83,20 +90,30 @@ export function actionsLandedForWindow(landings, window) {
   if (!window || !Array.isArray(landings?.actionsLanded)) return null;
   if (typeof landings.since !== 'string' || landings.since > window.start) return null;
   if (landings.complete === false) return null;
+  const finite = (v) => typeof v === 'number' && Number.isFinite(v);
   const byPerson = { ...zeroed(), others: 0 };
+  const newByPerson = { ...zeroed(), others: 0 };
   const prs = [];
   for (const e of landings.actionsLanded) {
     if (!inWindow(typeof e?.mergedAt === 'string' ? e.mergedAt.slice(0, 10) : null, window)) continue;
     // One malformed row in the week is a broken reading, not a row to skip:
     // skipping it would publish a total short by an amount nobody can see.
-    if (!Number.isInteger(e.pr) || typeof e.n !== 'number' || !Number.isFinite(e.n) || !isObject(e.pieces)) return null;
+    if (!Number.isInteger(e.pr) || !finite(e.n) || !isObject(e.pieces)) return null;
+    if (!finite(e.nNew) || !isObject(e.newActions)) return null;
     const author = typeof e.author === 'string' && e.author ? e.author : null;
-    byPerson[personOf(author) ?? 'others'] += e.n;
+    const who = personOf(author) ?? 'others';
+    byPerson[who] += e.n;
+    newByPerson[who] += e.nNew;
     // Spread, never assigned: a PR with no recorded author carries no key,
     // rather than an `author: null` the archive would have to explain.
-    prs.push({ pr: e.pr, n: e.n, pieces: e.pieces, ...(author ? { author } : {}) });
+    prs.push({ pr: e.pr, n: e.n, pieces: e.pieces, nNew: e.nNew, newActions: e.newActions, ...(author ? { author } : {}) });
   }
-  return { total: prs.reduce((sum, p) => sum + p.n, 0), byPerson, prs };
+  return {
+    total: prs.reduce((sum, p) => sum + p.n, 0),
+    byPerson,
+    newActions: { total: prs.reduce((sum, p) => sum + p.nNew, 0), byPerson: newByPerson },
+    prs,
+  };
 }
 
 // Best-effort, unlike the summary below: losing landings.json costs this one

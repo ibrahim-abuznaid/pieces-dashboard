@@ -506,3 +506,36 @@ test('heal never touches a complete week', () => {
   const { replaced } = healWeek(before, ok({ builtAt: '2026-08-02', shipping: shipped }));
   assert.equal(replaced, false);
 });
+
+// ── the actions created, beside the agent-only ones ─────────────────────────
+// Optional inside the block (the first blocks were archived without it), held
+// to the same three sums when present.
+const CREATED = () => {
+  const block = LANDED();
+  block.newActions = { total: 166, byPerson: { kishan: 12, sanket: 0, odai: 154, talal: 0, others: 0 } };
+  block.prs[0] = { ...block.prs[0], nNew: 154, newActions: { bexio: 103, twitch: 51 } };
+  block.prs[1] = { ...block.prs[1], nNew: 12, newActions: { asana: 9, notion: 3 } };
+  block.prs[2] = { ...block.prs[2], nNew: 0, newActions: {} };
+  return block;
+};
+
+test('a block with the actions created validates', () => validateSnapshot(withLanded(CREATED())));
+
+test('newActions people, PRs and pieces must each add up', () => {
+  const people = CREATED();
+  people.newActions.byPerson.odai = 100;
+  assert.throws(() => validateSnapshot(withLanded(people)), /aiActions\.actionsLanded\.newActions\.byPerson/);
+  const prs = CREATED();
+  prs.prs[1] = { ...prs.prs[1], nNew: 11, newActions: { asana: 8, notion: 3 } };
+  assert.throws(() => validateSnapshot(withLanded(prs)), /aiActions\.actionsLanded\.newActions/);
+  const pieces = CREATED();
+  pieces.prs[1] = { ...pieces.prs[1], newActions: { asana: 9 } };
+  assert.throws(() => validateSnapshot(withLanded(pieces)), /aiActions\.actionsLanded\.prs\[1\]/);
+});
+
+test('with newActions recorded, every PR row needs its own nNew and newActions', () => {
+  const block = CREATED();
+  const { nNew, newActions, ...row } = block.prs[2];
+  block.prs[2] = row;
+  assert.throws(() => validateSnapshot(withLanded(block)), /aiActions\.actionsLanded\.prs\[2\]\.nNew/);
+});

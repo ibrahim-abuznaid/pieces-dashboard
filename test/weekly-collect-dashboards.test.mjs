@@ -715,12 +715,14 @@ const LANDINGS = {
   fetched: '2026-11-07', since: '2026-10-17', complete: true,
   aiActions: {},
   actionsLanded: [
-    { pr: 16990, author: 'kishanprmr', mergedAt: '2026-10-30T23:59:00Z', n: 50, pieces: { gmail: 50 } },
-    { pr: 17040, author: 'kishanprmr', mergedAt: '2026-10-31T00:00:01Z', n: 12, pieces: { asana: 9, notion: 3 } },
-    { pr: 17034, author: 'OdaiAhmed99', mergedAt: '2026-11-03T10:00:00Z', n: 103, pieces: { bexio: 103 } },
-    { pr: 17041, author: 'ibrahim-abuznaid', mergedAt: '2026-11-05T09:00:00Z', n: 4, pieces: { slack: 4 } },
-    { pr: 17042, author: null, mergedAt: '2026-11-06T23:00:00Z', n: -2, pieces: { zoom: -2 } },
-    { pr: 17060, author: 'OdaiAhmed99', mergedAt: '2026-11-07T00:00:00Z', n: 30, pieces: { stripe: 30 } },
+    { pr: 16990, author: 'kishanprmr', mergedAt: '2026-10-30T23:59:00Z', n: 50, pieces: { gmail: 50 }, nNew: 50, newActions: { gmail: 50 } },
+    { pr: 17040, author: 'kishanprmr', mergedAt: '2026-10-31T00:00:01Z', n: 12, pieces: { asana: 9, notion: 3 }, nNew: 12, newActions: { asana: 9, notion: 3 } },
+    { pr: 17034, author: 'OdaiAhmed99', mergedAt: '2026-11-03T10:00:00Z', n: 103, pieces: { bexio: 103 }, nNew: 103, newActions: { bexio: 103 } },
+    // twitch: 51 actions built once for humans and agents — no agent-only line.
+    { pr: 17031, author: 'OdaiAhmed99', mergedAt: '2026-11-05T08:00:00Z', n: 0, pieces: {}, nNew: 51, newActions: { twitch: 51 } },
+    { pr: 17041, author: 'ibrahim-abuznaid', mergedAt: '2026-11-05T09:00:00Z', n: 4, pieces: { slack: 4 }, nNew: 4, newActions: { slack: 4 } },
+    { pr: 17042, author: null, mergedAt: '2026-11-06T23:00:00Z', n: -2, pieces: { zoom: -2 }, nNew: 0, newActions: {} },
+    { pr: 17060, author: 'OdaiAhmed99', mergedAt: '2026-11-07T00:00:00Z', n: 30, pieces: { stripe: 30 }, nNew: 30, newActions: { stripe: 30 } },
   ],
 };
 const withLandings = (landings = LANDINGS) => aiRead({ 'data/landings.json': landings });
@@ -730,11 +732,13 @@ test('the collector carries the AI actions landed this week, per person', () => 
   assert.deepEqual(out.actionsLanded, {
     total: 117,
     byPerson: { kishan: 12, sanket: 0, odai: 103, talal: 0, others: 2 },
+    newActions: { total: 170, byPerson: { kishan: 12, sanket: 0, odai: 154, talal: 0, others: 4 } },
     prs: [
-      { pr: 17040, n: 12, pieces: { asana: 9, notion: 3 }, author: 'kishanprmr' },
-      { pr: 17034, n: 103, pieces: { bexio: 103 }, author: 'OdaiAhmed99' },
-      { pr: 17041, n: 4, pieces: { slack: 4 }, author: 'ibrahim-abuznaid' },
-      { pr: 17042, n: -2, pieces: { zoom: -2 } },
+      { pr: 17040, n: 12, pieces: { asana: 9, notion: 3 }, nNew: 12, newActions: { asana: 9, notion: 3 }, author: 'kishanprmr' },
+      { pr: 17034, n: 103, pieces: { bexio: 103 }, nNew: 103, newActions: { bexio: 103 }, author: 'OdaiAhmed99' },
+      { pr: 17031, n: 0, pieces: {}, nNew: 51, newActions: { twitch: 51 }, author: 'OdaiAhmed99' },
+      { pr: 17041, n: 4, pieces: { slack: 4 }, nNew: 4, newActions: { slack: 4 }, author: 'ibrahim-abuznaid' },
+      { pr: 17042, n: -2, pieces: { zoom: -2 }, nNew: 0, newActions: {} },
     ],
   });
 });
@@ -754,7 +758,8 @@ test('a PR with no author is credited to others and carries no author key', () =
 
 test('a quiet week is a measured zero for everyone', () => {
   const out = actionsLandedForWindow({ since: '2026-10-17', actionsLanded: [] }, W45);
-  assert.deepEqual(out, { total: 0, byPerson: { kishan: 0, sanket: 0, odai: 0, talal: 0, others: 0 }, prs: [] });
+  assert.deepEqual(out, { total: 0, byPerson: { kishan: 0, sanket: 0, odai: 0, talal: 0, others: 0 },
+    newActions: { total: 0, byPerson: { kishan: 0, sanket: 0, odai: 0, talal: 0, others: 0 } }, prs: [] });
 });
 
 test('no landings file: the field is absent and the tile untouched', () => {
@@ -808,6 +813,13 @@ test('what the collector emits with actions landed passes validateSnapshot', () 
 });
 
 test('a malformed row inside the week is a broken reading, not a row to skip', () => {
-  const broken = { ...LANDINGS, actionsLanded: [...LANDINGS.actionsLanded, { pr: 17050, mergedAt: '2026-11-04T10:00:00Z', n: '7', pieces: {} }] };
+  const broken = { ...LANDINGS, actionsLanded: [...LANDINGS.actionsLanded, { pr: 17050, mergedAt: '2026-11-04T10:00:00Z', n: '7', pieces: {}, nNew: 0, newActions: {} }] };
   assert.equal(actionsLandedForWindow(broken, W45), null);
+});
+
+// A scan from before the actions-created count carries rows with the agent-only
+// half only. Half a measurement is not one: the week is not measured at all.
+test('a row without the actions-created half is an older scan, and the week is not measured', () => {
+  const older = { ...LANDINGS, actionsLanded: LANDINGS.actionsLanded.map(({ nNew, newActions, ...rest }) => rest) };
+  assert.equal(actionsLandedForWindow(older, W45), null);
 });

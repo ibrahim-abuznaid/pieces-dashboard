@@ -1471,7 +1471,7 @@ test('from W40 an open AI-actions PR counts on its author\'s target row, but not
     { name: 'grist', actions: 0, stage: 'pr-open', author: 'kishanprmr' },
   ]) });
   const t = tileOf(buildView({ weeks: [W39, W40] }), 'aiActions');
-  assert.deepEqual(t.targets.rows, [{ person: 'kishan', name: 'Kishan', actual: 2, target: 20, hit: false, open: 1, actions: null }]);
+  assert.deepEqual(t.targets.rows, [{ person: 'kishan', name: 'Kishan', actual: 2, target: 20, hit: false, open: 1, actions: null, newActions: null }]);
   assert.deepEqual(t.strip.items.map((i) => i.name), ['slack']);
 });
 
@@ -1556,7 +1556,13 @@ const LANDED = { total: 341, byPerson: { kishan: 229, sanket: 0, odai: 112, tala
 
 test('the AI-actions tile carries actions on main and landed this week', () => {
   const t = aiTile(oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER, actionsLanded: LANDED }) }));
-  assert.deepEqual(t.actions, { onMain: 105, landed: 341, others: 0 }, 'stripe 79 + gmail 26; approved and open rows are not on main');
+  assert.deepEqual(t.actions, { onMain: 105, landed: 341, others: 0, newActions: null, newOthers: null }, 'stripe 79 + gmail 26; approved and open rows are not on main');
+});
+
+test('the actions created ride beside the agent-only ones when the block recorded them', () => {
+  const block = { ...LANDED, newActions: { total: 420, byPerson: { kishan: 229, sanket: 0, odai: 180, talal: 0, others: 11 } } };
+  const t = aiTile(oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER, actionsLanded: block }) }));
+  assert.deepEqual(t.actions, { onMain: 105, landed: 341, others: 0, newActions: 420, newOthers: 11 });
 });
 
 test('others is what landed from logins off the team', () => {
@@ -1567,7 +1573,7 @@ test('others is what landed from logins off the team', () => {
 
 test('a week that did not measure landed actions still carries the count on main', () => {
   const t = aiTile(oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER }) }));
-  assert.deepEqual(t.actions, { onMain: 105, landed: null, others: null });
+  assert.deepEqual(t.actions, { onMain: 105, landed: null, others: null, newActions: null, newOthers: null });
 });
 
 test('no roster, or an empty one, is no count on main — never 0', () => {

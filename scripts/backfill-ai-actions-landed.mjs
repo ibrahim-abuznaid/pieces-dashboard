@@ -141,9 +141,9 @@ const signed = (n) => (n < 0 ? `−${-n}` : `+${n}`);
 // The people the tile draws a row for that week, anyone else on the team who
 // moved the number, and `others` always — so the line adds up to its total.
 function line(weekId, block, targets) {
-  const shown = PEOPLE.filter((p) => block.byPerson[p] !== 0 || targets?.[p] !== undefined);
-  const parts = [...shown, 'others'].map((p) => `${p} ${signed(block.byPerson[p])}`);
-  return `${weekId}  total ${signed(block.total)} · ${parts.join(' · ')} · ${block.prs.length} ${block.prs.length === 1 ? 'PR' : 'PRs'}`;
+  const shown = PEOPLE.filter((p) => block.byPerson[p] !== 0 || block.newActions.byPerson[p] !== 0 || targets?.[p] !== undefined);
+  const parts = [...shown, 'others'].map((p) => `${p} ${signed(block.newActions.byPerson[p])} (${signed(block.byPerson[p])} agent-only)`);
+  return `${weekId}  new actions ${signed(block.newActions.total)} (${signed(block.total)} agent-only) · ${parts.join(' · ')} · ${block.prs.length} ${block.prs.length === 1 ? 'PR' : 'PRs'}`;
 }
 
 function main(argv) {
@@ -172,8 +172,8 @@ function main(argv) {
     if (verbose) {
       console.log(`    ${m.merged} PRs merged into main ${m.window.start}..${m.window.end}, ${m.scanned} touched a piece`);
       for (const p of m.block.prs) {
-        const pieces = Object.entries(p.pieces).map(([slug, n]) => `${slug} ${signed(n)}`).join(', ');
-        console.log(`    #${p.pr} ${p.author ?? '(no author)'} ${signed(p.n)}: ${pieces}`);
+        const by = (map) => Object.entries(map).map(([slug, n]) => `${slug} ${signed(n)}`).join(', ') || 'none';
+        console.log(`    #${p.pr} ${p.author ?? '(no author)'} new ${signed(p.nNew)} [${by(p.newActions)}] · agent-only ${signed(p.n)} [${by(p.pieces)}]`);
       }
     }
   }

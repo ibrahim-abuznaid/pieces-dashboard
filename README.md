@@ -209,28 +209,41 @@ the current reading only and K1 is the one number with history.
 
 The weekly AI-actions tile counts **pieces** with at least one `audience: 'ai'` action, and credits a piece
 to its author once, the week it first went done. Most of the work is now *more* actions on pieces that already
-count — #17034 gave bexio 103 — and none of that moves a pieces number. So since W45 (and backfilled to W39) each
-week also records `aiActions.actionsLanded`: the net `audience: 'ai'` lines every PR merged into main inside
-the week's window added, per piece and per author (`total`, `byPerson` incl. `others`, and the `prs` behind it,
-so the number is auditable from `weeks.json` alone). The tile shows it as one line under the headline
-("7,155 AI actions on main · +1,652 this week") and as "· +N actions" beside each person's pieces score.
-Shown, not targeted — `targets.json` still targets pieces.
+count — #17034 gave bexio 103 — and none of that moves a pieces number. And some of it is actions built once
+for humans and agents alike (`audience: 'both'`, "no need to split them"): twitch's 51 in W45 carried not one
+agent-only line, so neither the pieces count nor an agent-only count could see them.
+
+So since W45 (backfilled to W39) each week records `aiActions.actionsLanded`, two counts off the same merged
+PRs, per author and per piece, with the `prs` behind them so every number is auditable from `weeks.json`:
+
+- **agent-only** (`total`, `byPerson`, `prs[].n`/`pieces`): net `audience: 'ai'` lines added — the agent
+  atomics, the same rule the pieces count uses;
+- **new actions** (`newActions.total`, `newActions.byPerson`, `prs[].nNew`/`newActions`): net `createAction(`
+  calls added, whatever the audience — the count Odai's "I just increase the number of actions" work shows up in.
+  `audience: 'both'` lines are deliberately not a measure of their own: a catalog-wide migration put them on 663
+  pieces, and a PR that promotes a `both` action to an agent-only atomic would read as one fewer.
+
+The tile shows both as one line under the headline ("7,155 agent-only actions on main · this week +2,010 new
+actions, +1,652 agent-only") and beside each person's pieces score ("· +260 actions, +199 agent-only"). Shown,
+not targeted — `targets.json` still targets pieces, and a piece whose only agent-callable actions are `both`
+does not count as a piece with AI actions. Whether it should is the lead's call, not the page's.
 
 How it is measured: the same 21-day merged-PR scan that credits the pieces (`scripts/fetch-pr-states.mjs` →
 `data/landings.json` `actionsLanded`, rule in `lib/discover.mjs` `discoverActionsLanded`), read off the diff:
-added minus removed matching lines, piece `src/` files only, PRs into `main` only, in the window by the UTC
-day of the merge. A file GitHub served without a patch (a diff too large to serve — twelve in W39–W45, all
-generated) is rebuilt from its contents by `scripts/rebuild-patch.mjs`, and one that will not rebuild marks
-the scan incomplete, which the Saturday job refuses (`LANDINGS_REQUIRED=1`). A week the scan cannot vouch for
-records no field and the page draws nothing for it; a measured quiet week reads "+0 actions".
+added minus removed matching lines, piece `src/` files only, PRs into `main` only, in the window by the UTC day
+of the merge. A file GitHub served without a patch (a diff too large to serve — twelve in W39–W45, all
+generated) is rebuilt from its contents by `scripts/rebuild-patch.mjs`, and one that will not rebuild marks the
+scan incomplete, which the Saturday job refuses (`LANDINGS_REQUIRED=1`). A week the scan cannot vouch for
+records no field and the page draws nothing for it; a measured quiet week reads "+0". A scan row carrying one
+count and not the other is an older scan, and the week is not measured rather than half so.
 
 `scripts/backfill-ai-actions-landed.mjs` restated W39–W45 on 2026-11-08 from the same rule, one week at a time
-(`--weeks 2026-W39..2026-W45 --apply`; dry run by default, `--verbose` lists the PRs). W41–W45 match the
-week-over-week change in actions on main exactly. W39 and W40 do not: the W39 approved-PR restatement
-(`backfill-ai-actions-approved.mjs`) moved five of Odai's PRs into W39's roster although they merged in W40's
-window, so W40 reads +600 landed against +394 on main and W39 the mirror image, plus a 27-action residue in
-W39 from the older hand-kept roster. Both numbers are right about what they measure; they just measure
-different things across that one seam.
+(`--weeks 2026-W39..2026-W45 --apply`; dry run by default, `--verbose` lists the PRs). The agent-only count for
+W41–W45 matches the week-over-week change in actions on main exactly. W39 and W40 do not: the W39 approved-PR
+restatement (`backfill-ai-actions-approved.mjs`) moved five of Odai's PRs into W39's roster although they merged
+in W40's window, so W40 reads +600 landed against +394 on main and W39 the mirror image, plus a 27-action
+residue in W39 from the older hand-kept roster. Both numbers are right about what they measure; they just
+measure different things across that one seam.
 
 ## Claiming work (the 3-stage model)
 

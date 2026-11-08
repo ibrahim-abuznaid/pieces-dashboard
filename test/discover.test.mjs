@@ -1,7 +1,7 @@
 // test/discover.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyFiles, discoverClaims, claimedPr, countAiAudienceLines, discoverActionsLanded } from '../lib/discover.mjs';
+import { classifyFiles, discoverClaims, claimedPr, countAiAudienceLines, countNewActions, discoverActionsLanded } from '../lib/discover.mjs';
 
 const file = (filename, patch = '') => ({ filename, patch });
 const piece = (slug, rest) => `packages/pieces/community/${slug}/${rest}`;
@@ -240,7 +240,7 @@ test('discoverActionsLanded counts a merged PR\'s net agent atomics per piece', 
     file(piece('bexio', 'src/lib/actions/a.ts'), ai(60)),
     file(piece('bexio', 'src/lib/actions/b.ts'), ai(43)),
   ])]);
-  assert.deepEqual(out, [{ pr: 17034, author: 'OdaiAhmed99', mergedAt: '2026-11-03T10:00:00Z', n: 103, pieces: { bexio: 103 } }]);
+  assert.deepEqual(out, [{ pr: 17034, author: 'OdaiAhmed99', mergedAt: '2026-11-03T10:00:00Z', n: 103, pieces: { bexio: 103 }, nNew: 0, newActions: {} }]);
 });
 
 test('one PR, two pieces: each piece keeps its own net', () => {
@@ -303,4 +303,45 @@ test('landed PRs sort by merge time, then by number', () => {
     merged(21, '2026-11-03T10:00:00Z', f),
   ]);
   assert.deepEqual(out.map((e) => e.pr), [21, 22, 30]);
+});
+
+// ── actions created, any audience ───────────────────────────────────────────
+// Odai builds some actions once for humans and agents (`audience: 'both'`),
+// and twitch's 51 of those carried not one agent-only line. The count of
+// actions CREATED sees them; the agent-only count stays what it is.
+const created = (n) => Array.from({ length: n }, (_, i) => `+export const a${i} = createAction({`).join('\n');
+const dropped = (n) => Array.from({ length: n }, (_, i) => `-export const a${i} = createAction({`).join('\n');
+
+test('countNewActions counts createAction calls added and removed, not the import', () => {
+  const patch = [
+    "+import { createAction, Property } from '@activepieces/pieces-framework';",
+    '+export const post = createAction({',
+    '+  name: "post",',
+    '-export const old = createAction ({',
+    '+++ b/packages/pieces/community/x/src/createAction(.ts',
+  ].join('\n');
+  assert.deepEqual(countNewActions(patch), { added: 1, removed: 1 });
+  assert.deepEqual(countNewActions(undefined), { added: 0, removed: 0 });
+});
+
+test('discoverActionsLanded carries the actions created beside the agent-only ones', () => {
+  const out = discoverActionsLanded([merged(17031, '2026-11-05T10:00:00Z', [
+    file(piece('twitch', 'src/lib/actions/a.ts'), `${created(51)}\n+  audience: 'both',`),
+    file(piece('bexio', 'src/lib/actions/b.ts'), `${created(103)}\n${ai(103)}\n-  audience: 'both',`),
+  ])]);
+  assert.deepEqual(out, [{ pr: 17031, author: 'OdaiAhmed99', mergedAt: '2026-11-05T10:00:00Z',
+    n: 103, pieces: { bexio: 103 }, nNew: 154, newActions: { bexio: 103, twitch: 51 } }]);
+});
+
+test('a PR that only creates actions, with no agent-only line, still lands', () => {
+  const out = discoverActionsLanded([merged(17165, '2026-11-06T10:00:00Z', [file(piece('mem', 'src/a.ts'), created(17))])]);
+  assert.deepEqual(out.map((e) => [e.n, e.pieces, e.nNew, e.newActions]), [[0, {}, 17, { mem: 17 }]]);
+});
+
+test('an action moved between files of one piece is not created twice', () => {
+  const out = discoverActionsLanded([merged(20, '2026-11-06T10:00:00Z', [
+    file(piece('zoom', 'src/old.ts'), dropped(4)),
+    file(piece('zoom', 'src/new.ts'), created(4)),
+  ])]);
+  assert.deepEqual(out, []);
 });

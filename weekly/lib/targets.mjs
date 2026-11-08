@@ -153,6 +153,13 @@ const landedActions = (ws, person) => {
   const n = ws.actionsLanded?.byPerson?.[person];
   return typeof n === 'number' ? n : null;
 };
+// And the actions the same PRs CREATED, any audience (the collector's
+// `newActions`): the number Odai's "I just increase the number of actions"
+// work shows up in. Null on a block archived before it was measured.
+const createdActions = (ws, person) => {
+  const n = ws.actionsLanded?.newActions?.byPerson?.[person];
+  return typeof n === 'number' ? n : null;
+};
 
 // The target block for one tile, or null when the week set none for it or the
 // tile is degraded (it already says "not measured this week"). Rows follow
@@ -170,7 +177,7 @@ export function targetsFor(spec, weeks, selected) {
     const actual = counts ? (counts[person] ?? 0) : null;
     return { person, name: displayName(person), actual, target, hit: actual !== null && actual >= target,
       ...(showOpen ? { open: measured.open[person] ?? 0 } : {}),
-      ...(spec.key === 'aiActions' ? { actions: landedActions(ws, person) } : {}) };
+      ...(spec.key === 'aiActions' ? { actions: landedActions(ws, person), newActions: createdActions(ws, person) } : {}) };
   });
   return { rows, also: counts ? alsoLine(counts, goals) : '' };
 }

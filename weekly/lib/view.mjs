@@ -75,15 +75,22 @@ const doneAiActions = (snap) => {
 // collector returns `roster: []` when it loses the file — so null, never 0.
 // `landed` and `others` come straight off aiActions.actionsLanded, and are
 // null for every week recorded before it (or that the scan could not vouch for).
+// `newActions`/`newOthers` are the actions the same PRs CREATED, any audience
+// (the collector's `newActions`) — the count that sees an action built once for
+// humans and agents alike, which the agent-only count by design does not. Null
+// on a block archived before it was measured.
 const aiActionCounts = (ws) => {
   const rows = Array.isArray(ws.roster) ? ws.roster : [];
   const onMain = rows.length
     ? rows.filter((r) => r.stage === 'merged').reduce((sum, r) => sum + r.actions, 0)
     : null;
+  const number = (v) => (typeof v === 'number' ? v : null);
   return {
     onMain,
-    landed: typeof ws.actionsLanded?.total === 'number' ? ws.actionsLanded.total : null,
-    others: typeof ws.actionsLanded?.byPerson?.others === 'number' ? ws.actionsLanded.byPerson.others : null,
+    landed: number(ws.actionsLanded?.total),
+    others: number(ws.actionsLanded?.byPerson?.others),
+    newActions: number(ws.actionsLanded?.newActions?.total),
+    newOthers: number(ws.actionsLanded?.newActions?.byPerson?.others),
   };
 };
 

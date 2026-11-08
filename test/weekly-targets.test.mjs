@@ -97,8 +97,8 @@ const WEEKS = [W39, W40];
 test('AI actions: newly done pieces credited to their PR author', () => {
   const t = targetsFor(AI, WEEKS, W40);
   assert.deepEqual(t.rows, [
-    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, actions: null },
-    { person: 'odai', name: 'Odai', actual: 1, target: 20, hit: false, actions: null },
+    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, actions: null, newActions: null },
+    { person: 'odai', name: 'Odai', actual: 1, target: 20, hit: false, actions: null, newActions: null },
   ]);
   assert.equal(t.also, 'Talal 1 · 1 other · 1 not credited');
 });
@@ -124,8 +124,8 @@ const AI_OPEN = { ...AI, credit: ['merged', 'approved', 'pr-open'], creditFrom: 
 test('from creditFrom on, an open PR counts for its author, and the row says how many are open', () => {
   const t = targetsFor(AI_OPEN, WEEKS, W40);
   assert.deepEqual(t.rows, [
-    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, open: 0, actions: null },
-    { person: 'odai', name: 'Odai', actual: 2, target: 20, hit: false, open: 1, actions: null },
+    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, open: 0, actions: null, newActions: null },
+    { person: 'odai', name: 'Odai', actual: 2, target: 20, hit: false, open: 1, actions: null, newActions: null },
   ]);
   assert.equal(t.also, 'Talal 1 · 1 other · 1 not credited');
 });
@@ -148,8 +148,8 @@ test('before creditFrom an open PR counts for nobody, and rows carry no open cou
   const W39t = { ...W39, targets: TARGETS };
   const t = targetsFor(AI_OPEN, [W38, W39t], W39t);
   assert.deepEqual(t.rows, [
-    { person: 'kishan', name: 'Kishan', actual: 0, target: 20, hit: false, actions: null },
-    { person: 'odai', name: 'Odai', actual: 0, target: 20, hit: false, actions: null },
+    { person: 'kishan', name: 'Kishan', actual: 0, target: 20, hit: false, actions: null, newActions: null },
+    { person: 'odai', name: 'Odai', actual: 0, target: 20, hit: false, actions: null, newActions: null },
   ]);
 });
 
@@ -291,7 +291,16 @@ test('a measured zero stays zero', () => {
 
 test('a week that did not measure actions carries null, never 0', () => {
   const t = targetsFor(AI, WEEKS, W40);
-  assert.ok(t.rows.every((r) => r.actions === null));
+  assert.ok(t.rows.every((r) => r.actions === null && r.newActions === null));
+});
+
+test('AI-actions rows carry the actions their person created, when the block recorded it', () => {
+  const block = { ...LANDED, newActions: { total: 166, byPerson: { kishan: 12, sanket: 0, odai: 154, talal: 0, others: 0 } } };
+  const W40a = { ...W40, aiActions: { ...W40.aiActions, actionsLanded: block } };
+  const t = targetsFor(AI_OPEN, [W39, W40a], W40a);
+  assert.deepEqual(t.rows.map((r) => [r.person, r.actions, r.newActions]), [['kishan', 12, 12], ['odai', 103, 154]]);
+  const without = targetsFor(AI_OPEN, [W39, { ...W40, aiActions: { ...W40.aiActions, actionsLanded: LANDED } }], { ...W40, aiActions: { ...W40.aiActions, actionsLanded: LANDED } });
+  assert.ok(without.rows.every((r) => r.newActions === null), 'a block archived without it reads null');
 });
 
 test('actions are carried even when the pieces count could not be measured', () => {

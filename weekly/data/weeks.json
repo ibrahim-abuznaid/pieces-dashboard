@@ -10443,11 +10443,26 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 773,
+            "byPerson": {
+              "kishan": 412,
+              "sanket": 0,
+              "odai": 361,
+              "talal": 0,
+              "others": 0
+            }
+          },
           "prs": [
             {
               "pr": 15539,
               "n": 49,
               "pieces": {
+                "pinterest": 29,
+                "trello": 20
+              },
+              "nNew": 49,
+              "newActions": {
                 "pinterest": 29,
                 "trello": 20
               },
@@ -10461,12 +10476,35 @@
                 "twitter": 1,
                 "youtube": 24
               },
+              "nNew": 31,
+              "newActions": {
+                "linkedin": 6,
+                "twitter": 1,
+                "youtube": 24
+              },
               "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15389,
+              "n": 0,
+              "pieces": {},
+              "nNew": 24,
+              "newActions": {
+                "google-gemini": 4,
+                "open-router": 7,
+                "supabase": 13
+              },
+              "author": "kishanprmr"
             },
             {
               "pr": 15703,
               "n": 17,
               "pieces": {
+                "apitable": 8,
+                "claude": 9
+              },
+              "nNew": 17,
+              "newActions": {
                 "apitable": 8,
                 "claude": 9
               },
@@ -10478,12 +10516,20 @@
               "pieces": {
                 "pushover": 19
               },
+              "nNew": 19,
+              "newActions": {
+                "pushover": 19
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 15695,
               "n": 19,
               "pieces": {
+                "google-contacts": 19
+              },
+              "nNew": 19,
+              "newActions": {
                 "google-contacts": 19
               },
               "author": "OdaiAhmed99"
@@ -10497,12 +10543,23 @@
                 "woocommerce": 39,
                 "wordpress": 30
               },
+              "nNew": 95,
+              "newActions": {
+                "google-my-business": 11,
+                "imap": 15,
+                "woocommerce": 39,
+                "wordpress": 30
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 15726,
               "n": 60,
               "pieces": {
+                "jira-cloud": 60
+              },
+              "nNew": 60,
+              "newActions": {
                 "jira-cloud": 60
               },
               "author": "kishanprmr"
@@ -10513,6 +10570,10 @@
               "pieces": {
                 "facebook-pages": 16
               },
+              "nNew": 16,
+              "newActions": {
+                "facebook-pages": 16
+              },
               "author": "kishanprmr"
             },
             {
@@ -10520,6 +10581,10 @@
               "n": 21,
               "pieces": {
                 "calendly": 21
+              },
+              "nNew": 26,
+              "newActions": {
+                "calendly": 26
               },
               "author": "kishanprmr"
             },
@@ -10529,12 +10594,20 @@
               "pieces": {
                 "typeform": 23
               },
+              "nNew": 27,
+              "newActions": {
+                "typeform": 27
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 15762,
               "n": 42,
               "pieces": {
+                "mistral-ai": 42
+              },
+              "nNew": 42,
+              "newActions": {
                 "mistral-ai": 42
               },
               "author": "kishanprmr"
@@ -10545,12 +10618,20 @@
               "pieces": {
                 "salesforce": 77
               },
+              "nNew": 77,
+              "newActions": {
+                "salesforce": 77
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 15781,
               "n": 35,
               "pieces": {
+                "microsoft-onedrive": 35
+              },
+              "nNew": 35,
+              "newActions": {
                 "microsoft-onedrive": 35
               },
               "author": "OdaiAhmed99"
@@ -10561,12 +10642,20 @@
               "pieces": {
                 "baserow": 32
               },
+              "nNew": 32,
+              "newActions": {
+                "baserow": 32
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 15798,
               "n": 91,
               "pieces": {
+                "monday": 91
+              },
+              "nNew": 91,
+              "newActions": {
                 "monday": 91
               },
               "author": "kishanprmr"
@@ -10577,12 +10666,20 @@
               "pieces": {
                 "mastodon": 84
               },
+              "nNew": 84,
+              "newActions": {
+                "mastodon": 84
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 15793,
               "n": 29,
               "pieces": {
+                "hugging-face": 29
+              },
+              "nNew": 29,
+              "newActions": {
                 "hugging-face": 29
               },
               "author": "OdaiAhmed99"
@@ -13269,11 +13366,25 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 791,
+            "byPerson": {
+              "kishan": 218,
+              "sanket": 0,
+              "odai": 573,
+              "talal": 0,
+              "others": 0
+            }
+          },
           "prs": [
             {
               "pr": 15696,
               "n": 45,
               "pieces": {
+                "microsoft-outlook": 45
+              },
+              "nNew": 45,
+              "newActions": {
                 "microsoft-outlook": 45
               },
               "author": "OdaiAhmed99"
@@ -13285,6 +13396,11 @@
                 "mailer-lite": 37,
                 "pipedrive": 32
               },
+              "nNew": 69,
+              "newActions": {
+                "mailer-lite": 37,
+                "pipedrive": 32
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -13293,12 +13409,20 @@
               "pieces": {
                 "whatsapp": 1
               },
+              "nNew": 20,
+              "newActions": {
+                "whatsapp": 20
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 15757,
               "n": 65,
               "pieces": {
+                "asana": 65
+              },
+              "nNew": 65,
+              "newActions": {
                 "asana": 65
               },
               "author": "OdaiAhmed99"
@@ -13309,12 +13433,30 @@
               "pieces": {
                 "dropbox": 26
               },
+              "nNew": 26,
+              "newActions": {
+                "dropbox": 26
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15618,
+              "n": 0,
+              "pieces": {},
+              "nNew": 25,
+              "newActions": {
+                "instagram-business": 25
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 15816,
               "n": 25,
               "pieces": {
+                "cal-com": 25
+              },
+              "nNew": 25,
+              "newActions": {
                 "cal-com": 25
               },
               "author": "kishanprmr"
@@ -13325,12 +13467,20 @@
               "pieces": {
                 "apitemplate-io": 5
               },
+              "nNew": 5,
+              "newActions": {
+                "apitemplate-io": 5
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 15865,
               "n": 12,
               "pieces": {
+                "nocodb": 12
+              },
+              "nNew": 12,
+              "newActions": {
                 "nocodb": 12
               },
               "author": "kishanprmr"
@@ -13341,6 +13491,10 @@
               "pieces": {
                 "tavily": 5
               },
+              "nNew": 5,
+              "newActions": {
+                "tavily": 5
+              },
               "author": "kishanprmr"
             },
             {
@@ -13348,6 +13502,22 @@
               "n": 44,
               "pieces": {
                 "jotform": 44
+              },
+              "nNew": 44,
+              "newActions": {
+                "jotform": 44
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15946,
+              "n": 0,
+              "pieces": {},
+              "nNew": 3,
+              "newActions": {
+                "microsoft-sql-server": 1,
+                "mysql": 1,
+                "postgres": 1
               },
               "author": "kishanprmr"
             },
@@ -13357,7 +13527,21 @@
               "pieces": {
                 "elevenlabs": 87
               },
+              "nNew": 87,
+              "newActions": {
+                "elevenlabs": 87
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 15884,
+              "n": 0,
+              "pieces": {},
+              "nNew": 1,
+              "newActions": {
+                "xml": 1
+              },
+              "author": "OdaiAhmed99"
             },
             {
               "pr": 15969,
@@ -13365,12 +13549,40 @@
               "pieces": {
                 "ntfy": 5
               },
+              "nNew": 11,
+              "newActions": {
+                "ntfy": 11
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15855,
+              "n": 0,
+              "pieces": {},
+              "nNew": 3,
+              "newActions": {
+                "convertapi": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15857,
+              "n": 0,
+              "pieces": {},
+              "nNew": 33,
+              "newActions": {
+                "0codekit": 33
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 15901,
               "n": 63,
               "pieces": {
+                "ghostcms": 63
+              },
+              "nNew": 63,
+              "newActions": {
                 "ghostcms": 63
               },
               "author": "OdaiAhmed99"
@@ -13381,6 +13593,20 @@
               "pieces": {
                 "convertkit": 33
               },
+              "nNew": 33,
+              "newActions": {
+                "convertkit": 33
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15900,
+              "n": 0,
+              "pieces": {},
+              "nNew": 16,
+              "newActions": {
+                "jsm-operations": 16
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -13388,6 +13614,10 @@
               "n": 3,
               "pieces": {
                 "exa": 3
+              },
+              "nNew": 8,
+              "newActions": {
+                "exa": 8
               },
               "author": "OdaiAhmed99"
             },
@@ -13397,6 +13627,10 @@
               "pieces": {
                 "zoho-crm": 34
               },
+              "nNew": 43,
+              "newActions": {
+                "zoho-crm": 43
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -13405,12 +13639,50 @@
               "pieces": {
                 "systeme-io": 12
               },
+              "nNew": 22,
+              "newActions": {
+                "systeme-io": 22
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15942,
+              "n": 0,
+              "pieces": {},
+              "nNew": 9,
+              "newActions": {
+                "csv": 9
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15944,
+              "n": 0,
+              "pieces": {},
+              "nNew": 7,
+              "newActions": {
+                "linear": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15949,
+              "n": 0,
+              "pieces": {},
+              "nNew": 8,
+              "newActions": {
+                "odoo": 8
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16005,
               "n": 30,
               "pieces": {
+                "maileroo": 30
+              },
+              "nNew": 30,
+              "newActions": {
                 "maileroo": 30
               },
               "author": "kishanprmr"
@@ -13421,6 +13693,10 @@
               "pieces": {
                 "jina-ai": 7
               },
+              "nNew": 7,
+              "newActions": {
+                "jina-ai": 7
+              },
               "author": "kishanprmr"
             },
             {
@@ -13428,6 +13704,10 @@
               "n": 1,
               "pieces": {
                 "binance": 1
+              },
+              "nNew": 10,
+              "newActions": {
+                "binance": 10
               },
               "author": "OdaiAhmed99"
             },
@@ -13437,6 +13717,10 @@
               "pieces": {
                 "google-slides": 16
               },
+              "nNew": 31,
+              "newActions": {
+                "google-slides": 31
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -13444,6 +13728,10 @@
               "n": 12,
               "pieces": {
                 "flowlu": 12
+              },
+              "nNew": 25,
+              "newActions": {
+                "flowlu": 25
               },
               "author": "OdaiAhmed99"
             }
@@ -17785,11 +18073,25 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 1814,
+            "byPerson": {
+              "kishan": 843,
+              "sanket": 0,
+              "odai": 968,
+              "talal": 0,
+              "others": 3
+            }
+          },
           "prs": [
             {
               "pr": 16099,
               "n": 29,
               "pieces": {
+                "microsoft-todo": 29
+              },
+              "nNew": 29,
+              "newActions": {
                 "microsoft-todo": 29
               },
               "author": "kishanprmr"
@@ -17800,12 +18102,20 @@
               "pieces": {
                 "zendesk": 99
               },
+              "nNew": 99,
+              "newActions": {
+                "zendesk": 99
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16049,
               "n": 46,
               "pieces": {
+                "ticktick": 46
+              },
+              "nNew": 46,
+              "newActions": {
                 "ticktick": 46
               },
               "author": "kishanprmr"
@@ -17816,12 +18126,20 @@
               "pieces": {
                 "grist": 23
               },
+              "nNew": 23,
+              "newActions": {
+                "grist": 23
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16044,
               "n": 14,
               "pieces": {
+                "supadata": 14
+              },
+              "nNew": 14,
+              "newActions": {
                 "supadata": 14
               },
               "author": "kishanprmr"
@@ -17832,12 +18150,20 @@
               "pieces": {
                 "presentation": 15
               },
+              "nNew": 15,
+              "newActions": {
+                "presentation": 15
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16077,
               "n": 64,
               "pieces": {
+                "cloudinary": 64
+              },
+              "nNew": 64,
+              "newActions": {
                 "cloudinary": 64
               },
               "author": "kishanprmr"
@@ -17848,6 +18174,10 @@
               "pieces": {
                 "reddit": 47
               },
+              "nNew": 47,
+              "newActions": {
+                "reddit": 47
+              },
               "author": "kishanprmr"
             },
             {
@@ -17856,12 +18186,30 @@
               "pieces": {
                 "attio": 77
               },
+              "nNew": 77,
+              "newActions": {
+                "attio": 77
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 16002,
+              "n": 0,
+              "pieces": {},
+              "nNew": 2,
+              "newActions": {
+                "queue": 2
+              },
+              "author": "OdaiAhmed99"
             },
             {
               "pr": 16069,
               "n": 45,
               "pieces": {
+                "linear": 45
+              },
+              "nNew": 45,
+              "newActions": {
                 "linear": 45
               },
               "author": "OdaiAhmed99"
@@ -17872,6 +18220,10 @@
               "pieces": {
                 "moxie-crm": 14
               },
+              "nNew": 47,
+              "newActions": {
+                "moxie-crm": 47
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -17880,7 +18232,21 @@
               "pieces": {
                 "hackernews": 10
               },
+              "nNew": 10,
+              "newActions": {
+                "hackernews": 10
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 16071,
+              "n": 0,
+              "pieces": {},
+              "nNew": 41,
+              "newActions": {
+                "0codekit": 41
+              },
+              "author": "OdaiAhmed99"
             },
             {
               "pr": 16134,
@@ -17888,12 +18254,20 @@
               "pieces": {
                 "pdf-co": 3
               },
+              "nNew": 29,
+              "newActions": {
+                "pdf-co": 29
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16070,
               "n": 34,
               "pieces": {
+                "odoo": 34
+              },
+              "nNew": 34,
+              "newActions": {
                 "odoo": 34
               },
               "author": "OdaiAhmed99"
@@ -17904,12 +18278,18 @@
               "pieces": {
                 "mastodon": -12
               },
+              "nNew": 0,
+              "newActions": {},
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16074,
               "n": 47,
               "pieces": {
+                "hugging-face": 47
+              },
+              "nNew": 47,
+              "newActions": {
                 "hugging-face": 47
               },
               "author": "OdaiAhmed99"
@@ -17920,6 +18300,10 @@
               "pieces": {
                 "bluesky": 6
               },
+              "nNew": 34,
+              "newActions": {
+                "bluesky": 34
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -17927,6 +18311,10 @@
               "n": 5,
               "pieces": {
                 "nifty": 5
+              },
+              "nNew": 20,
+              "newActions": {
+                "nifty": 20
               },
               "author": "OdaiAhmed99"
             },
@@ -17936,12 +18324,20 @@
               "pieces": {
                 "fathom": 3
               },
+              "nNew": 8,
+              "newActions": {
+                "fathom": 8
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16072,
               "n": 59,
               "pieces": {
+                "asana": 59
+              },
+              "nNew": 59,
+              "newActions": {
                 "asana": 59
               },
               "author": "OdaiAhmed99"
@@ -17952,12 +18348,20 @@
               "pieces": {
                 "shopify": 58
               },
+              "nNew": 58,
+              "newActions": {
+                "shopify": 58
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16088,
               "n": 56,
               "pieces": {
+                "shopify": 56
+              },
+              "nNew": 56,
+              "newActions": {
                 "shopify": 56
               },
               "author": "OdaiAhmed99"
@@ -17968,12 +18372,20 @@
               "pieces": {
                 "shopify": 41
               },
+              "nNew": 41,
+              "newActions": {
+                "shopify": 41
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16090,
               "n": 59,
               "pieces": {
+                "shopify": 59
+              },
+              "nNew": 59,
+              "newActions": {
                 "shopify": 59
               },
               "author": "OdaiAhmed99"
@@ -17984,6 +18396,10 @@
               "pieces": {
                 "shopify": 50
               },
+              "nNew": 50,
+              "newActions": {
+                "shopify": 50
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -17992,12 +18408,20 @@
               "pieces": {
                 "xero": 10
               },
+              "nNew": 33,
+              "newActions": {
+                "xero": 33
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16202,
               "n": 3,
               "pieces": {
+                "rss": 3
+              },
+              "nNew": 3,
+              "newActions": {
                 "rss": 3
               },
               "author": "kishanprmr"
@@ -18008,12 +18432,20 @@
               "pieces": {
                 "amazon-s3": 11
               },
+              "nNew": 11,
+              "newActions": {
+                "amazon-s3": 11
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16209,
               "n": 8,
               "pieces": {
+                "facebook-leads": 8
+              },
+              "nNew": 8,
+              "newActions": {
                 "facebook-leads": 8
               },
               "author": "kishanprmr"
@@ -18024,6 +18456,10 @@
               "pieces": {
                 "zoom": 2
               },
+              "nNew": 7,
+              "newActions": {
+                "zoom": 7
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -18031,6 +18467,10 @@
               "n": 6,
               "pieces": {
                 "coda": 6
+              },
+              "nNew": 33,
+              "newActions": {
+                "coda": 33
               },
               "author": "OdaiAhmed99"
             },
@@ -18040,6 +18480,10 @@
               "pieces": {
                 "heartbeat": 1
               },
+              "nNew": 44,
+              "newActions": {
+                "heartbeat": 44
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -18047,6 +18491,10 @@
               "n": 3,
               "pieces": {
                 "drip": 3
+              },
+              "nNew": 32,
+              "newActions": {
+                "drip": 32
               },
               "author": "OdaiAhmed99"
             },
@@ -18056,6 +18504,10 @@
               "pieces": {
                 "bika": 7
               },
+              "nNew": 8,
+              "newActions": {
+                "bika": 8
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -18063,6 +18515,10 @@
               "n": 3,
               "pieces": {
                 "browserless": 3
+              },
+              "nNew": 13,
+              "newActions": {
+                "browserless": 13
               },
               "author": "OdaiAhmed99"
             },
@@ -18072,6 +18528,10 @@
               "pieces": {
                 "taskade": 2
               },
+              "nNew": 38,
+              "newActions": {
+                "taskade": 38
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -18079,6 +18539,10 @@
               "n": 8,
               "pieces": {
                 "google-search-console": 8
+              },
+              "nNew": 9,
+              "newActions": {
+                "google-search-console": 9
               },
               "author": "OdaiAhmed99"
             },
@@ -18088,6 +18552,10 @@
               "pieces": {
                 "totalcms": 8
               },
+              "nNew": 17,
+              "newActions": {
+                "totalcms": 17
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -18096,12 +18564,20 @@
               "pieces": {
                 "square": 11
               },
+              "nNew": 38,
+              "newActions": {
+                "square": 38
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16316,
               "n": 193,
               "pieces": {
+                "mautic": 193
+              },
+              "nNew": 193,
+              "newActions": {
                 "mautic": 193
               },
               "author": "kishanprmr"
@@ -18112,6 +18588,10 @@
               "pieces": {
                 "robolly": 9
               },
+              "nNew": 9,
+              "newActions": {
+                "robolly": 9
+              },
               "author": "kishanprmr"
             },
             {
@@ -18120,13 +18600,31 @@
               "pieces": {
                 "image-router": 8
               },
+              "nNew": 8,
+              "newActions": {
+                "image-router": 8
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 16296,
+              "n": 0,
+              "pieces": {},
+              "nNew": 4,
+              "newActions": {
+                "localai": 4
+              },
+              "author": "OdaiAhmed99"
             },
             {
               "pr": 16300,
               "n": 4,
               "pieces": {
                 "softr": 4
+              },
+              "nNew": 25,
+              "newActions": {
+                "softr": 25
               },
               "author": "OdaiAhmed99"
             },
@@ -18136,6 +18634,10 @@
               "pieces": {
                 "toggl-track": 3
               },
+              "nNew": 22,
+              "newActions": {
+                "toggl-track": 22
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -18144,12 +18646,30 @@
               "pieces": {
                 "mailjet": 118
               },
+              "nNew": 118,
+              "newActions": {
+                "mailjet": 118
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 16232,
+              "n": 0,
+              "pieces": {},
+              "nNew": 3,
+              "newActions": {
+                "google-translate": 3
+              },
+              "author": "fabio-kozlowski"
             },
             {
               "pr": 16339,
               "n": 16,
               "pieces": {
+                "opnform": 16
+              },
+              "nNew": 16,
+              "newActions": {
                 "opnform": 16
               },
               "author": "kishanprmr"
@@ -18160,12 +18680,20 @@
               "pieces": {
                 "flowise": 40
               },
+              "nNew": 40,
+              "newActions": {
+                "flowise": 40
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16349,
               "n": 13,
               "pieces": {
+                "webscraping-ai": 13
+              },
+              "nNew": 13,
+              "newActions": {
                 "webscraping-ai": 13
               },
               "author": "kishanprmr"
@@ -18175,6 +18703,10 @@
               "n": 5,
               "pieces": {
                 "teable": 5
+              },
+              "nNew": 15,
+              "newActions": {
+                "teable": 15
               },
               "author": "OdaiAhmed99"
             }
@@ -23887,6 +24419,16 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 379,
+            "byPerson": {
+              "kishan": 20,
+              "sanket": 0,
+              "odai": 343,
+              "talal": 0,
+              "others": 16
+            }
+          },
           "prs": [
             {
               "pr": 16384,
@@ -23894,12 +24436,20 @@
               "pieces": {
                 "deepgram": 16
               },
+              "nNew": 28,
+              "newActions": {
+                "deepgram": 28
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16385,
               "n": 31,
               "pieces": {
+                "intercom": 31
+              },
+              "nNew": 31,
+              "newActions": {
                 "intercom": 31
               },
               "author": "OdaiAhmed99"
@@ -23910,12 +24460,20 @@
               "pieces": {
                 "nuelink": 22
               },
+              "nNew": 28,
+              "newActions": {
+                "nuelink": 28
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16395,
               "n": 54,
               "pieces": {
+                "gitlab": 54
+              },
+              "nNew": 54,
+              "newActions": {
                 "gitlab": 54
               },
               "author": "OdaiAhmed99"
@@ -23926,6 +24484,10 @@
               "pieces": {
                 "vtiger": 24
               },
+              "nNew": 24,
+              "newActions": {
+                "vtiger": 24
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -23934,13 +24496,31 @@
               "pieces": {
                 "gitlab": 58
               },
+              "nNew": 58,
+              "newActions": {
+                "gitlab": 58
+              },
               "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16292,
+              "n": 0,
+              "pieces": {},
+              "nNew": 15,
+              "newActions": {
+                "jumpcloud": 15
+              },
+              "author": "eliseukadesh67"
             },
             {
               "pr": 16420,
               "n": 7,
               "pieces": {
                 "short-io": 7
+              },
+              "nNew": 25,
+              "newActions": {
+                "short-io": 25
               },
               "author": "OdaiAhmed99"
             },
@@ -23950,13 +24530,31 @@
               "pieces": {
                 "lemon-squeezy": 2
               },
+              "nNew": 30,
+              "newActions": {
+                "lemon-squeezy": 30
+              },
               "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16251,
+              "n": 0,
+              "pieces": {},
+              "nNew": 1,
+              "newActions": {
+                "google-document-ai": 1
+              },
+              "author": "fabio-kozlowski"
             },
             {
               "pr": 16429,
               "n": 7,
               "pieces": {
                 "emailit": 7
+              },
+              "nNew": 26,
+              "newActions": {
+                "emailit": 26
               },
               "author": "OdaiAhmed99"
             },
@@ -23966,12 +24564,20 @@
               "pieces": {
                 "smartsuite": 21
               },
+              "nNew": 39,
+              "newActions": {
+                "smartsuite": 39
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16360,
               "n": 20,
               "pieces": {
+                "scrapegrapghai": 20
+              },
+              "nNew": 20,
+              "newActions": {
                 "scrapegrapghai": 20
               },
               "author": "kishanprmr"
@@ -31145,11 +31751,35 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 792,
+            "byPerson": {
+              "kishan": 333,
+              "sanket": 0,
+              "odai": 447,
+              "talal": 0,
+              "others": 12
+            }
+          },
           "prs": [
+            {
+              "pr": 16286,
+              "n": 0,
+              "pieces": {},
+              "nNew": 3,
+              "newActions": {
+                "amazon-lambda": 3
+              },
+              "author": "eliseukadesh67"
+            },
             {
               "pr": 16649,
               "n": 102,
               "pieces": {
+                "confluence": 102
+              },
+              "nNew": 102,
+              "newActions": {
                 "confluence": 102
               },
               "author": "kishanprmr"
@@ -31160,6 +31790,10 @@
               "pieces": {
                 "magical-api": 1
               },
+              "nNew": 1,
+              "newActions": {
+                "magical-api": 1
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -31167,6 +31801,10 @@
               "n": 41,
               "pieces": {
                 "retell-ai": 41
+              },
+              "nNew": 42,
+              "newActions": {
+                "retell-ai": 42
               },
               "author": "OdaiAhmed99"
             },
@@ -31176,6 +31814,10 @@
               "pieces": {
                 "pdfcrowd": 1
               },
+              "nNew": 8,
+              "newActions": {
+                "pdfcrowd": 8
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -31184,12 +31826,30 @@
               "pieces": {
                 "pinecone": 54
               },
+              "nNew": 54,
+              "newActions": {
+                "pinecone": 54
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 16294,
+              "n": 0,
+              "pieces": {},
+              "nNew": 7,
+              "newActions": {
+                "google-ads": 7
+              },
+              "author": "fabio-kozlowski"
             },
             {
               "pr": 16461,
               "n": 39,
               "pieces": {
+                "bettermode": 39
+              },
+              "nNew": 39,
+              "newActions": {
                 "bettermode": 39
               },
               "author": "OdaiAhmed99"
@@ -31200,12 +31860,20 @@
               "pieces": {
                 "snowflake": 30
               },
+              "nNew": 30,
+              "newActions": {
+                "snowflake": 30
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16459,
               "n": 54,
               "pieces": {
+                "lemlist": 54
+              },
+              "nNew": 54,
+              "newActions": {
                 "lemlist": 54
               },
               "author": "OdaiAhmed99"
@@ -31216,12 +31884,20 @@
               "pieces": {
                 "close": 40
               },
+              "nNew": 40,
+              "newActions": {
+                "close": 40
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16633,
               "n": 21,
               "pieces": {
+                "foreplay-co": 21
+              },
+              "nNew": 21,
+              "newActions": {
                 "foreplay-co": 21
               },
               "author": "OdaiAhmed99"
@@ -31232,6 +31908,10 @@
               "pieces": {
                 "matrix": 22
               },
+              "nNew": 22,
+              "newActions": {
+                "matrix": 22
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -31239,6 +31919,10 @@
               "n": 51,
               "pieces": {
                 "discourse": 51
+              },
+              "nNew": 52,
+              "newActions": {
+                "discourse": 52
               },
               "author": "OdaiAhmed99"
             },
@@ -31248,12 +31932,20 @@
               "pieces": {
                 "gotify": 10
               },
+              "nNew": 11,
+              "newActions": {
+                "gotify": 11
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16523,
               "n": 59,
               "pieces": {
+                "invoiceninja": 59
+              },
+              "nNew": 59,
+              "newActions": {
                 "invoiceninja": 59
               },
               "author": "OdaiAhmed99"
@@ -31264,6 +31956,10 @@
               "pieces": {
                 "netlify": 9
               },
+              "nNew": 21,
+              "newActions": {
+                "netlify": 21
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -31271,6 +31967,10 @@
               "n": 3,
               "pieces": {
                 "pdfmonkey": 3
+              },
+              "nNew": 9,
+              "newActions": {
+                "pdfmonkey": 9
               },
               "author": "OdaiAhmed99"
             },
@@ -31280,12 +31980,20 @@
               "pieces": {
                 "posthog": 37
               },
+              "nNew": 38,
+              "newActions": {
+                "posthog": 38
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16699,
               "n": 89,
               "pieces": {
+                "clockify": 89
+              },
+              "nNew": 89,
+              "newActions": {
                 "clockify": 89
               },
               "author": "kishanprmr"
@@ -31296,12 +32004,20 @@
               "pieces": {
                 "sender": 52
               },
+              "nNew": 52,
+              "newActions": {
+                "sender": 52
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16703,
               "n": 3,
               "pieces": {
+                "youform": 3
+              },
+              "nNew": 3,
+              "newActions": {
                 "youform": 3
               },
               "author": "kishanprmr"
@@ -31312,6 +32028,10 @@
               "pieces": {
                 "pastebin": 3
               },
+              "nNew": 3,
+              "newActions": {
+                "pastebin": 3
+              },
               "author": "kishanprmr"
             },
             {
@@ -31319,6 +32039,40 @@
               "n": 28,
               "pieces": {
                 "microsoft-365-planner": 28
+              },
+              "nNew": 28,
+              "newActions": {
+                "microsoft-365-planner": 28
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16291,
+              "n": 0,
+              "pieces": {},
+              "nNew": 2,
+              "newActions": {
+                "apache-kafka": 2
+              },
+              "author": "eliseukadesh67"
+            },
+            {
+              "pr": 16778,
+              "n": 0,
+              "pieces": {},
+              "nNew": 1,
+              "newActions": {
+                "word-documents": 1
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16779,
+              "n": 0,
+              "pieces": {},
+              "nNew": 1,
+              "newActions": {
+                "word-documents": 1
               },
               "author": "kishanprmr"
             }
@@ -39144,11 +39898,25 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 1133,
+            "byPerson": {
+              "kishan": 843,
+              "sanket": 0,
+              "odai": 282,
+              "talal": 0,
+              "others": 8
+            }
+          },
           "prs": [
             {
               "pr": 16817,
               "n": 262,
               "pieces": {
+                "zoho-desk": 262
+              },
+              "nNew": 262,
+              "newActions": {
                 "zoho-desk": 262
               },
               "author": "kishanprmr"
@@ -39159,12 +39927,20 @@
               "pieces": {
                 "metabase": 126
               },
+              "nNew": 128,
+              "newActions": {
+                "metabase": 128
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16813,
               "n": 28,
               "pieces": {
+                "zoho-bookings": 28
+              },
+              "nNew": 28,
+              "newActions": {
                 "zoho-bookings": 28
               },
               "author": "kishanprmr"
@@ -39175,12 +39951,20 @@
               "pieces": {
                 "qdrant": 30
               },
+              "nNew": 30,
+              "newActions": {
+                "qdrant": 30
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16807,
               "n": 13,
               "pieces": {
+                "twenty": 13
+              },
+              "nNew": 13,
+              "newActions": {
                 "twenty": 13
               },
               "author": "kishanprmr"
@@ -39191,12 +39975,20 @@
               "pieces": {
                 "emailoctopus": 25
               },
+              "nNew": 25,
+              "newActions": {
+                "emailoctopus": 25
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16811,
               "n": 31,
               "pieces": {
+                "zoho-campaigns": 31
+              },
+              "nNew": 31,
+              "newActions": {
                 "zoho-campaigns": 31
               },
               "author": "kishanprmr"
@@ -39207,13 +39999,41 @@
               "pieces": {
                 "zoho-invoice": 196
               },
+              "nNew": 196,
+              "newActions": {
+                "zoho-invoice": 196
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 16750,
+              "n": 0,
+              "pieces": {},
+              "nNew": 8,
+              "newActions": {
+                "databricks": 8
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16295,
+              "n": 0,
+              "pieces": {},
+              "nNew": 8,
+              "newActions": {
+                "google-workspace": 8
+              },
+              "author": "fabio-kozlowski"
             },
             {
               "pr": 16730,
               "n": 13,
               "pieces": {
                 "tarvent": 13
+              },
+              "nNew": 22,
+              "newActions": {
+                "tarvent": 22
               },
               "author": "OdaiAhmed99"
             },
@@ -39223,6 +40043,10 @@
               "pieces": {
                 "alai": 4
               },
+              "nNew": 11,
+              "newActions": {
+                "alai": 11
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39230,6 +40054,10 @@
               "n": 6,
               "pieces": {
                 "mindee": 6
+              },
+              "nNew": 20,
+              "newActions": {
+                "mindee": 20
               },
               "author": "OdaiAhmed99"
             },
@@ -39239,6 +40067,10 @@
               "pieces": {
                 "cognito-forms": 4
               },
+              "nNew": 10,
+              "newActions": {
+                "cognito-forms": 10
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39246,6 +40078,20 @@
               "n": 8,
               "pieces": {
                 "pandadoc": 8
+              },
+              "nNew": 23,
+              "newActions": {
+                "pandadoc": 23
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16766,
+              "n": 0,
+              "pieces": {},
+              "nNew": 16,
+              "newActions": {
+                "amazon-sqs": 16
               },
               "author": "OdaiAhmed99"
             },
@@ -39255,6 +40101,10 @@
               "pieces": {
                 "freshsales": 4
               },
+              "nNew": 37,
+              "newActions": {
+                "freshsales": 37
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39262,6 +40112,10 @@
               "n": 1,
               "pieces": {
                 "bannerbear": 1
+              },
+              "nNew": 10,
+              "newActions": {
+                "bannerbear": 10
               },
               "author": "OdaiAhmed99"
             },
@@ -39271,6 +40125,10 @@
               "pieces": {
                 "campaign-monitor": 2
               },
+              "nNew": 19,
+              "newActions": {
+                "campaign-monitor": 19
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39278,6 +40136,10 @@
               "n": 23,
               "pieces": {
                 "ninjapipe": 23
+              },
+              "nNew": 27,
+              "newActions": {
+                "ninjapipe": 27
               },
               "author": "OdaiAhmed99"
             },
@@ -39287,6 +40149,10 @@
               "pieces": {
                 "canva": 17
               },
+              "nNew": 20,
+              "newActions": {
+                "canva": 20
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39294,6 +40160,10 @@
               "n": 14,
               "pieces": {
                 "smartlead": 14
+              },
+              "nNew": 16,
+              "newActions": {
+                "smartlead": 16
               },
               "author": "OdaiAhmed99"
             },
@@ -39303,6 +40173,10 @@
               "pieces": {
                 "pastefy": 6
               },
+              "nNew": 9,
+              "newActions": {
+                "pastefy": 9
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39310,6 +40184,10 @@
               "n": 4,
               "pieces": {
                 "send-it": 4
+              },
+              "nNew": 6,
+              "newActions": {
+                "send-it": 6
               },
               "author": "OdaiAhmed99"
             },
@@ -39319,6 +40197,10 @@
               "pieces": {
                 "iloveapi": 1
               },
+              "nNew": 13,
+              "newActions": {
+                "iloveapi": 13
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -39327,12 +40209,20 @@
               "pieces": {
                 "workable": 2
               },
+              "nNew": 17,
+              "newActions": {
+                "workable": 17
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 16980,
               "n": 51,
               "pieces": {
+                "raindrop": 51
+              },
+              "nNew": 51,
+              "newActions": {
                 "raindrop": 51
               },
               "author": "kishanprmr"
@@ -39343,6 +40233,10 @@
               "pieces": {
                 "microsoft-onenote": 24
               },
+              "nNew": 24,
+              "newActions": {
+                "microsoft-onenote": 24
+              },
               "author": "kishanprmr"
             },
             {
@@ -39351,12 +40245,20 @@
               "pieces": {
                 "microsoft-outlook-calendar": 47
               },
+              "nNew": 47,
+              "newActions": {
+                "microsoft-outlook-calendar": 47
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 16927,
               "n": 6,
               "pieces": {
+                "rabbitmq": 6
+              },
+              "nNew": 6,
+              "newActions": {
                 "rabbitmq": 6
               },
               "author": "OdaiAhmed99"
@@ -47886,11 +48788,25 @@
             "talal": 0,
             "others": 0
           },
+          "newActions": {
+            "total": 1781,
+            "byPerson": {
+              "kishan": 1458,
+              "sanket": 0,
+              "odai": 321,
+              "talal": 0,
+              "others": 2
+            }
+          },
           "prs": [
             {
               "pr": 17071,
               "n": 20,
               "pieces": {
+                "sendfox": 20
+              },
+              "nNew": 20,
+              "newActions": {
                 "sendfox": 20
               },
               "author": "kishanprmr"
@@ -47901,12 +48817,20 @@
               "pieces": {
                 "surrealdb": 24
               },
+              "nNew": 24,
+              "newActions": {
+                "surrealdb": 24
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17070,
               "n": 20,
               "pieces": {
+                "mongodb": 20
+              },
+              "nNew": 20,
+              "newActions": {
                 "mongodb": 20
               },
               "author": "kishanprmr"
@@ -47917,12 +48841,20 @@
               "pieces": {
                 "duckdb": 5
               },
+              "nNew": 5,
+              "newActions": {
+                "duckdb": 5
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17046,
               "n": 20,
               "pieces": {
+                "gravityforms": 20
+              },
+              "nNew": 20,
+              "newActions": {
                 "gravityforms": 20
               },
               "author": "kishanprmr"
@@ -47933,12 +48865,20 @@
               "pieces": {
                 "perplexity-ai": 26
               },
+              "nNew": 26,
+              "newActions": {
+                "perplexity-ai": 26
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17072,
               "n": 18,
               "pieces": {
+                "mysql": 18
+              },
+              "nNew": 18,
+              "newActions": {
                 "mysql": 18
               },
               "author": "kishanprmr"
@@ -47949,12 +48889,20 @@
               "pieces": {
                 "postgres": 18
               },
+              "nNew": 18,
+              "newActions": {
+                "postgres": 18
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17075,
               "n": 19,
               "pieces": {
+                "microsoft-sql-server": 19
+              },
+              "nNew": 19,
+              "newActions": {
                 "microsoft-sql-server": 19
               },
               "author": "kishanprmr"
@@ -47965,6 +48913,10 @@
               "pieces": {
                 "microsoft-teams": 59
               },
+              "nNew": 59,
+              "newActions": {
+                "microsoft-teams": 59
+              },
               "author": "kishanprmr"
             },
             {
@@ -47973,12 +48925,30 @@
               "pieces": {
                 "groq": 7
               },
+              "nNew": 7,
+              "newActions": {
+                "groq": 7
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17140,
+              "n": 0,
+              "pieces": {},
+              "nNew": 5,
+              "newActions": {
+                "amazon-redshift": 5
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17069,
               "n": 78,
               "pieces": {
+                "webflow": 78
+              },
+              "nNew": 78,
+              "newActions": {
                 "webflow": 78
               },
               "author": "kishanprmr"
@@ -47989,6 +48959,10 @@
               "pieces": {
                 "mattermost": 179
               },
+              "nNew": 179,
+              "newActions": {
+                "mattermost": 179
+              },
               "author": "kishanprmr"
             },
             {
@@ -47996,6 +48970,10 @@
               "n": 4,
               "pieces": {
                 "actualbudget": 4
+              },
+              "nNew": 10,
+              "newActions": {
+                "actualbudget": 10
               },
               "author": "OdaiAhmed99"
             },
@@ -48005,12 +48983,20 @@
               "pieces": {
                 "figma": 1
               },
+              "nNew": 12,
+              "newActions": {
+                "figma": 12
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 17190,
               "n": 30,
               "pieces": {
+                "amazon-bedrock": 30
+              },
+              "nNew": 30,
+              "newActions": {
                 "amazon-bedrock": 30
               },
               "author": "kishanprmr"
@@ -48021,12 +49007,20 @@
               "pieces": {
                 "zoho-books": 153
               },
+              "nNew": 153,
+              "newActions": {
+                "zoho-books": 153
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17170,
               "n": 201,
               "pieces": {
+                "quickbooks-sandbox": 201
+              },
+              "nNew": 201,
+              "newActions": {
                 "quickbooks-sandbox": 201
               },
               "author": "kishanprmr"
@@ -48037,6 +49031,10 @@
               "pieces": {
                 "chargekeep": 5
               },
+              "nNew": 5,
+              "newActions": {
+                "chargekeep": 5
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -48044,6 +49042,10 @@
               "n": 4,
               "pieces": {
                 "hunter": 4
+              },
+              "nNew": 15,
+              "newActions": {
+                "hunter": 15
               },
               "author": "OdaiAhmed99"
             },
@@ -48053,6 +49055,10 @@
               "pieces": {
                 "formbricks": 9
               },
+              "nNew": 24,
+              "newActions": {
+                "formbricks": 24
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -48061,12 +49067,20 @@
               "pieces": {
                 "folk": 28
               },
+              "nNew": 29,
+              "newActions": {
+                "folk": 29
+              },
               "author": "OdaiAhmed99"
             },
             {
               "pr": 17058,
               "n": 146,
               "pieces": {
+                "microsoft-sharepoint": 146
+              },
+              "nNew": 146,
+              "newActions": {
                 "microsoft-sharepoint": 146
               },
               "author": "kishanprmr"
@@ -48077,12 +49091,20 @@
               "pieces": {
                 "filetopdf": 3
               },
+              "nNew": 3,
+              "newActions": {
+                "filetopdf": 3
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17217,
               "n": 26,
               "pieces": {
+                "pocketbase": 26
+              },
+              "nNew": 26,
+              "newActions": {
                 "pocketbase": 26
               },
               "author": "kishanprmr"
@@ -48093,12 +49115,20 @@
               "pieces": {
                 "millionverifier": 8
               },
+              "nNew": 8,
+              "newActions": {
+                "millionverifier": 8
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17219,
               "n": 25,
               "pieces": {
+                "parseur": 25
+              },
+              "nNew": 25,
+              "newActions": {
                 "parseur": 25
               },
               "author": "kishanprmr"
@@ -48109,12 +49139,20 @@
               "pieces": {
                 "doctly": 13
               },
+              "nNew": 13,
+              "newActions": {
+                "doctly": 13
+              },
               "author": "kishanprmr"
             },
             {
               "pr": 17034,
               "n": 103,
               "pieces": {
+                "bexio": 103
+              },
+              "nNew": 103,
+              "newActions": {
                 "bexio": 103
               },
               "author": "OdaiAhmed99"
@@ -48125,6 +49163,10 @@
               "pieces": {
                 "streak": 7
               },
+              "nNew": 7,
+              "newActions": {
+                "streak": 7
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -48132,6 +49174,20 @@
               "n": 8,
               "pieces": {
                 "pushbullet": 8
+              },
+              "nNew": 8,
+              "newActions": {
+                "pushbullet": 8
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17031,
+              "n": 0,
+              "pieces": {},
+              "nNew": 51,
+              "newActions": {
+                "twitch": 51
               },
               "author": "OdaiAhmed99"
             },
@@ -48141,12 +49197,30 @@
               "pieces": {
                 "podio": 355
               },
+              "nNew": 355,
+              "newActions": {
+                "podio": 355
+              },
               "author": "kishanprmr"
+            },
+            {
+              "pr": 17102,
+              "n": 0,
+              "pieces": {},
+              "nNew": 4,
+              "newActions": {
+                "base44": 4
+              },
+              "author": "OdaiAhmed99"
             },
             {
               "pr": 17157,
               "n": 6,
               "pieces": {
+                "knack": 6
+              },
+              "nNew": 6,
+              "newActions": {
                 "knack": 6
               },
               "author": "OdaiAhmed99"
@@ -48157,6 +49231,10 @@
               "pieces": {
                 "help-scout": 15
               },
+              "nNew": 15,
+              "newActions": {
+                "help-scout": 15
+              },
               "author": "OdaiAhmed99"
             },
             {
@@ -48164,6 +49242,20 @@
               "n": 7,
               "pieces": {
                 "leexi": 7
+              },
+              "nNew": 7,
+              "newActions": {
+                "leexi": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17165,
+              "n": 0,
+              "pieces": {},
+              "nNew": 17,
+              "newActions": {
+                "mem": 17
               },
               "author": "OdaiAhmed99"
             },
@@ -48173,7 +49265,21 @@
               "pieces": {
                 "loops": 2
               },
+              "nNew": 8,
+              "newActions": {
+                "loops": 8
+              },
               "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17112,
+              "n": 0,
+              "pieces": {},
+              "nNew": 2,
+              "newActions": {
+                "pdf": 2
+              },
+              "author": "ibrahim-abuznaid"
             }
           ]
         }

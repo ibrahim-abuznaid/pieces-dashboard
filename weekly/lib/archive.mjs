@@ -142,6 +142,35 @@ function validateActionsLanded(ws) {
   });
   const listed = sumOf(block.prs.map((row) => row.n));
   if (listed !== block.total) throw new Error(`${at}.prs add up to ${listed}, not the total ${block.total}`);
+  validateNewActions(block, at);
+}
+
+// The actions CREATED, beside the agent-only atomics above (see the collector).
+// Optional inside the block, because the first blocks were archived without it
+// (2026-11-08, re-stated the same day); when present it is held to the same
+// three sums — people to total, PRs to total, each PR to its pieces.
+function validateNewActions(block, at) {
+  const sub = block.newActions;
+  if (sub === undefined) return;
+  const subAt = `${at}.newActions`;
+  if (!isObject(sub)) throw new Error(`${subAt} must be an object when present`);
+  if (!finite(sub.total)) throw new Error(`${subAt}.total must be a number`);
+  if (!isObject(sub.byPerson)) throw new Error(`${subAt}.byPerson must be an object of person → count`);
+  for (const [person, n] of Object.entries(sub.byPerson)) {
+    if (!finite(n)) throw new Error(`${subAt}.byPerson.${person} must be a finite number, got ${JSON.stringify(n)}`);
+  }
+  const people = sumOf(Object.values(sub.byPerson));
+  if (people !== sub.total) throw new Error(`${subAt}.byPerson adds up to ${people}, not the total ${sub.total}`);
+  block.prs.forEach((row, i) => {
+    const rowAt = `${at}.prs[${i}]`;
+    if (!finite(row.nNew)) throw new Error(`${rowAt}.nNew must be a number when newActions is recorded`);
+    if (!isObject(row.newActions) || !Object.values(row.newActions).every(finite)) {
+      throw new Error(`${rowAt}.newActions must be an object of piece → count`);
+    }
+    if (sumOf(Object.values(row.newActions)) !== row.nNew) throw new Error(`${rowAt}: its newActions do not add up to nNew ${row.nNew}`);
+  });
+  const listed = sumOf(block.prs.map((row) => row.nNew));
+  if (listed !== sub.total) throw new Error(`${subAt}: the PRs' nNew add up to ${listed}, not the total ${sub.total}`);
 }
 
 function validateOptionalNumbers(key, ws) {

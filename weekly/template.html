@@ -372,8 +372,13 @@ function targetsHtml(tg) {
     const open = r.open > 0 ? ` · ${num(r.actual - r.open)} merged, ${num(r.open)} open` : '';
     // AI-actions rows only: the actions this person's PRs landed this week,
     // shown beside the pieces score, not counted toward it. Drawn whether or
-    // not the pieces half was measured — the two are separate readings.
-    const actions = typeof r.actions === 'number' ? ` · ${signedActions(r.actions)} actions` : '';
+    // not the pieces half was measured — the two are separate readings. Two
+    // numbers when both were measured: every action created, then the
+    // agent-only ones among the week's lines; one when only the latter was.
+    const landedParts = [];
+    if (typeof r.newActions === 'number') landedParts.push(`${signedActions(r.newActions)} actions`);
+    if (typeof r.actions === 'number') landedParts.push(`${signedActions(r.actions)} agent-only`);
+    const actions = landedParts.length ? ` · ${landedParts.join(', ')}` : '';
     const score = measured
       ? `${num(r.actual)}/${num(r.target)}${open}${actions}${r.hit ? ' <span class="tick" role="img" aria-label="target hit">✓</span>' : ''}`
       : `— / ${num(r.target)} · not measured${actions}`;
@@ -383,16 +388,22 @@ function targetsHtml(tg) {
     tg.also ? `<div class="note also">also: ${esc(tg.also)}</div>` : ''}`;
 }
 
-// The AI actions behind the AI-actions pieces count: on main in all, and how
-// many this week's merged PRs added (view.mjs aiActionCounts). One line under
-// the headline, above the target rows. No count on main, no line: a week that
-// recorded no roster has nothing to say here. No landed count, no "this week"
-// half — the week never measured it, and a "+0" would claim it did.
+// The actions behind the AI-actions pieces count: agent-only atomics on main
+// in all, and what this week's merged PRs added (view.mjs aiActionCounts) —
+// every action created, then the agent-only ones. One line under the headline,
+// above the target rows. No count on main, no line: a week that recorded no
+// roster has nothing to say here. No landed count, no "this week" half — the
+// week never measured it, and a "+0" would claim it did. "By others" is the
+// share from logins off the team, in whichever of the two counts is wider.
 function actionsHtml(a) {
   if (!a || typeof a.onMain !== 'number') return '';
-  const week = typeof a.landed === 'number' ? ` · ${signedActions(a.landed)} this week` : '';
-  const others = typeof a.others === 'number' && a.others > 0 ? ` (+${num(a.others)} by others)` : '';
-  return `<div class="note actions">${num(a.onMain)} AI actions on main${week}${others}</div>`;
+  const parts = [];
+  if (typeof a.newActions === 'number') parts.push(`${signedActions(a.newActions)} new actions`);
+  if (typeof a.landed === 'number') parts.push(`${signedActions(a.landed)} agent-only`);
+  const week = parts.length ? ` · this week ${parts.join(', ')}` : '';
+  const byOthers = typeof a.newOthers === 'number' ? a.newOthers : a.others;
+  const others = typeof byOthers === 'number' && byOthers > 0 ? ` (+${num(byOthers)} by others)` : '';
+  return `<div class="note actions">${num(a.onMain)} agent-only actions on main${week}${others}</div>`;
 }
 
 function tileHtml(t) {
