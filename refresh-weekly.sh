@@ -214,7 +214,7 @@ log "1/6 internal dashboard refresh (Linear + GitHub) — see $DASHBOARD/refresh
 INTERNAL_OK=1
 if ! bash "$DASHBOARD/refresh.sh"; then
   INTERNAL_OK=0
-  log "WARN internal refresh failed — tickets will degrade to no-data: $(internal_failure)"
+  log "WARN internal refresh failed — tickets, shipping and QA sweeps will degrade to no-data: $(internal_failure)"
   # tickets, shipping and the QA sweeps are the only tiles fed by the internal refresh. When
   # they are all a degraded week is missing, a heal cannot succeed this run, so
   # stop before the ~7-minute fetch instead of spending it four times a day.
@@ -222,6 +222,18 @@ if ! bash "$DASHBOARD/refresh.sh"; then
   if [ "${#SNAPSHOT_FLAGS[@]}" -gt 0 ] && [ -z "$OTHER" ]; then
     log "$WEEK still degraded ($STATE) — it heals once the internal refresh succeeds; the next run retries"
     alert_once_today "$WEEK is still missing $STATE" "$(internal_failure)"
+    exit 1
+  fi
+fi
+# The QA fetch is a non-fatal step of refresh.sh: it can fail while the rest
+# succeeds, and then the only trace is its marker. Say so here, in the log the
+# alert points at, and when the QA tile is ALL a degraded week is missing, stop
+# before the fetch — a heal cannot succeed until the marker clears.
+if [ -f "$DASHBOARD/NEEDS-QA-REFRESH" ]; then
+  log "WARN the QA-sweeps fetch failed — the QA sweeps tile degrades to no-data: $(sed -n 5p "$DASHBOARD/NEEDS-QA-REFRESH" | sed 's/^ *//') (detail: grep 'qa:' $DASHBOARD/refresh.log)"
+  if [ "${#SNAPSHOT_FLAGS[@]}" -gt 0 ] && [ "$STATE" = "qaSweeps" ]; then
+    log "$WEEK still degraded ($STATE) — it heals once the QA fetch succeeds; the next run retries"
+    alert_once_today "$WEEK is still missing $STATE" "refresh-qa.sh was rejected: $(sed -n 5p "$DASHBOARD/NEEDS-QA-REFRESH" | sed 's/^ *//'). Detail: grep 'qa:' $DASHBOARD/refresh.log"
     exit 1
   fi
 fi

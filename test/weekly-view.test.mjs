@@ -1662,7 +1662,7 @@ test('a dates-only QA week draws no rows and no queue, and says who fixed what t
   const t = qaTile(qaDates());
   assert.equal(t.targets, null);
   assert.equal(t.inReview, null);
-  assert.equal(t.perPerson, 'Kishan 0 · Sanket 0 · Odai 0 · Talal 0 · 6 with no assignee');
+  assert.equal(t.perPerson, 'fixed this week: Kishan 0 · Sanket 0 · Odai 0 · Talal 0 · 6 with no assignee');
 });
 
 test('the sweeps link to their projects in Linear, each with its own fixed/total', () => {
@@ -1689,9 +1689,13 @@ test('a QA week that fixed nothing says so; a week before any sweep has no strip
   assert.deepEqual(quiet.strip, { kind: 'tickets', label: 'Nothing fixed this week', items: [], rest: [], more: 0 });
   const none = qaTile({ ...qaDates(), total: 0, fixed: 0, fixedThisWeek: 0, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] });
   assert.equal(none.strip, null);
-  assert.equal(none.unit, 'QA tickets — no sweep filed yet');
+  assert.equal(none.unit, 'QA tickets — none for the team yet');
   assert.equal(none.value, 0);
+  assert.equal(none.perPerson, '', 'no ticket yet, no line of zeros');
 });
+
+test('the QA rows block names itself, so the page does not call the assignment a target', () =>
+  assert.equal(qaTile(qaLive()).targets.label, 'Fixed over assigned'));
 
 test('the QA delta is the fixes since the week before', () => {
   const v = buildView({ weeks: [

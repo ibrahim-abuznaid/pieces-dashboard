@@ -204,9 +204,15 @@ function validateQaSweeps(ws) {
   if (onBoard && ws.fixed + ws.inReview + ws.inProgress + ws.open !== ws.total) {
     throw new Error(`${at}: fixed + inReview + inProgress + open is not the total ${ws.total}`);
   }
+  for (const f of ['total', 'fixed', 'fixedThisWeek']) {
+    if (!Number.isInteger(ws[f]) || ws[f] < 0) throw new Error(`${at}.${f} must be a non-negative integer`);
+  }
+  if (ws.fixedThisWeek > ws.fixed || ws.fixed > ws.total) {
+    throw new Error(`${at}: fixedThisWeek ${ws.fixedThisWeek} ≤ fixed ${ws.fixed} ≤ total ${ws.total} does not hold`);
+  }
   if (!isObject(ws.byPerson)) throw new Error(`${at}.byPerson must be an object of person → counts`);
   const buckets = [...Object.entries(ws.byPerson), ['others', ws.others], ['unassigned', ws.unassigned]];
-  const sums = { fixed: 0, fixedThisWeek: 0, assigned: 0 };
+  const sums = { fixed: 0, fixedThisWeek: 0, assigned: 0, inReview: 0, inProgress: 0 };
   for (const [who, row] of buckets) {
     const rowAt = `${at}.${who}`;
     if (!isObject(row)) throw new Error(`${rowAt} must be an object of counts`);
@@ -218,12 +224,17 @@ function validateQaSweeps(ws) {
         throw new Error(onBoard ? `${rowAt}.${f} must be an integer when the board was read` : `${rowAt}.${f} must be absent on a dates-only block`);
       }
     }
+    for (const f of ['fixed', 'fixedThisWeek', ...(onBoard ? PERSON_ON_BOARD : [])]) {
+      if (row[f] < 0) throw new Error(`${rowAt}.${f} must not be negative`);
+    }
     sums.fixed += row.fixed; sums.fixedThisWeek += row.fixedThisWeek;
-    if (onBoard) sums.assigned += row.assigned;
+    if (onBoard) { sums.assigned += row.assigned; sums.inReview += row.inReview; sums.inProgress += row.inProgress; }
   }
   if (sums.fixed !== ws.fixed) throw new Error(`${at}: the people add up to ${sums.fixed} fixed, not ${ws.fixed}`);
   if (sums.fixedThisWeek !== ws.fixedThisWeek) throw new Error(`${at}: the people add up to ${sums.fixedThisWeek} fixed this week, not ${ws.fixedThisWeek}`);
   if (onBoard && sums.assigned !== ws.total) throw new Error(`${at}: the assignments add up to ${sums.assigned}, not the total ${ws.total}`);
+  if (onBoard && sums.inReview !== ws.inReview) throw new Error(`${at}: the people add up to ${sums.inReview} in review, not ${ws.inReview}`);
+  if (onBoard && sums.inProgress !== ws.inProgress) throw new Error(`${at}: the people add up to ${sums.inProgress} in progress, not ${ws.inProgress}`);
   if (!Array.isArray(ws.projects)) throw new Error(`${at}.projects must be an array`);
   const byProject = { total: 0, fixed: 0, fixedThisWeek: 0 };
   ws.projects.forEach((p, i) => {
@@ -244,6 +255,7 @@ function validateQaSweeps(ws) {
     throw new Error(`${at}.fixedIds must be an array of Linear ids`);
   }
   if (ws.fixedIds.length !== ws.fixedThisWeek) throw new Error(`${at}.fixedIds lists ${ws.fixedIds.length} ids, not the ${ws.fixedThisWeek} fixed this week`);
+  if (new Set(ws.fixedIds).size !== ws.fixedIds.length) throw new Error(`${at}.fixedIds lists an id twice`);
 }
 
 function validateOptionalNumbers(key, ws) {

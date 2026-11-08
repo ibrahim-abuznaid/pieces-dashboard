@@ -10,10 +10,14 @@
 // These are the `key`s the internal dashboard's refresh writes into
 // linear.json and github.json, NOT GitHub handles and not Linear display
 // names. The mapping to those lives where each is fetched:
-// dashboard/pull-github.mjs (PEOPLE[].gh) and dashboard/refresh-linear.sh
-// (the assignee ids in the prompt). Those two and this one have to name the
-// same people; the internal build validates every event row against its own
-// roster, which is the guard that catches a half-done change.
+// dashboard/pull-github.mjs (PEOPLE[].gh), dashboard/refresh-linear.sh (the
+// assignee ids in the prompt), and — since 2026-11-08 — dashboard/refresh-qa.sh
+// (the same ids, plus PEOPLE_KEYS) and dashboard/validate-qa.mjs (its default
+// roster). All of those and this one have to name the same people; the internal
+// build validates every event row against its own roster, which is the guard
+// that catches a half-done change. For the QA file the guard is this way round:
+// a person added here but not there arrives as "other" and earns no row; a
+// person added there but not here makes the QA collector refuse the file.
 export const PEOPLE = ['kishan', 'sanket', 'odai', 'talal'];
 
 export const zeroed = () => Object.fromEntries(PEOPLE.map((p) => [p, 0]));

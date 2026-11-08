@@ -540,3 +540,38 @@ test('with newActions recorded, every PR row needs its own nNew and newActions',
   block.prs[2] = row;
   assert.throws(() => validateSnapshot(withLanded(block)), /aiActions\.actionsLanded\.prs\[2\]\.nNew/);
 });
+
+// ── the QA sweeps block ─────────────────────────────────────────────────────
+// Every number it carries reaches the page, so the block is held to its own
+// sums (see validateQaSweeps). A dates-only block carries no board state.
+const qaRow = (over = {}) => ({ assigned: 0, fixed: 0, fixedThisWeek: 0, inReview: 0, inProgress: 0, ...over });
+const QA_LIVE = () => ({
+  status: 'ok', total: 7, fixed: 4, fixedThisWeek: 3, inReview: 1, inProgress: 1, open: 1, canceled: 1,
+  byPerson: { kishan: qaRow({ assigned: 1, inReview: 1 }), sanket: qaRow({ assigned: 2, fixed: 2, fixedThisWeek: 1 }),
+    odai: qaRow({ assigned: 2, inProgress: 1 }), talal: qaRow() },
+  others: qaRow(), unassigned: qaRow({ assigned: 2, fixed: 2, fixedThisWeek: 2 }),
+  projects: [{ id: 'P-PIE-366', name: 'qa sweep 3', url: 'https://linear.app/x', total: 6, fixed: 3, fixedThisWeek: 2, inReview: 1, inProgress: 1, open: 1 },
+    { id: 'P-ENG-336', name: 'QA Sweep 2', total: 1, fixed: 1, fixedThisWeek: 1, inReview: 0, inProgress: 0, open: 0 }],
+  fixedIds: ['ENG-859', 'PIE-892', 'PIE-896'],
+});
+const qaBad = (name, mutate, re) => test(name, () => {
+  const block = QA_LIVE(); mutate(block);
+  assert.throws(() => validateSnapshot(ok({ qaSweeps: block })), re);
+});
+
+test('a live QA block validates', () => validateSnapshot(ok({ qaSweeps: QA_LIVE() })));
+qaBad('QA: the people must add up to fixed', (b) => { b.byPerson.sanket.fixed = 1; }, /add up to 3 fixed, not 4/);
+qaBad('QA: the people must add up to fixed this week', (b) => { b.unassigned.fixedThisWeek = 1; }, /2 fixed this week, not 3/);
+qaBad('QA: the assignments must add up to the total', (b) => { b.byPerson.talal.assigned = 1; }, /assignments add up to 8/);
+qaBad('QA: the people must add up to in review', (b) => { b.byPerson.odai.inReview = 1; }, /2 in review, not 1/);
+qaBad('QA: the people must add up to in progress', (b) => { b.byPerson.odai.inProgress = 0; }, /0 in progress, not 1/);
+qaBad('QA: the board states must add up to the total', (b) => { b.open = 2; }, /not the total 7/);
+qaBad('QA: the projects must add up to the totals', (b) => { b.projects[1].fixed = 0; }, /projects add up to 3 fixed/);
+qaBad('QA: fixedIds must be exactly the week\'s fixes', (b) => { b.fixedIds.pop(); }, /lists 2 ids, not the 3/);
+qaBad('QA: an id listed twice is rejected', (b) => { b.fixedIds[2] = 'PIE-892'; }, /lists an id twice/);
+qaBad('QA: fixed this week cannot exceed fixed', (b) => { b.fixedThisWeek = 5; b.unassigned.fixedThisWeek = 4; b.projects[0].fixedThisWeek = 4; b.fixedIds = ['A-1', 'A-2', 'A-3', 'A-4', 'A-5']; }, /fixedThisWeek 5 ≤ fixed 4/);
+qaBad('QA: a negative count is rejected', (b) => { b.byPerson.kishan.fixed = -1; b.byPerson.sanket.fixed = 3; }, /must not be negative/);
+qaBad('QA: a dates-only block may carry no board state', (b) => {
+  for (const f of ['inReview', 'inProgress', 'open', 'canceled']) delete b[f];
+}, /assigned must be absent on a dates-only block/);
+qaBad('QA: a board block must carry every board count', (b) => { delete b.inProgress; }, /inProgress must be an integer when the board was read/);

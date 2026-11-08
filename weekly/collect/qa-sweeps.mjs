@@ -41,12 +41,19 @@ const isObject = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v)
 const OPEN_TYPES = ['triage', 'backlog', 'unstarted'];
 const CLOSED_TYPES = ['canceled', 'duplicate'];
 
-// A ticket's state on the board today. Started is split on the status NAME,
-// because "In Review" is the queue the lead watches; Blocked and every other
-// started state read as in progress.
-function liveState(t) {
-  if (t.statusType === 'completed') return 'fixed';
-  if (CLOSED_TYPES.includes(t.statusType)) return 'canceled';
+// A ticket's state on the board as read, HELD TO THE WEEK'S END. The file is
+// read on Saturday — or days later, on a heal — and a fix or a cancel dated
+// after the window's last day is still OPEN for this week: otherwise the
+// running total would run ahead of the week's own chips (a ticket closed at
+// 08:00 Saturday counted before the 09:00 run), and a heal on Wednesday would
+// pull three days of next week's fixes into this one. The queue counts
+// (in review, in progress, the assignment) are the board as read; they have
+// no date to hold them to. Started is split on the status NAME, because
+// "In Review" is the queue the lead watches; Blocked and every other started
+// state read as in progress.
+function liveState(t, end) {
+  if (t.statusType === 'completed') return isDate(t.completedAt) && t.completedAt <= end ? 'fixed' : 'open';
+  if (CLOSED_TYPES.includes(t.statusType)) return isDate(t.canceledAt) && t.canceledAt > end ? 'open' : 'canceled';
   if (t.statusType === 'started') return t.status === 'In Review' ? 'inReview' : 'inProgress';
   if (OPEN_TYPES.includes(t.statusType)) return 'open';
   throw new Error(`${t.id}: unknown statusType ${JSON.stringify(t.statusType)}`);
@@ -132,7 +139,10 @@ export function qaSweepsForWindow(qa, window, { asOf = null } = {}) {
     if (!inScope(t)) continue;
     const project = projects.get(t.project);
     if (!project) throw new Error(`${t.id}: project ${t.project} is not in qa.json's projects`);
-    const state = live ? liveState(t) : dateState(t, asOf);
+    // A ticket filed after the week's last day is next week's, in both readings.
+    const state = live
+      ? (t.createdAt > window.end ? undefined : liveState(t, window.end))
+      : dateState(t, asOf);
     if (state === undefined) continue;                 // not created yet, as of that day
     if (state === 'canceled') { if (live) out.canceled += 1; continue; }
     const who = bucketOf(t);

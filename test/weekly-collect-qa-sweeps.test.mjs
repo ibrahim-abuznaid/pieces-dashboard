@@ -73,6 +73,21 @@ test('a ticket that is neither the Pieces team\'s nor a roster member\'s is not 
   assert.equal(out.projects[1].total, 1, 'ENG-860 (team Engineering, assignee other) is out of scope');
 });
 
+test('the live reading is held to the week\'s end: a later fix is still open, a later ticket absent', () => {
+  const qa = QA();
+  // Fixed on the Saturday before the 09:00 run: next week's, not this week's.
+  qa.tickets[0] = { ...qa.tickets[0], statusType: 'completed', status: 'Done', completedAt: '2026-11-07' };
+  // Filed on the Saturday as well.
+  qa.tickets.push(t('PIE-1100', 'P-PIE-366', 'Pieces', 'odai', 'triage', 'Triage', { createdAt: '2026-11-07' }));
+  const out = qaSweepsForWindow(qa, W45);
+  assert.deepEqual({ total: out.total, fixed: out.fixed, fixedThisWeek: out.fixedThisWeek, open: out.open, inReview: out.inReview },
+    { total: 7, fixed: 4, fixedThisWeek: 3, open: 2, inReview: 0 });
+  assert.deepEqual(out.fixedIds, ['ENG-859', 'PIE-892', 'PIE-896']);
+  assert.equal(out.byPerson.kishan.assigned, 1, 'the ticket is still his, and still open for this week');
+  assert.equal(out.byPerson.odai.assigned, 2, 'the Saturday ticket does not exist for this week');
+  validateSnapshot(snapWith(out));
+});
+
 test('the live block validates as an archived week', () => {
   const qaSweeps = qaSweepsForWindow(QA(), W45);
   validateSnapshot(snapWith(qaSweeps));

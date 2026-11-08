@@ -199,7 +199,8 @@ board. Every number is auditable from the block alone — people + others + unas
 `fixedThisWeek`, the projects add up to the totals, `fixedIds` lists exactly `fixedThisWeek` ids.
 `scripts/backfill-qa-sweeps.mjs` restated W31–W45 on 2026-11-08 from `createdAt`/`completedAt`/`canceledAt`
 alone (dates-only, no board state), and W45 — the latest sealed week — from the board as read that day, as
-a heal of the week would have. W31–W37 predate the first sweep and read "no sweep filed yet".
+a heal of the week would have. W31–W43 hold no ticket of this team's (the Engineering sweeps existed, ours
+did not) and read "none for the team yet".
 
 ## AI actions — quality & rollout (counts only)
 

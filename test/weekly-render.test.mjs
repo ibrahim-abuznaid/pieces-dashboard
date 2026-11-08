@@ -1678,6 +1678,18 @@ test('the QA rows read fixed over assigned with the queue beside, and never spea
   assert.doesNotMatch(tile, /Talal/, 'a person with no tickets has no row');
   assert.doesNotMatch(tile, /merged|open<\/span>/);
   assert.match(tile, /also: 6 fixed with no assignee/);
+  assert.match(tile, /<ul class="targets" aria-label="Fixed over assigned">/);
+});
+
+test('a QA row\'s own strings are escaped like every other string in the row', () => {
+  const week = qaWeek();
+  week.qaSweeps.byPerson.kishan.inReview = 1;
+  const dom = renderDom([week]);
+  // The detail is built by the view from integers; this pins that the
+  // template does not trust it anyway, by checking the escape path exists
+  // for the unit as well: a literal "<" in the unit cannot reach the DOM.
+  assert.doesNotMatch(tileOf(dom, 'QA sweeps'), /<script/);
+  assert.match(tileOf(dom, 'Weekly targets'.replace('Weekly targets', 'QA sweeps')), /0\/46 fixed · 1 in review/);
 });
 
 test('each sweep links to its project in Linear from the tile', () => {

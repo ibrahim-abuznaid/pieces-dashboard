@@ -376,6 +376,21 @@ test('the NEEDS-LINEAR-REFRESH marker warns but does not fail the check', () => 
   assert.equal(r.failed.length, 0);
 });
 
+// The QA-sweeps file has its own marker (refresh-qa.sh) and its own tile; the
+// same reading: a warning that names the tile it darkens, never a failure.
+test('the NEEDS-QA-REFRESH marker warns on its own line and does not fail the check', () => {
+  const r = runChecks(healthy({ marker: { present: false, qa: { present: true, ageDays: 2, path: '/tmp/NEEDS-QA-REFRESH' } } }));
+  assert.equal(r.ok, true);
+  const c = check(r, 'qa refresh');
+  assert.equal(c.ok, false);
+  assert.equal(c.warn, true);
+  assert.match(c.detail, /2 days old.*QA sweeps tile/);
+  assert.equal(check(r, 'linear refresh').ok, true, 'the Linear marker is judged separately');
+});
+
+test('no QA marker is a passing check', () =>
+  assert.equal(check(runChecks(healthy({ marker: { present: false } })), 'qa refresh').ok, true));
+
 // --- CLI plumbing -----------------------------------------------------------
 
 test('parseArgs rejects a mistyped week rather than checking the wrong one', () => {

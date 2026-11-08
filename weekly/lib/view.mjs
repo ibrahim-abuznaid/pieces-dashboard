@@ -290,11 +290,11 @@ function coveredStrip(ws) {
 // The bug tickets the automated QA sweeps file in Linear, and how far the
 // team has worked through them (weekly/collect/qa-sweeps.mjs). The number is
 // tickets FIXED, a running total; `total` is every ticket in scope, canceled
-// ones excluded. A week with no sweep tickets yet (W31–W37, before the first
-// sweep existed) says so rather than "0 of 0".
+// ones excluded. A week with no ticket of this team's yet — W31–W43: the
+// Engineering sweeps existed, ours did not — says so rather than "0 of 0".
 const qaUnit = (ws) => (ws.total > 0
   ? `of ${ws.total} QA ${plural(ws.total, 'ticket')} fixed`
-  : 'QA tickets — no sweep filed yet');
+  : 'QA tickets — none for the team yet');
 
 // Per-person rows, in the target rows' shape, with the ASSIGNMENT as the
 // denominator: `Odai 0/49 fixed`. The assignment is a fact the board records;
@@ -323,18 +323,22 @@ function qaRows(ws) {
   // Tickets held by someone off the roster (the lead reviewing one himself,
   // 2026-11-08): no row, but not silently missing from the total either.
   if (ws.others?.assigned > 0) also.push(`${ws.others.assigned} assigned to others`);
-  return { rows, also: also.join(' · ') };
+  return { label: 'Fixed over assigned', rows, also: also.join(' · ') };
 }
 
-// The dates-only line: who fixed what this week, with the no-assignee and
-// off-team shares, so the parts add up to the tile's own fixedThisWeek.
+// The dates-only line: who fixed what THIS WEEK — said, because it sits
+// under a running total and would otherwise read as each person's share of
+// it — with the no-assignee and off-team shares, so the parts add up to the
+// tile's own fixedThisWeek. Zeros included, as on the tickets tile: a quiet
+// week is information. Nothing at all while the team has no ticket yet.
 function qaPersonLine(ws) {
+  if (!(ws.total > 0)) return '';
   const parts = Object.entries(ws.byPerson ?? {})
     .filter(([, r]) => Number.isInteger(r?.fixedThisWeek))
     .map(([key, r]) => `${titled(key)} ${r.fixedThisWeek}`);
   if (ws.unassigned?.fixedThisWeek > 0) parts.push(`${ws.unassigned.fixedThisWeek} with no assignee`);
   if (ws.others?.fixedThisWeek > 0) parts.push(`${ws.others.fixedThisWeek} by others`);
-  return ws.fixedThisWeek > 0 || parts.length ? parts.join(' · ') : '';
+  return parts.length ? `fixed this week: ${parts.join(' · ')}` : '';
 }
 
 // One link per sweep, with its own fixed/total, so the reader can open the
@@ -520,6 +524,15 @@ const TILES = [
   // hands `value`, so a delta can never compare a coverage count against a PR
   // count across the changeover: coveredCount is null on unmeasured weeks, and
   // a null side yields no delta at all.
+  // The QA sweeps: the bug tickets Linear's QA projects hold for this team, and
+  // how many are fixed. WIDE, and first of the wide tiles — directly under the
+  // small grid, because it is the week's work, not a rollout; a ninth small
+  // tile would leave a hole in the two-column grid. Running total with the
+  // same pill the rollouts carry; "+N in review" is the queue behind it. The
+  // per-person rows are the assignment, not a target — see qaRows.
+  { key: 'qaSweeps', title: 'QA sweeps', path: 'qaSweeps.fixed',
+    unit: qaUnit, review: 'qaSweeps.inReview', wide: true, running: true,
+    rows: qaRows, perPerson: qaPersonLine, links: qaLinks, strip: qaStrip },
   // The property-UI rollout: pieces carrying the new step-settings UI — grouped
   // props, the essential/Advanced split, the widget set.
   //
@@ -536,15 +549,6 @@ const TILES = [
   // to look for this still finds it there, now carrying the same kind of number
   // as the other rollouts. The prose did not die with the band: it moved to
   // weekly/data/notes.json and renders as this tile's note line.
-  // The QA sweeps: the bug tickets Linear's QA projects hold for this team, and
-  // how many are fixed. WIDE, and first of the wide tiles — directly under the
-  // small grid, because it is the week's work, not a rollout; a ninth small
-  // tile would leave a hole in the two-column grid. Running total with the
-  // same pill the rollouts carry; "+N in review" is the queue behind it. The
-  // per-person rows are the assignment, not a target — see qaRows.
-  { key: 'qaSweeps', title: 'QA sweeps', path: 'qaSweeps.fixed',
-    unit: qaUnit, review: 'qaSweeps.inReview', wide: true, running: true,
-    rows: qaRows, perPerson: qaPersonLine, links: qaLinks, strip: qaStrip },
   { key: 'uiImprovements', title: 'UI improvements', path: 'uiImprovements.merged',
     unit: (ws) => `of ${ws.totalPieces} pieces`,
     review: 'uiImprovements.review',
