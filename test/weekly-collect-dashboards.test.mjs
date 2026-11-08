@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { collectOutputSchema } from '../weekly/collect/output-schema.mjs';
-import { collectAiActions } from '../weekly/collect/ai-actions.mjs';
+import { collectAiActions, actionsLandedForWindow } from '../weekly/collect/ai-actions.mjs';
 import { collectUiImprovements } from '../weekly/collect/ui-improvements.mjs';
 import { validateSnapshot } from '../weekly/lib/archive.mjs';
 
@@ -704,4 +704,110 @@ test('the UI-improvements roster carries the author a build resolved', () => {
   const byFolder = Object.fromEntries(out.roster.map((r) => [r.folder, r]));
   assert.equal(byFolder.whatsscale.author, 'OdaiAhmed99');
   assert.equal('author' in byFolder['google-sheets'], false);
+});
+
+// ── AI actions landed this week ─────────────────────────────────────────────
+// The tile counts pieces; this counts the agent atomics the week's merged PRs
+// added, per author, off data/landings.json (scripts/fetch-pr-states.mjs).
+// Shown, never targeted, so it rides along the tile and must never cost it.
+const W45 = { start: '2026-10-31', end: '2026-11-06' };
+const LANDINGS = {
+  fetched: '2026-11-07', since: '2026-10-17', complete: true,
+  aiActions: {},
+  actionsLanded: [
+    { pr: 16990, author: 'kishanprmr', mergedAt: '2026-10-30T23:59:00Z', n: 50, pieces: { gmail: 50 } },
+    { pr: 17040, author: 'kishanprmr', mergedAt: '2026-10-31T00:00:01Z', n: 12, pieces: { asana: 9, notion: 3 } },
+    { pr: 17034, author: 'OdaiAhmed99', mergedAt: '2026-11-03T10:00:00Z', n: 103, pieces: { bexio: 103 } },
+    { pr: 17041, author: 'ibrahim-abuznaid', mergedAt: '2026-11-05T09:00:00Z', n: 4, pieces: { slack: 4 } },
+    { pr: 17042, author: null, mergedAt: '2026-11-06T23:00:00Z', n: -2, pieces: { zoom: -2 } },
+    { pr: 17060, author: 'OdaiAhmed99', mergedAt: '2026-11-07T00:00:00Z', n: 30, pieces: { stripe: 30 } },
+  ],
+};
+const withLandings = (landings = LANDINGS) => aiRead({ 'data/landings.json': landings });
+
+test('the collector carries the AI actions landed this week, per person', () => {
+  const out = collectAiActions({ readJson: withLandings(), window: W45 });
+  assert.deepEqual(out.actionsLanded, {
+    total: 117,
+    byPerson: { kishan: 12, sanket: 0, odai: 103, talal: 0, others: 2 },
+    prs: [
+      { pr: 17040, n: 12, pieces: { asana: 9, notion: 3 }, author: 'kishanprmr' },
+      { pr: 17034, n: 103, pieces: { bexio: 103 }, author: 'OdaiAhmed99' },
+      { pr: 17041, n: 4, pieces: { slack: 4 }, author: 'ibrahim-abuznaid' },
+      { pr: 17042, n: -2, pieces: { zoom: -2 } },
+    ],
+  });
+});
+
+test('PRs merged outside the window are not this week\'s actions', () => {
+  const { prs } = actionsLandedForWindow(LANDINGS, W45);
+  assert.ok(!prs.some((p) => p.pr === 16990), 'merged the Friday before');
+  assert.ok(!prs.some((p) => p.pr === 17060), 'merged the Saturday after');
+});
+
+test('a PR with no author is credited to others and carries no author key', () => {
+  const { prs, byPerson } = actionsLandedForWindow(LANDINGS, W45);
+  const row = prs.find((p) => p.pr === 17042);
+  assert.equal('author' in row, false, 'spread, never assigned: no author: null in the archive');
+  assert.equal(byPerson.others, 2, '4 by ibrahim-abuznaid, −2 by nobody');
+});
+
+test('a quiet week is a measured zero for everyone', () => {
+  const out = actionsLandedForWindow({ since: '2026-10-17', actionsLanded: [] }, W45);
+  assert.deepEqual(out, { total: 0, byPerson: { kishan: 0, sanket: 0, odai: 0, talal: 0, others: 0 }, prs: [] });
+});
+
+test('no landings file: the field is absent and the tile untouched', () => {
+  const out = collectAiActions({ readJson: aiRead(), window: W45 });
+  assert.equal(out.status, 'ok');
+  assert.equal('actionsLanded' in out, false);
+  assert.equal(out.merged, 2);
+});
+
+test('a landings file with no actionsLanded array leaves the field absent', () => {
+  const { actionsLanded, ...old } = LANDINGS;
+  const out = collectAiActions({ readJson: withLandings(old), window: W45 });
+  assert.equal(out.status, 'ok');
+  assert.equal('actionsLanded' in out, false);
+});
+
+// The scan reaches back 21 days from the day it ran. A week that starts before
+// that is only partly covered, and a partial count would read as a slow week.
+test('a scan that does not reach back to the week\'s start is not measured', () => {
+  const out = collectAiActions({ readJson: withLandings({ ...LANDINGS, since: '2026-11-01' }), window: W45 });
+  assert.equal(out.status, 'ok');
+  assert.equal('actionsLanded' in out, false);
+  assert.equal(actionsLandedForWindow({ ...LANDINGS, since: '2026-10-31' }, W45).total, 117, 'the start day itself is covered');
+});
+
+test('a scan that lost a call is not measured either', () =>
+  assert.equal(actionsLandedForWindow({ ...LANDINGS, complete: false }, W45), null));
+
+test('no window, no measurement', () =>
+  assert.equal(actionsLandedForWindow(LANDINGS, undefined), null));
+
+test('a landings file that will not parse costs the field, never the tile', () => {
+  const out = collectAiActions({ readJson: (p) => {
+    if (p === 'data/landings.json') throw new SyntaxError('Unexpected token');
+    return aiRead()(p);
+  }, window: W45 });
+  assert.equal(out.status, 'ok');
+  assert.equal('actionsLanded' in out, false);
+});
+
+test('what the collector emits with actions landed passes validateSnapshot', () => {
+  validateSnapshot({
+    week: '2026-W45', start: W45.start, end: W45.end, builtAt: '2026-11-07', decisions: [],
+    outputSchema: collectOutputSchema({ readJson: osRead() }),
+    aiActions: collectAiActions({ readJson: withLandings(), window: W45 }),
+    uiImprovements: collectUiImprovements({ readJson: uiRead() }),
+    connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
+    testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
+    tickets: { status: 'ok', total: 11 },
+  });
+});
+
+test('a malformed row inside the week is a broken reading, not a row to skip', () => {
+  const broken = { ...LANDINGS, actionsLanded: [...LANDINGS.actionsLanded, { pr: 17050, mergedAt: '2026-11-04T10:00:00Z', n: '7', pieces: {} }] };
+  assert.equal(actionsLandedForWindow(broken, W45), null);
 });

@@ -10433,7 +10433,162 @@
             "displayName": "Cal.com",
             "logo": "https://cdn.activepieces.com/pieces/cal.com.png"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 740,
+          "byPerson": {
+            "kishan": 379,
+            "sanket": 0,
+            "odai": 361,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 15539,
+              "n": 49,
+              "pieces": {
+                "pinterest": 29,
+                "trello": 20
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15688,
+              "n": 31,
+              "pieces": {
+                "linkedin": 6,
+                "twitter": 1,
+                "youtube": 24
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15703,
+              "n": 17,
+              "pieces": {
+                "apitable": 8,
+                "claude": 9
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15694,
+              "n": 19,
+              "pieces": {
+                "pushover": 19
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15695,
+              "n": 19,
+              "pieces": {
+                "google-contacts": 19
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15722,
+              "n": 95,
+              "pieces": {
+                "google-my-business": 11,
+                "imap": 15,
+                "woocommerce": 39,
+                "wordpress": 30
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15726,
+              "n": 60,
+              "pieces": {
+                "jira-cloud": 60
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15728,
+              "n": 16,
+              "pieces": {
+                "facebook-pages": 16
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15731,
+              "n": 21,
+              "pieces": {
+                "calendly": 21
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15734,
+              "n": 23,
+              "pieces": {
+                "typeform": 23
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15762,
+              "n": 42,
+              "pieces": {
+                "mistral-ai": 42
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15768,
+              "n": 77,
+              "pieces": {
+                "salesforce": 77
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15781,
+              "n": 35,
+              "pieces": {
+                "microsoft-onedrive": 35
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15797,
+              "n": 32,
+              "pieces": {
+                "baserow": 32
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15798,
+              "n": 91,
+              "pieces": {
+                "monday": 91
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15756,
+              "n": 84,
+              "pieces": {
+                "mastodon": 84
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15793,
+              "n": 29,
+              "pieces": {
+                "hugging-face": 29
+              },
+              "author": "OdaiAhmed99"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",
@@ -13104,7 +13259,196 @@
             "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/ticktick.png"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 600,
+          "byPerson": {
+            "kishan": 215,
+            "sanket": 0,
+            "odai": 385,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 15696,
+              "n": 45,
+              "pieces": {
+                "microsoft-outlook": 45
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15725,
+              "n": 69,
+              "pieces": {
+                "mailer-lite": 37,
+                "pipedrive": 32
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15585,
+              "n": 1,
+              "pieces": {
+                "whatsapp": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15757,
+              "n": 65,
+              "pieces": {
+                "asana": 65
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15661,
+              "n": 26,
+              "pieces": {
+                "dropbox": 26
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15816,
+              "n": 25,
+              "pieces": {
+                "cal-com": 25
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15862,
+              "n": 5,
+              "pieces": {
+                "apitemplate-io": 5
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15865,
+              "n": 12,
+              "pieces": {
+                "nocodb": 12
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15870,
+              "n": 5,
+              "pieces": {
+                "tavily": 5
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15879,
+              "n": 44,
+              "pieces": {
+                "jotform": 44
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15981,
+              "n": 87,
+              "pieces": {
+                "elevenlabs": 87
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 15969,
+              "n": 5,
+              "pieces": {
+                "ntfy": 5
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15901,
+              "n": 63,
+              "pieces": {
+                "ghostcms": 63
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15902,
+              "n": 33,
+              "pieces": {
+                "convertkit": 33
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15983,
+              "n": 3,
+              "pieces": {
+                "exa": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15982,
+              "n": 34,
+              "pieces": {
+                "zoho-crm": 34
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 15979,
+              "n": 12,
+              "pieces": {
+                "systeme-io": 12
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16005,
+              "n": 30,
+              "pieces": {
+                "maileroo": 30
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16011,
+              "n": 7,
+              "pieces": {
+                "jina-ai": 7
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16006,
+              "n": 1,
+              "pieces": {
+                "binance": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16007,
+              "n": 16,
+              "pieces": {
+                "google-slides": 16
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16015,
+              "n": 12,
+              "pieces": {
+                "flowlu": 12
+              },
+              "author": "OdaiAhmed99"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",
@@ -17431,7 +17775,411 @@
             "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/scrapegraphai.jpg"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 1384,
+          "byPerson": {
+            "kishan": 843,
+            "sanket": 0,
+            "odai": 541,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 16099,
+              "n": 29,
+              "pieces": {
+                "microsoft-todo": 29
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16079,
+              "n": 99,
+              "pieces": {
+                "zendesk": 99
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16049,
+              "n": 46,
+              "pieces": {
+                "ticktick": 46
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16047,
+              "n": 23,
+              "pieces": {
+                "grist": 23
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16044,
+              "n": 14,
+              "pieces": {
+                "supadata": 14
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16045,
+              "n": 15,
+              "pieces": {
+                "presentation": 15
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16077,
+              "n": 64,
+              "pieces": {
+                "cloudinary": 64
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16100,
+              "n": 47,
+              "pieces": {
+                "reddit": 47
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16105,
+              "n": 77,
+              "pieces": {
+                "attio": 77
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16069,
+              "n": 45,
+              "pieces": {
+                "linear": 45
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16097,
+              "n": 14,
+              "pieces": {
+                "moxie-crm": 14
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16129,
+              "n": 10,
+              "pieces": {
+                "hackernews": 10
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16134,
+              "n": 3,
+              "pieces": {
+                "pdf-co": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16070,
+              "n": 34,
+              "pieces": {
+                "odoo": 34
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16073,
+              "n": -12,
+              "pieces": {
+                "mastodon": -12
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16074,
+              "n": 47,
+              "pieces": {
+                "hugging-face": 47
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16125,
+              "n": 6,
+              "pieces": {
+                "bluesky": 6
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16128,
+              "n": 5,
+              "pieces": {
+                "nifty": 5
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16133,
+              "n": 3,
+              "pieces": {
+                "fathom": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16072,
+              "n": 59,
+              "pieces": {
+                "asana": 59
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16087,
+              "n": 58,
+              "pieces": {
+                "shopify": 58
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16088,
+              "n": 56,
+              "pieces": {
+                "shopify": 56
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16089,
+              "n": 41,
+              "pieces": {
+                "shopify": 41
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16090,
+              "n": 59,
+              "pieces": {
+                "shopify": 59
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16091,
+              "n": 50,
+              "pieces": {
+                "shopify": 50
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16136,
+              "n": 10,
+              "pieces": {
+                "xero": 10
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16202,
+              "n": 3,
+              "pieces": {
+                "rss": 3
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16204,
+              "n": 11,
+              "pieces": {
+                "amazon-s3": 11
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16209,
+              "n": 8,
+              "pieces": {
+                "facebook-leads": 8
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16137,
+              "n": 2,
+              "pieces": {
+                "zoom": 2
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16160,
+              "n": 6,
+              "pieces": {
+                "coda": 6
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16169,
+              "n": 1,
+              "pieces": {
+                "heartbeat": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16180,
+              "n": 3,
+              "pieces": {
+                "drip": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16217,
+              "n": 7,
+              "pieces": {
+                "bika": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16215,
+              "n": 3,
+              "pieces": {
+                "browserless": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16172,
+              "n": 2,
+              "pieces": {
+                "taskade": 2
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16227,
+              "n": 8,
+              "pieces": {
+                "google-search-console": 8
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16212,
+              "n": 8,
+              "pieces": {
+                "totalcms": 8
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16219,
+              "n": 11,
+              "pieces": {
+                "square": 11
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16316,
+              "n": 193,
+              "pieces": {
+                "mautic": 193
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16297,
+              "n": 9,
+              "pieces": {
+                "robolly": 9
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16293,
+              "n": 8,
+              "pieces": {
+                "image-router": 8
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16300,
+              "n": 4,
+              "pieces": {
+                "softr": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16318,
+              "n": 3,
+              "pieces": {
+                "toggl-track": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16324,
+              "n": 118,
+              "pieces": {
+                "mailjet": 118
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16339,
+              "n": 16,
+              "pieces": {
+                "opnform": 16
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16340,
+              "n": 40,
+              "pieces": {
+                "flowise": 40
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16349,
+              "n": 13,
+              "pieces": {
+                "webscraping-ai": 13
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16319,
+              "n": 5,
+              "pieces": {
+                "teable": 5
+              },
+              "author": "OdaiAhmed99"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",
@@ -23129,7 +23877,107 @@
             "author": "OdaiAhmed99",
             "logo": "https://cdn.activepieces.com/pieces/snowflake.png"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 262,
+          "byPerson": {
+            "kishan": 20,
+            "sanket": 0,
+            "odai": 242,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 16384,
+              "n": 16,
+              "pieces": {
+                "deepgram": 16
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16385,
+              "n": 31,
+              "pieces": {
+                "intercom": 31
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16386,
+              "n": 22,
+              "pieces": {
+                "nuelink": 22
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16395,
+              "n": 54,
+              "pieces": {
+                "gitlab": 54
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16399,
+              "n": 24,
+              "pieces": {
+                "vtiger": 24
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16396,
+              "n": 58,
+              "pieces": {
+                "gitlab": 58
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16420,
+              "n": 7,
+              "pieces": {
+                "short-io": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16423,
+              "n": 2,
+              "pieces": {
+                "lemon-squeezy": 2
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16429,
+              "n": 7,
+              "pieces": {
+                "emailit": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16426,
+              "n": 21,
+              "pieces": {
+                "smartsuite": 21
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16360,
+              "n": 20,
+              "pieces": {
+                "scrapegrapghai": 20
+              },
+              "author": "kishanprmr"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",
@@ -30287,7 +31135,195 @@
             "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/zoho-invoice.png"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 749,
+          "byPerson": {
+            "kishan": 331,
+            "sanket": 0,
+            "odai": 418,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 16649,
+              "n": 102,
+              "pieces": {
+                "confluence": 102
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16521,
+              "n": 1,
+              "pieces": {
+                "magical-api": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16462,
+              "n": 41,
+              "pieces": {
+                "retell-ai": 41
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16565,
+              "n": 1,
+              "pieces": {
+                "pdfcrowd": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16665,
+              "n": 54,
+              "pieces": {
+                "pinecone": 54
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16461,
+              "n": 39,
+              "pieces": {
+                "bettermode": 39
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16458,
+              "n": 30,
+              "pieces": {
+                "snowflake": 30
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16459,
+              "n": 54,
+              "pieces": {
+                "lemlist": 54
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16629,
+              "n": 40,
+              "pieces": {
+                "close": 40
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16633,
+              "n": 21,
+              "pieces": {
+                "foreplay-co": 21
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16524,
+              "n": 22,
+              "pieces": {
+                "matrix": 22
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16460,
+              "n": 51,
+              "pieces": {
+                "discourse": 51
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16522,
+              "n": 10,
+              "pieces": {
+                "gotify": 10
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16523,
+              "n": 59,
+              "pieces": {
+                "invoiceninja": 59
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16567,
+              "n": 9,
+              "pieces": {
+                "netlify": 9
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16570,
+              "n": 3,
+              "pieces": {
+                "pdfmonkey": 3
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16628,
+              "n": 37,
+              "pieces": {
+                "posthog": 37
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16699,
+              "n": 89,
+              "pieces": {
+                "clockify": 89
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16674,
+              "n": 52,
+              "pieces": {
+                "sender": 52
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16703,
+              "n": 3,
+              "pieces": {
+                "youform": 3
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16711,
+              "n": 3,
+              "pieces": {
+                "pastebin": 3
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16720,
+              "n": 28,
+              "pieces": {
+                "microsoft-365-planner": 28
+              },
+              "author": "kishanprmr"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",
@@ -38098,7 +39134,235 @@
             "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/telnyx.png"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 948,
+          "byPerson": {
+            "kishan": 833,
+            "sanket": 0,
+            "odai": 115,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 16817,
+              "n": 262,
+              "pieces": {
+                "zoho-desk": 262
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16814,
+              "n": 126,
+              "pieces": {
+                "metabase": 126
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16813,
+              "n": 28,
+              "pieces": {
+                "zoho-bookings": 28
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16812,
+              "n": 30,
+              "pieces": {
+                "qdrant": 30
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16807,
+              "n": 13,
+              "pieces": {
+                "twenty": 13
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16803,
+              "n": 25,
+              "pieces": {
+                "emailoctopus": 25
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16811,
+              "n": 31,
+              "pieces": {
+                "zoho-campaigns": 31
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16815,
+              "n": 196,
+              "pieces": {
+                "zoho-invoice": 196
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16730,
+              "n": 13,
+              "pieces": {
+                "tarvent": 13
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16728,
+              "n": 4,
+              "pieces": {
+                "alai": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16690,
+              "n": 6,
+              "pieces": {
+                "mindee": 6
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16673,
+              "n": 4,
+              "pieces": {
+                "cognito-forms": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16691,
+              "n": 8,
+              "pieces": {
+                "pandadoc": 8
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16770,
+              "n": 4,
+              "pieces": {
+                "freshsales": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16772,
+              "n": 1,
+              "pieces": {
+                "bannerbear": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16771,
+              "n": 2,
+              "pieces": {
+                "campaign-monitor": 2
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16860,
+              "n": 23,
+              "pieces": {
+                "ninjapipe": 23
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16956,
+              "n": 17,
+              "pieces": {
+                "canva": 17
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16928,
+              "n": 14,
+              "pieces": {
+                "smartlead": 14
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16903,
+              "n": 6,
+              "pieces": {
+                "pastefy": 6
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16869,
+              "n": 4,
+              "pieces": {
+                "send-it": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16827,
+              "n": 1,
+              "pieces": {
+                "iloveapi": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16825,
+              "n": 2,
+              "pieces": {
+                "workable": 2
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16980,
+              "n": 51,
+              "pieces": {
+                "raindrop": 51
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16999,
+              "n": 24,
+              "pieces": {
+                "microsoft-onenote": 24
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17009,
+              "n": 47,
+              "pieces": {
+                "microsoft-outlook-calendar": 47
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16927,
+              "n": 6,
+              "pieces": {
+                "rabbitmq": 6
+              },
+              "author": "OdaiAhmed99"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",
@@ -46612,7 +47876,307 @@
             "author": "kishanprmr",
             "logo": "https://cdn.activepieces.com/pieces/telnyx.png"
           }
-        ]
+        ],
+        "actionsLanded": {
+          "total": 1652,
+          "byPerson": {
+            "kishan": 1453,
+            "sanket": 0,
+            "odai": 199,
+            "talal": 0,
+            "others": 0
+          },
+          "prs": [
+            {
+              "pr": 17071,
+              "n": 20,
+              "pieces": {
+                "sendfox": 20
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17076,
+              "n": 24,
+              "pieces": {
+                "surrealdb": 24
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17070,
+              "n": 20,
+              "pieces": {
+                "mongodb": 20
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17074,
+              "n": 5,
+              "pieces": {
+                "duckdb": 5
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17046,
+              "n": 20,
+              "pieces": {
+                "gravityforms": 20
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17047,
+              "n": 26,
+              "pieces": {
+                "perplexity-ai": 26
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17072,
+              "n": 18,
+              "pieces": {
+                "mysql": 18
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17073,
+              "n": 18,
+              "pieces": {
+                "postgres": 18
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17075,
+              "n": 19,
+              "pieces": {
+                "microsoft-sql-server": 19
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17051,
+              "n": 59,
+              "pieces": {
+                "microsoft-teams": 59
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17048,
+              "n": 7,
+              "pieces": {
+                "groq": 7
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17069,
+              "n": 78,
+              "pieces": {
+                "webflow": 78
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17162,
+              "n": 179,
+              "pieces": {
+                "mattermost": 179
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16870,
+              "n": 4,
+              "pieces": {
+                "actualbudget": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16826,
+              "n": 1,
+              "pieces": {
+                "figma": 1
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17190,
+              "n": 30,
+              "pieces": {
+                "amazon-bedrock": 30
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17166,
+              "n": 153,
+              "pieces": {
+                "zoho-books": 153
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17170,
+              "n": 201,
+              "pieces": {
+                "quickbooks-sandbox": 201
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 16726,
+              "n": 5,
+              "pieces": {
+                "chargekeep": 5
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16902,
+              "n": 4,
+              "pieces": {
+                "hunter": 4
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16671,
+              "n": 9,
+              "pieces": {
+                "formbricks": 9
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16725,
+              "n": 28,
+              "pieces": {
+                "folk": 28
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17058,
+              "n": 146,
+              "pieces": {
+                "microsoft-sharepoint": 146
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17216,
+              "n": 3,
+              "pieces": {
+                "filetopdf": 3
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17217,
+              "n": 26,
+              "pieces": {
+                "pocketbase": 26
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17218,
+              "n": 8,
+              "pieces": {
+                "millionverifier": 8
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17219,
+              "n": 25,
+              "pieces": {
+                "parseur": 25
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17220,
+              "n": 13,
+              "pieces": {
+                "doctly": 13
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17034,
+              "n": 103,
+              "pieces": {
+                "bexio": 103
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16993,
+              "n": 7,
+              "pieces": {
+                "streak": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 16991,
+              "n": 8,
+              "pieces": {
+                "pushbullet": 8
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17222,
+              "n": 355,
+              "pieces": {
+                "podio": 355
+              },
+              "author": "kishanprmr"
+            },
+            {
+              "pr": 17157,
+              "n": 6,
+              "pieces": {
+                "knack": 6
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17129,
+              "n": 15,
+              "pieces": {
+                "help-scout": 15
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17158,
+              "n": 7,
+              "pieces": {
+                "leexi": 7
+              },
+              "author": "OdaiAhmed99"
+            },
+            {
+              "pr": 17164,
+              "n": 2,
+              "pieces": {
+                "loops": 2
+              },
+              "author": "OdaiAhmed99"
+            }
+          ]
+        }
       },
       "uiImprovements": {
         "status": "ok",

@@ -350,6 +350,11 @@ function inReviewHtml(n) {
   return `<span class="inreview">+${num(n)} in review</span>`;
 }
 
+// A signed count of actions: "+0" for a measured quiet week, and a real minus
+// sign (U+2212) for a week whose PRs removed more agent atomics than they
+// added — toLocaleString's hyphen reads as a dash beside the "·" separators.
+const signedActions = (n) => (n < 0 ? `−${num(-n)}` : `+${num(n)}`);
+
 // The per-person target rows (see the CSS above). `actual` null means the week
 // could not be measured, and that is said in words — never drawn as a 0 or an
 // empty bar that reads like one. The bar is decorative: the score beside it is
@@ -365,13 +370,29 @@ function targetsHtml(tg) {
     const pct = measured ? Math.floor(Math.min(r.actual / r.target, 1) * 100) : 0;
     const cls = `target${r.hit ? ' hit' : ''}${measured ? '' : ' unmeasured'}`;
     const open = r.open > 0 ? ` · ${num(r.actual - r.open)} merged, ${num(r.open)} open` : '';
+    // AI-actions rows only: the actions this person's PRs landed this week,
+    // shown beside the pieces score, not counted toward it. Drawn whether or
+    // not the pieces half was measured — the two are separate readings.
+    const actions = typeof r.actions === 'number' ? ` · ${signedActions(r.actions)} actions` : '';
     const score = measured
-      ? `${num(r.actual)}/${num(r.target)}${open}${r.hit ? ' <span class="tick" role="img" aria-label="target hit">✓</span>' : ''}`
-      : `— / ${num(r.target)} · not measured`;
+      ? `${num(r.actual)}/${num(r.target)}${open}${actions}${r.hit ? ' <span class="tick" role="img" aria-label="target hit">✓</span>' : ''}`
+      : `— / ${num(r.target)} · not measured${actions}`;
     return `<li class="${cls}"><span class="who">${esc(r.name)}</span><span class="bar" aria-hidden="true"><span class="fill" style="width:${pct}%"></span></span><span class="score">${score}</span></li>`;
   }).join('');
   return `<ul class="targets" aria-label="Weekly targets">${rows}</ul>${
     tg.also ? `<div class="note also">also: ${esc(tg.also)}</div>` : ''}`;
+}
+
+// The AI actions behind the AI-actions pieces count: on main in all, and how
+// many this week's merged PRs added (view.mjs aiActionCounts). One line under
+// the headline, above the target rows. No count on main, no line: a week that
+// recorded no roster has nothing to say here. No landed count, no "this week"
+// half — the week never measured it, and a "+0" would claim it did.
+function actionsHtml(a) {
+  if (!a || typeof a.onMain !== 'number') return '';
+  const week = typeof a.landed === 'number' ? ` · ${signedActions(a.landed)} this week` : '';
+  const others = typeof a.others === 'number' && a.others > 0 ? ` (+${num(a.others)} by others)` : '';
+  return `<div class="note actions">${num(a.onMain)} AI actions on main${week}${others}</div>`;
 }
 
 function tileHtml(t) {
@@ -383,6 +404,7 @@ function tileHtml(t) {
   }
   return `<div class="tile${wide}"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${inReviewHtml(t.inReview)}${deltaHtml(t)}</div>
+    ${actionsHtml(t.actions)}
     ${targetsHtml(t.targets)}
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
     ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}

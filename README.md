@@ -205,6 +205,33 @@ S5 11/2, S8 68/13 (39 deletes exempt), S9 25/3, S6/S7 0, and against their 09-11
 Not done yet: the weekly archive does not record any of this (its format is untouched), so the page shows
 the current reading only and K1 is the one number with history.
 
+### AI actions landed, not just pieces
+
+The weekly AI-actions tile counts **pieces** with at least one `audience: 'ai'` action, and credits a piece
+to its author once, the week it first went done. Most of the work is now *more* actions on pieces that already
+count — #17034 gave bexio 103 — and none of that moves a pieces number. So since W45 (and backfilled to W39) each
+week also records `aiActions.actionsLanded`: the net `audience: 'ai'` lines every PR merged into main inside
+the week's window added, per piece and per author (`total`, `byPerson` incl. `others`, and the `prs` behind it,
+so the number is auditable from `weeks.json` alone). The tile shows it as one line under the headline
+("7,155 AI actions on main · +1,652 this week") and as "· +N actions" beside each person's pieces score.
+Shown, not targeted — `targets.json` still targets pieces.
+
+How it is measured: the same 21-day merged-PR scan that credits the pieces (`scripts/fetch-pr-states.mjs` →
+`data/landings.json` `actionsLanded`, rule in `lib/discover.mjs` `discoverActionsLanded`), read off the diff:
+added minus removed matching lines, piece `src/` files only, PRs into `main` only, in the window by the UTC
+day of the merge. A file GitHub served without a patch (a diff too large to serve — twelve in W39–W45, all
+generated) is rebuilt from its contents by `scripts/rebuild-patch.mjs`, and one that will not rebuild marks
+the scan incomplete, which the Saturday job refuses (`LANDINGS_REQUIRED=1`). A week the scan cannot vouch for
+records no field and the page draws nothing for it; a measured quiet week reads "+0 actions".
+
+`scripts/backfill-ai-actions-landed.mjs` restated W39–W45 on 2026-11-08 from the same rule, one week at a time
+(`--weeks 2026-W39..2026-W45 --apply`; dry run by default, `--verbose` lists the PRs). W41–W45 match the
+week-over-week change in actions on main exactly. W39 and W40 do not: the W39 approved-PR restatement
+(`backfill-ai-actions-approved.mjs`) moved five of Odai's PRs into W39's roster although they merged in W40's
+window, so W40 reads +600 landed against +394 on main and W39 the mirror image, plus a 27-action residue in
+W39 from the older hand-kept roster. Both numbers are right about what they measure; they just measure
+different things across that one seam.
+
 ## Claiming work (the 3-stage model)
 
 Stages are **derived, never hand-edited**: assignee only → `assigned` · open PR → `PR open` · merged PR → `merged`.

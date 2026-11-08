@@ -5,8 +5,9 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { discoverClaims, discoverLandings, landingScanVerdict, ROLLOUTS } from '../lib/discover.mjs';
+import { discoverClaims, discoverLandings, discoverActionsLanded, landingScanVerdict, ROLLOUTS } from '../lib/discover.mjs';
 import { reviewVerdict } from '../lib/reviews.mjs';
+import { fillMissingPatches } from './rebuild-patch.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readIf = (p) => (existsSync(join(ROOT, p)) ? JSON.parse(readFileSync(join(ROOT, p), 'utf8')) : null);
@@ -108,27 +109,44 @@ function landings() {
   }
   const withPatches = [];
   for (const pr of merged.filter((p) => (p.files ?? []).some((f) => LANDING_ROOTS.some((r) => f.path?.startsWith(r))))) {
+    let files;
     try {
-      const files = gh(['api', '--paginate', `repos/${REPO}/pulls/${pr.number}/files?per_page=100`]);
-      withPatches.push({ number: pr.number, base: pr.baseRefName ?? null, mergedAt: pr.mergedAt,
-        author: pr.author?.login ?? null, files });
+      files = gh(['api', '--paginate', `repos/${REPO}/pulls/${pr.number}/files?per_page=100`]);
     } catch (e) {
       failures.push(`PR #${pr.number} files unavailable (${e.message})`);
       console.warn(`⚠ PR #${pr.number}: files unavailable (${e.message}) — its landings are not credited`);
+      continue;
     }
+    // A piece src/ file GitHub served without a patch would count no AI
+    // actions at all (lib/discover.mjs discoverActionsLanded reads the patch
+    // and nothing else), so it is rebuilt from the file's contents — and a
+    // file that will not rebuild is a lost call like any other, counted
+    // against `complete` so the Saturday job refuses the week rather than
+    // archiving a count short by a file nobody can see.
+    const filled = fillMissingPatches(files, pr.number);
+    for (const r of filled.rebuilt) console.log(`  patch rebuilt from file contents: ${r}`);
+    for (const f of filled.failures) { failures.push(f); console.warn(`⚠ ${f}`); }
+    withPatches.push({ number: pr.number, base: pr.baseRefName ?? null, mergedAt: pr.mergedAt,
+      author: pr.author?.login ?? null, files });
   }
   const found = discoverLandings(withPatches);
+  // The same PRs, counted in ACTIONS rather than pieces: every merged PR's net
+  // `audience: 'ai'` lines per piece, for the weekly tile's "+N this week"
+  // (weekly/collect/ai-actions.mjs). Same scan, so it is exactly as complete
+  // as the landings beside it — `complete` vouches for both.
+  const actionsLanded = discoverActionsLanded(withPatches);
   const total = ROLLOUTS.reduce((a, r) => a + Object.keys(found[r]).length, 0);
   const verdict = landingScanVerdict({ failures, required: process.env.LANDINGS_REQUIRED === '1' });
   console.log(`${verdict.complete ? '✓' : '⚠'} found ${total} landings across ${withPatches.length} piece PRs merged since ${since}${
     verdict.complete ? '' : ` — INCOMPLETE, ${failures.length} call(s) failed`}`);
-  return { since, complete: verdict.complete, found, error: verdict.error };
+  return { since, complete: verdict.complete, found, actionsLanded, error: verdict.error };
 }
 
 const landingScan = landings();
 writeFileSync(join(ROOT, 'data/landings.json'), JSON.stringify({
   fetched: new Date().toISOString().slice(0, 10), since: landingScan.since, complete: landingScan.complete,
   ...landingScan.found,
+  actionsLanded: landingScan.actionsLanded,
 }, null, 2) + '\n');
 
 // Discovered numbers need their state fetched like any other: the builds read

@@ -3,6 +3,7 @@
 // `stages` block is a no-data reason, never a zero — a silent 0 would read as
 // "no progress this week" when it means "we could not measure".
 import { readCatalogIndex, readCatalogPieces } from './output-schema.mjs';
+import { zeroed, personOf } from './people.mjs';
 
 const BUILD_HINT = 'run `npm run fetch && npm run build` before snapshotting';
 
@@ -50,7 +51,65 @@ function readRoster(readJson, catalog) {
   }
 }
 
-export function collectAiActions({ readJson }) {
+// ── AI actions landed this week ─────────────────────────────────────────────
+// The tile counts PIECES, and credits each one once, the week it first went
+// done. Most of the AI-actions work is now more actions on pieces that already
+// count — #17034 gave bexio 103 — and none of that moves a pieces number. This
+// is the count of the actions themselves: the net `audience: 'ai'` lines each
+// PR merged into main this week added, per author. Shown beside the pieces,
+// never targeted (weekly/data/targets.json targets pieces).
+//
+// Read off data/landings.json, which scripts/fetch-pr-states.mjs writes from
+// the same 21-day merged-PR scan that credits the pieces (lib/discover.mjs
+// discoverActionsLanded). PURE, handed the file, so the rule is testable
+// without one.
+//
+// Null — not measured — rather than a zero whenever the scan cannot vouch for
+// the whole week: no file, a file from before the field existed, a scan whose
+// 21 days do not reach back to the week's first day, or one that lost a call
+// (`complete: false`; the Saturday job refuses those anyway, see
+// landingScanVerdict). A partial count would read as a slow week. A scan that
+// covered the week and found nothing is a real 0, for everyone.
+//
+// In the window by the merge's UTC DAY, the same inWindow rule as
+// weekly/collect/shipping.mjs, so "this week" means one thing on the page.
+// Credit is the PR author, as everywhere on the targets: a login off the team,
+// or none at all, is `others` — the per-person map must still add up to the
+// total (weekly/lib/archive.mjs checks it), so nothing can fall out of it.
+const inWindow = (day, { start, end }) => Boolean(day) && day >= start && day <= end;
+const isObject = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
+
+export function actionsLandedForWindow(landings, window) {
+  if (!window || !Array.isArray(landings?.actionsLanded)) return null;
+  if (typeof landings.since !== 'string' || landings.since > window.start) return null;
+  if (landings.complete === false) return null;
+  const byPerson = { ...zeroed(), others: 0 };
+  const prs = [];
+  for (const e of landings.actionsLanded) {
+    if (!inWindow(typeof e?.mergedAt === 'string' ? e.mergedAt.slice(0, 10) : null, window)) continue;
+    // One malformed row in the week is a broken reading, not a row to skip:
+    // skipping it would publish a total short by an amount nobody can see.
+    if (!Number.isInteger(e.pr) || typeof e.n !== 'number' || !Number.isFinite(e.n) || !isObject(e.pieces)) return null;
+    const author = typeof e.author === 'string' && e.author ? e.author : null;
+    byPerson[personOf(author) ?? 'others'] += e.n;
+    // Spread, never assigned: a PR with no recorded author carries no key,
+    // rather than an `author: null` the archive would have to explain.
+    prs.push({ pr: e.pr, n: e.n, pieces: e.pieces, ...(author ? { author } : {}) });
+  }
+  return { total: prs.reduce((sum, p) => sum + p.n, 0), byPerson, prs };
+}
+
+// Best-effort, unlike the summary below: losing landings.json costs this one
+// field and never the tile, whose pieces count stands on its own.
+function readActionsLanded(readJson, window) {
+  try {
+    return actionsLandedForWindow(readJson('data/landings.json'), window);
+  } catch {
+    return null;
+  }
+}
+
+export function collectAiActions({ readJson, window }) {
   try {
     const s = readJson('dist/ai-actions/summary.json');
     if (!s?.stages) throw new Error('summary.json has no `stages` block');
@@ -59,6 +118,7 @@ export function collectAiActions({ readJson }) {
       return v;
     };
     const catalogPieces = readCatalogPieces(readJson);
+    const actionsLanded = readActionsLanded(readJson, window);
     return {
       status: 'ok',
       merged: num(s.stages.merged, 'stages.merged'),
@@ -74,6 +134,9 @@ export function collectAiActions({ readJson }) {
       ...(catalogPieces === undefined ? {} : { catalogPieces }),
       blockersOpen: num(s.blockersOpen, 'blockersOpen'),
       roster: readRoster(readJson, readCatalogIndex(readJson)),
+      // Spread, so a week the scan could not vouch for records no key at all —
+      // absent is "not measured", and the page then draws nothing for it.
+      ...(actionsLanded ? { actionsLanded } : {}),
     };
   } catch (err) {
     return { status: 'no-data', reason: `AI-actions summary unavailable (${err.message}) — ${BUILD_HINT}` };

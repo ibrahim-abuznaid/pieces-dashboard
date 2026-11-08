@@ -440,7 +440,10 @@ test('the per-piece rosters are not rendered anywhere on the page', () => {
   const dom = renderDom([withRosters()]);
   assert.doesNotMatch(dom, / tracked/);
   assert.doesNotMatch(dom, /Live on cloud|Merged, awaiting release|In progress|PR open|Held/);
-  assert.doesNotMatch(dom, /31 actions|37 AI actions/);
+  // A roster ROW read "37 AI actions"; the tile's own total reads "N AI actions
+  // on main" and, with one merged piece in this fixture, N is that piece's 37.
+  // The total is not per-piece detail, so only the row shape is banned.
+  assert.doesNotMatch(dom, /31 actions|37 AI actions(?! on main)/);
 });
 
 // A piece in review is not done, so it is not on a PM's page at all.
@@ -1578,4 +1581,59 @@ test('a week before the targets existed renders no target markup at all', () => 
 test('a target row is one line, whatever the name — the page height budget', () => {
   const css = pageCss(render([TARGET_WEEK]).html);
   assert.equal(declarationsFor(css, 'ul.targets .target')['white-space'], 'nowrap');
+});
+
+// ── AI actions on main, and landed this week ───────────────────────────────
+// One line under the AI-actions headline, and a "+N actions" on each target
+// row. Shown, never targeted; absent from a week that never measured it.
+const aiActs = (roster, more = {}) => ({ status: 'ok', merged: 2, prOpen: 0, assigned: 0, held: 0, totalPieces: 3,
+  blockersOpen: 0, roster, ...more });
+const AI_ROSTER = [
+  { name: 'stripe', actions: 6000, stage: 'merged', author: 'kishanprmr' },
+  { name: 'bexio', actions: 1155, stage: 'merged', author: 'OdaiAhmed99' },
+  { name: 'grist', actions: 0, stage: 'pr-open', author: 'kishanprmr' },
+];
+const LANDED_BLOCK = { total: 353, byPerson: { kishan: 229, sanket: 0, odai: 112, talal: 0, others: 12 },
+  prs: [{ pr: 17034, n: 103, pieces: { bexio: 103 }, author: 'OdaiAhmed99' }] };
+const actionsWeeks = (more = {}) => [
+  snap('2026-W44', { aiActions: aiActs(AI_ROSTER) }),
+  snap('2026-W45', { targets: { aiActions: { kishan: 20, odai: 20 } }, aiActions: aiActs(AI_ROSTER, more) }),
+];
+
+test('the AI-actions box says how many actions are on main and how many landed this week', () => {
+  const tile = tileOf(renderDom(actionsWeeks({ actionsLanded: LANDED_BLOCK })), 'AI-actions');
+  assert.match(tile, /<div class="note actions">7,155 AI actions on main · \+353 this week \(\+12 by others\)<\/div>/);
+  assert.match(tile, /Odai[\s\S]*?\+112 actions/);
+  assert.match(tile, /Kishan[\s\S]*?\+229 actions/);
+});
+
+test('the actions line sits under the headline and above the target rows', () => {
+  const tile = tileOf(renderDom(actionsWeeks({ actionsLanded: LANDED_BLOCK })), 'AI-actions');
+  assert.match(tile, /class="big"[\s\S]*class="note actions"[\s\S]*class="targets"/);
+});
+
+test('a week that never measured landed actions shows neither the line nor the row counts', () => {
+  const dom = renderDom(actionsWeeks());
+  assert.doesNotMatch(dom, /\+\d+ this week \(/);
+  assert.doesNotMatch(dom, /actions<\/span>|\d actions/);
+  assert.doesNotMatch(renderDom([snap('2026-W31')]), /AI actions on main/);
+});
+
+test('a week with the count on main but nothing landed measured says only the count', () => {
+  const tile = tileOf(renderDom(actionsWeeks()), 'AI-actions');
+  assert.match(tile, /<div class="note actions">7,155 AI actions on main<\/div>/);
+});
+
+test('a measured quiet week reads +0, and removals read with a real minus sign', () => {
+  const quiet = { total: -3, byPerson: { kishan: 0, sanket: 0, odai: -3, talal: 0, others: 0 }, prs: [] };
+  const tile = tileOf(renderDom(actionsWeeks({ actionsLanded: quiet })), 'AI-actions');
+  assert.match(tile, /AI actions on main · −3 this week</);
+  assert.match(tile, /Kishan[\s\S]*?\+0 actions/);
+  assert.match(tile, /Odai[\s\S]*?−3 actions/);
+  assert.doesNotMatch(tile, /by others/);
+});
+
+test('no other box draws an actions line', () => {
+  const dom = renderDom(actionsWeeks({ actionsLanded: LANDED_BLOCK }));
+  assert.equal([...dom.matchAll(/class="note actions"/g)].length, 1);
 });

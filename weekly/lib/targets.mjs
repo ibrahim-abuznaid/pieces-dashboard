@@ -144,6 +144,16 @@ function alsoLine(counts, goals) {
   return parts.join(' · ');
 }
 
+// The AI actions a person's PRs landed on main this week, beside their pieces
+// score (weekly/collect/ai-actions.mjs). Shown, not targeted: the target is
+// still pieces. AI-actions rows only, and only from the week's own record —
+// null when the week did not measure it, which the template draws as nothing.
+// A measured 0 stays 0: a quiet week reads "+0 actions", not as missing.
+const landedActions = (ws, person) => {
+  const n = ws.actionsLanded?.byPerson?.[person];
+  return typeof n === 'number' ? n : null;
+};
+
 // The target block for one tile, or null when the week set none for it or the
 // tile is degraded (it already says "not measured this week"). Rows follow
 // targets.json order. `actual` is null — "not measured" — whenever the counts
@@ -159,7 +169,8 @@ export function targetsFor(spec, weeks, selected) {
   const rows = Object.entries(goals).map(([person, target]) => {
     const actual = counts ? (counts[person] ?? 0) : null;
     return { person, name: displayName(person), actual, target, hit: actual !== null && actual >= target,
-      ...(showOpen ? { open: measured.open[person] ?? 0 } : {}) };
+      ...(showOpen ? { open: measured.open[person] ?? 0 } : {}),
+      ...(spec.key === 'aiActions' ? { actions: landedActions(ws, person) } : {}) };
   });
   return { rows, also: counts ? alsoLine(counts, goals) : '' };
 }

@@ -62,6 +62,31 @@ const doneAiActions = (snap) => {
   return merged + (pick(snap, 'aiActions.approved') ?? 0);
 };
 
+// ── AI actions, not pieces ──────────────────────────────────────────────────
+// The tile's number is PIECES with at least one agent atomic, and a piece
+// counts once. Beside it the page shows the actions themselves — on main in
+// all, and how many this week's merged PRs added — because adding 103 actions
+// to a piece that already counted (#17034, bexio) is real work the pieces
+// number cannot see. Shown, never targeted.
+//
+// `onMain` is the sum of the MERGED roster rows' own counts: approved and open
+// rows are not on main yet, and their `actions` are 0 by construction anyway
+// (lib/ai-roster.mjs). No roster, or an empty one, is no reading — the
+// collector returns `roster: []` when it loses the file — so null, never 0.
+// `landed` and `others` come straight off aiActions.actionsLanded, and are
+// null for every week recorded before it (or that the scan could not vouch for).
+const aiActionCounts = (ws) => {
+  const rows = Array.isArray(ws.roster) ? ws.roster : [];
+  const onMain = rows.length
+    ? rows.filter((r) => r.stage === 'merged').reduce((sum, r) => sum + r.actions, 0)
+    : null;
+  return {
+    onMain,
+    landed: typeof ws.actionsLanded?.total === 'number' ? ws.actionsLanded.total : null,
+    others: typeof ws.actionsLanded?.byPerson?.others === 'number' ? ws.actionsLanded.byPerson.others : null,
+  };
+};
+
 // ── who closed the tickets ──────────────────────────────────────────────────
 // One line inside the tickets box, read out of the SAME object the total is
 // summed from. Never out of a list of names kept here: the team is hiring a
@@ -396,7 +421,9 @@ const TILES = [
     // The target rows also count open PRs from W40 on (Ibrahim's call
     // 2026-10-03, see countsFor in targets.mjs); the headline and strip do not.
     strip: pieceStrip, done: ['merged', 'approved'], running: true,
-    credit: ['merged', 'approved', 'pr-open'], creditFrom: '2026-W40' },
+    credit: ['merged', 'approved', 'pr-open'], creditFrom: '2026-W40',
+    // The actions behind the pieces — see aiActionCounts above.
+    actions: aiActionCounts },
   // Two headlines, chosen by what the snapshot measured. With coverage recorded
   // the number a PM wants is pieces COVERED, and build progress (PRs, commits)
   // drops to the note line; without it — every older snapshot, and any week the
@@ -592,7 +619,7 @@ export function buildView(archive, { weekId, notes } = {}) {
                status: 'no-data', reason: NOT_MEASURED,
                value: null, delta: null, running: false, prior: null,
                inReview: null, unit: '', strip: null, perPerson: '',
-               targets: null, note: '' };
+               targets: null, note: '', actions: null };
     }
     // Resolved per week when the spec asks (pathFor), so value and delta always
     // share one metric — see the piece-testing entry in TILES.
@@ -620,6 +647,8 @@ export function buildView(archive, { weekId, notes } = {}) {
       // view. A zero with no target behind it is not listed.
       targets,
       note: curatedNote(notes?.[selected.week]?.[spec.key]) ?? spec.note?.(ws) ?? '',
+      // On every tile so the shape never varies; only AI actions fills it.
+      actions: spec.actions?.(ws) ?? null,
     };
   });
 

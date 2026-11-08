@@ -237,7 +237,9 @@ export function main(argv) {
       targets: readTargets(),
       collectors: {
         outputSchema: () => collectOutputSchema({ readJson: readRepoJson }),
-        aiActions: () => collectAiActions({ readJson: readRepoJson }),
+        // `window` for the AI actions landed THIS week (data/landings.json);
+        // the pieces counts are state, not windowed, and ignore it.
+        aiActions: () => collectAiActions({ readJson: readRepoJson, window }),
         uiImprovements: () => collectUiImprovements({ readJson: readRepoJson }),
         connectionIdentifier: () => collectConnectionIdentifier({ readJson: readRepoJson }),
         testing: () => collectTesting({ window, gh, curl, testerUrl, readJson: readRepoJson }),

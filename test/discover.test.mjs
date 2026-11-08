@@ -1,7 +1,7 @@
 // test/discover.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyFiles, discoverClaims, claimedPr } from '../lib/discover.mjs';
+import { classifyFiles, discoverClaims, claimedPr, countAiAudienceLines, discoverActionsLanded } from '../lib/discover.mjs';
 
 const file = (filename, patch = '') => ({ filename, patch });
 const piece = (slug, rest) => `packages/pieces/community/${slug}/${rest}`;
@@ -197,4 +197,110 @@ test('open connection-identifier PRs are discovered per piece', () => {
     file(piece('figma', 'src/lib/auth.ts'), '+  getConnectionIdentifier,'),
   ] }]);
   assert.deepEqual(out.connectionIdentifier, { box: 16100, figma: 16100 });
+});
+
+// ── AI actions landed, counted ──────────────────────────────────────────────
+// The tile counts PIECES, and a piece counts once. Odai's #17034 gave bexio 103
+// more agent atomics on a piece that already counted, and the pieces number did
+// not move. These count the ACTIONS: every `audience: 'ai'` line a merged PR
+// added, minus every one it removed, per piece.
+test('countAiAudienceLines counts added and removed agent atomics', () => {
+  const patch = [
+    "@@ -1,4 +1,6 @@",
+    "+  audience: 'ai',",
+    '+    audience: "ai",',
+    "-  audience:'ai',",
+    "   audience: 'ai',",
+    "+  audience: 'both',",
+  ].join('\n');
+  assert.deepEqual(countAiAudienceLines(patch), { added: 2, removed: 1 });
+});
+
+test('a comment naming the phrase is not an action, added or removed', () => {
+  assert.deepEqual(countAiAudienceLines("+// audience:'ai' atomics\n-  // AI agent atomics (audience: 'ai')"),
+    { added: 0, removed: 0 });
+});
+
+// The file headers start with the same characters as a changed line.
+test('the +++ and --- file headers are never counted', () => {
+  assert.deepEqual(countAiAudienceLines("+++ audience: 'ai'\n--- audience: 'ai'"), { added: 0, removed: 0 });
+});
+
+test('no patch counts nothing rather than throwing', () => {
+  assert.deepEqual(countAiAudienceLines(undefined), { added: 0, removed: 0 });
+  assert.deepEqual(countAiAudienceLines(''), { added: 0, removed: 0 });
+});
+
+const ai = (n) => Array.from({ length: n }, () => "+  audience: 'ai',").join('\n');
+const gone = (n) => Array.from({ length: n }, () => "-  audience: 'ai',").join('\n');
+const merged = (number, mergedAt, files, more = {}) => ({ number, mergedAt, base: 'main', author: 'OdaiAhmed99', files, ...more });
+
+test('discoverActionsLanded counts a merged PR\'s net agent atomics per piece', () => {
+  const out = discoverActionsLanded([merged(17034, '2026-11-03T10:00:00Z', [
+    file(piece('bexio', 'src/lib/actions/a.ts'), ai(60)),
+    file(piece('bexio', 'src/lib/actions/b.ts'), ai(43)),
+  ])]);
+  assert.deepEqual(out, [{ pr: 17034, author: 'OdaiAhmed99', mergedAt: '2026-11-03T10:00:00Z', n: 103, pieces: { bexio: 103 } }]);
+});
+
+test('one PR, two pieces: each piece keeps its own net', () => {
+  const out = discoverActionsLanded([merged(10, '2026-11-03T10:00:00Z', [
+    file(piece('asana', 'src/index.ts'), ai(3)),
+    file(`packages/pieces/core/tables/src/lib/x.ts`, `${ai(2)}\n${gone(1)}`),
+  ])]);
+  assert.deepEqual(out[0].pieces, { asana: 3, tables: 1 });
+  assert.equal(out[0].n, 4);
+});
+
+// src/ only, the same scope main is read in: a fixture is not a shipped action.
+test('agent atomics outside src/ are not counted', () => {
+  const out = discoverActionsLanded([merged(11, '2026-11-03T10:00:00Z', [
+    file(piece('asana', 'test/fixtures/actions.ts'), ai(5)),
+    file('packages/server/api/src/app/agent.ts', ai(5)),
+  ])]);
+  assert.deepEqual(out, []);
+});
+
+// A refactor that moves actions between files of one piece adds nothing.
+test('a piece whose net is zero is dropped, and so is a PR with none left', () => {
+  const out = discoverActionsLanded([
+    merged(12, '2026-11-03T10:00:00Z', [
+      file(piece('zoom', 'src/old.ts'), gone(4)),
+      file(piece('zoom', 'src/new.ts'), ai(4)),
+      file(piece('notion', 'src/a.ts'), ai(1)),
+    ]),
+    merged(13, '2026-11-03T11:00:00Z', [file(piece('discord', 'src/a.ts'), `${ai(2)}\n${gone(2)}`)]),
+  ]);
+  assert.deepEqual(out.map((e) => [e.pr, e.pieces]), [[12, { notion: 1 }]]);
+});
+
+test('a PR that removes agent atomics lands a negative net', () => {
+  const out = discoverActionsLanded([merged(14, '2026-11-03T10:00:00Z', [file(piece('slack', 'src/a.ts'), gone(3))])]);
+  assert.deepEqual(out.map((e) => [e.n, e.pieces]), [[-3, { slack: -3 }]]);
+});
+
+// A stacked PR merged into its parent branch has shipped nothing to main.
+test('a PR merged into another branch, or not merged, lands nothing', () => {
+  const out = discoverActionsLanded([
+    merged(15, '2026-11-03T10:00:00Z', [file(piece('asana', 'src/a.ts'), ai(2))], { base: 'feat/asana-ai' }),
+    merged(16, null, [file(piece('gmail', 'src/a.ts'), ai(2))]),
+    merged(17, '', [file(piece('gmail', 'src/a.ts'), ai(2))]),
+    { number: 18, base: 'main', files: [file(piece('gmail', 'src/a.ts'), ai(2))] },
+  ]);
+  assert.deepEqual(out, []);
+});
+
+test('a missing author is null, never dropped', () => {
+  const out = discoverActionsLanded([merged(19, '2026-11-03T10:00:00Z', [file(piece('asana', 'src/a.ts'), ai(1))], { author: undefined })]);
+  assert.equal(out[0].author, null);
+});
+
+test('landed PRs sort by merge time, then by number', () => {
+  const f = [file(piece('asana', 'src/a.ts'), ai(1))];
+  const out = discoverActionsLanded([
+    merged(30, '2026-11-04T10:00:00Z', f),
+    merged(22, '2026-11-03T10:00:00Z', f),
+    merged(21, '2026-11-03T10:00:00Z', f),
+  ]);
+  assert.deepEqual(out.map((e) => e.pr), [21, 22, 30]);
 });

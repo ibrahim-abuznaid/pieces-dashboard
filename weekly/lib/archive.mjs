@@ -102,6 +102,48 @@ function validateCatalogPieces(key, ws) {
   }
 }
 
+// The AI actions a week's merged PRs landed (weekly/collect/ai-actions.mjs).
+// OPTIONAL like `roster`: every week before the field existed has none, and a
+// week the scan could not vouch for records none — absent is "not measured".
+//
+// When present every number in it reaches the page, so it has to be the
+// measurement it claims to be, and AUDITABLE from this file alone: the people
+// add up to the total (the rule checkedByPerson holds the tickets to), the PRs
+// listed add up to it too — they are the whole story behind it, not a sample —
+// and each PR's count is its pieces'. Negatives are legal everywhere: a PR
+// that removes agent atomics lands fewer, and the total says so.
+const isObject = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
+const finite = (v) => typeof v === 'number' && Number.isFinite(v);
+const sumOf = (values) => values.reduce((a, b) => a + b, 0);
+
+function validateActionsLanded(ws) {
+  const block = ws.actionsLanded;
+  if (block === undefined) return;
+  const at = 'aiActions.actionsLanded';
+  if (!isObject(block)) throw new Error(`${at} must be an object when present`);
+  if (!finite(block.total)) throw new Error(`${at}.total must be a number`);
+  if (!isObject(block.byPerson)) throw new Error(`${at}.byPerson must be an object of person → count`);
+  for (const [person, n] of Object.entries(block.byPerson)) {
+    if (!finite(n)) throw new Error(`${at}.byPerson.${person} must be a finite number, got ${JSON.stringify(n)}`);
+  }
+  const people = sumOf(Object.values(block.byPerson));
+  if (people !== block.total) throw new Error(`${at}.byPerson adds up to ${people}, not the total ${block.total}`);
+  if (!Array.isArray(block.prs)) throw new Error(`${at}.prs must be an array`);
+  block.prs.forEach((row, i) => {
+    const rowAt = `${at}.prs[${i}]`;
+    if (!isObject(row)) throw new Error(`${rowAt} must be an object`);
+    if (!Number.isInteger(row.pr)) throw new Error(`${rowAt}.pr must be an integer PR number, got ${JSON.stringify(row.pr)}`);
+    if (!finite(row.n)) throw new Error(`${rowAt}.n must be a number`);
+    if (!isObject(row.pieces) || !Object.values(row.pieces).every(finite)) {
+      throw new Error(`${rowAt}.pieces must be an object of piece → count`);
+    }
+    if (sumOf(Object.values(row.pieces)) !== row.n) throw new Error(`${rowAt}: its pieces do not add up to n ${row.n}`);
+    optionalString(rowAt, 'author', row.author, { nullable: false });
+  });
+  const listed = sumOf(block.prs.map((row) => row.n));
+  if (listed !== block.total) throw new Error(`${at}.prs add up to ${listed}, not the total ${block.total}`);
+}
+
 function validateOptionalNumbers(key, ws) {
   for (const f of OPTIONAL_NUMBERS[key] ?? []) {
     if (ws[f] === undefined) continue;
@@ -132,6 +174,7 @@ export function validateSnapshot(snap) {
     validateRoster(key, ws);
     validateCatalogPieces(key, ws);
     validateOptionalNumbers(key, ws);
+    if (key === 'aiActions') validateActionsLanded(ws);
     if (ws.status === 'no-data') {
       if (typeof ws.reason !== 'string' || !ws.reason) throw new Error(`${key}: no-data needs a reason`);
       continue;

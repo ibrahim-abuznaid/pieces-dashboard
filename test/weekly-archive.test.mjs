@@ -374,6 +374,92 @@ test('a roster author must be a non-empty string when present', () => {
   }
 });
 
+// ── AI actions landed ───────────────────────────────────────────────────────
+// Optional: every week before the field existed has none. When present, every
+// number in it reaches the page, and the per-person split has to add up to the
+// total it sits under — the same rule checkedByPerson holds the tickets to.
+const LANDED = () => ({
+  total: 113,
+  byPerson: { kishan: 12, sanket: 0, odai: 103, talal: 0, others: -2 },
+  prs: [
+    { pr: 17034, n: 103, pieces: { bexio: 103 }, author: 'OdaiAhmed99' },
+    { pr: 17040, n: 12, pieces: { asana: 9, notion: 3 }, author: 'kishanprmr' },
+    { pr: 17042, n: -2, pieces: { zoom: -2 } },
+  ],
+});
+const withLanded = (actionsLanded) => {
+  const s = ok();
+  s.aiActions = { ...s.aiActions, actionsLanded };
+  return s;
+};
+
+test('a week with no actionsLanded validates — the field is optional', () => validateSnapshot(ok()));
+
+test('a well-formed actionsLanded block validates, negatives and a missing author included', () =>
+  validateSnapshot(withLanded(LANDED())));
+
+test('a quiet week validates: zero everywhere, no PRs', () =>
+  validateSnapshot(withLanded({ total: 0, byPerson: { kishan: 0, odai: 0, others: 0 }, prs: [] })));
+
+test('actionsLanded must be an object', () => {
+  for (const bad of [null, [], 113]) {
+    assert.throws(() => validateSnapshot(withLanded(bad)), /aiActions\.actionsLanded must be an object/);
+  }
+});
+
+test('actionsLanded.total must be a number', () =>
+  assert.throws(() => validateSnapshot(withLanded({ ...LANDED(), total: '113' })), /aiActions\.actionsLanded\.total/));
+
+test('a per-person split that does not add up to the total is rejected', () =>
+  assert.throws(() => validateSnapshot(withLanded({ ...LANDED(), byPerson: { kishan: 12, odai: 103 } })),
+    /aiActions\.actionsLanded\.byPerson/));
+
+test('a per-person count that is not a finite number is rejected', () => {
+  for (const bad of ['12', null, Infinity]) {
+    assert.throws(() => validateSnapshot(withLanded({ ...LANDED(), byPerson: { ...LANDED().byPerson, kishan: bad } })),
+      /aiActions\.actionsLanded\.byPerson/);
+  }
+});
+
+test('a PR number that is not an integer is rejected, and the row is named', () => {
+  for (const bad of [17034.5, '17034', null]) {
+    const block = LANDED();
+    block.prs[1] = { ...block.prs[1], pr: bad };
+    assert.throws(() => validateSnapshot(withLanded(block)), /aiActions\.actionsLanded\.prs\[1\]\.pr/);
+  }
+});
+
+test('a PR row needs a numeric n and a pieces object of numbers', () => {
+  const nBad = LANDED();
+  nBad.prs[0] = { ...nBad.prs[0], n: '103' };
+  assert.throws(() => validateSnapshot(withLanded(nBad)), /aiActions\.actionsLanded\.prs\[0\]\.n/);
+  const piecesBad = LANDED();
+  piecesBad.prs[0] = { ...piecesBad.prs[0], pieces: { bexio: '103' } };
+  assert.throws(() => validateSnapshot(withLanded(piecesBad)), /aiActions\.actionsLanded\.prs\[0\]\.pieces/);
+  const noPieces = LANDED();
+  noPieces.prs[0] = { pr: 17034, n: 103, author: 'OdaiAhmed99' };
+  assert.throws(() => validateSnapshot(withLanded(noPieces)), /aiActions\.actionsLanded\.prs\[0\]\.pieces/);
+});
+
+test('a PR author must be a non-empty string when present', () => {
+  for (const bad of ['', null, 42]) {
+    const block = LANDED();
+    block.prs[0] = { ...block.prs[0], author: bad };
+    assert.throws(() => validateSnapshot(withLanded(block)), /aiActions\.actionsLanded\.prs\[0\]\.author/);
+  }
+});
+
+// Every number on the page is auditable from the archive: the PRs listed are the
+// whole story behind the total, and each PR's count is its pieces'.
+test('PRs that do not add up to the total, or pieces that do not add up to their PR, are rejected', () => {
+  const short = LANDED();
+  short.prs.pop();
+  assert.throws(() => validateSnapshot(withLanded(short)), /aiActions\.actionsLanded\.prs/);
+  const split = LANDED();
+  split.prs[1] = { ...split.prs[1], pieces: { asana: 9 } };
+  assert.throws(() => validateSnapshot(withLanded(split)), /aiActions\.actionsLanded\.prs\[1\]/);
+});
+
 // ── healing a degraded week ─────────────────────────────────────────────────
 // A week archived with a no-data tile is not finished: its collector failed,
 // and the job retries until the week is whole. Replacing an archived week is

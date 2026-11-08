@@ -97,8 +97,8 @@ const WEEKS = [W39, W40];
 test('AI actions: newly done pieces credited to their PR author', () => {
   const t = targetsFor(AI, WEEKS, W40);
   assert.deepEqual(t.rows, [
-    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false },
-    { person: 'odai', name: 'Odai', actual: 1, target: 20, hit: false },
+    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, actions: null },
+    { person: 'odai', name: 'Odai', actual: 1, target: 20, hit: false, actions: null },
   ]);
   assert.equal(t.also, 'Talal 1 · 1 other · 1 not credited');
 });
@@ -124,8 +124,8 @@ const AI_OPEN = { ...AI, credit: ['merged', 'approved', 'pr-open'], creditFrom: 
 test('from creditFrom on, an open PR counts for its author, and the row says how many are open', () => {
   const t = targetsFor(AI_OPEN, WEEKS, W40);
   assert.deepEqual(t.rows, [
-    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, open: 0 },
-    { person: 'odai', name: 'Odai', actual: 2, target: 20, hit: false, open: 1 },
+    { person: 'kishan', name: 'Kishan', actual: 3, target: 20, hit: false, open: 0, actions: null },
+    { person: 'odai', name: 'Odai', actual: 2, target: 20, hit: false, open: 1, actions: null },
   ]);
   assert.equal(t.also, 'Talal 1 · 1 other · 1 not credited');
 });
@@ -148,8 +148,8 @@ test('before creditFrom an open PR counts for nobody, and rows carry no open cou
   const W39t = { ...W39, targets: TARGETS };
   const t = targetsFor(AI_OPEN, [W38, W39t], W39t);
   assert.deepEqual(t.rows, [
-    { person: 'kishan', name: 'Kishan', actual: 0, target: 20, hit: false },
-    { person: 'odai', name: 'Odai', actual: 0, target: 20, hit: false },
+    { person: 'kishan', name: 'Kishan', actual: 0, target: 20, hit: false, actions: null },
+    { person: 'odai', name: 'Odai', actual: 0, target: 20, hit: false, actions: null },
   ]);
 });
 
@@ -269,4 +269,40 @@ test('checkedByPerson refuses a map that does not sum to its total', () => {
   assert.equal(checkedByPerson({ kishan: '2' }, 2), null);
   assert.equal(checkedByPerson({}, 0), null);
   assert.equal(checkedByPerson(undefined, 0), null);
+});
+
+// ── AI actions landed, per person ───────────────────────────────────────────
+// Shown beside the pieces score, never targeted. Only the AI-actions rows carry
+// it: null when the week did not measure it, and a measured 0 stays 0 — a quiet
+// week reads "+0 actions", not as missing.
+const LANDED = { total: 115, byPerson: { kishan: 12, sanket: 0, odai: 103, talal: 0, others: 0 }, prs: [] };
+
+test('AI-actions rows carry the actions their person landed this week', () => {
+  const W40a = { ...W40, aiActions: { ...W40.aiActions, actionsLanded: LANDED } };
+  const t = targetsFor(AI_OPEN, [W39, W40a], W40a);
+  assert.deepEqual(t.rows.map((r) => [r.person, r.actions]), [['kishan', 12], ['odai', 103]]);
+});
+
+test('a measured zero stays zero', () => {
+  const quiet = { ...LANDED, total: 103, byPerson: { ...LANDED.byPerson, kishan: 0 } };
+  const W40a = { ...W40, aiActions: { ...W40.aiActions, actionsLanded: quiet } };
+  assert.equal(targetsFor(AI, [W39, W40a], W40a).rows.find((r) => r.person === 'kishan').actions, 0);
+});
+
+test('a week that did not measure actions carries null, never 0', () => {
+  const t = targetsFor(AI, WEEKS, W40);
+  assert.ok(t.rows.every((r) => r.actions === null));
+});
+
+test('actions are carried even when the pieces count could not be measured', () => {
+  const W40a = { ...W40, aiActions: { ...W40.aiActions, actionsLanded: LANDED } };
+  const t = targetsFor(AI, [W40a], W40a);
+  assert.deepEqual(t.rows.map((r) => [r.actual, r.actions]), [[null, 12], [null, 103]]);
+});
+
+test('no other tile\'s rows carry an actions key', () => {
+  for (const spec of [UI, TESTING, TICKETS]) {
+    const t = targetsFor(spec, WEEKS, W40);
+    assert.ok(t.rows.every((r) => !('actions' in r)), spec.key);
+  }
 });

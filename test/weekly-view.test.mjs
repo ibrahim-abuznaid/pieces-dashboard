@@ -255,7 +255,7 @@ test('only the tiles that count people carry a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['delta', 'inReview', 'key', 'note', 'perPerson', 'prior', 'reason', 'running', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
+      ['actions', 'delta', 'inReview', 'key', 'note', 'perPerson', 'prior', 'reason', 'running', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
   }
 });
 
@@ -1471,7 +1471,7 @@ test('from W40 an open AI-actions PR counts on its author\'s target row, but not
     { name: 'grist', actions: 0, stage: 'pr-open', author: 'kishanprmr' },
   ]) });
   const t = tileOf(buildView({ weeks: [W39, W40] }), 'aiActions');
-  assert.deepEqual(t.targets.rows, [{ person: 'kishan', name: 'Kishan', actual: 2, target: 20, hit: false, open: 1 }]);
+  assert.deepEqual(t.targets.rows, [{ person: 'kishan', name: 'Kishan', actual: 2, target: 20, hit: false, open: 1, actions: null }]);
   assert.deepEqual(t.strip.items.map((i) => i.name), ['slack']);
 });
 
@@ -1545,4 +1545,48 @@ test('the connection-identifier tile draws no target row while none is set', () 
   const W41 = snap('2026-W41', { targets: { aiActions: { odai: 20 } },
     connectionIdentifier: ci({ roster: [ciRow('gmail', 'live', 'OdaiAhmed99')] }) });
   assert.equal(tileOf(buildView({ weeks: [W41] }), 'connectionIdentifier').targets, null);
+});
+
+// ── AI actions on main, and landed this week ───────────────────────────────
+// The tile counts PIECES. Beside it: how many agent atomics are on main in all
+// (the merged roster rows' own counts), and how many the week's merged PRs added
+// (aiActions.actionsLanded, see weekly/collect/ai-actions.mjs). Shown, never
+// targeted, and every tile carries the field so the shape never varies.
+const LANDED = { total: 341, byPerson: { kishan: 229, sanket: 0, odai: 112, talal: 0, others: 0 }, prs: [] };
+
+test('the AI-actions tile carries actions on main and landed this week', () => {
+  const t = aiTile(oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER, actionsLanded: LANDED }) }));
+  assert.deepEqual(t.actions, { onMain: 105, landed: 341, others: 0 }, 'stripe 79 + gmail 26; approved and open rows are not on main');
+});
+
+test('others is what landed from logins off the team', () => {
+  const t = aiTile(oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER,
+    actionsLanded: { ...LANDED, total: 353, byPerson: { ...LANDED.byPerson, others: 12 } } }) }));
+  assert.equal(t.actions.others, 12);
+});
+
+test('a week that did not measure landed actions still carries the count on main', () => {
+  const t = aiTile(oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER }) }));
+  assert.deepEqual(t.actions, { onMain: 105, landed: null, others: null });
+});
+
+test('no roster, or an empty one, is no count on main — never 0', () => {
+  assert.equal(aiTile(oneWeek({ aiActions: aiWith({}) })).actions.onMain, null);
+  assert.equal(aiTile(oneWeek({ aiActions: aiWith({ roster: [] }) })).actions.onMain, null);
+});
+
+test('every other tile, and a degraded AI-actions tile, carries actions: null', () => {
+  const v = oneWeek({ aiActions: aiWith({ roster: AI_APPROVED_ROSTER, actionsLanded: LANDED }) });
+  for (const t of v.tiles.filter((x) => x.key !== 'aiActions')) assert.equal(t.actions, null, t.key);
+  assert.equal(aiTile(oneWeek({ aiActions: { status: 'no-data', reason: 'x' } })).actions, null);
+});
+
+test('the AI-actions target rows carry each person\'s landed actions', () => {
+  const ai = (roster, more = {}) => ({ status: 'ok', merged: 1, prOpen: 0, assigned: 0, held: 0, totalPieces: 2, blockersOpen: 0, roster, ...more });
+  const W39 = snap('2026-W39', { aiActions: ai([{ name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' }]) });
+  const W40 = snap('2026-W40', { targets: { aiActions: { kishan: 20, odai: 20 } }, aiActions: ai([
+    { name: 'gmail', actions: 1, stage: 'merged', author: 'kishanprmr' },
+  ], { actionsLanded: LANDED }) });
+  const t = tileOf(buildView({ weeks: [W39, W40] }), 'aiActions');
+  assert.deepEqual(t.targets.rows.map((r) => [r.person, r.actual, r.actions]), [['kishan', 0, 229], ['odai', 0, 112]]);
 });
