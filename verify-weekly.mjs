@@ -34,6 +34,7 @@ export const ARCHIVE_PATH = join(ROOT, 'weekly/data/weeks.json');
 export const TEAM_DASHBOARD = process.env.PIECES_TEAM_DASHBOARD
   ?? '/home/ibrahim/AP_work/Activepieces_v/pieces-team/dashboard';
 export const LINEAR_MARKER = join(TEAM_DASHBOARD, 'NEEDS-LINEAR-REFRESH');
+export const QA_MARKER = join(TEAM_DASHBOARD, 'NEEDS-QA-REFRESH');
 
 // 8, not 7: the snapshot job runs Saturday 09:00, so a healthy archive's newest
 // `builtAt` is 0–6 days old on any given day and 7 on the Saturday morning
@@ -331,6 +332,15 @@ export function runChecks({ liveHtml, liveError, archive, today = localToday(), 
   } else {
     add('linear refresh', true, 'no NEEDS-LINEAR-REFRESH marker');
   }
+  // Same reading for the QA-sweeps file (refresh-qa.sh): its own marker, its
+  // own tile, warning only.
+  const qa = marker.qa ?? {};
+  if (qa.present) {
+    const age = Number.isFinite(qa.ageDays) ? `${qa.ageDays} day${qa.ageDays === 1 ? '' : 's'} old` : 'age unknown';
+    add('qa refresh', false, `NEEDS-QA-REFRESH present (${age}) at ${qa.path ?? QA_MARKER} — the QA sweeps tile degrades to no-data until it clears`, { warn: true });
+  } else {
+    add('qa refresh', true, 'no NEEDS-QA-REFRESH marker');
+  }
 
   const failed = checks.filter((c) => !c.ok && !c.warn && !c.skipped);
   return { checks, failed, ok: failed.length === 0 };
@@ -432,7 +442,7 @@ async function cli(argv) {
     liveHtml, liveError,
     archive: readArchive(ARCHIVE_PATH),
     today: localToday(),
-    marker: readMarker(),
+    marker: { ...readMarker(), qa: readMarker(QA_MARKER) },
   });
   for (const c of checks) {
     const mark = c.skipped ? '·' : c.ok ? '✓' : c.warn ? '⚠' : '✗';

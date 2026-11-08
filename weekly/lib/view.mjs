@@ -286,6 +286,84 @@ function coveredStrip(ws) {
   return rows.length ? capped('pieces', '', rows.map(toChip)) : null;
 }
 
+// ── the QA sweeps ───────────────────────────────────────────────────────────
+// The bug tickets the automated QA sweeps file in Linear, and how far the
+// team has worked through them (weekly/collect/qa-sweeps.mjs). The number is
+// tickets FIXED, a running total; `total` is every ticket in scope, canceled
+// ones excluded. A week with no sweep tickets yet (W31–W37, before the first
+// sweep existed) says so rather than "0 of 0".
+const qaUnit = (ws) => (ws.total > 0
+  ? `of ${ws.total} QA ${plural(ws.total, 'ticket')} fixed`
+  : 'QA tickets — no sweep filed yet');
+
+// Per-person rows, in the target rows' shape, with the ASSIGNMENT as the
+// denominator: `Odai 0/49 fixed`. The assignment is a fact the board records;
+// a target would be a management decision this page does not get to make.
+// Only on a block that read the board (`assigned` present) — a dates-only
+// week keeps the plain per-person line below — and only for people with
+// tickets. What the rows do not show rides on the "also" line: fixes with no
+// assignee, and fixes by logins off the team.
+const qaDetail = (row) => {
+  const parts = [];
+  if (row.fixedThisWeek > 0) parts.push(`+${row.fixedThisWeek} this week`);
+  if (row.inReview > 0) parts.push(`${row.inReview} in review`);
+  return parts.join(' · ');
+};
+
+function qaRows(ws) {
+  if (!Object.values(ws.byPerson ?? {}).every((r) => typeof r?.assigned === 'number')) return null;
+  const rows = Object.entries(ws.byPerson)
+    .filter(([, r]) => r.assigned > 0)
+    .map(([person, r]) => ({ person, name: titled(person), actual: r.fixed, target: r.assigned,
+      hit: r.fixed >= r.assigned, unit: 'fixed', detail: qaDetail(r) }));
+  if (!rows.length) return null;
+  const also = [];
+  if (ws.unassigned?.fixed > 0) also.push(`${ws.unassigned.fixed} fixed with no assignee`);
+  if (ws.others?.fixed > 0) also.push(`${ws.others.fixed} fixed by others`);
+  return { rows, also: also.join(' · ') };
+}
+
+// The dates-only line: who fixed what this week, with the no-assignee and
+// off-team shares, so the parts add up to the tile's own fixedThisWeek.
+function qaPersonLine(ws) {
+  const parts = Object.entries(ws.byPerson ?? {})
+    .filter(([, r]) => Number.isInteger(r?.fixedThisWeek))
+    .map(([key, r]) => `${titled(key)} ${r.fixedThisWeek}`);
+  if (ws.unassigned?.fixedThisWeek > 0) parts.push(`${ws.unassigned.fixedThisWeek} with no assignee`);
+  if (ws.others?.fixedThisWeek > 0) parts.push(`${ws.others.fixedThisWeek} by others`);
+  return ws.fixedThisWeek > 0 || parts.length ? parts.join(' · ') : '';
+}
+
+// One link per sweep, with its own fixed/total, so the reader can open the
+// project in Linear from the tile. The project's name is the only Linear text
+// on the page for this tile; see qaStrip for why.
+function qaLinks(ws) {
+  const items = (Array.isArray(ws.projects) ? ws.projects : [])
+    .filter((p) => typeof p?.name === 'string' && p.name)
+    .map((p) => {
+      const href = httpsHref(p.url);
+      const text = `${p.name} ${p.fixed}/${p.total}`;
+      return href ? { text, href } : { text };
+    });
+  return items.length ? items : null;
+}
+
+// The tickets fixed this week, as id chips linking to Linear. IDS ONLY, never
+// a title: these are bug reports, several of them labelled `security`, and
+// this repo is public — a title such as "pre-auth crash of the self-hosted
+// API" is not something this page may publish before the fix ships. The
+// tickets tile shows titles because its tickets were chosen for the page;
+// these were not. A week that measured and fixed nothing says so.
+function qaStrip(ws) {
+  if (!(ws.total > 0)) return null;
+  const items = (Array.isArray(ws.fixedIds) ? ws.fixedIds : [])
+    .filter((id) => typeof id === 'string' && LINEAR_ID.test(id))
+    .map((id) => ({ id, name: '', href: ticketUrl(id) }));
+  return items.length
+    ? capped('tickets', 'Fixed this week', items)
+    : { kind: 'tickets', label: 'Nothing fixed this week', items: [], rest: [], more: 0 };
+}
+
 // key, title, the metric the big number shows, and how to phrase it. A box is a
 // number, its unit and the pieces behind it: the sub-lines each one used to
 // carry (`9 live on cloud · 8 in review`, `28 tracked · 24 PRs open`,
@@ -455,6 +533,15 @@ const TILES = [
   // to look for this still finds it there, now carrying the same kind of number
   // as the other rollouts. The prose did not die with the band: it moved to
   // weekly/data/notes.json and renders as this tile's note line.
+  // The QA sweeps: the bug tickets Linear's QA projects hold for this team, and
+  // how many are fixed. WIDE, and first of the wide tiles — directly under the
+  // small grid, because it is the week's work, not a rollout; a ninth small
+  // tile would leave a hole in the two-column grid. Running total with the
+  // same pill the rollouts carry; "+N in review" is the queue behind it. The
+  // per-person rows are the assignment, not a target — see qaRows.
+  { key: 'qaSweeps', title: 'QA sweeps', path: 'qaSweeps.fixed',
+    unit: qaUnit, review: 'qaSweeps.inReview', wide: true, running: true,
+    rows: qaRows, perPerson: qaPersonLine, links: qaLinks, strip: qaStrip },
   { key: 'uiImprovements', title: 'UI improvements', path: 'uiImprovements.merged',
     unit: (ws) => `of ${ws.totalPieces} pieces`,
     review: 'uiImprovements.review',
@@ -626,13 +713,15 @@ export function buildView(archive, { weekId, notes } = {}) {
                status: 'no-data', reason: NOT_MEASURED,
                value: null, delta: null, running: false, prior: null,
                inReview: null, unit: '', strip: null, perPerson: '',
-               targets: null, note: '', actions: null };
+               targets: null, note: '', actions: null, links: null };
     }
     // Resolved per week when the spec asks (pathFor), so value and delta always
     // share one metric — see the piece-testing entry in TILES.
     const path = spec.pathFor ? spec.pathFor(ws) : spec.path;
     const running = typeof spec.running === 'function' ? spec.running(ws) : spec.running === true;
-    const targets = targetsFor(spec, weeks, selected);
+    // The lead's targets when the week set any; else the tile's own rows
+    // (today only the QA sweeps build them, from the assignment).
+    const targets = targetsFor(spec, weeks, selected) ?? spec.rows?.(ws) ?? null;
     return {
       key: spec.key, title: spec.title, wide: spec.wide === true, status: 'ok', reason: '',
       value: pick(selected, path),
@@ -656,6 +745,9 @@ export function buildView(archive, { weekId, notes } = {}) {
       note: curatedNote(notes?.[selected.week]?.[spec.key]) ?? spec.note?.(ws) ?? '',
       // On every tile so the shape never varies; only AI actions fills it.
       actions: spec.actions?.(ws) ?? null,
+      // Links under the headline — the sweeps' projects in Linear. Every tile
+      // carries the field; only the QA sweeps fill it.
+      links: spec.links?.(ws) ?? null,
     };
   });
 

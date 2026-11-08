@@ -593,6 +593,7 @@ test('what the collectors emit — including an unresolved logo — passes valid
     connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
     testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
     tickets: { status: 'ok', total: 11 },
+    qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   };
   assert.ok(snap.aiActions.roster.some((r) => r.logo === null), 'the fixture must exercise the unresolved path');
   assert.ok(snap.aiActions.roster.some((r) => typeof r.displayName === 'string'), 'and the resolved name path');
@@ -650,6 +651,7 @@ test('an unmeasured cloud half stays absent, it does not become zero', () => {
     connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
     testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
     tickets: { status: 'ok', total: 11 },
+    qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   });
 });
 
@@ -809,6 +811,7 @@ test('what the collector emits with actions landed passes validateSnapshot', () 
     connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
     testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
     tickets: { status: 'ok', total: 11 },
+    qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   });
 });
 

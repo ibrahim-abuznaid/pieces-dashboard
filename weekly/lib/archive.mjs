@@ -26,6 +26,12 @@ const REQUIRED = {
   connectionIdentifier: ['merged', 'review', 'assigned', 'totalPieces'],
   testing: ['prsMerged', 'commits'],
   tickets: ['total'],
+  // The QA sweeps (weekly/collect/qa-sweeps.mjs). The board-state counts
+  // (`inReview`, `inProgress`, `open`, `canceled`) are NOT required, for the
+  // reason `live` is not on the rollouts: the weeks before the tile existed
+  // were restated from ticket dates (scripts/backfill-qa-sweeps.mjs), and a
+  // past day's board is not knowable. See validateQaSweeps.
+  qaSweeps: ['total', 'fixed', 'fixedThisWeek'],
 };
 
 // Counts a workstream MAY carry. Required where listed above, rejected when
@@ -173,6 +179,73 @@ function validateNewActions(block, at) {
   if (listed !== sub.total) throw new Error(`${subAt}: the PRs' nNew add up to ${listed}, not the total ${sub.total}`);
 }
 
+// The QA sweeps block (weekly/collect/qa-sweeps.mjs). Every number in it
+// reaches the page, so it is held AUDITABLE from this file alone, on the rule
+// actionsLanded follows: the people, plus others and unassigned, add up to
+// `fixed` and to `fixedThisWeek`; the projects add up to `total`, `fixed` and
+// `fixedThisWeek`; `fixedIds` lists exactly `fixedThisWeek` ids. A block that
+// read the board carries `open`, and then fixed + inReview + inProgress + open
+// is `total` and every person's `assigned` is recorded — the per-person rows
+// divide by it. A dates-only block carries none of those, and must carry none
+// of them: a past week claiming an `assigned` it never read is the overclaim
+// the backfill rule exists to prevent.
+const COUNTS_ON_BOARD = ['inReview', 'inProgress', 'open', 'canceled'];
+const PERSON_ON_BOARD = ['assigned', 'inReview', 'inProgress'];
+
+function validateQaSweeps(ws) {
+  if (ws.status !== 'ok') return;
+  const at = 'qaSweeps';
+  const onBoard = ws.open !== undefined;
+  for (const f of COUNTS_ON_BOARD) {
+    if (onBoard ? !Number.isInteger(ws[f]) : ws[f] !== undefined) {
+      throw new Error(onBoard ? `${at}.${f} must be an integer when the board was read` : `${at}.${f} must be absent on a dates-only block`);
+    }
+  }
+  if (onBoard && ws.fixed + ws.inReview + ws.inProgress + ws.open !== ws.total) {
+    throw new Error(`${at}: fixed + inReview + inProgress + open is not the total ${ws.total}`);
+  }
+  if (!isObject(ws.byPerson)) throw new Error(`${at}.byPerson must be an object of person → counts`);
+  const buckets = [...Object.entries(ws.byPerson), ['others', ws.others], ['unassigned', ws.unassigned]];
+  const sums = { fixed: 0, fixedThisWeek: 0, assigned: 0 };
+  for (const [who, row] of buckets) {
+    const rowAt = `${at}.${who}`;
+    if (!isObject(row)) throw new Error(`${rowAt} must be an object of counts`);
+    for (const f of ['fixed', 'fixedThisWeek']) {
+      if (!Number.isInteger(row[f])) throw new Error(`${rowAt}.${f} must be an integer`);
+    }
+    for (const f of PERSON_ON_BOARD) {
+      if (onBoard ? !Number.isInteger(row[f]) : row[f] !== undefined) {
+        throw new Error(onBoard ? `${rowAt}.${f} must be an integer when the board was read` : `${rowAt}.${f} must be absent on a dates-only block`);
+      }
+    }
+    sums.fixed += row.fixed; sums.fixedThisWeek += row.fixedThisWeek;
+    if (onBoard) sums.assigned += row.assigned;
+  }
+  if (sums.fixed !== ws.fixed) throw new Error(`${at}: the people add up to ${sums.fixed} fixed, not ${ws.fixed}`);
+  if (sums.fixedThisWeek !== ws.fixedThisWeek) throw new Error(`${at}: the people add up to ${sums.fixedThisWeek} fixed this week, not ${ws.fixedThisWeek}`);
+  if (onBoard && sums.assigned !== ws.total) throw new Error(`${at}: the assignments add up to ${sums.assigned}, not the total ${ws.total}`);
+  if (!Array.isArray(ws.projects)) throw new Error(`${at}.projects must be an array`);
+  const byProject = { total: 0, fixed: 0, fixedThisWeek: 0 };
+  ws.projects.forEach((p, i) => {
+    const rowAt = `${at}.projects[${i}]`;
+    if (!isObject(p)) throw new Error(`${rowAt} must be an object`);
+    if (typeof p.id !== 'string' || !p.id) throw new Error(`${rowAt}.id must be a non-empty string`);
+    if (typeof p.name !== 'string' || !p.name) throw new Error(`${rowAt}.name must be a non-empty string`);
+    optionalString(rowAt, 'url', p.url, { nullable: false });
+    for (const f of ['total', 'fixed', 'fixedThisWeek']) {
+      if (!Number.isInteger(p[f])) throw new Error(`${rowAt}.${f} must be an integer`);
+      byProject[f] += p[f];
+    }
+  });
+  for (const f of ['total', 'fixed', 'fixedThisWeek']) {
+    if (byProject[f] !== ws[f]) throw new Error(`${at}.projects add up to ${byProject[f]} ${f}, not ${ws[f]}`);
+  }
+  if (!Array.isArray(ws.fixedIds) || !ws.fixedIds.every((id) => typeof id === 'string' && /^[A-Za-z][A-Za-z0-9]*-\d+$/.test(id))) {
+    throw new Error(`${at}.fixedIds must be an array of Linear ids`);
+  }
+  if (ws.fixedIds.length !== ws.fixedThisWeek) throw new Error(`${at}.fixedIds lists ${ws.fixedIds.length} ids, not the ${ws.fixedThisWeek} fixed this week`);
+}
+
 function validateOptionalNumbers(key, ws) {
   for (const f of OPTIONAL_NUMBERS[key] ?? []) {
     if (ws[f] === undefined) continue;
@@ -204,6 +277,7 @@ export function validateSnapshot(snap) {
     validateCatalogPieces(key, ws);
     validateOptionalNumbers(key, ws);
     if (key === 'aiActions') validateActionsLanded(ws);
+    if (key === 'qaSweeps') validateQaSweeps(ws);
     if (ws.status === 'no-data') {
       if (typeof ws.reason !== 'string' || !ws.reason) throw new Error(`${key}: no-data needs a reason`);
       continue;
@@ -226,7 +300,7 @@ export function appendWeek(archive, snap, { force = false } = {}) {
   return { ...archive, weeks };
 }
 
-export const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets', 'shipping'];
+export const WORKSTREAMS = ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier', 'testing', 'tickets', 'shipping', 'qaSweeps'];
 
 // A no-data tile is a collector that failed, never a measured quiet week (a
 // quiet week is `ok` with zeros), so this list is what the week is still missing.

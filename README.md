@@ -34,6 +34,8 @@ that was only knowable at the time (`catalogPieces`, `blockersOpen`, cloud `live
 
 - `backfill-ui-improvements.mjs` — added the `uiImprovements` block to the six weeks archived before that
   workstream existed.
+- `backfill-qa-sweeps.mjs` — run 2026-11-08, adding the `qaSweeps` block to every archived week (see
+  *QA sweeps* below).
 - `backfill-ai-actions.mjs` — **run 2026-09-18, rewriting `aiActions` in W31–W37.** Three claims pointed at
   PRs that closed unmerged and were re-opened under new numbers (#13926→#14519, #13929→#14520,
   #13930→#14565). The recorded number still resolved, so the daily refresh stayed green while the *pointer*
@@ -164,6 +166,40 @@ Neither headline is piece **health**: pass/fail run results are still not collec
 a **stats endpoint** read the same way (the coverage endpoint already reports per-piece health — rendering it
 is a deliberate later step, not a data gap). Do not read that box as "pieces passing" — see
 `weekly/collect/testing.mjs`.
+
+### QA sweeps — the bug tickets, linked by keyword
+
+A wide tile under the small grid, since 2026-11-08. The automated QA sweeps file their findings as Linear
+tickets inside **projects** — `qa sweep 3`, `QA Sweep 3: Triggers`, `QA Sweep 2`, `QA Sweep 1` so far —
+and the tile is linked to Linear by **keyword, not by project id**: every project whose name contains `qa`
+(case-insensitive) is a sweep, so the next one lands on the page without an edit. Design:
+`docs/superpowers/specs/2026-11-08-weekly-qa-sweeps-tile-design.md`.
+
+**Scope** is the Pieces team's tickets: team **Pieces**, or assigned to someone on the roster. Three of the
+four sweeps are Engineering projects whose tickets are not this team's work (604 tickets across the four,
+149 in scope on the day it shipped, all from `qa sweep 3`).
+
+**What it shows.** The number is tickets **fixed** (Linear `completed`), a running total, with the same
+week-over-week pill as the rollouts; "+N in review" is the queue behind it; canceled and duplicate tickets
+are outside the total. One line links each sweep in Linear with its own `fixed/total`. The per-person rows
+read `Odai 0/49 fixed · 1 in review` — the denominator is the **assignment**, a fact the board records, not
+a target this page invents; they draw only on weeks that read the board. The chips are the **ids** of the
+tickets fixed this week, linking to Linear, and **never their titles**: these are bug reports, several
+labelled `security`, and this repo is public.
+
+**How the data gets here.** The internal dashboard's refresh runs `refresh-qa.sh` (headless Claude + the
+Linear MCP: `list_projects(query:"qa")` → name test → `list_issues` per project → scope → `validate-qa.mjs`
+→ `dashboard/data/qa.json`). It is a non-fatal step with its own marker, `NEEDS-QA-REFRESH`, so a failed QA
+fetch degrades this tile alone and never the ticket counts. The collector (`weekly/collect/qa-sweeps.mjs`)
+reads that file, re-applies the scope rule, and refuses a file stamped before the week's end.
+
+**Archive.** `qaSweeps` is a required workstream: `total`, `fixed`, `fixedThisWeek`; the board-state counts
+(`inReview`, `inProgress`, `open`, `canceled`, and the per-person `assigned`) only on weeks that read the
+board. Every number is auditable from the block alone — people + others + unassigned add up to `fixed` and
+`fixedThisWeek`, the projects add up to the totals, `fixedIds` lists exactly `fixedThisWeek` ids.
+`scripts/backfill-qa-sweeps.mjs` restated W31–W45 on 2026-11-08 from `createdAt`/`completedAt`/`canceledAt`
+alone (dates-only, no board state), and W45 — the latest sealed week — from the board as read that day, as
+a heal of the week would have. W31–W37 predate the first sweep and read "no sweep filed yet".
 
 ## AI actions — quality & rollout (counts only)
 

@@ -21,6 +21,7 @@ import { collectConnectionIdentifier } from './collect/connection-identifier.mjs
 import { collectTesting } from './collect/testing.mjs';
 import { collectTickets } from './collect/tickets.mjs';
 import { collectShipping } from './collect/shipping.mjs';
+import { collectQaSweeps } from './collect/qa-sweeps.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ARCHIVE = join(ROOT, 'weekly/data/weeks.json');
@@ -253,6 +254,13 @@ export function main(argv) {
         // be a self-inflicted outage; github.json carries its own stamp and the
         // collector checks it.
         shipping: () => collectShipping({ window, weekId, readJson: readTeamJson }),
+        // The QA sweeps: dashboard/data/qa.json, written by the internal
+        // refresh's refresh-qa.sh (headless Claude + Linear MCP, keyword "qa").
+        // Its own marker, so a failed QA fetch degrades this tile alone.
+        qaSweeps: () => collectQaSweeps({
+          window, readJson: readTeamJson,
+          qaRefreshPending: existsSync(join(TEAM_DASHBOARD, 'NEEDS-QA-REFRESH')),
+        }),
       },
     });
   } finally {

@@ -22,6 +22,7 @@ const snap = (week, over = {}) => ({
   connectionIdentifier: { status: 'ok', merged: 58, live: 58, review: 0, assigned: 0, totalPieces: 111 },
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5 }, prsMerged: {}, reviews: {}, shipped: [] },
+  qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   decisions: [], ...over,
 });
 

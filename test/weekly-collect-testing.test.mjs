@@ -159,7 +159,7 @@ test('a coverage roster validates as a snapshot workstream', () => {
   validateSnapshot({
     week: '2026-W31', start: WINDOW.start, end: WINDOW.end, builtAt: '2026-08-01',
     decisions: [], outputSchema: noData, aiActions: noData, uiImprovements: noData, connectionIdentifier: noData, tickets: noData,
-    testing: withCoverage(),
+    qaSweeps: noData, testing: withCoverage(),
   });
 });
 

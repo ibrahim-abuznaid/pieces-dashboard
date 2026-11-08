@@ -132,6 +132,13 @@
   ul.targets .unmeasured .bar { background: transparent; border: 1px dashed var(--border); }
   ul.targets .score { font-variant-numeric: tabular-nums; color: var(--text-primary); }
   ul.targets .unmeasured .score { color: var(--text-muted); }
+  /* A wide tile's rows two across: one row per line across the full width
+     would draw a bar five times longer than the number it stands for. */
+  .tile.wide ul.targets { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+  @media (max-width: 640px) { .tile.wide ul.targets { grid-template-columns: minmax(0, 1fr); } }
+  /* Links in a note line (the QA sweeps' projects): the note's own colour,
+     underlined so a link reads as one without colour. */
+  .note.links a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
   /* The pieces behind the number, in the same box as the number. `.chip` is the
      shared vocabulary from shared/theme.css; the pill shape, the colours (all
@@ -382,12 +389,15 @@ function targetsHtml(tg) {
     const actionsLine = typeof r.newActions === 'number' ? `${signedActions(r.newActions)} actions added`
       : typeof r.actions === 'number' ? `${signedActions(r.actions)} agent-only actions added` : '';
     const actions = actionsLine ? ` · ${actionsLine}` : '';
-    const unit = actionsLine ? ' pieces' : '';
+    // A row may name its own unit (the QA sweeps' rows read "0/49 fixed") and
+    // carry a detail the view built ("+2 this week · 1 in review").
+    const unit = r.unit ? ` ${r.unit}` : actionsLine ? ' pieces' : '';
+    const detail = r.detail ? ` · ${r.detail}` : '';
     const tip = typeof r.newActions === 'number' && typeof r.actions === 'number'
       ? ` title="${esc(`${signedActions(r.newActions)} actions in this week's merged PRs, any audience · ${signedActions(r.actions)} of them agent-only (audience 'ai')`)}"` : '';
     const score = measured
-      ? `${num(r.actual)}/${num(r.target)}${unit}${open}${actions}${r.hit ? ' <span class="tick" role="img" aria-label="target hit">✓</span>' : ''}`
-      : `— / ${num(r.target)}${unit} · not measured${actions}`;
+      ? `${num(r.actual)}/${num(r.target)}${unit}${open}${actions}${detail}${r.hit ? ' <span class="tick" role="img" aria-label="target hit">✓</span>' : ''}`
+      : `— / ${num(r.target)}${unit} · not measured${actions}${detail}`;
     return `<li class="${cls}"><span class="who">${esc(r.name)}</span><span class="bar" aria-hidden="true"><span class="fill" style="width:${pct}%"></span></span><span class="score"${tip}>${score}</span></li>`;
   }).join('');
   return `<ul class="targets" aria-label="Weekly targets">${rows}</ul>${
@@ -417,6 +427,18 @@ function actionsHtml(a) {
   return `<div class="note actions" title="${esc(detail.join(' · '))}">${num(a.onMain)} agent actions on main${week}</div>`;
 }
 
+// Links under a headline: the QA sweeps' projects in Linear, each with its
+// own fixed/total (view.mjs qaLinks). Text and href are both escaped, and the
+// view has already refused any href that is not https. An item with no href
+// renders as plain text rather than a dead link.
+function linksHtml(items) {
+  if (!Array.isArray(items) || !items.length) return '';
+  const parts = items.map((it) => (it.href
+    ? `<a href="${esc(it.href)}" target="_blank" rel="noopener">${esc(it.text)}</a>`
+    : esc(it.text)));
+  return `<div class="note links">${parts.join(' · ')}</div>`;
+}
+
 function tileHtml(t) {
   const wide = t.wide ? ' wide' : '';
   if (t.status !== 'ok') {
@@ -427,6 +449,7 @@ function tileHtml(t) {
   return `<div class="tile${wide}"><h2>${esc(t.title)}</h2>
     <div><span class="big">${num(t.value)}</span><span class="unit">${esc(t.unit)}</span>${inReviewHtml(t.inReview)}${deltaHtml(t)}</div>
     ${actionsHtml(t.actions)}
+    ${linksHtml(t.links)}
     ${targetsHtml(t.targets)}
     ${t.perPerson ? `<div class="note">${esc(t.perPerson)}</div>` : ''}
     ${t.note ? `<div class="note">${esc(t.note)}</div>` : ''}

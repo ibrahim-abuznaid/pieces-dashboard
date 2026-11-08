@@ -27,6 +27,7 @@ const snap = (week, over = {}) => ({
               byPerson: { kishan: 3, sanket: 4, odai: 0, talal: 0 },
               reviews: 21, reviewsByPerson: { kishan: 12, sanket: 9, odai: 0, talal: 0 },
               reviewsApprox: true, shipped: [{ number: 9, title: 'feat(slack): x', url: 'https://g/9' }] },
+  qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   decisions: [], ...over,
 });
 
@@ -90,7 +91,7 @@ test('writes summary.json for the selected week', () => {
   const { outDir } = render([snap('2026-W31')]);
   const summary = JSON.parse(readFileSync(join(outDir, 'summary.json'), 'utf8'));
   assert.equal(summary.week, '2026-W31');
-  assert.equal(summary.tiles.length, 8);
+  assert.equal(summary.tiles.length, 9);
 });
 
 test('an empty archive renders a placeholder rather than throwing', () => {
@@ -165,9 +166,9 @@ test('the DOM-lite harness actually renders the page body', () => {
 
 const at = (dom, needle) => dom.indexOf(needle);
 
-test('the page is a header, eight boxes and nothing structural besides', () => {
+test('the page is a header, nine boxes and nothing structural besides', () => {
   const dom = renderDom([withRosters()]);
-  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 8);
+  assert.equal([...dom.matchAll(/<div class="tile[ "]/g)].length, 9);
   assert.doesNotMatch(dom, /<section/, 'the roster and detail sections are gone');
   assert.doesNotMatch(dom, /<table|<tr|<td|<th/, 'nothing on this page is a table any more');
   assert.doesNotMatch(dom, /<details|<summary/, 'no collapsible per-piece detail');
@@ -1647,4 +1648,61 @@ test('with the actions created recorded, the line and the rows carry both counts
 test('no other box draws an actions line', () => {
   const dom = renderDom(actionsWeeks({ actionsLanded: LANDED_BLOCK }));
   assert.equal([...dom.matchAll(/class="note actions"/g)].length, 1);
+});
+
+// ── the QA sweeps tile on the page ──────────────────────────────────────────
+const qaPerson = (over = {}) => ({ assigned: 0, fixed: 0, fixedThisWeek: 0, inReview: 0, inProgress: 0, ...over });
+const qaWeek = () => snap('2026-W31', { qaSweeps: {
+  status: 'ok', total: 149, fixed: 6, fixedThisWeek: 6, inReview: 1, inProgress: 0, open: 142, canceled: 0,
+  byPerson: { kishan: qaPerson({ assigned: 46, inReview: 1 }), sanket: qaPerson({ assigned: 48 }),
+    odai: qaPerson({ assigned: 49 }), talal: qaPerson() },
+  others: qaPerson(), unassigned: qaPerson({ assigned: 6, fixed: 6, fixedThisWeek: 6 }),
+  projects: [{ id: 'P-PIE-366', name: 'qa sweep 3', url: 'https://linear.app/activepieces/project/qa-sweep-3',
+    total: 149, fixed: 6, fixedThisWeek: 6, inReview: 1, inProgress: 0, open: 142 }],
+  fixedIds: ['PIE-892', 'PIE-896', 'PIE-908', 'PIE-922', 'PIE-1017', 'PIE-1034'],
+} });
+
+test('the QA sweeps tile is wide, leads with fixed of in-scope, and shows the review queue', () => {
+  const dom = renderDom([qaWeek()]);
+  assert.match(dom, /<div class="tile wide"><h2>QA sweeps<\/h2>/);
+  const tile = tileOf(dom, 'QA sweeps');
+  assert.match(tile, /class="big">6</);
+  assert.match(tile, /of 149 QA tickets fixed/);
+  assert.match(tile, /\+1 in review/);
+});
+
+test('the QA rows read fixed over assigned with the queue beside, and never speak of PRs', () => {
+  const tile = tileOf(renderDom([qaWeek()]), 'QA sweeps');
+  assert.match(tile, /<span class="who">Kishan<\/span>.*?<span class="score">0\/46 fixed · 1 in review<\/span>/);
+  assert.match(tile, /<span class="who">Odai<\/span>.*?<span class="score">0\/49 fixed<\/span>/);
+  assert.doesNotMatch(tile, /Talal/, 'a person with no tickets has no row');
+  assert.doesNotMatch(tile, /merged|open<\/span>/);
+  assert.match(tile, /also: 6 fixed with no assignee/);
+});
+
+test('each sweep links to its project in Linear from the tile', () => {
+  const tile = tileOf(renderDom([qaWeek()]), 'QA sweeps');
+  assert.match(tile, /<div class="note links"><a href="https:\/\/linear\.app\/activepieces\/project\/qa-sweep-3" target="_blank" rel="noopener">qa sweep 3 6\/149<\/a><\/div>/);
+});
+
+test('the QA chips carry the id and a link to the ticket, and no title', () => {
+  const tile = tileOf(renderDom([qaWeek()]), 'QA sweeps');
+  assert.match(tile, /<a href="https:\/\/linear\.app\/activepieces\/issue\/PIE-892" target="_blank" rel="noopener"><span class="tid">PIE-892<\/span><\/a>/);
+  assert.doesNotMatch(tile, /class="nm"/, 'no chip in this tile has a name');
+  assert.match(tile, /Fixed this week/);
+  assert.match(tile, /\+1 more/);
+});
+
+test('a dates-only QA week renders the per-person line and no bars', () => {
+  const week = qaWeek();
+  week.qaSweeps = { status: 'ok', total: 149, fixed: 6, fixedThisWeek: 6,
+    byPerson: { kishan: { fixed: 0, fixedThisWeek: 0 }, sanket: { fixed: 0, fixedThisWeek: 0 }, odai: { fixed: 0, fixedThisWeek: 0 }, talal: { fixed: 0, fixedThisWeek: 0 } },
+    others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 6, fixedThisWeek: 6 },
+    projects: [{ id: 'P-PIE-366', name: 'qa sweep 3', total: 149, fixed: 6, fixedThisWeek: 6 }],
+    fixedIds: ['PIE-892', 'PIE-896', 'PIE-908', 'PIE-922', 'PIE-1017', 'PIE-1034'] };
+  const tile = tileOf(renderDom([week]), 'QA sweeps');
+  assert.doesNotMatch(tile, /class="targets"/);
+  assert.doesNotMatch(tile, /in review/);
+  assert.match(tile, /Kishan 0 · Sanket 0 · Odai 0 · Talal 0 · 6 with no assignee/);
+  assert.match(tile, /<div class="note links">qa sweep 3 6\/149<\/div>/, 'no url, no link — plain text');
 });

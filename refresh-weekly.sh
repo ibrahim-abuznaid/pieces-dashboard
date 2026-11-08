@@ -215,10 +215,10 @@ INTERNAL_OK=1
 if ! bash "$DASHBOARD/refresh.sh"; then
   INTERNAL_OK=0
   log "WARN internal refresh failed — tickets will degrade to no-data: $(internal_failure)"
-  # tickets and shipping are the only tiles fed by the internal refresh. When
+  # tickets, shipping and the QA sweeps are the only tiles fed by the internal refresh. When
   # they are all a degraded week is missing, a heal cannot succeed this run, so
   # stop before the ~7-minute fetch instead of spending it four times a day.
-  OTHER="${STATE//tickets/}"; OTHER="${OTHER//shipping/}"; OTHER="${OTHER//,/}"
+  OTHER="${STATE//tickets/}"; OTHER="${OTHER//shipping/}"; OTHER="${OTHER//qaSweeps/}"; OTHER="${OTHER//,/}"
   if [ "${#SNAPSHOT_FLAGS[@]}" -gt 0 ] && [ -z "$OTHER" ]; then
     log "$WEEK still degraded ($STATE) — it heals once the internal refresh succeeds; the next run retries"
     alert_once_today "$WEEK is still missing $STATE" "$(internal_failure)"

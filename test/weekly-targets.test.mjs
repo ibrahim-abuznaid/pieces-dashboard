@@ -91,6 +91,7 @@ const W40 = wk('2026-W40', {
   uiImprovements: ok([row('slack', 'live', 'Talaljaber'), row('gmail', 'merged', 'talaljaber')]),
   testing: ok([row('apify', 'covered'), row('slack', 'covered'), row('gmail', 'covered')]),
   tickets: { status: 'ok', total: 9, byPerson: { kishan: 6, sanket: 1, odai: 2, talal: 0 } },
+  qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
 });
 const WEEKS = [W39, W40];
 

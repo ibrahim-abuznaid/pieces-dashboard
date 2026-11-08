@@ -19,6 +19,7 @@ const snap = (week, over = {}) => ({
               byPerson: { kishan: 3, sanket: 4, odai: 0, talal: 0 },
               reviews: 21, reviewsByPerson: { kishan: 12, sanket: 9, odai: 0, talal: 0 },
               reviewsApprox: true, shipped: [{ number: 9, title: 'feat(slack): x', url: 'https://g/9' }] },
+  qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   decisions: ['6 outputSchema pieces merged but not cloud-live'],
   ...over,
 });
@@ -49,12 +50,13 @@ test('an empty archive is flagged rather than crashing', () =>
 test('picker lists weeks newest first', () =>
   assert.deepEqual(buildView(archive).weeks, ['2026-W31', '2026-W30']));
 
-// Eight, and the order is the argument. The week's own work leads -- PRs,
+// Nine, and the order is the argument. The week's own work leads -- PRs,
 // tickets, reviews, testing -- and the four rollouts follow it, because a page
-// that opens on numbers which move in months reports nothing most weeks.
-test('always eight tiles in fixed order, the week before the rollouts', () =>
+// that opens on numbers which move in months reports nothing most weeks. The
+// QA sweeps sit between: the week's work again, wide, under the small grid.
+test('always nine tiles in fixed order, the week before the rollouts', () =>
   assert.deepEqual(buildView(archive).tiles.map((t) => t.key),
-    ['prsMerged', 'tickets', 'reviews', 'testing', 'outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier']));
+    ['prsMerged', 'tickets', 'reviews', 'testing', 'outputSchema', 'aiActions', 'qaSweeps', 'uiImprovements', 'connectionIdentifier']));
 
 // Six small boxes fill three clean rows of the two-column grid before the wide
 // one spans the foot. Five would leave a half-empty row and a hole beside it.
@@ -65,12 +67,13 @@ test('the small tiles come in pairs so no row is left half-empty', () => {
 
 // The wide boxes span both grid columns, so they sit together at the foot:
 // anywhere among the small ones they would split a row pair and leave a hole.
-// UI improvements first, where the full-width band used to sit, then the newer
+// The QA sweeps first — the week's work, directly under the small grid — then
+// UI improvements, where the full-width band used to sit, then the newer
 // rollout under it.
-test('the two wide tiles come last, UI improvements then connection identifier', () => {
+test('the three wide tiles come last: QA sweeps, UI improvements, connection identifier', () => {
   const tiles = buildView(archive).tiles;
-  assert.deepEqual(tiles.filter((t) => t.wide).map((t) => t.key), ['uiImprovements', 'connectionIdentifier']);
-  assert.deepEqual(tiles.slice(-2).map((t) => t.key), ['uiImprovements', 'connectionIdentifier']);
+  assert.deepEqual(tiles.filter((t) => t.wide).map((t) => t.key), ['qaSweeps', 'uiImprovements', 'connectionIdentifier']);
+  assert.deepEqual(tiles.slice(-3).map((t) => t.key), ['qaSweeps', 'uiImprovements', 'connectionIdentifier']);
 });
 
 // The headline for outputSchema is MERGED work — live + merged-not-live — not
@@ -99,9 +102,9 @@ const threeWeeks = { weeks: [
   ...archive.weeks,
 ] };
 
-test('the four rollouts are running totals and the people counts are not', () =>
+test('the four rollouts and the QA sweeps are running totals; the people counts are not', () =>
   assert.deepEqual(buildView(archive).tiles.filter((t) => t.running).map((t) => t.key),
-    ['outputSchema', 'aiActions', 'uiImprovements', 'connectionIdentifier']));
+    ['outputSchema', 'aiActions', 'qaSweeps', 'uiImprovements', 'connectionIdentifier']));
 
 test('a running total carries the previous week\'s change as its prior', () => {
   const tile = tileOf(buildView(threeWeeks), 'outputSchema');
@@ -255,7 +258,7 @@ test('only the tiles that count people carry a per-person line', () =>
 test('every ok tile carries the full field set', () => {
   for (const t of buildView(archive).tiles.filter((x) => x.status === 'ok')) {
     assert.deepEqual(Object.keys(t).sort(),
-      ['actions', 'delta', 'inReview', 'key', 'note', 'perPerson', 'prior', 'reason', 'running', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
+      ['actions', 'delta', 'inReview', 'key', 'links', 'note', 'perPerson', 'prior', 'reason', 'running', 'status', 'strip', 'targets', 'title', 'unit', 'value', 'wide']);
   }
 });
 
@@ -394,7 +397,8 @@ test('a prior week that reported nothing still leaves nothing to compare', () =>
   const degraded = { status: 'no-data', reason: 'x' };
   const a = { weeks: [
     snap('2026-W30', { outputSchema: degraded, aiActions: degraded, uiImprovements: degraded,
-                       connectionIdentifier: degraded, testing: degraded, tickets: degraded, shipping: degraded }),
+                       connectionIdentifier: degraded, testing: degraded, tickets: degraded, shipping: degraded,
+                       qaSweeps: degraded }),
     snap('2026-W31'),
   ] };
   assert.equal(buildView(a).noPriorWeek, true);
@@ -1338,6 +1342,8 @@ const inReviewOf = (v) => Object.fromEntries(v.tiles.map((t) => [t.key, t.inRevi
 test('only the workstreams that measure a queue carry one', () =>
   assert.deepEqual(inReviewOf(buildView(archive)), {
     aiActions: 24, uiImprovements: 2, connectionIdentifier: 3, outputSchema: null, testing: null, tickets: null,
+    // A dates-only QA block carries no queue; a live one does (see the QA tests).
+    qaSweeps: null,
     // Neither counts anything that waits on a reviewer: a merged PR has landed,
     // and a review given is over.
     prsMerged: null, reviews: null }));
@@ -1595,4 +1601,106 @@ test('the AI-actions target rows carry each person\'s landed actions', () => {
   ], { actionsLanded: LANDED }) });
   const t = tileOf(buildView({ weeks: [W39, W40] }), 'aiActions');
   assert.deepEqual(t.targets.rows.map((r) => [r.person, r.actual, r.actions]), [['kishan', 0, 229], ['odai', 0, 112]]);
+});
+
+// ── the QA sweeps tile ──────────────────────────────────────────────────────
+// The bug tickets Linear's QA projects hold for this team (collect/qa-sweeps.mjs).
+const qaPerson = (over = {}) => ({ assigned: 0, fixed: 0, fixedThisWeek: 0, inReview: 0, inProgress: 0, ...over });
+const qaLive = (over = {}) => ({
+  status: 'ok', total: 149, fixed: 6, fixedThisWeek: 6, inReview: 1, inProgress: 0, open: 142, canceled: 0,
+  byPerson: { kishan: qaPerson({ assigned: 46, inReview: 1 }), sanket: qaPerson({ assigned: 48 }),
+    odai: qaPerson({ assigned: 49 }), talal: qaPerson() },
+  others: qaPerson(), unassigned: qaPerson({ assigned: 6, fixed: 6, fixedThisWeek: 6 }),
+  projects: [{ id: 'P-PIE-366', name: 'qa sweep 3', url: 'https://linear.app/activepieces/project/qa-sweep-3',
+    total: 149, fixed: 6, fixedThisWeek: 6, inReview: 1, inProgress: 0, open: 142 }],
+  fixedIds: ['PIE-892', 'PIE-896', 'PIE-908', 'PIE-922', 'PIE-1017', 'PIE-1034'],
+  ...over,
+});
+// The same week as the dates alone can restate it: no board state, no assignment.
+const qaDates = () => ({
+  status: 'ok', total: 149, fixed: 6, fixedThisWeek: 6,
+  byPerson: { kishan: { fixed: 0, fixedThisWeek: 0 }, sanket: { fixed: 0, fixedThisWeek: 0 },
+    odai: { fixed: 0, fixedThisWeek: 0 }, talal: { fixed: 0, fixedThisWeek: 0 } },
+  others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 6, fixedThisWeek: 6 },
+  projects: [{ id: 'P-PIE-366', name: 'qa sweep 3', url: 'https://linear.app/activepieces/project/qa-sweep-3', total: 149, fixed: 6, fixedThisWeek: 6 }],
+  fixedIds: ['PIE-892', 'PIE-896', 'PIE-908', 'PIE-922', 'PIE-1017', 'PIE-1034'],
+});
+const qaTile = (over) => tileOf(oneWeek({ qaSweeps: over }), 'qaSweeps');
+
+test('the QA tile leads with tickets fixed against the tickets in scope, as a running total, wide', () => {
+  const t = qaTile(qaLive());
+  assert.equal(t.title, 'QA sweeps');
+  assert.equal(t.value, 6);
+  assert.equal(t.unit, 'of 149 QA tickets fixed');
+  assert.equal(t.running, true);
+  assert.equal(t.wide, true);
+  assert.equal(t.inReview, 1);
+});
+
+test('the QA rows are fixed over ASSIGNED, for the people with tickets, with the week and the queue beside', () => {
+  const t = qaTile(qaLive({ byPerson: { ...qaLive().byPerson, sanket: qaPerson({ assigned: 48, fixed: 3, fixedThisWeek: 2 }) }, fixed: 9, fixedThisWeek: 8 }));
+  assert.deepEqual(t.targets.rows, [
+    { person: 'kishan', name: 'Kishan', actual: 0, target: 46, hit: false, unit: 'fixed', detail: '1 in review' },
+    { person: 'sanket', name: 'Sanket', actual: 3, target: 48, hit: false, unit: 'fixed', detail: '+2 this week' },
+    { person: 'odai', name: 'Odai', actual: 0, target: 49, hit: false, unit: 'fixed', detail: '' },
+  ]);
+  assert.equal(t.targets.also, '6 fixed with no assignee');
+  assert.equal(t.perPerson, '', 'the rows replace the per-person line');
+});
+
+test('a QA row is hit when everything assigned to the person is fixed', () => {
+  const t = qaTile(qaLive({ byPerson: { ...qaLive().byPerson, talal: qaPerson({ assigned: 2, fixed: 2, fixedThisWeek: 1 }) }, fixed: 8, fixedThisWeek: 7 }));
+  assert.deepEqual(t.targets.rows.at(-1), { person: 'talal', name: 'Talal', actual: 2, target: 2, hit: true, unit: 'fixed', detail: '+1 this week' });
+});
+
+test('a dates-only QA week draws no rows and no queue, and says who fixed what this week', () => {
+  const t = qaTile(qaDates());
+  assert.equal(t.targets, null);
+  assert.equal(t.inReview, null);
+  assert.equal(t.perPerson, 'Kishan 0 · Sanket 0 · Odai 0 · Talal 0 · 6 with no assignee');
+});
+
+test('the sweeps link to their projects in Linear, each with its own fixed/total', () => {
+  const t = qaTile(qaLive());
+  assert.deepEqual(t.links, [{ text: 'qa sweep 3 6/149', href: 'https://linear.app/activepieces/project/qa-sweep-3' }]);
+  const plain = qaTile(qaLive({ projects: [{ ...qaLive().projects[0], url: 'http://linear.app/x' }] }));
+  assert.deepEqual(plain.links, [{ text: 'qa sweep 3 6/149' }], 'a non-https url costs the link, not the line');
+  for (const other of oneWeek({ qaSweeps: qaLive() }).tiles.filter((x) => x.key !== 'qaSweeps')) assert.equal(other.links, null, other.key);
+});
+
+test('the QA chips are ids only — no title — linking to the ticket, capped like every strip', () => {
+  const s = stripOf(oneWeek({ qaSweeps: qaLive() }), 'qaSweeps');
+  assert.equal(s.kind, 'tickets');
+  assert.equal(s.label, 'Fixed this week');
+  assert.deepEqual(s.items[0], { id: 'PIE-892', name: '', href: 'https://linear.app/activepieces/issue/PIE-892' });
+  assert.equal(s.items.length, STRIP_CAP);
+  assert.deepEqual(s.rest.map((i) => i.id), ['PIE-1034']);
+  assert.equal(s.more, 1);
+});
+
+test('a QA week that fixed nothing says so; a week before any sweep has no strip and says that', () => {
+  const quiet = qaTile(qaLive({ fixed: 0, fixedThisWeek: 0, open: 148, fixedIds: [],
+    unassigned: qaPerson({ assigned: 6 }), projects: [{ ...qaLive().projects[0], fixed: 0, fixedThisWeek: 0, open: 148 }] }));
+  assert.deepEqual(quiet.strip, { kind: 'tickets', label: 'Nothing fixed this week', items: [], rest: [], more: 0 });
+  const none = qaTile({ ...qaDates(), total: 0, fixed: 0, fixedThisWeek: 0, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] });
+  assert.equal(none.strip, null);
+  assert.equal(none.unit, 'QA tickets — no sweep filed yet');
+  assert.equal(none.value, 0);
+});
+
+test('the QA delta is the fixes since the week before', () => {
+  const v = buildView({ weeks: [
+    snap('2026-W30', { qaSweeps: { ...qaDates(), fixed: 2, fixedThisWeek: 2, unassigned: { fixed: 2, fixedThisWeek: 2 },
+      projects: [{ ...qaDates().projects[0], fixed: 2, fixedThisWeek: 2 }], fixedIds: ['PIE-892', 'PIE-896'] } }),
+    snap('2026-W31', { qaSweeps: qaLive() }),
+  ] });
+  assert.equal(tileOf(v, 'qaSweeps').delta, 4);
+});
+
+test('a degraded QA week is a no-data tile with no rows, links or strip', () => {
+  const t = qaTile({ status: 'no-data', reason: 'QA refresh pending' });
+  assert.equal(t.status, 'no-data');
+  assert.equal(t.targets, null);
+  assert.equal(t.links, null);
+  assert.equal(t.strip, null);
 });

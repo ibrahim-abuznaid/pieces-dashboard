@@ -15,6 +15,7 @@ const ok = (over = {}) => ({
   testing: { status: 'ok', prsMerged: 1, commits: 4, shipped: [] },
   tickets: { status: 'ok', total: 11, byPerson: { kishan: 5, sanket: 6 },
              prsMerged: { kishan: 3, sanket: 4 }, reviews: { kishan: 12, sanket: 9 }, shipped: [] },
+  qaSweeps: { status: 'ok', total: 0, fixed: 0, fixedThisWeek: 0, byPerson: {}, others: { fixed: 0, fixedThisWeek: 0 }, unassigned: { fixed: 0, fixedThisWeek: 0 }, projects: [], fixedIds: [] },
   decisions: [],
   ...over,
 });
