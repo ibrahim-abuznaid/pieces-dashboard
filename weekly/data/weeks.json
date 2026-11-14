@@ -54464,12 +54464,12 @@
       "builtAt": "2026-11-14",
       "outputSchema": {
         "status": "ok",
-        "live": 270,
+        "live": 272,
         "mergedNotLive": 7,
         "review": 5,
         "prOpen": 8,
         "todo": 494,
-        "totalPieces": 776,
+        "totalPieces": 778,
         "roster": [
           {
             "folder": "0codekit",
@@ -55264,6 +55264,15 @@
             "logo": "https://cdn.activepieces.com/pieces/canva.png"
           },
           {
+            "folder": "jira-service-management",
+            "name": "Jira Service Management",
+            "actions": 13,
+            "triggers": 1,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/jira.png"
+          },
+          {
             "folder": "linear",
             "name": "Linear",
             "actions": 13,
@@ -55694,6 +55703,15 @@
             "stage": "live",
             "tier": "P4",
             "logo": "https://cdn.activepieces.com/pieces/clockify.png"
+          },
+          {
+            "folder": "datalab",
+            "name": "Datalab",
+            "actions": 8,
+            "triggers": 0,
+            "stage": "live",
+            "tier": "P4",
+            "logo": "https://cdn.activepieces.com/pieces/datalab.png"
           },
           {
             "folder": "emailoctopus",
@@ -57013,13 +57031,13 @@
       },
       "aiActions": {
         "status": "ok",
-        "merged": 224,
+        "merged": 226,
         "prOpen": 4,
         "approved": 9,
         "assigned": 0,
         "held": 2,
-        "totalPieces": 239,
-        "catalogPieces": 776,
+        "totalPieces": 241,
+        "catalogPieces": 778,
         "blockersOpen": 58,
         "roster": [
           {
@@ -58172,6 +58190,14 @@
             "logo": "https://cdn.activepieces.com/pieces/apitable.png"
           },
           {
+            "name": "datalab",
+            "actions": 8,
+            "stage": "merged",
+            "displayName": "Datalab",
+            "author": "ibrahim-abuznaid",
+            "logo": "https://cdn.activepieces.com/pieces/datalab.png"
+          },
+          {
             "name": "facebook-leads",
             "actions": 8,
             "stage": "merged",
@@ -58775,6 +58801,14 @@
             "logo": "https://cdn.activepieces.com/pieces/klaviyo.png"
           },
           {
+            "name": "microsoft-dynamics-crm",
+            "actions": 0,
+            "stage": "merged",
+            "displayName": "Microsoft Dynamics CRM",
+            "author": "OdaiAhmed99",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png"
+          },
+          {
             "name": "quickbooks",
             "actions": 0,
             "stage": "approved",
@@ -59024,11 +59058,11 @@
       },
       "uiImprovements": {
         "status": "ok",
-        "merged": 83,
-        "live": 83,
-        "review": 50,
+        "merged": 86,
+        "live": 85,
+        "review": 49,
         "assigned": 0,
-        "totalPieces": 776,
+        "totalPieces": 778,
         "roster": [
           {
             "folder": "hubspot",
@@ -59408,6 +59442,15 @@
             "logo": "https://cdn.activepieces.com/pieces/coupa.png"
           },
           {
+            "folder": "jira-service-management",
+            "name": "jira-service-management",
+            "displayName": "Jira Service Management",
+            "actions": 14,
+            "stage": "live",
+            "logo": "https://cdn.activepieces.com/pieces/jira.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
             "folder": "webflow",
             "name": "webflow",
             "displayName": "Webflow",
@@ -59632,6 +59675,15 @@
             "logo": "https://cdn.activepieces.com/pieces/calendly.png"
           },
           {
+            "folder": "datalab",
+            "name": "datalab",
+            "displayName": "Datalab",
+            "actions": 8,
+            "stage": "live",
+            "logo": "https://cdn.activepieces.com/pieces/datalab.png",
+            "author": "ibrahim-abuznaid"
+          },
+          {
             "folder": "google-my-business",
             "name": "google-my-business",
             "displayName": "Google My Business",
@@ -59847,6 +59899,15 @@
             "stage": "review",
             "logo": "https://cdn.activepieces.com/pieces/imap.png",
             "author": "Talaljaber"
+          },
+          {
+            "folder": "microsoft-dynamics-crm",
+            "name": "microsoft-dynamics-crm",
+            "displayName": "Microsoft Dynamics CRM",
+            "actions": 5,
+            "stage": "merged",
+            "logo": "https://cdn.activepieces.com/pieces/microsoft-dynamics-crm.png",
+            "author": "OdaiAhmed99"
           },
           {
             "folder": "nocodb",
@@ -60158,25 +60219,16 @@
             "actions": 1,
             "stage": "live",
             "logo": "https://cdn.activepieces.com/pieces/new-core/smtp.svg"
-          },
-          {
-            "folder": "jira-service-management",
-            "name": "jira-service-management",
-            "displayName": "jira-service-management",
-            "actions": 0,
-            "stage": "review",
-            "logo": null,
-            "author": "ibrahim-abuznaid"
           }
         ]
       },
       "connectionIdentifier": {
         "status": "ok",
-        "merged": 74,
-        "live": 74,
-        "review": 6,
+        "merged": 75,
+        "live": 75,
+        "review": 5,
         "assigned": 0,
-        "totalPieces": 120,
+        "totalPieces": 121,
         "roster": [
           {
             "folder": "simplyprint",
@@ -60491,6 +60543,15 @@
             "stage": "live",
             "logo": "https://cdn.activepieces.com/pieces/google-cloud-storage.png",
             "author": "AhmadTash"
+          },
+          {
+            "folder": "jira-service-management",
+            "name": "jira-service-management",
+            "displayName": "Jira Service Management",
+            "actions": 14,
+            "stage": "live",
+            "logo": "https://cdn.activepieces.com/pieces/jira.png",
+            "author": "ibrahim-abuznaid"
           },
           {
             "folder": "canva",
@@ -60856,15 +60917,6 @@
             "author": "mllopart"
           },
           {
-            "folder": "jira-service-management",
-            "name": "jira-service-management",
-            "displayName": "jira-service-management",
-            "actions": 0,
-            "stage": "review",
-            "logo": null,
-            "author": "ibrahim-abuznaid"
-          },
-          {
             "folder": "sap-successfactors-saml2-oauth",
             "name": "sap-successfactors-saml2-oauth",
             "displayName": "sap-successfactors-saml2-oauth",
@@ -60897,7 +60949,7 @@
         "status": "ok",
         "prsMerged": 1,
         "commits": 2,
-        "catalogPieces": 776,
+        "catalogPieces": 778,
         "roster": [
           {
             "name": "hubspot",
@@ -63600,7 +63652,7 @@
       "tickets": {
         "status": "ok",
         "total": 117,
-        "inReview": 56,
+        "inReview": 57,
         "byPerson": {
           "kishan": 0,
           "sanket": 0,
@@ -63616,7 +63668,7 @@
         "reviews": {
           "kishan": 2,
           "sanket": 2,
-          "odai": 5,
+          "odai": 7,
           "talal": 0
         },
         "shipped": [
@@ -63776,11 +63828,11 @@
           "odai": 32,
           "talal": 0
         },
-        "reviews": 9,
+        "reviews": 11,
         "reviewsByPerson": {
           "kishan": 2,
           "sanket": 2,
-          "odai": 5,
+          "odai": 7,
           "talal": 0
         },
         "reviewsApprox": true,
@@ -63928,8 +63980,142 @@
         ]
       },
       "qaSweeps": {
-        "status": "no-data",
-        "reason": "QA refresh pending — internal dashboard wrote NEEDS-QA-REFRESH"
+        "status": "ok",
+        "total": 210,
+        "fixed": 75,
+        "fixedThisWeek": 69,
+        "inReview": 15,
+        "inProgress": 1,
+        "open": 119,
+        "canceled": 0,
+        "byPerson": {
+          "kishan": {
+            "assigned": 64,
+            "fixed": 0,
+            "fixedThisWeek": 0,
+            "inReview": 0,
+            "inProgress": 1
+          },
+          "sanket": {
+            "assigned": 56,
+            "fixed": 0,
+            "fixedThisWeek": 0,
+            "inReview": 0,
+            "inProgress": 0
+          },
+          "odai": {
+            "assigned": 84,
+            "fixed": 69,
+            "fixedThisWeek": 69,
+            "inReview": 15,
+            "inProgress": 0
+          },
+          "talal": {
+            "assigned": 0,
+            "fixed": 0,
+            "fixedThisWeek": 0,
+            "inReview": 0,
+            "inProgress": 0
+          }
+        },
+        "others": {
+          "assigned": 0,
+          "fixed": 0,
+          "fixedThisWeek": 0,
+          "inReview": 0,
+          "inProgress": 0
+        },
+        "unassigned": {
+          "assigned": 6,
+          "fixed": 6,
+          "fixedThisWeek": 0,
+          "inReview": 0,
+          "inProgress": 0
+        },
+        "projects": [
+          {
+            "id": "P-PIE-366",
+            "name": "qa sweep 3",
+            "total": 210,
+            "fixed": 75,
+            "fixedThisWeek": 69,
+            "url": "https://linear.app/activepieces/project/qa-sweep-3-0f3675b93747",
+            "inReview": 15,
+            "inProgress": 1,
+            "open": 119
+          }
+        ],
+        "fixedIds": [
+          "PIE-902",
+          "PIE-912",
+          "PIE-916",
+          "PIE-921",
+          "PIE-929",
+          "PIE-930",
+          "PIE-931",
+          "PIE-932",
+          "PIE-933",
+          "PIE-934",
+          "PIE-935",
+          "PIE-936",
+          "PIE-938",
+          "PIE-942",
+          "PIE-945",
+          "PIE-946",
+          "PIE-947",
+          "PIE-948",
+          "PIE-949",
+          "PIE-950",
+          "PIE-951",
+          "PIE-952",
+          "PIE-953",
+          "PIE-955",
+          "PIE-956",
+          "PIE-957",
+          "PIE-958",
+          "PIE-959",
+          "PIE-960",
+          "PIE-961",
+          "PIE-962",
+          "PIE-963",
+          "PIE-965",
+          "PIE-966",
+          "PIE-967",
+          "PIE-969",
+          "PIE-970",
+          "PIE-971",
+          "PIE-973",
+          "PIE-975",
+          "PIE-986",
+          "PIE-989",
+          "PIE-995",
+          "PIE-997",
+          "PIE-1001",
+          "PIE-1004",
+          "PIE-1010",
+          "PIE-1015",
+          "PIE-1018",
+          "PIE-1020",
+          "PIE-1021",
+          "PIE-1022",
+          "PIE-1023",
+          "PIE-1024",
+          "PIE-1025",
+          "PIE-1027",
+          "PIE-1028",
+          "PIE-1029",
+          "PIE-1030",
+          "PIE-1038",
+          "PIE-1039",
+          "PIE-1040",
+          "PIE-1113",
+          "PIE-1128",
+          "PIE-1137",
+          "PIE-1140",
+          "PIE-1142",
+          "PIE-1145",
+          "PIE-1151"
+        ]
       },
       "targets": {
         "aiActions": {
@@ -63948,7 +64134,8 @@
         }
       },
       "decisions": [
-        "7 pieces merged but not live — needs a cloud release"
+        "7 pieces merged but not live — needs a cloud release",
+        "1 piece with the new property UI merged but not live — needs a cloud release"
       ]
     }
   ]
